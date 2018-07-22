@@ -8,6 +8,7 @@ import argh
 import toukka.commands.spotify.me
 import toukka.commands.spotify.pandas
 import toukka.commands.spotify.playlist
+import toukka.commands.spotify.fun
 
 __prog_name__ = 'spotify-toukka'
 __version__ = '0.0.0'
@@ -38,6 +39,10 @@ def main():
     parser.add_commands(toukka.commands.spotify.pandas.COMMANDS,
                         namespace='pandas',
                         title='Pandas related commands')
+
+    parser.add_commands(toukka.commands.spotify.fun.COMMANDS,
+                        namespace='fun',
+                        title='just for fun')
 
     args = parser.parse_args()
 
