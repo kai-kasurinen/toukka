@@ -4,8 +4,8 @@
 
 import pandas
 
-from ..toukka import Toukka
-from ..utils import json_dump, json_dump_print
+from toukka.toukka import Toukka
+from toukka.utils import json_dump, json_dump_print
 
 def playlist(uri):
     """experimental pandas"""

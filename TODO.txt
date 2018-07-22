@@ -77,8 +77,12 @@ null
 
 
 
+
 PYTHON:
 
 https://pyformat.info/
 
 argh + argcomplete
+
+python rest:
+http://beanbag.readthedocs.io/en/latest/examples.html

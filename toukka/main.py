@@ -5,9 +5,9 @@
 import logging
 import argh
 
-import toukka.commands.me
-import toukka.commands.pandas
-import toukka.commands.playlist
+import toukka.commands.spotify.me
+import toukka.commands.spotify.pandas
+import toukka.commands.spotify.playlist
 
 __prog_name__ = 'spotify-toukka'
 __version__ = '0.0.0'
@@ -27,15 +27,15 @@ def main():
                         const=logging.DEBUG,
                         default=logging.INFO)
 
-    parser.add_commands(toukka.commands.me.COMMANDS,
+    parser.add_commands(toukka.commands.spotify.me.COMMANDS,
                         namespace='me',
                         title='Current user related commands')
 
-    parser.add_commands(toukka.commands.playlist.COMMANDS,
+    parser.add_commands(toukka.commands.spotify.playlist.COMMANDS,
                         namespace='playlist',
                         title='Playlist related commands')
 
-    parser.add_commands(toukka.commands.pandas.COMMANDS,
+    parser.add_commands(toukka.commands.spotify.pandas.COMMANDS,
                         namespace='pandas',
                         title='Pandas related commands')
 

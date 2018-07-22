@@ -10,7 +10,7 @@ import statistics
 
 import simplejson as json
 
-from ..toukka import Toukka
+from toukka.toukka import Toukka
 
 
 @argh.named('info')

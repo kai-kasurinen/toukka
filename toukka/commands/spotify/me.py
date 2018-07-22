@@ -11,9 +11,9 @@ import tabulate
 import argh
 import simplejson as json
 
-from ..toukka import Toukka
-from ..models.track_features import TrackFeaturesDelivered
-from ..utils import json_dump, json_dump_print, format_as_table
+from toukka.toukka import Toukka
+from toukka.models.track_features import TrackFeaturesDelivered
+from toukka.utils import json_dump, json_dump_print, format_as_table
 
 
 @argh.named('info')

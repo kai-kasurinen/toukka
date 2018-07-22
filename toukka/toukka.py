@@ -1,6 +1,6 @@
 #
 
-from .spotify import SpotifyScoped
+from toukka.spotify import SpotifyScoped
 
 class Toukka(SpotifyScoped):
     def __init__(self):
