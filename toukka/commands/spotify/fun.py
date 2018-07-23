@@ -1,16 +1,12 @@
 #
+#
 
+import logging
 import random
 import simplejson as json
 import argh
 
 from toukka.toukka import Toukka
-
-
-'''
-    generates a list of songs where the first word in each subsequent song
-    matches the last word of the previous song.
-'''
 
 
 def find_songs_that_start_with_word(word):
@@ -20,13 +16,13 @@ def find_songs_that_start_with_word(word):
     max_offset = 500
     seen = set()
 
-    max_titles = 20
+    max_titles = 100
     max_offset = 200
     offset = 0
 
     out = []
     while offset < max_offset and len(out) < max_titles:
-        results = toukka.sp.search(q=word, type = 'track', limit=50, offset = offset)
+        results = toukka.sp.search(q=word, type='track', limit=50, offset=offset)
         if len(results['tracks']['items']) == 0:
             break
 
@@ -43,13 +39,19 @@ def find_songs_that_start_with_word(word):
                 continue
             words = name.split()
             if len(words) > 1 and words[0] == word and words[-1] not in skiplist:
-                #print "        ", name, len(out)
-                out.append(item)
+                logging.debug("\t %s %s", name, len(out))
+                out.append(item)    
         offset += 50
-    #print "found", len(out), "matches"
+    logging.debug("found %s matches", len(out))
     return out
 
+
 def make_chain(word):
+    '''
+    generates a list of songs where the first word in each subsequent song
+    matches the last word of the previous song.
+    '''
+
     which = 1
     while True:
         songs = find_songs_that_start_with_word(word)
@@ -60,5 +62,6 @@ def make_chain(word):
             word = song['name'].lower().split()[-1]
         else:
             break
-#
+
+
 COMMANDS = [make_chain]

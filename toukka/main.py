@@ -6,6 +6,7 @@ import logging
 import argh
 
 import toukka.commands.spotify.me
+import toukka.commands.spotify.player
 import toukka.commands.spotify.pandas
 import toukka.commands.spotify.playlist
 import toukka.commands.spotify.fun
@@ -31,6 +32,10 @@ def main():
     parser.add_commands(toukka.commands.spotify.me.COMMANDS,
                         namespace='me',
                         title='Current user related commands')
+
+    parser.add_commands(toukka.commands.spotify.player.COMMANDS,
+                        namespace='player',
+                        title='player control')
 
     parser.add_commands(toukka.commands.spotify.playlist.COMMANDS,
                         namespace='playlist',
