@@ -1,9 +1,9 @@
 #
 
 import spotipy
+from json import JSONDecodeError
 
-
-class subSpotify(spotipy.Spotify):
+class subSpotify():
 
     ''' This is a subclass of spotipy.Spotify for the purpose of defining new methods.
     '''

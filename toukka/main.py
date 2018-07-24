@@ -5,11 +5,11 @@
 import logging
 import argh
 
-import toukka.commands.spotify.me
-import toukka.commands.spotify.player
-import toukka.commands.spotify.pandas
-import toukka.commands.spotify.playlist
-import toukka.commands.spotify.fun
+import toukka.commands.spotify
+import toukka.commands.musicbrainz
+import toukka.commands.discogs
+import toukka.commands.pandas
+import toukka.commands.toukka
 
 __prog_name__ = 'spotify-toukka'
 __version__ = '0.0.0'
@@ -29,25 +29,21 @@ def main():
                         const=logging.DEBUG,
                         default=logging.INFO)
 
-    parser.add_commands(toukka.commands.spotify.me.COMMANDS,
-                        namespace='me',
-                        title='Current user related commands')
+    parser.add_commands(toukka.commands.spotify.COMMANDS,
+                        namespace=toukka.commands.spotify.NAMESPACE,
+                        namespace_kwargs=toukka.commands.spotify.NAMESPACE_KWARGS)
 
-    parser.add_commands(toukka.commands.spotify.player.COMMANDS,
-                        namespace='player',
-                        title='player control')
+    parser.add_commands(toukka.commands.musicbrainz.COMMANDS,
+                        namespace=toukka.commands.musicbrainz.NAMESPACE,
+                        namespace_kwargs=toukka.commands.musicbrainz.NAMESPACE_KWARGS)
 
-    parser.add_commands(toukka.commands.spotify.playlist.COMMANDS,
-                        namespace='playlist',
-                        title='Playlist related commands')
+    parser.add_commands(toukka.commands.discogs.COMMANDS,
+                        namespace=toukka.commands.discogs.NAMESPACE,
+                        namespace_kwargs=toukka.commands.discogs.NAMESPACE_KWARGS)
 
-    parser.add_commands(toukka.commands.spotify.pandas.COMMANDS,
-                        namespace='pandas',
-                        title='Pandas related commands')
-
-    parser.add_commands(toukka.commands.spotify.fun.COMMANDS,
-                        namespace='fun',
-                        title='just for fun')
+    parser.add_commands(toukka.commands.toukka.COMMANDS,
+                        namespace=toukka.commands.toukka.NAMESPACE,
+                        namespace_kwargs=toukka.commands.toukka.NAMESPACE_KWARGS)
 
     args = parser.parse_args()
 

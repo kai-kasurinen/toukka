@@ -12,6 +12,22 @@ import simplejson as json
 
 from toukka.toukka import Toukka
 
+def user_playlists(user):
+    '''Gets playlists of a user'''
+    toukka = Toukka()
+
+    playlists = toukka.sp.user_playlists(user)
+
+    print("total: {}".format(
+        playlists['total']))
+
+    print()
+    for playlist in playlists['items']:
+        print("name: {}, number of songs: {}, playlist ID: {} ".format(
+            playlist['name'],
+            playlist['tracks']['total'],
+            playlist['id']))
+
 
 @argh.named('info')
 def playlist_info(uri):
@@ -80,4 +96,7 @@ def playlist_info(uri):
 
 
 #
-COMMANDS = [playlist_info]
+COMMANDS = [playlist_info,
+            user_playlists]
+
+# END

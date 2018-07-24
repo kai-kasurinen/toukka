@@ -7,6 +7,7 @@ import pandas
 from toukka.toukka import Toukka
 from toukka.utils import json_dump, json_dump_print
 
+
 def playlist(uri):
     """experimental pandas"""
 
@@ -28,7 +29,7 @@ def playlist(uri):
     data = pandas.DataFrame(tracks)
     print(data)
 
-#
+
 COMMANDS = [playlist]
 
 # END

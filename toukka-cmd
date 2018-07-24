@@ -2,7 +2,7 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import sys
-sys.dont_write_bytecode = True
+#sys.dont_write_bytecode = True
 
 from toukka.main import main
 
