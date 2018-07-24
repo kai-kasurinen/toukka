@@ -1,67 +1,12 @@
-import spotipy
-import spotipy.util as util
-from spotipy.oauth2 import SpotifyClientCredentials
+#
 
-import configparser
-import os
-from json import JSONDecodeError
+import spotipy
 
 
 class subSpotify(spotipy.Spotify):
 
     ''' This is a subclass of spotipy.Spotify for the purpose of defining new methods.
     '''
-
-    def __init__(self, token=None, scope=None):
-        if not token:
-            token = subSpotify.generate_token(scope)
-        assert token, "Failed to get token on subSpotify initialization."
-        super().__init__(token)
-        self._scope = scope
-
-    @staticmethod
-    def generate_token(scope):
-        ''' Requires a spotify_config.cfg file with the relevant information in it
-        '''
-        with open('config.cfg') as fp:
-            config = configparser.ConfigParser()
-            config.readfp(fp)
-            client_id = config.get('SPOTIFY', 'client_id')
-            client_secret = config.get('SPOTIFY', 'client_secret')
-            username = config.get('SPOTIFY', 'username')
-
-        try:
-            token = util.prompt_for_user_token(
-                username=username,
-                scope=scope,
-                client_id=client_id,
-                client_secret=client_secret,
-                redirect_uri="http://localhost:8888/callback/",
-            )
-            ''' util.prompt_for_user_token() checks the cache for a valid token first,
-                so if that goes wrong, this deletes the one in cache then tries again.
-            '''
-        except (AttributeError, JSONDecodeError):
-            print("Had to delete token in cache.")
-            os.remove(f".cache-{username}")
-            token = util.prompt_for_user_token(
-                username=username,
-                scope=scope,
-                client_id=client_id,
-                client_secret=client_secret,
-                redirect_uri="http://localhost:8888/callback/",
-            )
-            
-        return token
-
-    def refresh(self):
-        ''' Supposed to get a freshly authorized client, but doesn't seem to be working at the moment.
-        '''
-        if self._scope:
-            return subSpotify(self._scope)
-        else:
-            raise TypeError("Cannot refresh client without a scope available."
-                + "\nTry constructing the original client by passing the scope instead of a whole token.")
 
     def get_users_by_id(self, user_ids):
         ''' Handles looking up an iterable of user IDs one at a time, then returning an aggregated list of users.
@@ -224,16 +169,6 @@ class subSpotify(spotipy.Spotify):
 
         return list(lonely_songs.values())
 
-def gen_creds():
-    #currently unsure whether this works
-    with open('config.cfg') as fp:
-        config = configparser.ConfigParser()
-        config.readfp(fp)
-        client_id = config.get('SPOTIFY', 'client_id')
-        client_secret = config.get('SPOTIFY', 'client_secret')
-        username = config.get('SPOTIFY', 'username')
-
-    return SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 
 def splitlist(input_list, size):
     ''' splits a list into a list of regularly-sized sublists
