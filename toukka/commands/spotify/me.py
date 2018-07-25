@@ -24,7 +24,7 @@ def current_user():
 @argh.named('saved-albums')
 def current_user_saved_albums():
     toukka = Toukka()
-    return toukka.sp.current_user_saved_albums()
+    return json_dump(toukka.sp.current_user_saved_albums())
 
 
 @argh.named('saved-tracks')
