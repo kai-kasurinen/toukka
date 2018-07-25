@@ -9,6 +9,7 @@ from . import player
 from . import playlist
 from . import search
 from . import track
+from . import user
 
 COMMANDS = [
     *album.COMMANDS,
@@ -18,7 +19,8 @@ COMMANDS = [
     *player.COMMANDS,
     *playlist.COMMANDS,
     *search.COMMANDS,
-    *track.COMMANDS]
+    *track.COMMANDS,
+    *user.COMMANDS]
 
 NAMESPACE = 'spotify'
 

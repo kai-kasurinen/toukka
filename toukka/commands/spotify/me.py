@@ -16,7 +16,6 @@ from toukka.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
 
 
-@argh.named('info')
 def current_user():
     toukka = Toukka()
     return json_dump(toukka.sp.me())

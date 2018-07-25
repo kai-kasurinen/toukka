@@ -86,3 +86,9 @@ argh + argcomplete
 
 python rest:
 http://beanbag.readthedocs.io/en/latest/examples.html
+
+
+python filter:
+    
+        playlists = [p for p in playlists if p.get('owner').get('id') == user]
+        playlists = list(filter(lambda p: p.get('owner').get('id') == user, playlists))
