@@ -14,6 +14,7 @@ import simplejson as json
 from toukka.toukka import Toukka
 from toukka.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
+from ..utils import _get_flags, _list_to_string
 
 
 def current_user():
@@ -39,82 +40,49 @@ def current_user_followed_artists():
     return json_dump(toukka.sp.current_user_followed_artists())
 
 
-@argh.named('top-tracks')
-def current_user_top_tracks():
+_RANGES_DESCRIPTION = {
+    'long_term':   'calculated from several years',
+    'medium_term': 'approximately last 6 months',
+    'short_term': 'approximately last 4 weeks'
+}
+
+
+# @argh.named('top-tracks')
+def current_user_top_tracks(time_range: 'short, medium or long'):
     toukka = Toukka()
-    # long_term: calculated from several years
-    # medium_term: aapproximately last 6 months
-    # short_term: approximately last 4 weeks
-    ranges = ['short_term', 'medium_term', 'long_term']
 
-    for r in ranges:
-        print("range:", r)
-        results = toukka.sp.current_user_top_tracks(time_range=r, limit=50)
-        for i, item in enumerate(results['items']):
-            print(i+1, item['name'], '//',
-                  _get_nice_string_from_artists(item['artists']))
-        print()
+    if time_range not in ('short', 'medium', 'long'):
+        raise Exception()
+
+    time_range = '{}_term'.format(time_range)
+
+    print('{}: {}'.format(time_range, _RANGES_DESCRIPTION.get(time_range)))
+    print()
+
+    results = toukka.sp.current_user_top_tracks(time_range=time_range, limit=50)
+
+    for i, item in enumerate(results['items']):
+        artists_string = _get_string_from_artists(item['artists'])
+        print('{pos:2} {name:40} {artists_string}'.
+              format(**item, pos=i, artists_string=artists_string))
 
 
-@argh.named('top-tracks-new')
-def current_user_top_tracks_new():
+# @argh.named('top-artists')
+def current_user_top_artists(time_range: 'short, medium or long'):
     toukka = Toukka()
-    # long_term: calculated from several years
-    # medium_term: aapproximately last 6 months
-    # short_term: approximately last 4 weeks
-    ranges = ['short_term', 'medium_term', 'long_term']
 
-    for r in ranges:
-        print("range", r)
-        results = toukka.sp.current_user_top_tracks(time_range=r, limit=50)
-        tracks = _get_tracks_dict(results['items'])
-        # table = tabulate.tabulate(tracks, headers='keys', showindex='always')
-        table = format_as_table(tracks, ['pos', 'name', 'artists', 'popularity'])
-        print(table)
+    if time_range not in ('short', 'medium', 'long'):
+        raise Exception()
 
+    time_range = '{}_term'.format(time_range)
 
-def _get_tracks_dict(items):
+    print('{}: {}'.format(time_range, _RANGES_DESCRIPTION.get(time_range)))
+    print()
 
-    tracks = []
-    for i, track in enumerate(items):
-        tracks.append({
-            'pos': i+1,
-            # 'artists': list(artist.get('name') for artist in track['artists']),
-            'artists': ", ".join(artist.get('name') for artist in track['artists']),
-            'name': track['name'],
-            'uri': track['uri'],
-            'popularity': track['popularity']
-        })
-    return tracks
+    results = toukka.sp.current_user_top_artists(time_range=time_range, limit=50)
 
-
-@argh.named('top-artists')
-def current_user_top_artists():
-    toukka = Toukka()
-    # long_term: calculated from several years
-    # medium_term: aapproximately last 6 months
-    # short_term: approximately last 4 weeks
-    ranges = ['short_term', 'medium_term', 'long_term']
-    for r in ranges:
-        print("range:", r)
-        results = toukka.sp.current_user_top_artists(time_range=r, limit=50)
-        for i, item in enumerate(results['items']):
-            print(i+1, item['name'])
-        print()
-
-
-@argh.named('top-artists-new')
-def current_user_top_artists_new():
-    toukka = Toukka()
-    # long_term: calculated from several years
-    # medium_term: aapproximately last 6 months
-    # short_term: approximately last 4 weeks
-    ranges = ['short_term', 'medium_term', 'long_term']
-    for r in ranges:
-        print("range:", r)
-        results = toukka.sp.current_user_top_artists(time_range=r, limit=50)
-        print(format_as_table(results['items'], ['name', 'popularity', 'genres']))
-        print()
+    for i, item in enumerate(results['items']):
+        print('{pos:2} {name:50} {_genres}'.format(**item, pos=i, _genres=_list_to_string(item.get('genres'))))
 
 
 @argh.named('playlists')
@@ -157,8 +125,12 @@ def current_user_recently_played():
     print('total agggregated items: %s' % len(items))
 
 
-def _get_nice_string_from_artists(artists):
+def _get_string_from_artists_with_ids(artists):
     return ", ".join("%s (%s)" % (artist.get('name'), artist.get('id')) for artist in artists)
+
+
+def _get_string_from_artists(artists):
+    return ', '.join('%s' % (artist.get('name')) for artist in artists)
 
 
 #
@@ -168,9 +140,7 @@ COMMANDS = [current_user,
             current_user_saved_tracks,
             current_user_followed_artists,
             current_user_top_tracks,
-            current_user_top_tracks_new,
             current_user_top_artists,
-            current_user_top_artists_new,
             current_user_playlists,
             current_user_recently_played
             ]

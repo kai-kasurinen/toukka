@@ -322,6 +322,54 @@ def playlist_info(uri):
     # well known artists, least known artists,
     # similar artists to explore
 
+#
+
+@argh.named('top-tracks-new')
+def current_user_top_tracks_new():
+    toukka = Toukka()
+    # long_term: calculated from several years
+    # medium_term: aapproximately last 6 months
+    # short_term: approximately last 4 weeks
+    ranges = ['short_term', 'medium_term', 'long_term']
+
+    for r in ranges:
+        print("range", r)
+        results = toukka.sp.current_user_top_tracks(time_range=r, limit=50)
+        tracks = _get_tracks_dict(results['items'])
+        # table = tabulate.tabulate(tracks, headers='keys', showindex='always')
+        table = format_as_table(tracks, ['pos', 'name', 'artists', 'popularity'])
+        print(table)
+
+
+def _get_tracks_dict(items):
+
+    tracks = []
+    for i, track in enumerate(items):
+        tracks.append({
+            'pos': i+1,
+            # 'artists': list(artist.get('name') for artist in track['artists']),
+            'artists': ", ".join(artist.get('name') for artist in track['artists']),
+            'name': track['name'],
+            'uri': track['uri'],
+            'popularity': track['popularity']
+        })
+    return tracks
+
+
+
+
+@argh.named('top-artists-new')
+def current_user_top_artists_new():
+    toukka = Toukka()
+    # long_term: calculated from several years
+    # medium_term: aapproximately last 6 months
+    # short_term: approximately last 4 weeks
+    ranges = ['short_term', 'medium_term', 'long_term']
+    for r in ranges:
+        print("range:", r)
+        results = toukka.sp.current_user_top_artists(time_range=r, limit=50)
+        print(format_as_table(results['items'], ['name', 'popularity', 'genres']))
+        print()
 
 
 #

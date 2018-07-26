@@ -92,3 +92,7 @@ python filter:
     
         playlists = [p for p in playlists if p.get('owner').get('id') == user]
         playlists = list(filter(lambda p: p.get('owner').get('id') == user, playlists))
+
+    public = list(filter(lambda p: p.get('public') is True, playlists))
+    collaborative = list(filter(lambda p: p.get('collaborative') is True, playlists))
+    own = list(filter(lambda p: p.get('owner').get('id') == user, playlists))

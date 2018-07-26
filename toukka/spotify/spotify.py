@@ -8,6 +8,10 @@ class Spotify(spotipy.Spotify, subSpotify):
     def crowd_site_entity(self, entity):
         return self._get('https://api.spotify.com/crowd-site-api/v0/entity/' + entity)
 
+    def crowd_site_recent_entities(self):
+        # ? limit, offset
+        return self._get('https://api.spotify.com/crowd-site-api/v0/recent-entities')
+
     def audio_features_one(self, track):
         return self.audio_features(track)[0]
 

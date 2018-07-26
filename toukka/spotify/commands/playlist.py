@@ -11,6 +11,7 @@ import statistics
 import simplejson as json
 
 from toukka.toukka import Toukka
+from ..utils import _get_flags, _list_to_string
 
 
 def user_playlists_info(user):
@@ -19,17 +20,16 @@ def user_playlists_info(user):
 
     paging = toukka.sp.user_playlists(user)
 
-    print("total: {}".format(
+    print("total playlists: {}".format(
         paging['total']))
 
     playlists = toukka.sp.aggregate_paging_results(paging)
-    # playlists = paging.get('items')
 
-    public = list(filter(lambda p: p.get('public') is True, playlists))
-    collaborative = list(filter(lambda p: p.get('collaborative') is True, playlists))
-    own = list(filter(lambda p: p.get('owner').get('id') == user, playlists))
+    own = [p for p in playlists if p.get('owner').get('id') == user]
+    public = [p for p in playlists if p.get('public') is True]
+    collaborative = [p for p in playlists if p.get('collaborative') is True]
 
-    print('total agggregated playlists: %s' % len(playlists))
+    print('total user own playlists: %s' % len(own))
     print('total public playlists: %s' % len(public))
     print('total collaborative playlists: %s' % len(collaborative))
     print('total user own playlists: %s' % len(own))
@@ -62,10 +62,10 @@ def user_playlists(user,
     print('\nfiltered to {} of total {}'.format(len(playlists), paging.get('total')))
 
 
-def _print_playlists(playlists, one_line=False):
+def _print_playlists(playlists, one_line=True):
 
     if one_line:
-        line = "name: {name:40}, id: {id:30}, owner: {owner[id]:30}, tracks: {tracks[total]} flags: {flags}"
+        line = "name: {name:40} id: {id:30} owner: {owner[id]:30} tracks: {tracks[total]:5} flags: {flags}"
     else:
         line = "name: {name}\nid: {id}\nowner: {owner[id]}\nflags: {flags}\ntracks: {tracks[total]}\n"
 
@@ -73,14 +73,6 @@ def _print_playlists(playlists, one_line=False):
         print(line.format(
             **playlist,
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
-
-
-def _get_flags(dict, needed):
-    return [key for key, value in dict.items() if key in needed and value is True]
-
-
-def _list_to_string(list, sep=', '):
-    return sep.join(list)
 
 
 def playlist_info(uri, with_tracks=False):

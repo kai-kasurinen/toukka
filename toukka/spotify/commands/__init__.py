@@ -10,6 +10,7 @@ from . import playlist
 from . import search
 from . import track
 from . import user
+from . import entity
 
 COMMANDS = [
     *album.COMMANDS,
@@ -20,7 +21,8 @@ COMMANDS = [
     *playlist.COMMANDS,
     *search.COMMANDS,
     *track.COMMANDS,
-    *user.COMMANDS]
+    *user.COMMANDS,
+    *entity.COMMANDS]
 
 NAMESPACE = 'spotify'
 
