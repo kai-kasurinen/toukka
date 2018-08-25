@@ -64,7 +64,7 @@ def current_user_top_tracks(time_range: 'short, medium or long'):
     for i, item in enumerate(results['items']):
         artists_string = _get_string_from_artists(item['artists'])
         print('{pos:2} {name:40} {artists_string}'.
-              format(**item, pos=i, artists_string=artists_string))
+              format(**item, pos=i+1, artists_string=artists_string))
 
 
 # @argh.named('top-artists')
@@ -82,7 +82,7 @@ def current_user_top_artists(time_range: 'short, medium or long'):
     results = toukka.sp.current_user_top_artists(time_range=time_range, limit=50)
 
     for i, item in enumerate(results['items']):
-        print('{pos:2} {name:50} {_genres}'.format(**item, pos=i, _genres=_list_to_string(item.get('genres'))))
+        print('{pos:2} {name:50} {_genres}'.format(**item, pos=i+1, _genres=_list_to_string(item.get('genres'))))
 
 
 @argh.named('playlists')
@@ -119,10 +119,18 @@ def current_user_recently_played():
             datetime.datetime.fromtimestamp(int(after)/1000),
             datetime.datetime.fromtimestamp(int(before)/1000)))
 
-    print('total items: %s' % len(paging['items']))
+    #print('total items: %s' % len(paging['items']))
 
     items = toukka.sp.aggregate_paging_results(paging)
-    print('total agggregated items: %s' % len(items))
+
+    for item in items:
+        #json_dump_print(item)
+        artists_string = _get_string_from_artists(item['track']['artists'])
+        _played_at = item['played_at']
+
+        print('{played_at} {track[name]:40} {artists_string} {context[uri]}'.
+              format(**item, artists_string=artists_string))
+
 
 
 def _get_string_from_artists_with_ids(artists):

@@ -18,13 +18,13 @@ from toukka.utils import json_dump, json_dump_print, format_as_table
 
 @argh.named('playing')
 def playing(with_artist=True,
-                               with_album=True,
-                               with_track=True,
-                               with_track_features=False,
-                               with_track_features_delivered=False,
-                               with_track_moods=True,
-                               with_track_styles=True,
-                               with_track_key_and_mode=False):
+            with_album=True,
+            with_track=True,
+            with_track_features=False,
+            with_track_features_delivered=False,
+            with_track_moods=True,
+            with_track_styles=True,
+            with_track_key_and_mode=False):
     """show information about current user playing track"""
     # pylint: disable=unused-argument, too-many-arguments
 
@@ -43,7 +43,7 @@ def playing(with_artist=True,
     # status and context
     print('is playing: %s' % (currently_playing['is_playing']))
     if context:
-        print('\tcontext: %s (%s)' % (context['type'], context['uri']))
+        print('\tcontext: {type}, {uri}'.format(**context))
     else:
         print('\tcontext: %s' % context)
 
@@ -57,8 +57,12 @@ def playing(with_artist=True,
     if currently_playing.get('progress_ms'):
         print('\tprogress: %s' % datetime.timedelta(milliseconds=currently_playing['progress_ms']))
 
+    if item is None:
+        print('item is None')
+        return
+
     if with_artist:
-        artists = item['artists']
+        artists = item.get('artists')
         for artist in artists:
             artist_item = toukka.sp.artist(artist['id'])
             artist_entity = toukka.sp.crowd_site_entity(artist['uri'])
@@ -88,34 +92,24 @@ def _print_artist_info(artist_item, artist_entity, **kwargs):
     """"""
 
     artist = artist_item
+    entity = artist_entity.get('entity')
 
-    print('artist: %s (%s)' % (artist['name'], artist['id']))
-    artist_genres = artist_item['genres']
-    print('\tgenres: %s' % (artist_genres))
-    artist_uri = artist_item['uri']
-    artist_tags = artist_entity['entity'].get('tags')
-    artist_external_urls = artist_entity['entity'].get('external_urls')
-    print('\ttags: %s' % (artist_tags))
-    artist_popularity = artist_item['popularity']
-    print('\tpopularity: %s' % (artist_popularity))
-    artist_followers = artist_item.get('followers').get('total')
-    print('\tfollowers: %s' % (artist_followers))
+    print('artist: {name} ({uri})'.format(**artist))
+    print('\tgenres: {genres}'.format(**artist))
+    print('\ttags: {tags}'.format(**entity))
+    print('\tpopularity: {popularity}'.format(**artist))
+    print('\tfollowers: {followers[total]}'.format(**artist))
 
+    artist_external_urls = entity.get('external_urls')
     if artist_external_urls:
         print('\turls:')
         for u in artist_external_urls:
-            print('\t\t%s: %s' % (u.get('name'), u.get('url')))
+            print('\t\t{name}: {url}'.format(**u))
 
-    artist_origin_locality = artist_entity.get('entity').get('origin_locality')
-    artist_origin_country = artist_entity.get('entity').get('origin_country')
-    artist_aliases = artist_entity.get('entity').get('aliases')
-    artist_categories = artist_entity.get('entity').get('categories')
-    print('\torigin locality: %s' % artist_origin_locality)
-    print('\torigin country: %s' % artist_origin_country)
-    print('\taliases: %s' % artist_aliases)
-    print('\tcategories: %s' % artist_categories)
-    artist_bio = artist_entity['entity'].get('bio')
-    print('\tbio: %.100s ...' % _cleanhtml(artist_bio))
+    print('\torigin: {origin_locality}, {origin_country[code]}'.format(**entity))
+    print('\taliases: {aliases}'.format(**entity))
+    print('\tcategories: {categories}'.format(**entity))
+    print('\tbio: %.100s ...' % _cleanhtml(entity.get('bio')))
 
 
 def _print_album_info(album_item, album_entity, **kwargs):
@@ -142,11 +136,9 @@ def _print_album_info(album_item, album_entity, **kwargs):
     else:
         logging.warning('No entity for album %s' % album_uri)
 
-    print('album: %s (%s) (%s) (%s %s)' % (
-        album_name, album_type, album_id,
-        album_release_date, album_release_date_precision))
+    print('album: {name} ({album_type}) ({uri}) ({release_date} {release_date_precision})'.format(**album))
 
-    print('\tartists: %s' % _get_nice_string_from_artists(album_item['artists']))
+    print('\tartists: %s' % _get_nice_string_from_artists(album.get('artists')))
     print('\tgenres: %s' % (album_genres))
     print('\texternal ids: %s' % (album_item['external_ids']))
     print('\tpopularity: %s' % (album_popularity))
@@ -192,7 +184,7 @@ def _print_track_info(track_item, track_entity, track_features, **kwargs):
     track_markets = item.get('available_markets')
     track_duration = item['duration_ms']
 
-    print('track: %s (%s)' % (track_name, track_id))
+    print('track: %s (%s)' % (track_name, track_uri))
     print('\tartists: %s' % _get_nice_string_from_artists(item['artists']))
     print('\tduration: %s' % (datetime.timedelta(milliseconds=track_duration)))
 
@@ -384,7 +376,7 @@ def _cleanhtml(raw_html):
 
 
 def _get_nice_string_from_artists(artists):
-    return ", ".join("%s (%s)" % (artist.get('name'), artist.get('id')) for artist in artists)
+    return ", ".join("%s (%s)" % (artist.get('name'), artist.get('uri')) for artist in artists)
 
 
 #

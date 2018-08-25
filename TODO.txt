@@ -76,6 +76,26 @@ null
  -> correct album is https://line-in.spotify.com/album/4pefQ21iSk8hdnxw3WSB5Y
 
 
+ 20180825 ads?
+
+Traceback (most recent call last):
+  File "/home/jozo/bin/toukka", line 10, in <module>
+    sys.exit(main())
+  File "/home/jozo/git/toukka/toukka/main.py", line 53, in main
+    parser.dispatch()
+  File "/usr/lib/python3/dist-packages/argh/helpers.py", line 55, in dispatch
+    return dispatch(self, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 174, in dispatch
+    for line in lines:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 277, in _execute_command
+    for line in result:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 260, in _call
+    result = function(*positional, **keywords)
+  File "/home/jozo/git/toukka/toukka/toukka/commands/toukka.py", line 61, in playing
+    artists = item['artists']
+TypeError: 'NoneType' object is not subscriptable
+
+
 
 
 PYTHON:
@@ -96,3 +116,8 @@ python filter:
     public = list(filter(lambda p: p.get('public') is True, playlists))
     collaborative = list(filter(lambda p: p.get('collaborative') is True, playlists))
     own = list(filter(lambda p: p.get('owner').get('id') == user, playlists))
+
+
+
+
+
