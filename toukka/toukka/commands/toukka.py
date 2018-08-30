@@ -11,9 +11,12 @@ import tabulate
 import argh
 import simplejson as json
 
-from toukka.toukka import Toukka
+from toukka import Toukka
 from toukka.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
+from toukka.utils import _get_flags, _list_to_string
+
+
 
 
 @argh.named('playing')
@@ -32,11 +35,11 @@ def playing(with_artist=True,
 
     toukka = Toukka()
 
+    # FIXME: market
     currently_playing = toukka.sp.currently_playing()
 
     if not currently_playing:
-        print('User not connected to Spotify')
-        return
+        raise argh.CommandError('User not connected to Spotify')
 
     context = currently_playing.get('context')
     item = currently_playing.get('item')
@@ -134,6 +137,8 @@ def _print_album_info(album_item, album_entity, **kwargs):
         print('\tpopularity: {popularity}'.format(**album))
     if album.get('available_markets'):
         print('\tmarkets: %s' % (len(album.get('available_markets'))))
+    if album.get('restrictions'):
+        print('\trestrictions: {restrictions}'.format(**album))
 
     if entity:
         if entity.get('tags'):
@@ -200,11 +205,19 @@ def _print_track_info(track_item, track_entity, track_features, **kwargs):
 
     if track.get('external_ids'):
         print('\texternal ids: {external_ids}'.format(**track))
-
     if track.get('popularity'):
         print('\tpopularity: {popularity}'.format(**track))
     if track.get('available_markets'):
         print('\tmarkets: %s' % (len(track.get('available_markets'))))
+    if track.get('linked_from'):
+        linked_track = track.get('linked_from')
+        print('\tlinked from: {uri}'.format(**linked_track))
+    if track.get('restrictions'):
+        print('\trestrictions: {restrictions}'.format(**track))
+
+    flags = _get_flags(track, ['explicit', 'is_playable', 'is_local'])
+    if flags:
+        print('\tflags: %s' % flags)
 
     if track_features:
         _print_track_features(track_features, **kwargs)

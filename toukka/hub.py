@@ -41,6 +41,7 @@ class MusicBrainz:
     def __init__(self):
         self.mb = musicbrainzngs
         self.mb.set_useragent('toukka', '0.0.0')
+        #self.mb.set_format(fmt='json')
 
 
 class Toukka(SpotifyScoped, MusicBrainz):

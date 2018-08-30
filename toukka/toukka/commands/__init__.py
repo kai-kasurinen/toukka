@@ -3,9 +3,11 @@
 
 from . import toukka
 from . import fun
+from . import url
 
 COMMANDS = [
     *toukka.COMMANDS,
+    *url.COMMANDS,
     *fun.COMMANDS]
 
 NAMESPACE = 'toukka'

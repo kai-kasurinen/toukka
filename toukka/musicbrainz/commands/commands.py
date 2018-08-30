@@ -1,6 +1,210 @@
 #
 
+import pprint
+import argh
 from toukka.toukka import Toukka
+
+
+def get_area_by_id(area_id):
+    '''get area by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_area_by_id(area_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_artist_by_id(artist_id):
+    '''get artist by id'''
+    toukka = Toukka()
+    includes = ['aliases', 'annotation', 'tags', 'ratings']
+    try:
+        result = toukka.mb.get_artist_by_id(artist_id, includes=includes)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_event_by_id(event_id):
+    '''get event by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_event_by_id(event_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_instrument_by_id(instrument_id):
+    '''get instrument by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_instrument_by_id(instrument_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_label_by_id(label_id):
+    '''get label by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_instrument_by_id(label_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_place_by_id(place_id):
+    '''get place by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_place_by_id(place_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+
+def get_recording_by_id(recording_id):
+    '''get recording by id'''
+    toukka = Toukka()
+    includes = [
+        'artists',
+        'releases',
+        'discids',
+        'media',
+        'artist-credits',
+        'isrcs',
+        'annotation',
+        'aliases',
+        'tags',
+        #'user-tags',
+        'ratings',
+        #'user-ratings',
+        'area-rels',
+        'artist-rels',
+        'label-rels',
+        'place-rels',
+        'event-rels',
+        'recording-rels',
+        'release-rels',
+        'release-group-rels',
+        'series-rels',
+        'url-rels',
+        'work-rels',
+        'instrument-rels']
+
+    try:
+        result = toukka.mb.get_recording_by_id(recording_id, includes=includes)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_recordings_by_isrc(isrc):
+    '''get recording by isrc'''
+    toukka = Toukka()
+    includes = ['artists']
+    try:
+        result = toukka.mb.get_recordings_by_isrc(isrc, includes=includes)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_release_group_by_id(release_group_id):
+    '''get release group by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_release_group_by_id(release_group_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_release_by_id(release_id):
+    '''get release by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_release_by_id(release_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_releases_by_discid(discid):
+    '''get releases by discid'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_releases_by_discid(discid)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_series_by_id(series_id):
+    '''get series by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_series_by_id(series_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_work_by_id(work_id):
+    '''get work by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_work_by_id(work_id)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_works_by_iswc(iswc):
+    '''get works by iswc'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_works_by_iswc(iswc)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_url_by_id(iid):
+    '''get url by id'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_url_by_id(iid)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_collections():
+    '''get collections'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_collections()
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+def get_releases_in_collection(collection):
+    '''get releases in collection'''
+    toukka = Toukka()
+    try:
+        result = toukka.mb.get_get_releases_in_collection(collection)
+    except toukka.mb.ResponseError as error:
+        raise argh.CommandError(error)
+    pprint.pprint(result)
+
+
+###
 
 
 def show_release_details(rel):
@@ -37,6 +241,24 @@ def search_release(artist, album):
 
 #
 
-COMMANDS = [search_release]
+COMMANDS = [
+    get_area_by_id,
+    get_artist_by_id,
+    get_event_by_id,
+    get_instrument_by_id,
+    get_label_by_id,
+    get_place_by_id,
+    get_recording_by_id,
+    get_recordings_by_isrc,
+    get_release_group_by_id,
+    get_release_by_id,
+    get_releases_by_discid,
+    get_series_by_id,
+    get_work_by_id,
+    get_works_by_iswc,
+    get_url_by_id,
+    get_collections,
+    get_releases_in_collection,
+    search_release]
 
 # END

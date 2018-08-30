@@ -11,7 +11,7 @@ import statistics
 import simplejson as json
 
 from toukka.toukka import Toukka
-from ..utils import _get_flags, _list_to_string
+from toukka.utils import _get_flags, _list_to_string
 
 
 def user_playlists_info(user):
