@@ -9,6 +9,8 @@ from cachecontrol.caches.file_cache import FileCache
 from xdg.BaseDirectory import save_cache_path
 from spotipy.util import prompt_for_user_token
 from toukka.spotify import Spotify, SCOPES_ALL
+import musicbrainzngs
+
 
 class SpotifyScoped:
 
@@ -36,10 +38,16 @@ class SpotifyScoped:
         self.sp.trace = False
 
 
-class Toukka(SpotifyScoped):
+class MusicBrainz:
+    def __init__(self):
+        self.mb = musicbrainzngs
+        self.mb.set_useragent('invalid', '0')
+
+
+class Toukka(SpotifyScoped, MusicBrainz):
     def __init__(self):
         SpotifyScoped.__init__(self)
-
+        MusicBrainz.__init__(self)
 
 
 # END

@@ -2,6 +2,9 @@
 
 '''Musicbrainz'''
 
+from . import commands
+
+
 NAMESPACE = 'musicbrainz'
 
 NAMESPACE_KWARGS = {
@@ -10,6 +13,6 @@ NAMESPACE_KWARGS = {
     'help': 'help, help, help'
     }
 
-COMMANDS = []
+COMMANDS = [*commands.COMMANDS]
 
 # END
