@@ -13,7 +13,6 @@ import musicbrainzngs
 
 
 class SpotifyScoped:
-
     def __init__(self, username=None):
 
         scope = " ".join(SCOPES_ALL)
@@ -41,7 +40,7 @@ class SpotifyScoped:
 class MusicBrainz:
     def __init__(self):
         self.mb = musicbrainzngs
-        self.mb.set_useragent('invalid', '0')
+        self.mb.set_useragent('toukka', '0.0.0')
 
 
 class Toukka(SpotifyScoped, MusicBrainz):

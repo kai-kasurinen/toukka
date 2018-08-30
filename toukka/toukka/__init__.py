@@ -1,3 +1,4 @@
 #
 
-from .toukka import Toukka
+# FIXME: remove
+from toukka import Toukka
