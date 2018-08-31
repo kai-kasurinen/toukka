@@ -36,6 +36,7 @@ class SpotifyScoped:
 
         self.sp = Spotify(auth=token, requests_session=session)
         self.sp.trace = False
+        self.sp.max_get_retries = 1  # default is 10
 
 
 

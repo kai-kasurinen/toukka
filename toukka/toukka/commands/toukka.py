@@ -154,9 +154,15 @@ def _print_artist_info(artist_item, artist_entity, **kwargs):
 
     print('artist: {name} ({uri})'.format(**artist))
     print('\tgenres: {genres}'.format(**artist))
-    print('\ttags: {tags}'.format(**entity))
+    if entity:
+        print('\ttags: {tags}'.format(**entity))
     print('\tpopularity: {popularity}'.format(**artist))
     print('\tfollowers: {followers[total]}'.format(**artist))
+
+    if artist.get('external_ids'):
+        print('\texternal ids: {external_ids}'.format(**artist))
+    if artist.get('external_urls'):
+        print('\texternal urls: {external_urls}'.format(**artist))
 
     if entity:
         if entity.get('external_urls'):
@@ -168,10 +174,8 @@ def _print_artist_info(artist_item, artist_entity, **kwargs):
         if entity.get('external_ids'):
             print('\texternal ids: {external_ids}'.format(**entity))
 
+        print('\torigin: {origin_locality}, {origin_country[code]}'.format(**entity))
 
-    print('\torigin: {origin_locality}, {origin_country[code]}'.format(**entity))
-
-    if entity:
         if entity.get('aliases'):
             print('\taliases: {aliases}'.format(**entity))
         if entity.get('categories'):
@@ -198,6 +202,9 @@ def _print_album_info(album_item, album_entity, **kwargs):
         print('\tgenres: {genres}'.format(**album))
     if album.get('external_ids'):
         print('\texternal ids: {external_ids}'.format(**album))
+    if album.get('external_urls'):
+        print('\texternal urls: {external_urls}'.format(**album))
+
     if album.get('popularity'):
         print('\tpopularity: {popularity}'.format(**album))
     if album.get('available_markets'):
@@ -221,6 +228,8 @@ def _print_album_info(album_item, album_entity, **kwargs):
             for url in entity.get('external_urls'):
                 print('\t\t{name}: {url}'.format(**url))
 
+    if album.get('label'):
+        print('\tlabel: {label}'.format(**album))
     if album.get('copyrights'):
         print('\tcopyrights:')
         for copyright in album.get('copyrights'):
@@ -255,6 +264,7 @@ def _print_track_info(track_item, track_entity, track_features, **kwargs):
     print('track: {name} ({uri})'.format(**track))
     print('\tartists: %s' % _get_nice_string_from_artists(track.get('artists')))
     print('\tduration: %s' % (datetime.timedelta(milliseconds=track.get('duration_ms'))))
+    print('\ttrack number: {track_number}, disc number: {disc_number}'.format(**track))
 
     if entity:
         if entity.get('artists'):
@@ -272,6 +282,8 @@ def _print_track_info(track_item, track_entity, track_features, **kwargs):
 
     if track.get('external_ids'):
         print('\texternal ids: {external_ids}'.format(**track))
+    if track.get('external_urls'):
+        print('\texternal urls: {external_urls}'.format(**track))
     if track.get('popularity'):
         print('\tpopularity: {popularity}'.format(**track))
     if track.get('available_markets'):

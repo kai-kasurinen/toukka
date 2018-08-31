@@ -7,12 +7,15 @@ from .spotipyhelper import subSpotify
 
 class Spotify(spotipy.Spotify, subSpotify):
 
+    # https://community.spotify.com/t5/Line-In/Shutting-down-Line-In/td-p/4557664
     def crowd_site_entity(self, entity):
-        return self._get('https://api.spotify.com/crowd-site-api/v0/entity/' + entity)
+        #return self._get('https://api.spotify.com/crowd-site-api/v0/entity/' + entity)
+        return None
 
     def crowd_site_recent_entities(self):
         # ? limit, offset
-        return self._get('https://api.spotify.com/crowd-site-api/v0/recent-entities')
+        #return self._get('https://api.spotify.com/crowd-site-api/v0/recent-entities')
+        return None
 
     def audio_features_one(self, track):
         return self.audio_features(track)[0]
