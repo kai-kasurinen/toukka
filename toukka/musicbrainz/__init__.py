@@ -1,1 +1,3 @@
 #
+
+from .musicbrainz import MusicBrainz

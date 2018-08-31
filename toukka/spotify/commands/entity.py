@@ -12,6 +12,10 @@ def entity(uri, dump=False):
     '''Get artist info'''
     toukka = Toukka()
     results = toukka.sp.crowd_site_entity(uri)
+    if not results:
+        print('no entity for {}'.format(uri))
+        return
+
     entity = results.get('entity')
 
     if dump:

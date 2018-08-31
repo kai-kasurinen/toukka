@@ -17,8 +17,11 @@ __version__ = '0.0.0'
 
 def main():
     """main, main, main, main"""
-    logging.basicConfig(level=logging.INFO,
-                        format='%(name)s %(levelname)s %(message)s')
+    logging.basicConfig(
+        level=logging.INFO,
+        #format='%(name)s %(levelname)s %(message)s'
+        format='%(asctime)s %(name)s %(levelname)s %(message)s')
+    logging.captureWarnings(True)
 
     parser = argh.ArghParser()
 

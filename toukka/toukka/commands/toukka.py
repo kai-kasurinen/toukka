@@ -4,6 +4,7 @@ import re
 import logging
 import datetime
 import statistics
+import pprint
 
 import iso8601
 import humanize
@@ -15,6 +16,54 @@ from toukka import Toukka
 from toukka.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
 from toukka.utils import _get_flags, _list_to_string
+
+def _fix_isrc(isrc):
+    return isrc.upper().strip('-')
+
+def playing_musicbrainz():
+    toukka = Toukka()
+
+    currently_playing = toukka.sp.currently_playing()
+    if not currently_playing:
+        raise argh.CommandError('User not connected to Spotify')
+
+    sp_item = currently_playing.get('item')
+    if sp_item is None:
+        raise argh.CommandError('Currently playing not track')
+
+    sp_track = sp_item
+    sp_isrc = sp_track.get('external_ids').get('isrc')
+    print('spotify playing track {}'.format(sp_isrc))
+    mb_isrc = toukka.mb.get_isrc(_fix_isrc(sp_isrc))
+
+    if mb_isrc:
+        #pprint.pprint(mb_isrc)
+        print('found {isrc}, recordings count {count}'.format(**mb_isrc, count=len(mb_isrc.get('recordings'))))
+
+        for r in mb_isrc.get('recordings'):
+            mb_recording = toukka.mb.get_recording(r.get('id'))
+            #pprint.pprint(mb_recording)
+            print('{title} ({id})'.format(**mb_recording))
+    else:
+        print('no isrc found at musicbrainz')
+
+    sp_artists = sp_item.get('artists')
+    for sp_artist in sp_artists:
+        sp_artist_mb_urls = toukka.sp.get_external_urls(sp_artist.get('uri'), 'musicbrainz')
+        print('spotify artist {name} ({uri}) has {} musicbrainz urls'.format(len(sp_artist_mb_urls), **sp_artist))
+        for u in sp_artist_mb_urls:
+            mb_artist = toukka.mb.get_artist_by_url(u)
+            #pprint.pprint(mb_artist)
+            print('{name}, type: {type}, gender: {gender}, id: {id}'.format(**mb_artist))
+
+    sp_album = sp_item.get('album')
+    sp_album_mb_urls = toukka.sp.get_external_urls(sp_album.get('uri'), 'musicbrainz')
+    print('spotify album {name} ({uri}) has {} musicbrainz urls'.format(len(sp_album_mb_urls), **sp_album))
+    for u in sp_album_mb_urls:
+        mb_release = toukka.get_release_by_url(u)
+        #pprint.pprint(mb_release)
+        print('{title} ({id})'.format(**mb_release))
+
 
 
 
@@ -97,7 +146,11 @@ def _print_artist_info(artist_item, artist_entity, **kwargs):
     """"""
 
     artist = artist_item
-    entity = artist_entity.get('entity')
+    if artist_entity:
+        entity = artist_entity.get('entity')
+    else:
+        logging.warning('no artist entity')
+        entity = None
 
     print('artist: {name} ({uri})'.format(**artist))
     print('\tgenres: {genres}'.format(**artist))
@@ -105,26 +158,38 @@ def _print_artist_info(artist_item, artist_entity, **kwargs):
     print('\tpopularity: {popularity}'.format(**artist))
     print('\tfollowers: {followers[total]}'.format(**artist))
 
-    if entity.get('external_urls'):
-        print('\turls:')
-        for url in entity.get('external_urls'):
-            print('\t\t{name}: {url}'.format(**url))
+    if entity:
+        if entity.get('external_urls'):
+            print('\turls:')
+            for url in entity.get('external_urls'):
+                print('\t\t{name}: {url}'.format(**url))
+
+        # FIXME: is this real?
+        if entity.get('external_ids'):
+            print('\texternal ids: {external_ids}'.format(**entity))
+
 
     print('\torigin: {origin_locality}, {origin_country[code]}'.format(**entity))
 
-    if entity.get('aliases'):
-        print('\taliases: {aliases}'.format(**entity))
-    if entity.get('categories'):
-        print('\tcategories: {categories}'.format(**entity))
-    if entity.get('bio'):
-        print('\tbio: %.100s ...' % _cleanhtml(entity.get('bio')))
+    if entity:
+        if entity.get('aliases'):
+            print('\taliases: {aliases}'.format(**entity))
+        if entity.get('categories'):
+            print('\tcategories: {categories}'.format(**entity))
+        if entity.get('bio'):
+            print('\tbio: %.100s ...' % _cleanhtml(entity.get('bio')))
 
 
 def _print_album_info(album_item, album_entity, **kwargs):
     """"""
 
     album = album_item
-    entity = album_entity.get('entity')
+
+    if album_entity:
+        entity = album_entity.get('entity')
+    else:
+        logging.warning('no album entity')
+        entity = None
 
     print('album: {name} ({album_type}) ({uri}) ({release_date} {release_date_precision})'.format(**album))
     print('\tartists: %s' % _get_nice_string_from_artists(album.get('artists')))
@@ -155,8 +220,6 @@ def _print_album_info(album_item, album_entity, **kwargs):
             print('\turls:')
             for url in entity.get('external_urls'):
                 print('\t\t{name}: {url}'.format(**url))
-    else:
-        logging.warning('No entity for album %s' % album_uri)
 
     if album.get('copyrights'):
         print('\tcopyrights:')
@@ -169,8 +232,12 @@ def _print_track_info(track_item, track_entity, track_features, **kwargs):
 
     track = track_item
     item = track_item
-    entity = track_entity.get('entity')
-
+    if track_entity:
+        entity = track_entity.get('entity')
+    else:
+        logging.warning('no track entity')
+        entity = None
+        
     track_name = item['name']
     track_id = item['id']
     track_uri = item['uri']
@@ -400,6 +467,6 @@ def _get_nice_string_from_artists(artists):
 
 #
 
-COMMANDS = [playing, playlist_info]
+COMMANDS = [playing, playing_musicbrainz, playlist_info]
 
 # END

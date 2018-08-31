@@ -1,5 +1,7 @@
 #
 
+import logging
+
 import spotipy
 from .spotipyhelper import subSpotify
 
@@ -45,7 +47,15 @@ class Spotify(spotipy.Spotify, subSpotify):
 
         return self.get_playlist_by_uri(playing['context']['uri'])
 
-
+    def get_external_urls(self, uri, name):
+        # FIXME: may fail
+        r = self.crowd_site_entity(uri)
+        if not r:
+            return {}
+        entity = r.get('entity')
+        urls = [url.get('url') for url in entity.get('external_urls') if url.get('name') == name]
+        logging.debug('found %s %s urls from %s entity', len(urls), name, uri)
+        return urls
 
 
 

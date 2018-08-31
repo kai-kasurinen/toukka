@@ -109,13 +109,12 @@ class subSpotify():
         tracklist1 = self.get_tracks_from_playlist(playlist=playlist1)
         tracklist2 = self.get_tracks_from_playlist(playlist=playlist2)
 
-        diff_ids = list( set([x['id'] for x in tracklist1]).symmetric_difference(set([x['id'] for x in tracklist2])) )
+        diff_ids = list(set([x['id'] for x in tracklist1]).symmetric_difference(set([x['id'] for x in tracklist2])))
 
-        lookup_ref = {x['id']:x for x in tracklist1}
-        lookup_ref.update({y['id']:y for y in tracklist2})
+        lookup_ref = {x['id']: x for x in tracklist1}
+        lookup_ref.update({y['id']: y for y in tracklist2})
 
         return [lookup_ref[x] for x in diff_ids]
-
 
     def playlists_where_song_appears(self, username, song_id):
         ''' Returns a list of playlists that the given song appears in for the given user
@@ -159,7 +158,7 @@ class subSpotify():
         ''' Returns a list of the songs in the user's library that do not appear in any of their playlists
         '''
         pointers = self.aggregate_paging_results(self.current_user_saved_tracks())
-        lonely_songs = { p['track']['id'] : p['track'] for p in pointers }
+        lonely_songs = {p['track']['id']: p['track'] for p in pointers}
 
         playlists = self.aggregate_paging_results(self.current_user_playlists())
         for playlist in playlists:

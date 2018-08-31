@@ -3,13 +3,14 @@
 import os
 import logging
 import requests
+import warnings
 
 from cachecontrol import CacheControl
 from cachecontrol.caches.file_cache import FileCache
 from xdg.BaseDirectory import save_cache_path
 from spotipy.util import prompt_for_user_token
 from toukka.spotify import Spotify, SCOPES_ALL
-import musicbrainzngs
+from toukka.musicbrainz import MusicBrainz
 
 
 class SpotifyScoped:
@@ -37,17 +38,12 @@ class SpotifyScoped:
         self.sp.trace = False
 
 
-class MusicBrainz:
-    def __init__(self):
-        self.mb = musicbrainzngs
-        self.mb.set_useragent('toukka', '0.0.0')
-        #self.mb.set_format(fmt='json')
-
 
 class Toukka(SpotifyScoped, MusicBrainz):
     def __init__(self):
         SpotifyScoped.__init__(self)
-        MusicBrainz.__init__(self)
+        self.mb = MusicBrainz()
+        self.mbngs = self.mb.mbngs
 
 
 # END
