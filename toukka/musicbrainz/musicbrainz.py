@@ -3,6 +3,7 @@
 import logging
 import warnings
 import re
+import urllib.parse
 import musicbrainzngs
 
 
@@ -18,6 +19,7 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_recordings_by_isrc(isrc, includes=includes)
         except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -25,12 +27,25 @@ class MusicBrainz:
         assert(result.get('isrc') == isrc)
         return result
 
+    def search_releases_with_upc(self, upc):
+        try:
+            result = self.mbngs.search_releases(barcode=upc)
+        except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
+            if error.cause.code == 404:
+                return None
+            else:
+                raise
+        return result
+
+
     def get_recording(self, mbid):
         includes = ['artists', 'aliases', 'artist-rels', 'tags', 'ratings']
         #includes = self._get_includes('recording')
         try:
             result = self.mbngs.get_recording_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -38,11 +53,12 @@ class MusicBrainz:
         return result
 
     def get_release(self, mbid):
-        includes = ['tags']
-        #includes = self._get_includes('release')
+        includes = ['artist-credits', 'tags', 'annotation', 'media', 'labels']
+        # includes = self._get_includes('release')
         try:
             result = self.mbngs.get_release_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -50,17 +66,32 @@ class MusicBrainz:
         return result
 
     def get_artist(self, mbid):
-        includes = ['tags', 'ratings']
+        includes = ['tags', 'ratings', 'annotation', 'aliases']
         # FIXME: Bad request!!
         #includes = self._get_includes('artist')
         try:
             result = self.mbngs.get_artist_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
                 raise
         return result
+
+    def browse_urls(self, url):
+        #includes = []
+        includes = self._get_includes('url')
+        try:
+            result = self.mbngs.browse_urls(resource=url, includes=includes)
+        except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
+            if error.cause.code == 404:
+                return None
+            else:
+                raise
+        return result
+
 
     def get_artist_by_url(self, url):
         mbid = self._find_mbid_from_string(url)
@@ -95,6 +126,10 @@ class MusicBrainz:
         else:
             logging.debug('No MBID found from string (%s)', string)
             return
+
+    def get_entity_url(self, entity_type, mbid):
+        BASE_URL = 'https://musicbrainz.org/'
+        return urllib.parse.urljoin(BASE_URL, entity_type + '/' + mbid)
 
 
 
