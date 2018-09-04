@@ -4,9 +4,10 @@ import logging
 import shelve
 import pprint
 import unicodedata
+import datetime
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 class Spotify2MusicBrainz:
     def __init__(self, dbfile=None, hub=None):
@@ -18,10 +19,12 @@ class Spotify2MusicBrainz:
         self.hub = hub
         # FIXME:
         self.toukka = self.hub
+        # FIXME: temporary
+        #self._remove_bad_data_from_db()
 
     def get_mbid(self, uri):
         mbid = self.db.get(uri)
-        logger.debug('db get %s: %s', uri, mbid)
+        #logger.debug('db get %s: %s', uri, mbid)
         return mbid
 
     def _get_mbid_silent(self, uri):
@@ -30,6 +33,14 @@ class Spotify2MusicBrainz:
     def add_mbid(self, uri, mbid):
         logger.debug('db add %s: %s', uri, mbid)
         self.db[uri] = mbid
+
+    def del_uri(self, uri):
+        logger.debug('db del %s', uri)
+        if not self._get_mbid_silent(uri):
+            logger.debug('uri is not in db')
+            return
+        # raises KeyError if no such key
+        del self.db[uri]
 
     def _validate_mbid(self, uri, mbid):
         if self._get_mbid_silent(uri):
@@ -50,6 +61,12 @@ class Spotify2MusicBrainz:
         else:
             logger.debug('multiple mbids, not adding any')
             return False
+    
+    def _remove_bad_data_from_db(self):
+        # length mismatch
+        self.del_uri('spotify:track:0FlNSJQaK8ntxwOHetrgQY')
+        self.del_uri('spotify:track:5C8kdULh3GjB8sxSiIj2vJ')
+
 
     def feed_track_id(self, track_id):
         self._search(track_id)
@@ -141,7 +158,7 @@ class Spotify2MusicBrainz:
             #logger.debug('%s uri is already on db', uri)
             return
 
-        logger.debug('searching track by data from MusicBrainz')
+        logger.debug('searching track by data from musicbrainz')
 
         fields = dict()
 
@@ -170,9 +187,9 @@ class Spotify2MusicBrainz:
                 logger.debug('not adding album name to fields')
 
         # name of recording or a track associated with the recording
-        #fields['recording'] = track.get('name')
+        #fields['recording'] = self._normalize_string(track.get('name'))
         # name of the recording with any accent characters retained
-        fields['recordingaccent'] = self._normalize_string(track.get('name'))
+        fields['recordingaccent'] = track.get('name')
         # track number on medium
         fields['tnum'] = track.get('track_number')
         # the medium that the recording should be found on, first medium is position 1 
@@ -180,6 +197,7 @@ class Spotify2MusicBrainz:
 
         mbids = list()
         logger.debug('search fields: %s', fields)
+        # FIXME: move to .mb.
         result = self.toukka.mbngs.search_recordings(strict=True, **fields)
         if result:
             logger.debug('found %s recordings from MusicBrainz', result.get('count'))
@@ -229,6 +247,15 @@ class Spotify2MusicBrainz:
 
         if recording.get('video'):
             logger.debug('fail: recording is video, failing...')
+            return False
+
+        # check length difference, ms
+        track_length = track.get('duration_ms')
+        recording_length = recording.get('length')
+        length_difference = abs(track_length-recording_length)
+        logger.debug('track length: %i, recording length: %i, difference: %i', track_length, recording_length, length_difference)
+        if length_difference > 2000:   # 2s
+            logger.debug('fail: length_difference < 2000')
             return False
 
         #pprint.pprint(recording)
@@ -380,9 +407,10 @@ class Spotify2MusicBrainz:
         sp_artist_name = sp_artist.get('name')
         mb_artist_name = mb_artist.get('name')
 
+        # FIXME: bug: fail: sp_artist_name (Yo-Yo Ma) != mb_artist_name (Yo‐Yo Ma)
         if sp_artist_name == mb_artist_name:
             logger.debug('ok: sp_artist_name == mb_artist_name')
-            is_oḱ = True
+            is_ok = True
         elif self._normalize_string(sp_artist_name) == self._normalize_string(mb_artist_name):
             logger.debug('ok: sp_artist_name_normalized == mb_artist_name_normalized')
             is_ok = True

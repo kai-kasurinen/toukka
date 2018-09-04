@@ -152,7 +152,6 @@ class PlayingPrinter:
     def _print_album_info(self, album_id):
 
         album = self.toukka.sp.album(album_id)
-        self.album = album
 
         print('album: {name} ({album_type}) ({uri}) ({release_date} {release_date_precision})'.format(**album))
         print('\tartists: %s' % self._spotify_artists_to_string(album.get('artists')))
@@ -310,14 +309,14 @@ class PlayingPrinter:
 
     def _print_musicbrainz_recording(self, mbid):
         recording = self.toukka.mb.get_recording(mbid)
-        print('recording: {title} ({disambiguation}) ({id})'.format(**recording))
+        print('recording: {title} ({disambiguation}) ({id}) ({isrcs})'.format(**recording))
         print('\tartists: {}'.format(self._musicbrainz_artist_credit_to_string(recording.get('artist-credit'))))
         if recording.get('tags'):
             print('\ttags: {}'.format(self._musicbrainz_tags_to_string(recording.get('tags'))))
         if recording.get('rating').get('value'):
             print('\trating: {rating[value]} (votes: {rating[votes-count]})'.format(**recording))
         print('\turl: {}'.format(self.toukka.mb.get_entity_url('recording', recording.get('id'))))
-        print('\tworks: {}'.format(self.toukka.mb.get_recording_work_relations(mbid)))
+        #print('\tworks: {}'.format(self.toukka.mb.get_recording_work_relations(mbid)))
         self._print_acousticbrainz_info(recording.get('id'))
         self._print_url_relations(self.toukka.mb.get_recording_url_relations(mbid))
         print()
@@ -326,10 +325,8 @@ class PlayingPrinter:
 
     def _print_musicbrainz_work(self, mbid):
         work = self.toukka.mb.get_work(mbid)
-        print('work: {title} ({disambiguation}) ({id}) ({type}) ({languages})'.format(**work))
+        print('work: {title} ({disambiguation}) ({id}) ({type}) ({languages}) ({iswcs})'.format(**work))
         print('\turl: {}'.format(self.toukka.mb.get_entity_url('work', work.get('id'))))
-        if work.get('iswcs'):
-            print('\tiswcs: {iswcs}'.format(**work))
         if work.get('attributes'):
             print('\tattributes: {attributes}'.format(**work))
         if work.get('tags'):
