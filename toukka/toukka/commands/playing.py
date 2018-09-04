@@ -18,8 +18,6 @@ from toukka.utils import json_dump, json_dump_print, format_as_table
 from toukka.utils import _get_flags, _list_to_string
 
 
-def _fix_isrc(isrc):
-    return isrc.upper().strip('-')
 
 
 @argh.named('playing')
@@ -38,6 +36,7 @@ def playing(with_artist=True,
     args = locals()
     p = PlayingPrinter(args=args)
     p.print()
+
 
 
 class PlayingPrinter:
@@ -79,7 +78,30 @@ class PlayingPrinter:
 
         if self.args.get('with_musicbrainz'):
             print()
-            self._search_from_musicbrainz()
+            self.toukka.sp2mb.feed_track_id(item.get('id'))
+            self._print_musicbrainz()
+
+    def _print_musicbrainz(self):
+        print()
+        print('MusicBrainz:')
+
+        sp_track_uri = self.currently_playing.get('item').get('uri')
+        sp_track_mbid = self.toukka.sp2mb.get_mbid(sp_track_uri)
+        if sp_track_mbid:
+            self._print_musicbrainz_recording(sp_track_mbid)
+
+        sp_album_uri = self.currently_playing.get('item').get('album').get('uri')
+        sp_album_mbid = self.toukka.sp2mb.get_mbid(sp_album_uri)
+        if sp_album_mbid:
+            self._print_musicbrainz_release(sp_album_mbid)
+
+        for sp_artist in self.currently_playing.get('item').get('artists'):
+                sp_artist_uri = sp_artist.get('uri')
+                sp_artist_mbid = self.toukka.sp2mb.get_mbid(sp_artist_uri)
+                if sp_artist_mbid:
+                    self._print_musicbrainz_artist(sp_artist_mbid)
+
+
 
     def _print_is_playing(self):
         currently_playing = self.currently_playing
@@ -232,109 +254,49 @@ class PlayingPrinter:
         else:
             logging.warning('No audio features for track %s' % track_id)
 
-    def _search_from_musicbrainz(self):
-        self._search_recording_isrc_from_musicbrainz()
-        print()
-        self._search_album_upc_from_musicbrainz()
-        print()
-        self._search_artists_urls_from_musicbrainz()
-        print()
-        self._search_album_url_from_musicbrainz(self.album)
-        print()
-        self._search_track_url_from_musicbrainz(self.currently_playing.get('item'))
-        print()
+    def _musicbrainz_artist_credit_to_string(self, artist_credit):
+        return ", ".join("%s (%s)" % (credit.get('artist').get('name'), credit.get('artist').get('id')) for credit in artist_credit)
 
     def _print_musicbrainz_artist(self, mbid):
         artist = self.toukka.mb.get_artist(mbid)
         print('artist: {name} ({disambiguation}) ({id})'.format(**artist))
-        print('\ttags: {tags}'.format(**artist))
+        print('\ttags: {}'.format(self._musicbrainz_tags_to_string(artist.get('tags'))))
+        print('\trating: {rating}'.format(**artist))
         print('\turl: {}'.format(self.toukka.mb.get_entity_url('artist', artist.get('id'))))
+        print()
 
     def _print_musicbrainz_release(self, mbid):
         release = self.toukka.mb.get_release(mbid)
         print('release: {title} ({disambiguation}) ({id}) ({barcode}) ({date} {country})'.format(**release))
         print('\tartists: {}'.format(self._musicbrainz_artist_credit_to_string(release.get('artist-credit'))))
-        print('\ttags: {tags}'.format(**release))
+        print('\ttags: {}'.format(self._musicbrainz_tags_to_string(release.get('tags'))))
+        print('\trelease group: {title} ({disambiguation}) ({primary-type}, {secondary-types})'.format(**release.get('release-group'))) 
         print('\turl: {}'.format(self.toukka.mb.get_entity_url('release', release.get('id'))))
+        print()
 
     def _print_musicbrainz_recording(self, mbid):
         recording = self.toukka.mb.get_recording(mbid)
         print('recording: {title} ({disambiguation}) ({id})'.format(**recording))
         print('\tartists: {}'.format(self._musicbrainz_artist_credit_to_string(recording.get('artist-credit'))))
-        print('\ttags: {tags}'.format(**recording))
+        print('\ttags: {}'.format(self._musicbrainz_tags_to_string(recording.get('tags'))))
+        print('\trating: {rating}'.format(**recording))
         print('\turl: {}'.format(self.toukka.mb.get_entity_url('recording', recording.get('id'))))
+        self._print_acousticbrainz_info(recording.get('id'))
+        print()
 
-    def _search_recording_isrc_from_musicbrainz(self):
-        sp_track = self.currently_playing.get('item')
-        sp_isrc = sp_track.get('external_ids').get('isrc')
-        print('Spotify playing track with ISRC {}'.format(sp_isrc))
-        mb_isrc = self.toukka.mb.get_isrc(_fix_isrc(sp_isrc))
-
-        if mb_isrc:
-            #pprint.pprint(mb_isrc)
-            print('Found {isrc}, recordings count {count}'.format(**mb_isrc, count=len(mb_isrc.get('recordings'))))
-
-            for r in mb_isrc.get('recordings'):
-                self._print_musicbrainz_recording(r.get('id'))
-        else:
-            print('Not found any matching ISRCs from musicbrainz')
-
-    def _search_album_upc_from_musicbrainz(self):
-        sp_album = self.album
-        sp_upc = sp_album.get('external_ids').get('upc')
-        print('Spotify playing album with UPC {}'.format(sp_upc))
-        result = self.toukka.mb.search_releases_with_upc(sp_upc)
-        print('Found {count} releases from musicbrainz'.format(**result))
-        #pprint.pprint(result)
-        for r in result.get('releases'):
-            self._print_musicbrainz_release(r.get('id'))
-
-    def _search_artists_urls_from_musicbrainz(self):
-        artists = self.currently_playing.get('item').get('artists')
-        for artist in artists:
-            self._search_artist_url_from_musicbrainz(artist)
-
-    def _search_artist_url_from_musicbrainz(self, artist):
-        url = artist.get('external_urls').get('spotify')
-        print('Searching artist ({name}) from musicbrainz by url'.format(**artist))
-        result = self.toukka.mb.browse_urls(url)
-        if result:
-            #pprint.pprint(result)
-            print('Found {} relations from musicbrainz'.format(len(result.get('relations'))))
-            for relation in result.get('relations'):
-                self._print_musicbrainz_artist(relation.get('artist').get('id'))
-        else:
-            print('Not found')
-
-    def _search_album_url_from_musicbrainz(self, album):
-        url = album.get('external_urls').get('spotify')
-        print('Searching album ({name}) from musicbrainz by url'.format(**album))
-        result = self.toukka.mb.browse_urls(url)
-        if result:
-            #pprint.pprint(result)
-            print('Found {} relations from musicbrainz'.format(len(result.get('relations'))))
-            for relation in result.get('relations'):
-                self._print_musicbrainz_release(relation.get('release').get('id'))
-        else:
-            print('Not found')
-
-    def _search_track_url_from_musicbrainz(self, track):
-        url = track.get('external_urls').get('spotify')
-        print('Searching track ({name}) from musicbrainz by url'.format(**track))
-        result = self.toukka.mb.browse_urls(url)
-        if result:
-            #pprint.pprint(result)
-            print('Found {} relations from musicbrainz'.format(len(result.get('relations'))))
-            for relation in result.get('relations'):
-                self._print_musicbrainz_recording(relation.get('recording').get('id'))
-        else:
-            print('Not found')
+    def _print_acousticbrainz_info(self, mbid):
+        c = self.toukka.acousticbrainz.get_count(mbid)
+        url = self.toukka.acousticbrainz.get_url(mbid)
+        print('\tacousticbrainz: {count} entries, {url}'.format(**+c, url=url))
 
     def _spotify_artists_to_string(self, artists):
         return ", ".join("%s (%s)" % (artist.get('name'), artist.get('uri')) for artist in artists)
 
     def _musicbrainz_artist_credit_to_string(self, artist_credit):
         return ", ".join("%s (%s)" % (credit.get('artist').get('name'), credit.get('artist').get('id')) for credit in artist_credit)
+
+    def _musicbrainz_tags_to_string(self, tags):
+        return ", ".join("%s (%s)" % (tag.get('name'), tag.get('count')) for tag in tags)
 
 
 #

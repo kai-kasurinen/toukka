@@ -5,15 +5,12 @@
 import logging
 import argh
 
+import toukka
 import toukka.spotify.commands
 import toukka.musicbrainz.commands
 import toukka.discogs.commands
 import toukka.pandas.commands
 import toukka.toukka.commands
-
-__prog_name__ = 'spotify-toukka'
-__version__ = '0.0.0'
-
 
 def main():
     """main, main, main, main"""
@@ -51,7 +48,7 @@ def main():
     args = parser.parse_args()
 
     logging.getLogger().setLevel(args.loglevel)
-    logging.debug('%s %s', __prog_name__, __version__)
+    logging.debug('%s %s', toukka.__prog_name__, toukka.__version__)
 
     parser.dispatch()
 

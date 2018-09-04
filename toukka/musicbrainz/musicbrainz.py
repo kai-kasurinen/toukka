@@ -6,6 +6,7 @@ import re
 import urllib.parse
 import musicbrainzngs
 
+logger = logging.getLogger(__name__)
 
 class MusicBrainz:
     def __init__(self):
@@ -38,10 +39,15 @@ class MusicBrainz:
                 raise
         return result
 
-
     def get_recording(self, mbid):
-        includes = ['artists', 'aliases', 'artist-rels', 'tags', 'ratings']
-        #includes = self._get_includes('recording')
+        logger.debug('get_recording %s', mbid)
+        # artists, releases, discids, media, artist-credits, isrcs, annotation, aliases,
+        # tags, user-tags, ratings, user-ratings,
+        # area-rels, artist-rels, label-rels, place-rels, event-rels,
+        # recording-rels, release-rels, release-group-rels, series-rels,
+        # url-rels, work-rels, instrument-rels
+        #includes = ['artists', 'aliases', 'artist-rels', 'tags', 'ratings', 'isrcs']
+        includes = self._get_includes('recording')
         try:
             result = self.mbngs.get_recording_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
@@ -53,8 +59,9 @@ class MusicBrainz:
         return result
 
     def get_release(self, mbid):
-        includes = ['artist-credits', 'tags', 'annotation', 'media', 'labels']
-        # includes = self._get_includes('release')
+        logger.debug('get_release %s', mbid)
+        #includes = ['artist-credits', 'tags', 'annotation', 'media', 'labels']
+        includes = self._get_includes('release')
         try:
             result = self.mbngs.get_release_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
@@ -66,6 +73,7 @@ class MusicBrainz:
         return result
 
     def get_artist(self, mbid):
+        logger.debug('get_artist %s', mbid)
         includes = ['tags', 'ratings', 'annotation', 'aliases']
         # FIXME: Bad request!!
         #includes = self._get_includes('artist')
