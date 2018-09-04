@@ -4,9 +4,14 @@ import logging
 import warnings
 import re
 import urllib.parse
+import functools
+import pprint
 import musicbrainzngs
 
+
 logger = logging.getLogger(__name__)
+#logger.setLevel(logging.DEBUG)
+
 
 class MusicBrainz:
     def __init__(self):
@@ -15,6 +20,7 @@ class MusicBrainz:
         warnings.filterwarnings('ignore', 'The json format is non-official and may change at any time')
         self.mbngs.set_format(fmt='json')
 
+    @functools.lru_cache(maxsize=32)
     def get_isrc(self, isrc):
         includes = self._get_includes('isrc')
         try:
@@ -28,6 +34,7 @@ class MusicBrainz:
         assert(result.get('isrc') == isrc)
         return result
 
+    @functools.lru_cache(maxsize=32)
     def search_releases_with_upc(self, upc):
         try:
             result = self.mbngs.search_releases(barcode=upc)
@@ -39,6 +46,7 @@ class MusicBrainz:
                 raise
         return result
 
+    @functools.lru_cache(maxsize=32)
     def get_recording(self, mbid):
         logger.debug('get_recording %s', mbid)
         # artists, releases, discids, media, artist-credits, isrcs, annotation, aliases,
@@ -58,6 +66,7 @@ class MusicBrainz:
                 raise
         return result
 
+    @functools.lru_cache(maxsize=32)
     def get_release(self, mbid):
         logger.debug('get_release %s', mbid)
         #includes = ['artist-credits', 'tags', 'annotation', 'media', 'labels']
@@ -72,11 +81,24 @@ class MusicBrainz:
                 raise
         return result
 
+    @functools.lru_cache(maxsize=32)
+    def get_release_group(self, mbid):
+        logger.debug('get_release group %s', mbid)
+        includes = self._get_includes('release-group')
+        try:
+            result = self.mbngs.get_release_group_by_id(mbid, includes=includes)
+        except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
+            if error.cause.code == 404:
+                return None
+            else:
+                raise
+        return result
+
+    @functools.lru_cache(maxsize=32)
     def get_artist(self, mbid):
         logger.debug('get_artist %s', mbid)
-        includes = ['tags', 'ratings', 'annotation', 'aliases']
-        # FIXME: Bad request!!
-        #includes = self._get_includes('artist')
+        includes = self._get_includes('artist')
         try:
             result = self.mbngs.get_artist_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
@@ -87,8 +109,30 @@ class MusicBrainz:
                 raise
         return result
 
-    def browse_urls(self, url):
+    @functools.lru_cache(maxsize=32)
+    def get_work(self, mbid):
+        logger.debug('get_work %s', mbid)
+        # artists, aliases, annotation, tags, user-tags, ratings, user-ratings,
+        # area-rels, artist-rels, label-rels, place-rels, event-rels, recording-rels,
+        # release-rels, release-group-rels, series-rels, url-rels, work-rels, instrument-rels
         #includes = []
+
+        includes = self._get_includes('work')
+        # BUG: 400 Bad request without this
+        includes.remove('artists')
+
+        try:
+            result = self.mbngs.get_work_by_id(mbid, includes=includes)
+        except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
+            if error.cause.code == 404:
+                return None
+            else:
+                raise
+        return result
+
+    def browse_urls(self, url):
+        logger.debug('browse_urls %s', url)
         includes = self._get_includes('url')
         try:
             result = self.mbngs.browse_urls(resource=url, includes=includes)
@@ -100,6 +144,50 @@ class MusicBrainz:
                 raise
         return result
 
+    def get_artist_url_relations(self, mbid):
+        artist = self.get_artist(mbid)
+        relations = artist.get('relations')
+        return self._filter_url_relations(relations)
+
+    def get_recording_url_relations(self, mbid):
+        recording = self.get_recording(mbid)
+        relations = recording.get('relations')
+        return self._filter_url_relations(relations)
+
+    def get_recording_work_relations(self, mbid):
+        return self._filter_work_relations(
+            self.get_recording_relations_by_target_type(mbid, 'work'))
+
+    def get_recording_relations_by_target_type(self, mbid, target_type):
+        recording = self.get_recording(mbid)
+        return self._filter_relations_by_target_type(recording.get('relations'), target_type)
+
+    def get_release_url_relations(self, mbid):
+        release = self.get_release(mbid)
+        relations = release.get('relations')
+        return self._filter_url_relations(relations)
+
+    def get_release_url_relations_by_type(self, mbid, rtype):
+        return self._filter_url_relations_by_type(rtype, self.get_release_url_relations(mbid))
+
+    def get_release_group_url_relations(self, mbid):
+        release = self.get_release_group(mbid)
+        relations = release.get('relations')
+        return self._filter_url_relations(relations)
+
+    def _filter_relations_by_target_type(self, relations, target_type):
+        return [r for r in relations if r.get('target-type') == target_type]
+
+    def _filter_work_relations(self, relations):
+        return [r.get('work').get('id') for r in relations]
+
+    def _filter_url_relations(self, relations):
+        return [{'type': r.get('type'),
+                 'url': r.get('url').get('resource')}
+                for r in relations if r.get('target-type') == 'url']
+
+    def _filter_url_relations_by_type(self, rtype, relations):
+        return [r.get('url') for r in relations if r.get('type') == rtype]
 
     def get_artist_by_url(self, url):
         mbid = self._find_mbid_from_string(url)

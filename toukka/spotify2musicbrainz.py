@@ -6,7 +6,7 @@ import pprint
 import unicodedata
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 class Spotify2MusicBrainz:
     def __init__(self, dbfile=None, hub=None):
