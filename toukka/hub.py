@@ -10,13 +10,16 @@ from cachecontrol.caches.file_cache import FileCache
 from xdg.BaseDirectory import save_cache_path
 from spotipy import SpotifyException
 from spotipy.util import prompt_for_user_token
+
+import discogs_client
+import wikidata.client
+
 from toukka.spotify import Spotify, SCOPES_ALL
 from toukka.musicbrainz import MusicBrainz
 from toukka.acousticbrainz import AcousticBrainz
 from toukka.utils import Singleton
 from toukka.spotify2musicbrainz import Spotify2MusicBrainz
-
-import discogs_client
+from toukka.finna import Finna
 
 
 class Hub(metaclass=Singleton):
@@ -28,6 +31,8 @@ class Hub(metaclass=Singleton):
         self._init_discogs()
         self._init_musicbrainz()
         self._init_spotify2musicbrainz()
+        self._init_finna()
+        self._init_wikidata()
 
     def _init_cache_path(self):
         cache_path = save_cache_path('toukka')
@@ -61,6 +66,12 @@ class Hub(metaclass=Singleton):
     def _init_discogs(self):
         self.discogs = discogs_client.Client('toukka/0.0.0')
 
+    def _init_finna(self):
+        self.finna = Finna(session=self._session)
+
+    def _init_wikidata(self):
+        self.wikidata = wikidata.client.Client()
+
     def _init_spotify2musicbrainz(self):
         dbfile = os.path.join(save_cache_path('toukka'), 'spotify2musicbrainz')
         self.sp2mb = Spotify2MusicBrainz(hub=self, dbfile=dbfile)
@@ -75,6 +86,7 @@ class Toukka(metaclass=Singleton):
         self.acousticbrainz = self.hub.acousticbrainz
         self.discogs = self.hub.discogs
         self.sp2mb = self.hub.sp2mb
+        self.finna = self.hub.finna
 
 
 

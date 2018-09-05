@@ -6,6 +6,8 @@ import pprint
 import unicodedata
 import datetime
 import functools
+import fuzzywuzzy.fuzz
+import unidecode
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -23,7 +25,7 @@ class Spotify2MusicBrainz:
         # FIXME:
         self.toukka = self.hub
         # FIXME: temporary
-        #self._remove_bad_data_from_db()
+        self._remove_bad_data_from_db()
         self.strict_search = True
         self.fuzzy_search = True
 
@@ -72,7 +74,7 @@ class Spotify2MusicBrainz:
         # length mismatch
         self.del_uri('spotify:track:0FlNSJQaK8ntxwOHetrgQY')
         self.del_uri('spotify:track:5C8kdULh3GjB8sxSiIj2vJ')
-
+        self.del_uri('spotify:artist:2tt3u8V6gNUHjzgLqwhmgP')
 
     def feed_track_id(self, track_id):
         self._search(track_id)
@@ -230,11 +232,12 @@ class Spotify2MusicBrainz:
             logger.debug('failed validate')
 
     def _validate_track_mbid(self, track, mbid):
-        logger.debug('validating track (%s) mbid (%s)', track.get('uri'), mbid)
+        logger.debug('validating track (%s), mbid (%s)', track.get('uri'), mbid)
         uri = track.get('uri')
 
         recording = self.toukka.mb.get_recording(mbid)
 
+        # spotify do not have videos
         if recording.get('video'):
             logger.debug('fail: recording is video, failing...')
             return False
@@ -248,7 +251,16 @@ class Spotify2MusicBrainz:
             logger.debug('fail: length_difference < 2000')
             return False
 
-        #pprint.pprint(recording)
+        # artists matching
+        track_artists = ', '.join([a.get('name') for a in track.get('artists')])
+        recording_artists = ', '.join([c.get('name') for c in recording.get('artist-credit')])
+        logger.debug('track_artists: %s', track_artists)
+        logger.debug('recording_artists: %s', recording_artists)
+        self._compare_strings(track_artists, recording_artists)
+        if track_artists != recording_artists:
+            logger.debug('fail: track_artists != recording_artists')
+            return False
+
         # check validy
         is_isrc_ok = False
         is_name_ok = False
@@ -322,6 +334,7 @@ class Spotify2MusicBrainz:
             ra = recording.get('artist-credit')[0].get('artist')
             tan = ta.get('name')
             ran = ra.get('name')
+            self._compare_strings(tan, ran)
             if tan == ran:
                 logger.debug('track artist name and recording artist name matches, so we found artist mbid')
                 self._found_artist_mbid(ta, ra.get('id'))
@@ -344,6 +357,8 @@ class Spotify2MusicBrainz:
             ta = track.get('album')
             ra = recording.get('releases')[0]
             # FIXME: need fuzzy
+            self._compare_strings(ta.get('name'), ra.get('title'))
+            #
             tan = ta.get('name').lower().replace('-', '').replace('  ', ' ')
             ran = ra.get('title').lower().replace(':', '').replace('  ', ' ')
             if tan == ran:
@@ -393,6 +408,9 @@ class Spotify2MusicBrainz:
 
         sp_artist = artist
         mb_artist = self.toukka.mb.get_artist(mbid)
+
+        # FIXME:
+        self._compare_strings(sp_artist.get('name'), mb_artist.get('name'))
 
         sp_artist_name = sp_artist.get('name').lower()
         mb_artist_name = mb_artist.get('name').lower()
@@ -472,6 +490,8 @@ class Spotify2MusicBrainz:
             return False
 
         # FIXME: need fuzzy
+        self._compare_strings(album.get('name'), release.get('title'))
+        #
         album_name = album.get('name').lower().replace('-', '').replace('  ', ' ')
         release_name = release.get('title').lower().replace(':', '').replace('  ', ' ')
         release_name_with_disambiguation = release_name + ' ' + release.get('disambiguation')
@@ -673,7 +693,6 @@ class Spotify2MusicBrainz:
             logger.debug('failed, no result')
         return mbids
 
-
     def _normalize_string(self, string):
         # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
         return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
@@ -681,7 +700,26 @@ class Spotify2MusicBrainz:
     def _fix_isrc(self, isrc):
         return isrc.upper().replace('-', '')
 
-
+    def _compare_strings(self, s1, s2):
+        logger.debug('comparing strings')
+        logger.debug('s1: %s "%s"', type(s1), s1)
+        logger.debug('s2: %s "%s"', type(s2), s2)
+        logger.debug('fuzz_ratio: %i', fuzzywuzzy.fuzz.ratio(s1, s2))
+        if s1 == s2:
+            logger.debug('ok: strings are same')
+            return True
+        elif s1.lower() == s2.lower():
+            logger.debug('ok: strings lowercase are same')
+        # TODO: keep unicode and use transliteration tables
+        elif unidecode.unidecode(s1) == unidecode.unidecode(s2):
+            logger.debug('ok: strings transliterated ascii are same')
+            return True
+        elif unidecode.unidecode(s1).lower() == unidecode.unidecode(s2).lower():
+            logger.debug('ok: strings lowercase transliterated ascii and are same')
+            return True
+        else:
+            logger.debug('fail: strings not same')
+            return False
 
 
 # END

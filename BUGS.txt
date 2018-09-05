@@ -1,1 +1,9 @@
-https://community.spotify.com/t5/Line-In/Shutting-down-Line-In/td-p/4557664
+# 1
+FIXME: bug: fail: sp_artist_name (Yo-Yo Ma) != mb_artist_name (Yo‐Yo Ma)
+>>> s1.encode('utf-8')
+b'Yo-Yo Ma'
+>>> s2.encode('utf-8')
+b'Yo\xe2\x80\x90Yo Ma'
+
+https://github.com/metabrainz/picard/blob/master/picard/util/textencoding.py
+

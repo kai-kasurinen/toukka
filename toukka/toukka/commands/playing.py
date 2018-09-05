@@ -21,15 +21,15 @@ from toukka.utils import _get_flags, _list_to_string
 
 
 @argh.named('playing')
-def playing(with_artist=True,
-            with_album=True,
-            with_track=True,
-            with_track_features=False,
-            with_track_features_delivered=False,
-            with_track_moods=True,
-            with_track_styles=True,
-            with_track_key_and_mode=False,
-            with_musicbrainz=True):
+def playing(with_artist: bool=True,
+            with_album: bool=True,
+            with_track: bool=True,
+            with_track_features: bool=False,
+            with_track_features_delivered: bool=False,
+            with_track_moods: bool=True,
+            with_track_styles: bool=True,
+            with_track_key_and_mode: bool=False,
+            with_musicbrainz: bool=True):
     """show information about current user playing track"""
     # pylint: disable=unused-argument, too-many-arguments
 
@@ -344,13 +344,16 @@ class PlayingPrinter:
     def _print_discogs_release(self, rid):
         release = self.toukka.discogs.release(rid)
         release.refresh()
-        print('release: {title} ({id}) ({country}) ({released}) ({status})'.format(**release.data))
-        print('\tartists: {}'.format(release.artists))
+        print('release: {title} ({id}) ({released}) ({status})'.format_map(release.data))
+        print('\tartists: {}'.format(self._discogs_artists_to_string(release.artists)))
+        if release.country:
+            print('\tcountry: {}'.format(release.country))
         # release.url returns None?
-        print('\turl: {uri}'.format(**release.data))
+        print('\turl: {uri}'.format_map(release.data))
         print('\tgenres: {}'.format(release.genres))
         print('\tstyles: {}'.format(release.styles))
-        print('\tidentifiers: {identifiers}'.format(**release.data))
+        if release.data.get('identifiers'):
+            print('\tidentifiers: {identifiers}'.format(**release.data))
         print()
 
     def _spotify_artists_to_string(self, artists):
@@ -361,6 +364,9 @@ class PlayingPrinter:
 
     def _musicbrainz_tags_to_string(self, tags):
         return ", ".join("%s (%s)" % (tag.get('name'), tag.get('count')) for tag in tags)
+
+    def _discogs_artists_to_string(self, artists):
+        return ", ".join("%s (%s)" % (artist.name, artist.id) for artist in artists)
 
 
 #

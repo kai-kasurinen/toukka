@@ -12,6 +12,8 @@ import toukka.acousticbrainz.commands
 import toukka.discogs.commands
 import toukka.pandas.commands
 import toukka.toukka.commands
+import toukka.finna.commands
+import toukka.wikidata.commands
 
 def main():
     """main, main, main, main"""
@@ -42,9 +44,17 @@ def main():
                         namespace=toukka.acousticbrainz.commands.NAMESPACE,
                         namespace_kwargs=toukka.acousticbrainz.commands.NAMESPACE_KWARGS)
 
+    parser.add_commands(toukka.finna.commands.COMMANDS,
+                        namespace=toukka.finna.commands.NAMESPACE,
+                        namespace_kwargs=toukka.finna.commands.NAMESPACE_KWARGS)
+
     parser.add_commands(toukka.discogs.commands.COMMANDS,
                         namespace=toukka.discogs.commands.NAMESPACE,
                         namespace_kwargs=toukka.discogs.commands.NAMESPACE_KWARGS)
+
+    parser.add_commands(toukka.wikidata.commands.COMMANDS,
+                        namespace=toukka.wikidata.commands.NAMESPACE,
+                        namespace_kwargs=toukka.wikidata.commands.NAMESPACE_KWARGS)
 
     parser.add_commands(toukka.toukka.commands.COMMANDS,
                         namespace=toukka.toukka.commands.NAMESPACE,
