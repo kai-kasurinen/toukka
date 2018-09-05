@@ -21,7 +21,37 @@ class MusicBrainz:
         self.mbngs.set_format(fmt='json')
 
     @functools.lru_cache(maxsize=32)
-    def get_isrc(self, isrc):
+    def search_recordings(self, query='', limit=None, offset=None, strict=False, **fields):
+        try:
+            result = self.mbngs.search_recordings(query=query,
+                                                  limit=limit,
+                                                  offset=offset,
+                                                  strict=strict,
+                                                  **fields)
+        except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
+            raise
+        return result
+
+    @functools.lru_cache(maxsize=32)
+    def search_releases(self, query='', limit=None, offset=None, strict=False, **fields):
+        try:
+            result = self.mbngs.search_releases(query=query,
+                                                  limit=limit,
+                                                  offset=offset,
+                                                  strict=strict,
+                                                  **fields)
+        except musicbrainzngs.ResponseError as error:
+            logging.debug('HTTP error %s', error.cause.code)
+            raise
+        return result
+
+    @functools.lru_cache(maxsize=32)
+    def search_releases_with_upc(self, upc):
+        return self.search_releases(barcode=upc)
+
+    @functools.lru_cache(maxsize=32)
+    def get_recordings_by_isrc(self, isrc):
         includes = self._get_includes('isrc')
         try:
             result = self.mbngs.get_recordings_by_isrc(isrc, includes=includes)
@@ -34,17 +64,6 @@ class MusicBrainz:
         assert(result.get('isrc') == isrc)
         return result
 
-    @functools.lru_cache(maxsize=32)
-    def search_releases_with_upc(self, upc):
-        try:
-            result = self.mbngs.search_releases(barcode=upc)
-        except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
-            if error.cause.code == 404:
-                return None
-            else:
-                raise
-        return result
 
     @functools.lru_cache(maxsize=32)
     def get_recording(self, mbid):

@@ -5,6 +5,7 @@ import argh
 
 from toukka import Toukka
 
+
 @argh.aliases('artist')
 def get_artist_by_id(artist_id):
     '''get artist by id'''
@@ -84,6 +85,16 @@ def identify():
     pprint.pprint(user)
     pprint.pprint(user.data)
 
+
+def search(*query, **fields):
+    '''search'''
+    toukka = Toukka()
+    results = toukka.discogs.search(*query, **fields)
+    pprint.pprint(results)
+    pprint.pprint(results.count())
+    pprint.pprint(results.pages())
+
+
 #
 
 COMMANDS = [
@@ -95,6 +106,7 @@ COMMANDS = [
     get_listing_by_id,
     get_order_by_id,
     get_fee_for,
-    identify]
+    identify,
+    search]
 
 # END

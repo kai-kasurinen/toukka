@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 class Spotify2MusicBrainz:
+
+
     def __init__(self, dbfile=None, hub=None):
         if not dbfile:
             raise Exception()
@@ -21,6 +23,9 @@ class Spotify2MusicBrainz:
         self.toukka = self.hub
         # FIXME: temporary
         #self._remove_bad_data_from_db()
+        self.strict_search = True
+        self.fuzzy_search = False
+
 
     def get_mbid(self, uri):
         mbid = self.db.get(uri)
@@ -74,17 +79,20 @@ class Spotify2MusicBrainz:
     def _search(self, track_id):
         track = self.toukka.sp.track(track_id)
         album = self.toukka.sp.album(track.get('album').get('id'))
+        logger.debug('strict_search %s, fuzzy_search %s', self.strict_search, self.fuzzy_search)
 
         self._search_track(track)
         self._search_album(album)
 
+        # FIXME: remove duplicates
         for artist in track.get('artists'):
             self._search_artist(artist)
 
         for artist in album.get('artists'):
             self._search_artist(artist)
 
-        self._pingpong(track, album)
+        if self.fuzzy_search:
+            self._pingpong(track, album)
 
     def _pingpong(self, track, album):
         track_uri = track.get('uri')
@@ -121,13 +129,14 @@ class Spotify2MusicBrainz:
         uri = track.get('uri')
 
         if self._get_mbid_silent(uri):
-            #logger.debug('%s uri is already on db', uri)
             return
 
-        self._search_track_by_isrc(track)
-        self._search_track_by_url(track)
-        self._search_track_by_data(track)
-        self._search_track_by_data(track, with_album_name=False)
+        if self.strict_search:
+            self._search_track_by_url(track)
+            self._search_track_by_isrc(track)
+        if self.fuzzy_search:
+            self._search_track_by_data(track)
+
 
     def _search_track_by_isrc(self, track):
         uri = track.get('uri')
@@ -137,7 +146,7 @@ class Spotify2MusicBrainz:
             return
 
         isrc = self._fix_isrc(track.get('external_ids').get('isrc'))
-        mbids = self._search_recording_isrc_from_musicbrainz(isrc)
+        mbids = self._search_recording_by_isrc_from_musicbrainz(isrc)
         self._found_track_mbids(track, mbids)
 
     def _search_track_by_url(self, track):
@@ -148,7 +157,7 @@ class Spotify2MusicBrainz:
             return
 
         url = track.get('external_urls').get('spotify')
-        mbids = self._search_track_url_from_musicbrainz(url)
+        mbids = self._search_recording_by_url_from_musicbrainz(url)
         self._found_track_mbids(track, mbids)
 
     def _search_track_by_data(self, track, with_album_name=True):
@@ -195,25 +204,7 @@ class Spotify2MusicBrainz:
         # the medium that the recording should be found on, first medium is position 1 
         fields['position'] = track.get('disc_number')
 
-        mbids = list()
-        logger.debug('search fields: %s', fields)
-        # FIXME: move to .mb.
-        result = self.toukka.mbngs.search_recordings(strict=True, **fields)
-        if result:
-            logger.debug('found %s recordings from MusicBrainz', result.get('count'))
-            if result.get('count') == 0:
-                return
-            if result.get('count') == 1:
-                logger.debug('only one found, so adding it')
-                for r in result.get('recordings'):
-                    mbids.append(r.get('id'))
-            else:
-                logger.debug('multiple found, dont know what to do')
-
-            #pprint.pprint(result)
-        else:
-            logger.debug('failed, no result')
-
+        mbids = self._search_recording_by_data_from_musicbrainz(**fields)
         self._found_track_mbids(track, mbids)
 
     def _found_track_mbids(self, track, mbids):
@@ -492,6 +483,9 @@ class Spotify2MusicBrainz:
         elif album_name == release_name_with_disambiguation:
             logger.debug('ok: album_name == release_name_with_disambiguation')
             is_name_ok = True
+        elif album_name in release_name:
+            logger.debug('ok: album_name in release_name')
+            is_name_ok = True
         else:
             logger.debug('fail: album_name (%s) != release_name (%s)', album_name, release_name)
             is_name_ok = False
@@ -524,8 +518,11 @@ class Spotify2MusicBrainz:
             #logger.debug('%s uri is already on db', uri)
             return
 
-        self._search_album_by_upc(album)
-        self._search_album_by_url(album)
+        if self.strict_search:
+            self._search_album_by_url(album)
+            self._search_album_by_upc(album)
+        if self.fuzzy_search:
+            pass
 
     def _search_album_by_upc(self, album):
         uri = album.get('uri')
@@ -535,7 +532,7 @@ class Spotify2MusicBrainz:
             return
 
         upc = album.get('external_ids').get('upc')
-        mbids = self._search_album_upc_from_musicbrainz(upc)
+        mbids = self._search_release_by_upc_from_musicbrainz(upc)
         self._found_album_mbids(album, mbids)
 
     def _search_album_by_url(self, album):
@@ -546,7 +543,7 @@ class Spotify2MusicBrainz:
             return
 
         url = album.get('external_urls').get('spotify')
-        mbids = self._search_album_url_from_musicbrainz(url)
+        mbids = self._search_release_by_url_from_musicbrainz(url)
         self._found_album_mbids(album, mbids)
 
     def _search_artist(self, artist):
@@ -556,8 +553,11 @@ class Spotify2MusicBrainz:
             #logger.debug('%s uri is already on db', uri)
             return
 
-        self._search_artist_by_url(artist)
-        #self._search_artist_by_data(artist)
+        if self.strict_search:
+            self._search_artist_by_url(artist)
+        if self.fuzzy_search:
+            #self._search_artist_by_data(artist)
+            pass
 
     def _search_artist_by_url(self, artist):
         uri = artist.get('uri')
@@ -567,7 +567,7 @@ class Spotify2MusicBrainz:
             return
 
         url = artist.get('external_urls').get('spotify')
-        mbids = self._search_artist_url_from_musicbrainz(url)
+        mbids = self._search_artist_by_url_from_musicbrainz(url)
         self._found_artist_mbids(artist, mbids)
 
     def _search_artist_by_data(self, artist):
@@ -602,9 +602,9 @@ class Spotify2MusicBrainz:
         return
 
 
-    def _search_recording_isrc_from_musicbrainz(self, isrc):
+    def _search_recording_by_isrc_from_musicbrainz(self, isrc):
         logger.debug('searching isrc %s from musicbrainz', isrc)
-        result = self.toukka.mb.get_isrc(isrc)
+        result = self.toukka.mb.get_recordings_by_isrc(isrc)
         mbids = list()
         if result:
             #pprint.pprint(result)
@@ -616,8 +616,8 @@ class Spotify2MusicBrainz:
         return mbids
 
 
-    def _search_album_upc_from_musicbrainz(self, upc):
-        logger.debug('searching UPC %s from musicbrainz', upc)
+    def _search_release_by_upc_from_musicbrainz(self, upc):
+        logger.debug('searching release by upc %s from musicbrainz', upc)
         mbids = list()
         result = self.toukka.mb.search_releases_with_upc(upc)
         if result:
@@ -628,8 +628,8 @@ class Spotify2MusicBrainz:
             logger.debug('failed, no result')
         return mbids
 
-    def _search_artist_url_from_musicbrainz(self, url):
-        logger.debug('searching artist url %s from musicbrainz', url)
+    def _search_artist_by_url_from_musicbrainz(self, url):
+        logger.debug('searching artist by url %s from musicbrainz', url)
         result = self.toukka.mb.browse_urls(url)
         mbids = list()
         if result:
@@ -641,8 +641,8 @@ class Spotify2MusicBrainz:
             logger.debug('failed, no result')
         return mbids
 
-    def _search_album_url_from_musicbrainz(self, url):
-        logger.debug('searching album url %s from musicbrainz', url)
+    def _search_album_by_url_from_musicbrainz(self, url):
+        logger.debug('searching album by url %s from musicbrainz', url)
         mbids = list()
         result = self.toukka.mb.browse_urls(url)
         if result:
@@ -654,8 +654,8 @@ class Spotify2MusicBrainz:
             logger.debug('failed, no result')
         return mbids
 
-    def _search_track_url_from_musicbrainz(self, url):
-        logger.debug('searching track url %s from musicbrainz', url)
+    def _search_recording_by_url_from_musicbrainz(self, url):
+        logger.debug('searching recording by url %s from musicbrainz', url)
         mbids = list()
         result = self.toukka.mb.browse_urls(url)
         if result:
@@ -666,6 +666,20 @@ class Spotify2MusicBrainz:
         else:
             logger.debug('failed, no result')
         return mbids
+
+    def _search_recording_by_data_from_musicbrainz(self, **fields):
+        logger.debug('searching recording by data from musicbrainz')
+        logger.debug('search fields: %s', fields)
+        mbids = list()
+        result = self.toukka.mb.search_recordings(strict=True, **fields)
+        if result:
+            logger.debug('found %s recordings from musicbrainz', result.get('count'))
+            for r in result.get('recordings'):
+                mbids.append(r.get('id'))
+        else:
+            logger.debug('failed, no result')
+        return mbids
+
 
     def _normalize_string(self, string):
         # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
