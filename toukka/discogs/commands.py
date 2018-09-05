@@ -6,6 +6,15 @@ import argh
 from toukka import Toukka
 
 
+NAMESPACE = 'discogs'
+
+NAMESPACE_KWARGS = {
+    'title': 'Discogs',
+    'description': 'discogs, discogs, discogs',
+    'help': 'help, help, help'
+}
+
+
 @argh.aliases('artist')
 def get_artist_by_id(artist_id):
     '''get artist by id'''

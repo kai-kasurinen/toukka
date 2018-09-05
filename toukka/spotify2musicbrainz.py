@@ -5,6 +5,7 @@ import shelve
 import pprint
 import unicodedata
 import datetime
+import functools
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -24,7 +25,7 @@ class Spotify2MusicBrainz:
         # FIXME: temporary
         #self._remove_bad_data_from_db()
         self.strict_search = True
-        self.fuzzy_search = False
+        self.fuzzy_search = True
 
 
     def get_mbid(self, uri):
@@ -132,7 +133,7 @@ class Spotify2MusicBrainz:
             return
 
         if self.strict_search:
-            self._search_track_by_url(track)
+            #self._search_track_by_url(track)
             self._search_track_by_isrc(track)
         if self.fuzzy_search:
             self._search_track_by_data(track)
@@ -166,8 +167,6 @@ class Spotify2MusicBrainz:
         if self._get_mbid_silent(uri):
             #logger.debug('%s uri is already on db', uri)
             return
-
-        logger.debug('searching track by data from musicbrainz')
 
         fields = dict()
 
@@ -550,14 +549,12 @@ class Spotify2MusicBrainz:
         uri = artist.get('uri')
 
         if self._get_mbid_silent(uri):
-            #logger.debug('%s uri is already on db', uri)
             return
 
         if self.strict_search:
             self._search_artist_by_url(artist)
         if self.fuzzy_search:
-            #self._search_artist_by_data(artist)
-            pass
+            self._search_artist_by_data(artist)
 
     def _search_artist_by_url(self, artist):
         uri = artist.get('uri')
@@ -568,38 +565,22 @@ class Spotify2MusicBrainz:
 
         url = artist.get('external_urls').get('spotify')
         mbids = self._search_artist_by_url_from_musicbrainz(url)
-        self._found_artist_mbids(artist, mbids)
+        return self._found_artist_mbids(artist, mbids)
+
 
     def _search_artist_by_data(self, artist):
         uri = artist.get('uri')
 
         if self._get_mbid_silent(uri):
-            #logger.debug('%s uri is already on db', uri)
             return
 
-        logger.debug('searching artist by data from musicbrainz')
-
         fields = dict()
-
         fields['artist'] = artist.get('name')
 
-        mbids = list()
-        logger.debug('search fields: %s', fields)
-        result = self.toukka.mbngs.search_artists(strict=True, **fields)
-        if result:
-            logger.debug('found %s artists from musicbrainz', result.get('count'))
-            #pprint.pprint(result)
-        else:
-            logger.debug('failed, no result')
-
-        if result and result.get('count') == 1:
-            logger.debug('only one found')
-            for r in result.get('artists'):
-                mbids.append(r.get('id'))
-        else:
-            pass
-
-        return
+        mbids = self._search_artist_by_data_from_musicbrainz(**fields)
+        # FIXME: do not enable
+        #self._found_artist_mbids(artist, mbids)
+        return False
 
 
     def _search_recording_by_isrc_from_musicbrainz(self, isrc):
@@ -614,7 +595,6 @@ class Spotify2MusicBrainz:
         else:
             logger.debug('failed, no result')
         return mbids
-
 
     def _search_release_by_upc_from_musicbrainz(self, upc):
         logger.debug('searching release by upc %s from musicbrainz', upc)
@@ -641,8 +621,8 @@ class Spotify2MusicBrainz:
             logger.debug('failed, no result')
         return mbids
 
-    def _search_album_by_url_from_musicbrainz(self, url):
-        logger.debug('searching album by url %s from musicbrainz', url)
+    def _search_release_by_url_from_musicbrainz(self, url):
+        logger.debug('searching release by url %s from musicbrainz', url)
         mbids = list()
         result = self.toukka.mb.browse_urls(url)
         if result:
@@ -675,6 +655,19 @@ class Spotify2MusicBrainz:
         if result:
             logger.debug('found %s recordings from musicbrainz', result.get('count'))
             for r in result.get('recordings'):
+                mbids.append(r.get('id'))
+        else:
+            logger.debug('failed, no result')
+        return mbids
+
+    def _search_artist_by_data_from_musicbrainz(self, **fields):
+        logger.debug('searching artist by data from musicbrainz')
+        logger.debug('search fields: %s', fields)
+        mbids = list()
+        result = self.toukka.mb.search_artists(strict=True, **fields)
+        if result:
+            logger.debug('found %s artists from musicbrainz', result.get('count'))
+            for r in result.get('artists'):
                 mbids.append(r.get('id'))
         else:
             logger.debug('failed, no result')

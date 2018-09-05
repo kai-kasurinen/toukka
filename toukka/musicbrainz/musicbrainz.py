@@ -21,6 +21,19 @@ class MusicBrainz:
         self.mbngs.set_format(fmt='json')
 
     @functools.lru_cache(maxsize=32)
+    def search_artists(self, query='', limit=None, offset=None, strict=False, **fields):
+        try:
+            result = self.mbngs.search_artists(query=query,
+                                                  limit=limit,
+                                                  offset=offset,
+                                                  strict=strict,
+                                                  **fields)
+        except musicbrainzngs.ResponseError as error:
+            logger.debug('HTTP error %s', error.cause.code)
+            raise
+        return result
+
+    @functools.lru_cache(maxsize=32)
     def search_recordings(self, query='', limit=None, offset=None, strict=False, **fields):
         try:
             result = self.mbngs.search_recordings(query=query,
@@ -29,7 +42,7 @@ class MusicBrainz:
                                                   strict=strict,
                                                   **fields)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             raise
         return result
 
@@ -42,7 +55,7 @@ class MusicBrainz:
                                                   strict=strict,
                                                   **fields)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             raise
         return result
 
@@ -56,14 +69,13 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_recordings_by_isrc(isrc, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
                 raise
         assert(result.get('isrc') == isrc)
         return result
-
 
     @functools.lru_cache(maxsize=32)
     def get_recording(self, mbid):
@@ -78,7 +90,7 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_recording_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -93,7 +105,7 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_release_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -107,7 +119,7 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_release_group_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -121,7 +133,7 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_artist_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -143,20 +155,21 @@ class MusicBrainz:
         try:
             result = self.mbngs.get_work_by_id(mbid, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
                 raise
         return result
 
+    @functools.lru_cache(maxsize=32)
     def browse_urls(self, url):
         logger.debug('browse_urls %s', url)
         includes = self._get_includes('url')
         try:
             result = self.mbngs.browse_urls(resource=url, includes=includes)
         except musicbrainzngs.ResponseError as error:
-            logging.debug('HTTP error %s', error.cause.code)
+            logger.debug('HTTP error %s', error.cause.code)
             if error.cause.code == 404:
                 return None
             else:
@@ -239,7 +252,7 @@ class MusicBrainz:
         if match:
             return match.group()
         else:
-            logging.debug('No MBID found from string (%s)', string)
+            logger.debug('No MBID found from string (%s)', string)
             return
 
     def get_entity_url(self, entity_type, mbid):

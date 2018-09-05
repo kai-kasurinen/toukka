@@ -12,7 +12,7 @@ import tabulate
 import argh
 import simplejson as json
 
-from toukka import Toukka
+from toukka import Toukka, ResourceURL
 from toukka.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
 from toukka.utils import _get_flags, _list_to_string
@@ -80,7 +80,7 @@ class PlayingPrinter:
             print()
             self.toukka.sp2mb.feed_track_id(item.get('id'))
             self._print_musicbrainz()
-            #self._print_discogs()
+            self._print_discogs()
 
 
     def _print_musicbrainz(self):
@@ -104,7 +104,6 @@ class PlayingPrinter:
                     self._print_musicbrainz_artist(sp_artist_mbid)
 
     def _print_discogs(self):
-        print()
         print('Discogs:')
 
         sp_album_uri = self.currently_playing.get('item').get('album').get('uri')
@@ -112,8 +111,7 @@ class PlayingPrinter:
         if sp_album_mbid:
             urls = self.toukka.mb.get_release_url_relations_by_type(sp_album_mbid, 'discogs')
             for u in urls:
-                print(u)
-
+                self._print_discogs_release_by_url(u)
 
 
     def _print_is_playing(self):
@@ -150,26 +148,24 @@ class PlayingPrinter:
             print('\texternal urls: {external_urls}'.format(**artist))
 
     def _print_album_info(self, album_id):
-
         album = self.toukka.sp.album(album_id)
-
         print('album: {name} ({album_type}) ({uri}) ({release_date} {release_date_precision})'.format(**album))
         print('\tartists: %s' % self._spotify_artists_to_string(album.get('artists')))
-
         if album.get('genres'):
             print('\tgenres: {genres}'.format(**album))
         if album.get('external_ids'):
             print('\texternal ids: {external_ids}'.format(**album))
         if album.get('external_urls'):
             print('\texternal urls: {external_urls}'.format(**album))
-
         if album.get('popularity'):
             print('\tpopularity: {popularity}'.format(**album))
         if album.get('available_markets'):
             print('\tmarkets: %s' % (len(album.get('available_markets'))))
         if album.get('restrictions'):
             print('\trestrictions: {restrictions}'.format(**album))
-
+        # FIXME: needs get_album_tracks
+        if album.get('tracks'):
+            print('\ttracks: %s' % (album.get('tracks').get('total')))
         if album.get('label'):
             print('\tlabel: {label}'.format(**album))
         if album.get('copyrights'):
@@ -178,26 +174,11 @@ class PlayingPrinter:
                 print('\t\t{type}: {text}'.format(**copyright))
 
     def _print_track_info(self, track_id):
-
-        # FIXME: we already have this
         track = self.toukka.sp.track(track_id)
-        item = track
-        track_id = item.get('id')
-        track_uri = item.get('uri')
-
-        track_name = item['name']
-        track_id = item['id']
-        track_uri = item['uri']
-
-        track_popularity = item['popularity']
-        track_markets = item.get('available_markets')
-        track_duration = item['duration_ms']
-
         print('track: {name} ({uri})'.format(**track))
         print('\tartists: %s' % self._spotify_artists_to_string(track.get('artists')))
         print('\tduration: %s' % (datetime.timedelta(milliseconds=track.get('duration_ms'))))
         print('\ttrack number: {track_number}, disc number: {disc_number}'.format(**track))
-
         if track.get('external_ids'):
             print('\texternal ids: {external_ids}'.format(**track))
         if track.get('external_urls'):
@@ -357,8 +338,20 @@ class PlayingPrinter:
         url = self.toukka.acousticbrainz.get_url(mbid)
         print('\tacousticbrainz: {count} entries, {url}'.format(**+c, url=url))
 
-    def _print_discogs_release(self, url):
-        pass
+    def _print_discogs_release_by_url(self, url):
+        self._print_discogs_release(ResourceURL(url).entity_id)
+
+    def _print_discogs_release(self, rid):
+        release = self.toukka.discogs.release(rid)
+        release.refresh()
+        print('release: {title} ({id}) ({country}) ({released}) ({status})'.format(**release.data))
+        print('\tartists: {}'.format(release.artists))
+        # release.url returns None?
+        print('\turl: {uri}'.format(**release.data))
+        print('\tgenres: {}'.format(release.genres))
+        print('\tstyles: {}'.format(release.styles))
+        print('\tidentifiers: {identifiers}'.format(**release.data))
+        print()
 
     def _spotify_artists_to_string(self, artists):
         return ", ".join("%s (%s)" % (artist.get('name'), artist.get('uri')) for artist in artists)
