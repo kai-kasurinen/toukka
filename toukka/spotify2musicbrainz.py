@@ -394,8 +394,8 @@ class Spotify2MusicBrainz:
         sp_artist = artist
         mb_artist = self.toukka.mb.get_artist(mbid)
 
-        sp_artist_name = sp_artist.get('name')
-        mb_artist_name = mb_artist.get('name')
+        sp_artist_name = sp_artist.get('name').lower()
+        mb_artist_name = mb_artist.get('name').lower()
 
         # FIXME: bug: fail: sp_artist_name (Yo-Yo Ma) != mb_artist_name (Yo‐Yo Ma)
         if sp_artist_name == mb_artist_name:

@@ -8,6 +8,7 @@ import argh
 import toukka
 import toukka.spotify.commands
 import toukka.musicbrainz.commands
+import toukka.acousticbrainz.commands
 import toukka.discogs.commands
 import toukka.pandas.commands
 import toukka.toukka.commands
@@ -36,6 +37,10 @@ def main():
     parser.add_commands(toukka.musicbrainz.commands.COMMANDS,
                         namespace=toukka.musicbrainz.commands.NAMESPACE,
                         namespace_kwargs=toukka.musicbrainz.commands.NAMESPACE_KWARGS)
+
+    parser.add_commands(toukka.acousticbrainz.commands.COMMANDS,
+                        namespace=toukka.acousticbrainz.commands.NAMESPACE,
+                        namespace_kwargs=toukka.acousticbrainz.commands.NAMESPACE_KWARGS)
 
     parser.add_commands(toukka.discogs.commands.COMMANDS,
                         namespace=toukka.discogs.commands.NAMESPACE,
