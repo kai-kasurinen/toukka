@@ -7,3 +7,15 @@ b'Yo\xe2\x80\x90Yo Ma'
 
 https://github.com/metabrainz/picard/blob/master/picard/util/textencoding.py
 
+# 2
+2018-09-06 07:50:53,670 toukka.spotify2musicbrainz DEBUG fail: album_upc (0063757962625) != release_barcode (063757962625)
+
+https://www.nationwidebarcode.com/whats-the-difference-between-a-upc-and-ean/
+"you can convert your 12 digit UPC to a 13 digit EAN by adding in the country code 0."
+
+# 3 
+
+2018-09-06 21:28:50,888 toukka.spotify2musicbrainz DEBUG searching release by url https://open.spotify.com/album/4crZqF0juXlRdiMKJHm6iu from musicbrainz
+2018-09-06 21:28:51,837 toukka.spotify2musicbrainz DEBUG failed, no result
+2018-09-06 21:28:51,838 toukka.spotify2musicbrainz DEBUG searching album by upc all variants
+2018-09-06 21:28:51,838 toukka.spotify2musicbrainz DEBUG warning: album_upc (00602537602407) is unknown format

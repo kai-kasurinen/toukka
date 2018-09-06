@@ -1,19 +1,5 @@
 #
 
-"""utility functions"""
-
-import simplejson
-
-
-def json_dump(obj):
-    """dumps json with indent"""
-    return simplejson.dumps(obj, indent='  ')
-
-
-def json_dump_print(obj):
-    """prints json with indent"""
-    print((json_dump(obj)))
-
 
 # https://www.calazan.com/python-function-for-displaying-a-list-of-dictionaries-in-table-format/
 def format_as_table(data,
@@ -78,23 +64,3 @@ def format_as_table(data,
             data_to_format.append(element[pair[0]])
         formatted_data += format % tuple(data_to_format)
     return formatted_data
-
-
-def _get_flags(dict, needed):
-    return [key for key, value in dict.items() if key in needed and value is True]
-
-
-def _list_to_string(list, sep=', '):
-    return sep.join(list)
-
-
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-
-# END

@@ -139,8 +139,9 @@ class PlayingPrinter:
 
         artist = self.toukka.sp.artist(artist_id)
 
-        print('artist: {name} ({uri}) (popularity: {popularity}, followers: {followers[total]})'.format(**artist))
-        print('\tgenres: {genres}'.format(**artist))
+        print('artist: {name} ({uri}) (popularity: {popularity}, followers: {followers[total]})'.format_map(artist))
+        if artist.get('genres'):
+            print('\tgenres: {genres}'.format_map(artist))
         #print('\tpopularity: {popularity}'.format(**artist))
         #print('\tfollowers: {followers[total]}'.format(**artist))
 
@@ -249,7 +250,9 @@ class PlayingPrinter:
 
     def _print_musicbrainz_artist(self, mbid):
         artist = self.toukka.mb.get_artist(mbid)
-        print('artist: {name} ({disambiguation}) ({id})'.format(**artist))
+        print('artist: {name} ({disambiguation}) ({id}) ({type} {gender})'.format(**artist))
+        if artist.get('area'):
+            print('\tarea: {name}'.format_map(artist.get('area')))
         if artist.get('tags'):
             print('\ttags: {}'.format(self._musicbrainz_tags_to_string(artist.get('tags'))))
         if artist.get('rating').get('value'):
