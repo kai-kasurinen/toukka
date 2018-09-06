@@ -66,7 +66,7 @@ class Spotify2MusicBrainz:
         else:
             logger.debug('multiple mbids, not adding any')
             return False
-    
+
     def _remove_bad_data_from_db(self):
         # length mismatch
         self.del_uri('spotify:track:0FlNSJQaK8ntxwOHetrgQY')
@@ -92,6 +92,10 @@ class Spotify2MusicBrainz:
         album = self.toukka.sp.album(track.get('album').get('id'))
         logger.debug('strict_search %s, fuzzy_search %s', self.strict_search, self.fuzzy_search)
 
+        # try this first
+        if self.fuzzy_search:
+            self._search_with_extract(track)
+
         try:
             self._search_track(track)
         except ValidationFailed as e:
@@ -105,8 +109,9 @@ class Spotify2MusicBrainz:
         artists = track.get('artists') + album.get('artists')
         self._search_artists(artists)
 
+        # and try again last
         if self.fuzzy_search:
-            self._pingpong(track, album)
+            self._search_with_extract(track)
 
     def _search_artists(self, artists):
 
@@ -121,50 +126,44 @@ class Spotify2MusicBrainz:
             except ValidationFailed as e:
                 logger.debug('found someting but failed validate')
 
-
-
-    def _pingpong(self, track, album):
+    def _search_with_extract(self, track):
+        logger.debug('_search_with_extract')
+        album = track.get('album')
         track_uri = track.get('uri')
         album_uri = album.get('uri')
         track_mbid = self._get_mbid_silent(track_uri)
         album_mbid = self._get_mbid_silent(album_uri)
 
         if len(track.get('artists')) != 1:
-            logger.debug('pingpong not support multiple artists')
+            logger.debug('warn: multiple artists, using first one')
 
         artist = track.get('artists')[0]
         artist_uri = artist.get('uri')
         artist_mbid = self._get_mbid_silent(artist_uri)
 
-        logger.debug('pingpong, track: %s, album: %s, artist: %s', track_mbid, album_mbid, artist_mbid)
+        logger.debug('track: %s, album: %s, artist: %s', track_mbid, album_mbid, artist_mbid)
 
-        if (track_mbid and album_mbid and artist_mbid):
-            logger.debug('Yippii! track, album and artist found')
-        elif (track_mbid and album_mbid and not artist_mbid):
-            logger.debug('track and album found, artist still missing')
+        if track_mbid and not artist_mbid:
+            logger.debug('track found, trying extract artist from it')
             try:
                 self._extract_artists_from_recording(track, self._get_recording_by_track(track))
             except ValidationFailed as e:
                 logger.debug('found someting but failed validate')
 
-        elif (track_mbid and not album_mbid and artist_mbid):
-            logger.debug('track and artist found, album still missing')
+        if track_mbid and not album_mbid:
+            logger.debug('track found, trying extract album from it')
             try:
                 self._extract_album_from_recording(track, self._get_recording_by_track(track))
             except ValidationFailed as e:
                 logger.debug('found someting but failed validate')
-        elif (track_mbid and not album_mbid and not artist_mbid):
-            logger.debug('track found, album and artist still missing')
+
+        if album_mbid and not artist_mbid:
+            logger.debug('album found, trying extract artist from it')
             try:
-                self._extract_artists_from_recording(track, self._get_recording_by_track(track))
+                self._extract_artists_from_release(album, self._get_release_by_album(album))
             except ValidationFailed as e:
                 logger.debug('found someting but failed validate')
-            try:
-                self._extract_album_from_recording(track, self._get_recording_by_track(track))
-            except ValidationFailed as e:
-                logger.debug('found someting but failed validate')
-        else:
-            logger.debug('what is this?')
+
 
     def _search_track(self, track):
         if self._get_mbid_silent(track.get('uri')):
@@ -182,6 +181,8 @@ class Spotify2MusicBrainz:
                 self._search_track_by_data(track, artist=artist)
                 # this is even worse choice
                 self._search_track_by_data(track, artist=artist, with_album_name=False)
+                # outch
+                self._search_track_by_data(track, artist=artist, with_track_name=False)
 
         return
 
@@ -221,7 +222,7 @@ class Spotify2MusicBrainz:
         if with_artist:
             # cos musicbrainzngs and musicbrainz search sucks
             if artist is None:
-                logger.debug('warning: no artist given using first one')
+                logger.debug('warn: no artist given using first one')
                 artist = track.get('artists')[0]
 
             artist_mbid = self._get_mbid_silent(artist.get('uri'))
@@ -267,7 +268,7 @@ class Spotify2MusicBrainz:
             fields['position'] = track.get('disc_number')
 
         if with_release_status:
-            # Release status (official, promotion, Bootleg, Pseudo-Release) 
+            # Release status (official, promotion, Bootleg, Pseudo-Release)
             fields['status'] = 'official'
 
         mbids = self._search_recording_by_data_from_musicbrainz(**fields)
@@ -313,14 +314,15 @@ class Spotify2MusicBrainz:
         track_length = track.get('duration_ms')
         recording_length = recording.get('length')
         length_difference = abs(track_length-recording_length)
-        logger.debug('track length: %i, recording length: %i, difference: %i', track_length, recording_length, length_difference)
+        logger.debug('track length: %i, recording length: %i, difference: %i',
+                     track_length, recording_length, length_difference)
         if length_difference > 2000:   # 2s
             logger.debug('fail: length_difference < 2000')
             raise ValidationFailed()
 
         # artists matching
         track_artists = ', '.join([a.get('name') for a in track.get('artists')])
-        recording_artists = ', '.join([c.get('name') for c in recording.get('artist-credit')])
+        recording_artists = self._musicbrainz_artist_credit_to_string(recording.get('artist-credit'))
         logger.debug('track_artists: %s', track_artists)
         logger.debug('recording_artists: %s', recording_artists)
         if not self._compare_strings(track_artists, recording_artists):
@@ -336,7 +338,7 @@ class Spotify2MusicBrainz:
         recording_isrcs = recording.get('isrcs')
 
         if len(recording_isrcs) == 0:
-            logger.debug('warning: recording without ISRCs')
+            logger.debug('warn: recording without ISRCs')
             is_isrc_ok = True
         elif len(recording_isrcs) == 1:
             if track_isrc in recording_isrcs:
@@ -346,7 +348,7 @@ class Spotify2MusicBrainz:
                 logger.debug('fail: track_isrc is not in recording_isrcs')
                 is_isrc_ok = False
         elif len(recording_isrcs) > 1:
-            logger.debug('warning: recording has multiple ISRCs: %s', recording.get('isrcs'))
+            logger.debug('warn: recording has multiple ISRCs: %s', recording.get('isrcs'))
             if track_isrc in recording_isrcs:
                 logger.debug('ok: track_isrc is in recording_isrcs')
                 is_isrc_ok = True
@@ -385,31 +387,56 @@ class Spotify2MusicBrainz:
         return is_ok
 
     def _get_recording_by_track(self, track):
+        logger.debug('_get_recording_by_track')
         return self.toukka.mb.get_recording(self.get_mbid(track.get('uri')))
 
-    def _extract_recording_and_track(self, track, recording):
-        logger.debug('WARNING: trying extract artist and album from recording')
-        self._extract_artists_from_recording(track, recording)
-        self._extract_album_from_recording(track, recording)
+    def _get_release_by_album(self, album):
+        logger.debug('_get_recording_by_album')
+        return self.toukka.mb.get_release(self.get_mbid(album.get('uri')))
 
     def _extract_artists_from_recording(self, track, recording):
         logger.debug('trying extract artists from recording')
-        # try get artist
-        if len(track.get('artists')) == 1 and len(recording.get('artist-credit')) == 1:
-            logger.debug('track and recording has only one artist, check it')
-            ta = track.get('artists')[0]
-            ra = recording.get('artist-credit')[0].get('artist')
-            tan = ta.get('name')
-            ran = ra.get('name')
-            if self._compare_strings(tan, ran):
-                logger.debug('track artist name and recording artist name matches, so we may found artist mbid')
-                self._found_artist_mbid(ta, ra.get('id'))
-            else:
-                logger.debug('track artist name and recording artist name mismatches, tan: %s, ran: %s', tan, ran)
-                #logger.debug('WARNING: trying it anyway')
-                #self._found_artist_mbid(ta, ra.get('id'))
+        mbids = list()
+        if len(track.get('artists')) != 1:
+            logger.debug('multiple track artists, not implemented')
+            return False
+        if len(recording.get('artist-credit')) != 1:
+            logger.debug('multiple recording artists, not implemented')
+            return False
+
+        track_artist = track.get('artists')[0]
+        track_artist_name = track_artist.get('name')
+        recording_artist = recording.get('artist-credit')[0].get('artist')
+        recording_artist_name = recording_artist.get('name')
+        if self._compare_strings(track_artist_name, recording_artist_name):
+            logger.debug('track artist name and recording artist name matches, so we may found artist mbid')
+            mbids.append(recording_artist.get('id'))
         else:
-            logger.debug('multiple artists, not implemented')
+            logger.debug('track artist name and recording artist name mismatches, tan: %s, ran: %s', track_artist_name, recording_artist_name)
+
+        return self._found_artist_mbids(track_artist, mbids)
+
+    def _extract_artists_from_release(self, album, release):
+        logger.debug('trying extract artists from release')
+        mbids = list()
+        if len(album.get('artists')) != 1:
+            logger.debug('multiple album artists, not implemented')
+            return False
+        if len(release.get('artist-credit')) != 1:
+            logger.debug('multiple release artists, not implemented')
+            return False
+
+        album_artist = album.get('artists')[0]
+        album_artist_name = album_artist.get('name')
+        release_artist = release.get('artist-credit')[0].get('artist')
+        release_artist_name = release_artist.get('name')
+        if self._compare_strings(album_artist_name, release_artist_name):
+            logger.debug('album artist name and release artist name matches, so we may found artist mbid')
+            mbids.append(release_artist.get('id'))
+        else:
+            logger.debug('album artist name and release artist name mismatches, tan: %s, ran: %s', album_artist_name, release_artist_name)
+
+        return self._found_artist_mbids(album_artist, mbids)
 
     def _extract_album_from_recording(self, track, recording):
         logger.debug('trying extract album from recording')
@@ -418,7 +445,7 @@ class Spotify2MusicBrainz:
         track_album = track.get('album')
         track_album_name = track_album.get('name')
         releases = recording.get('releases')
-        if len(releases):
+        if len(releases) > 1:
             logger.debug('warn: recording linked to %s releases', len(releases))
 
         for release in releases:
@@ -427,10 +454,10 @@ class Spotify2MusicBrainz:
                 logger.debug('track album name and recording album name matches, so we may found release mbid')
                 mbids.append(release.get('id'))
             else:
-                logger.debug('track album name and recording album name mismatches, tan: %s, ran: %s', track_album_name, release_aname)
+                logger.debug('track album name and recording album name mismatches')
+                logger.debug('track_album_name: %s, release_name: %s', track_album_name, release_name)
 
         return self._found_album_mbids(track_album, mbids)
-
 
     def _found_artist_mbids(self, artist, mbids):
         if not mbids:
@@ -478,7 +505,7 @@ class Spotify2MusicBrainz:
             mb_artist_aliases_filtered = list()
             for a in mb_artist_aliases:
                 if (a.get('type') == 'Artist name' and a.get('primary') is True and a.get('locale') == 'en'):
-                        mb_artist_aliases_filtered.append(a.get('name'))
+                    mb_artist_aliases_filtered.append(a.get('name'))
             logger.debug('mb_artist_aliases_filtered: %s', mb_artist_aliases_filtered)
             if sp_artist_name in mb_artist_aliases_filtered:
                 logger.debug('ok: sp_artist_name in mb_artist_aliases_filtered')
@@ -534,7 +561,7 @@ class Spotify2MusicBrainz:
 
         # album artists vs release artists
         album_artists = ', '.join([a.get('name') for a in album.get('artists')])
-        release_artists = ', '.join([c.get('name') for c in release.get('artist-credit')])
+        release_artists = self._musicbrainz_artist_credit_to_string(release.get('artist-credit'))
         logger.debug('album_artists: %s', album_artists)
         logger.debug('release_artists: %s', release_artists)
         if not self._compare_strings(album_artists, release_artists):
@@ -567,7 +594,7 @@ class Spotify2MusicBrainz:
 
         if self._compare_barcodes(album_upc, release_barcode):
             is_upc_ok = True
-        elif release_barcode == None:
+        elif release_barcode is None:
             logger.debug('warn: release_barcode is None')
             is_upc_ok = True
         else:
@@ -615,8 +642,13 @@ class Spotify2MusicBrainz:
             # check if country code is 0
             if album_upc[0] == '0':
                 barcodes.add(self._convert_barcode_ean13_to_upc12(album_upc))
+        elif len(album_upc) == 14:
+            logger.debug('warn: album_upc (%s) is unknown format', album_upc)
+            if len(album_upc) == 14 and album_upc[0] == '0' and album_upc[1] == '0':
+                barcodes.add(album_upc[1:])
+                barcodes.add(album_upc[2:])
         else:
-            logger.debug('warning: album_upc (%s) is unknown format', album_upc)
+            logger.debug('warn: album_upc (%s) is unknown format', album_upc)
 
         logger.debug('media_formats: %s', media_formats)
         logger.debug('barcodes: %s', barcodes)
@@ -791,12 +823,18 @@ class Spotify2MusicBrainz:
     def _fix_isrc(self, isrc):
         return isrc.upper().replace('-', '')
 
+    def _musicbrainz_artist_credit_to_string(self, artist_credit):
+        return ''.join(c.get('name') + c.get('joinphrase') for c in artist_credit)
+
+    def _musicbrainz_artist_credit_to_string_without_joinphrase(self, artist_credit):
+        return ', '.join([c.get('name') for c in recording.get('artist-credit')])
+
     def _compare_strings(self, s1, s2):
-        logger.debug('comparing strings')
-        logger.debug('s1: %s "%s"', type(s1), s1)
-        logger.debug('s2: %s "%s"', type(s2), s2)
-        logger.debug('fuzz_ratio: %i', fuzzywuzzy.fuzz.ratio(s1, s2))
-        if s1 == s2:
+        logger.debug('comparing strings: "%s", "%s", fuzz: %i', s1, s2, fuzzywuzzy.fuzz.ratio(s1, s2))
+        if type(s1) != type(s2):
+            logger.debug('fail: strings are different python type: %s, %s', type(s1), type(s2))
+            return False
+        elif s1 == s2:
             logger.debug('ok: strings are same')
             return True
         elif s1.lower() == s2.lower():
@@ -820,7 +858,10 @@ class Spotify2MusicBrainz:
 
     def _compare_barcodes(self, b1, b2):
         logger.debug('comparing barcodes: %s, %s', b1, b2)
-        if b1 == b2:
+        if type(b1) != type(b2):
+            logger.debug('fail: barcodes are different python type: %s, %s', type(b1), type(b2))
+            return False
+        elif b1 == b2:
             logger.debug('ok: barcodes are same')
             return True
         elif self._convert_barcode_to_ean13(b1) == self._convert_barcode_to_ean13(b2):
@@ -851,6 +892,7 @@ class Spotify2MusicBrainz:
             return barcode[1:]
         else:
             raise Exception()
+
 
 
 class ValidationFailed(Exception):

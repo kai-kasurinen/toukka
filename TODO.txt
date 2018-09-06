@@ -142,3 +142,8 @@ https://docs.python.org/3/library/collections.html#collections.defaultdict
 
 http://ykl.kirjastot.fi/ Yleisten kirjastojen luokitusjärjestelmä
 
+
+
+
+--- Musicbrainz
+https://github.com/Josef-Friedrich/audiorename

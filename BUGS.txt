@@ -19,3 +19,9 @@ https://www.nationwidebarcode.com/whats-the-difference-between-a-upc-and-ean/
 2018-09-06 21:28:51,837 toukka.spotify2musicbrainz DEBUG failed, no result
 2018-09-06 21:28:51,838 toukka.spotify2musicbrainz DEBUG searching album by upc all variants
 2018-09-06 21:28:51,838 toukka.spotify2musicbrainz DEBUG warning: album_upc (00602537602407) is unknown format
+
+maybe https://fi.wikipedia.org/wiki/GTIN
+
+# 4
+2018-09-07 01:02:49,200 toukka.spotify2musicbrainz DEBUG comparing strings: "Irina Bjorklund & Peter Fox", "Irina Björklund, Peter Fox", fuzz: 91                                                                                            
+

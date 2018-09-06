@@ -362,8 +362,11 @@ class PlayingPrinter:
     def _spotify_artists_to_string(self, artists):
         return ", ".join("%s (%s)" % (artist.get('name'), artist.get('uri')) for artist in artists)
 
-    def _musicbrainz_artist_credit_to_string(self, artist_credit):
+    def _musicbrainz_artist_credit_to_string_with_ids(self, artist_credit):
         return ", ".join("%s (%s)" % (credit.get('artist').get('name'), credit.get('artist').get('id')) for credit in artist_credit)
+
+    def _musicbrainz_artist_credit_to_string(self, artist_credit):
+        return ''.join(c.get('name') + c.get('joinphrase') for c in artist_credit)
 
     def _musicbrainz_tags_to_string(self, tags):
         return ", ".join("%s (%s)" % (tag.get('name'), tag.get('count')) for tag in tags)
