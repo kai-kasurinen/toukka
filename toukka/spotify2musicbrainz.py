@@ -1,13 +1,14 @@
 #
 
 import logging
-import shelve
 import pprint
 import unicodedata
 import datetime
 import functools
 import fuzzywuzzy.fuzz
 import unidecode
+from sqlitedict import SqliteDict
+import json
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -19,7 +20,9 @@ class Spotify2MusicBrainz:
             raise Exception()
         if not hub:
             raise Exception()
-        self.db = shelve.open(dbfile)
+        # ok?
+        self.db = SqliteDict(dbfile, tablename='sp2mb', autocommit=True,
+                             encode=json.dumps, decode=json.loads)
         self.hub = hub
         # FIXME:
         self.toukka = self.hub
@@ -216,6 +219,8 @@ class Spotify2MusicBrainz:
         if self._get_mbid_silent(track.get('uri')):
             return
 
+        logger.debug('_search_track_by_data')
+
         fields = dict()
 
         if with_artist:
@@ -253,14 +258,16 @@ class Spotify2MusicBrainz:
                     fields['format'] = media_format
 
                 # number of tracks on release as a whole
-                fields['tracksrelease'] = album.get('tracks').get('total')
+                fields['tracksrelease'] = album.get('total_tracks')
 
         if with_track_name:
             # name of recording or a track associated with the recording
-            # fields['recording'] = self._normalize_string(track.get('name'))
-
+            #fields['recording'] = self._normalize_string(track.get('name'))
+            fields['recording'] = track.get('name')
             # name of the recording with any accent characters retained
-            fields['recordingaccent'] = track.get('name')
+            #fields['recordingaccent'] = track.get('name')
+        else:
+            logger.debug('not adding track name to fields')
 
         if with_track_position:
             # track number on medium
@@ -321,12 +328,24 @@ class Spotify2MusicBrainz:
             logger.debug('fail: length_difference < 2000')
             raise ValidationFailed()
 
-        # artists matching
-        track_artists = ', '.join([a.get('name') for a in track.get('artists')])
+        self._compare_artists(spotify=track.get('artists'), musicbrainz=recording.get('artist-credit'))
+        # artists list matching
+        track_artists_mbids = self._sort_list([self._get_mbid_silent(a.get('uri')) for a in track.get('artists')])
+        recording_artists_mbids = self._sort_list([ac.get('artist').get('id') for ac in recording.get('artist-credit')])
+        logger.debug('track_artists_mbids: %s', track_artists_mbids)
+        logger.debug('recording_artist_mbids: %s', recording_artists_mbids)
+
+        # artists strings matching
+        track_artists = ', '.join(a.get('name') for a in track.get('artists'))
         recording_artists = self._musicbrainz_artist_credit_to_string(recording.get('artist-credit'))
+        recording_artists_without_joinphrase = self._musicbrainz_artist_credit_to_string_without_joinphrase(recording.get('artist-credit'))
         logger.debug('track_artists: %s', track_artists)
         logger.debug('recording_artists: %s', recording_artists)
-        if not self._compare_strings(track_artists, recording_artists):
+        if self._compare_strings(track_artists, recording_artists):
+            logger.debug('ok: track_artists == recording_artists')
+        elif self._compare_strings(track_artists, recording_artists_without_joinphrase):
+            logger.debug('ok: track_artists == recording_artists_without_joinphrase')
+        else:
             logger.debug('fail: track_artists != recording_artists')
             raise ValidationFailed()
 
@@ -405,6 +424,7 @@ class Spotify2MusicBrainz:
             logger.debug('multiple recording artists, not implemented')
             return False
 
+        # it may be better to try id vs mbid matching
         track_artist = track.get('artists')[0]
         track_artist_name = track_artist.get('name')
         recording_artist = recording.get('artist-credit')[0].get('artist')
@@ -835,7 +855,7 @@ class Spotify2MusicBrainz:
         return ''.join(c.get('name') + c.get('joinphrase') for c in artist_credit)
 
     def _musicbrainz_artist_credit_to_string_without_joinphrase(self, artist_credit):
-        return ', '.join([c.get('name') for c in recording.get('artist-credit')])
+        return ', '.join(c.get('name') for c in artist_credit)
 
     def _compare_strings(self, s1, s2):
         logger.debug('comparing strings: "%s", "%s", fuzz: %i', s1, s2, fuzzywuzzy.fuzz.ratio(s1, s2))
@@ -907,6 +927,47 @@ class Spotify2MusicBrainz:
         else:
             raise Exception()
 
+    def _sort_list(self, l):
+        # https://stackoverflow.com/questions/18411560/python-sort-list-with-none-at-the-end
+        return sorted(l, key=lambda x: (x is None, x))
+
+    def _compare_artists(self, spotify=None, musicbrainz=None):
+        logger.debug('comparing artists')
+
+        if spotify is None:
+            raise Exception()
+        if musicbrainz is None:
+            raise Exception()
+
+        spotify_artists = spotify
+        musicbrainz_artists = musicbrainz
+
+        # artists list matching
+        spotify_artists_mbids = self._sort_list([self._get_mbid_silent(a.get('uri')) for a in spotify])
+        musicbrainz_artists_mbids = self._sort_list([ac.get('artist').get('id') for ac in musicbrainz_artists])
+        logger.debug('spotify_artists_mbids: %s', spotify_artists_mbids)
+        logger.debug('musicbrainz_artist_mbids: %s', musicbrainz_artists_mbids)
+
+        # artists strings
+        spotify_artists_string = ', '.join(a.get('name') for a in spotify_artists)
+        musicbrainz_artists_string = self._musicbrainz_artist_credit_to_string(musicbrainz_artists)
+        musicbrainz_artists_string_without_joinphrase = self._musicbrainz_artist_credit_to_string_without_joinphrase(musicbrainz_artists)
+        logger.debug('spotify_artists_string: %s', spotify_artists_string)
+        logger.debug('musicbrainz_artists_string: %s', musicbrainz_artists_string)
+
+        if spotify_artists_mbids == musicbrainz_artists_mbids:
+            logger.debug('ok: spotify_artists_mbids == musicbrainz_artists_mbids')
+            return True
+        elif self._compare_strings(spotify_artists_string, musicbrainz_artists_string):
+            logger.debug('ok: spotify_artists_string == musicbrainz_artists_string')
+            return True
+        elif self._compare_strings(spotify_artists_string, musicbrainz_artists_string_without_joinphrase):
+            logger.debug('ok: spotify_artists_string == musicbrainz_artists_string_without_joinphrase')
+            return True
+        else:
+            logger.debug('fail: spotify_artists != musicbrainz_artists')
+            return False
+        return False
 
 
 class ValidationFailed(Exception):

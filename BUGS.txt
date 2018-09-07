@@ -1,4 +1,4 @@
-# 1
+# 1 FIXED
 FIXME: bug: fail: sp_artist_name (Yo-Yo Ma) != mb_artist_name (Yo‐Yo Ma)
 >>> s1.encode('utf-8')
 b'Yo-Yo Ma'
@@ -7,13 +7,13 @@ b'Yo\xe2\x80\x90Yo Ma'
 
 https://github.com/metabrainz/picard/blob/master/picard/util/textencoding.py
 
-# 2
+# 2 FIXED
 2018-09-06 07:50:53,670 toukka.spotify2musicbrainz DEBUG fail: album_upc (0063757962625) != release_barcode (063757962625)
 
 https://www.nationwidebarcode.com/whats-the-difference-between-a-upc-and-ean/
 "you can convert your 12 digit UPC to a 13 digit EAN by adding in the country code 0."
 
-# 3 
+# 3 FIXED
 
 2018-09-06 21:28:50,888 toukka.spotify2musicbrainz DEBUG searching release by url https://open.spotify.com/album/4crZqF0juXlRdiMKJHm6iu from musicbrainz
 2018-09-06 21:28:51,837 toukka.spotify2musicbrainz DEBUG failed, no result
@@ -22,10 +22,10 @@ https://www.nationwidebarcode.com/whats-the-difference-between-a-upc-and-ean/
 
 maybe https://fi.wikipedia.org/wiki/GTIN
 
-# 4
+# 4 FIXED
 2018-09-07 01:02:49,200 toukka.spotify2musicbrainz DEBUG comparing strings: "Irina Bjorklund & Peter Fox", "Irina Björklund, Peter Fox", fuzz: 91                                                                                            
 
-# 5
+# 5 FIXED
 
 Traceback (most recent call last):                                                                                                       
   File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 46, in on_metadata    
@@ -45,7 +45,7 @@ spotipy.client.SpotifyException: http status: 401, code:-1 - https://api.spotify
         https://github.com/metabrainz/listenbrainz-server/blob/master/listenbrainz/domain/spotify.py
         
 
-# 6 
+# 6 FIXED
 ^CTraceback (most recent call last):
   File "/home/jozo/bin/toukka", line 10, in <module>
     sys.exit(main())
@@ -76,3 +76,37 @@ The urlopen() and urlretrieve() functions can cause arbitrarily long delays whil
 
 
 urllib and glib mainloop?
+
+
+# 8
+2018-09-07 13:58:09,347 toukka.spotify2musicbrainz DEBUG track_artists: Youn Sun Nah                                                                                                                                                       
+2018-09-07 13:58:09,347 toukka.spotify2musicbrainz DEBUG recording_artists: 나윤선 (Youn Sun Nah)                                                                                                                                          
+2018-09-07 13:58:09,347 toukka.spotify2musicbrainz DEBUG comparing strings: "Youn Sun Nah", "나윤선 (Youn Sun Nah)", fuzz: 80                                                                                                              
+2018-09-07 13:58:09,381 toukka.spotify2musicbrainz DEBUG fail: strings not same
+2018-09-07 13:58:09,381 toukka.spotify2musicbrainz DEBUG fail: track_artists != recording_artists                                                                                                                
+
+# 9 FIXED?
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 68, in _print_callback
+    self.playing_printer.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 83, in print
+    self._print_musicbrainz()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 97, in _print_musicbrainz
+    self._print_musicbrainz_recording(sp_track_mbid)
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 305, in _print_musicbrainz_recording
+    self._print_musicbrainz_work(work_mbid)
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 308, in _print_musicbrainz_work
+    work = self.toukka.mb.get_work(mbid)
+  File "/home/jozo/git/toukka/toukka/musicbrainz/musicbrainz.py", line 153, in get_work
+    includes.remove('artists')
+ValueError: list.remove(x): x not in list
+
+# 10
+2018-09-07 14:35:28,617 toukka.spotify2musicbrainz DEBUG _get_recording_by_album
+2018-09-07 14:35:28,620 toukka.spotify2musicbrainz WARNING FAIL: _validate_mbid: spotify:artist:1qehjJokc0bqa0RTbb5heQ uri is already on db                                                                                                
+
+# 11
+2018-09-07 15:06:58,163 toukka.spotify2musicbrainz DEBUG album_artists: Sven Ahlbäck, Maria Kalaniemi
+2018-09-07 15:06:58,163 toukka.spotify2musicbrainz DEBUG release_artists: Maria Kalaniemi & Sven Ahlbäck
+2018-09-07 15:06:58,163 toukka.spotify2musicbrainz DEBUG comparing strings: "Sven Ahlbäck, Maria Kalaniemi", "Maria Kalaniemi & Sven Ahlbäck", fuzz: 51
+

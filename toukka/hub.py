@@ -8,18 +8,22 @@ import warnings
 from cachecontrol import CacheControl
 from cachecontrol.caches.file_cache import FileCache
 from xdg.BaseDirectory import save_cache_path
-from spotipy import SpotifyException
-from spotipy.util import prompt_for_user_token
+
 
 import discogs_client
 import wikidata.client
 
-from toukka.spotify import Spotify, SCOPES_ALL
+from toukka.spotify import Spotify
+from toukka.spotify.client_credentials_manager import ClientCredentialsManager
 from toukka.musicbrainz import MusicBrainz
 from toukka.acousticbrainz import AcousticBrainz
 from toukka.utils import Singleton
 from toukka.spotify2musicbrainz import Spotify2MusicBrainz
 from toukka.finna import Finna
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 
 
 class Hub(metaclass=Singleton):
@@ -28,6 +32,7 @@ class Hub(metaclass=Singleton):
         self._init_cache_path()
         self._init_session()
         self._init_spotify()
+        #self._init_spotify_with_oauth()
         self._init_discogs()
         self._init_musicbrainz()
         self._init_spotify2musicbrainz()
@@ -42,21 +47,12 @@ class Hub(metaclass=Singleton):
         cache = FileCache(cache_path_cachecontrol)
         self._session = CacheControl(requests.Session(), cache)
 
-    def _init_spotify(self, username=None):
-        if not username:
-            username = os.getenv('SPOTIPY_USER')
-        if not username:
-            raise SpotifyException(550, -1, 'no username set')
-
+    def _init_spotify(self):
+        # TODO: add tokens to sqlite
         cache_path_tokens = save_cache_path('toukka', 'spotify', 'tokens')
-        cache_file_for_token = os.path.join(cache_path_tokens, username)
-
-        scope = " ".join(SCOPES_ALL)
-        # FIXME: handle tokens 
-        # FIXME: move client_id and others to config
-        token = prompt_for_user_token(username, scope, cache_path=cache_file_for_token)
-
-        self.sp = Spotify(auth=token, requests_session=self._session)
+        client_credentials_manager = ClientCredentialsManager(cache_directory=cache_path_tokens)
+        self.sp = Spotify(requests_session=self._session,
+                          client_credentials_manager=client_credentials_manager)
         self.sp.trace = False
         self.sp.max_get_retries = 1  # default is 10
 
@@ -75,8 +71,8 @@ class Hub(metaclass=Singleton):
         self.wikidata = wikidata.client.Client()
 
     def _init_spotify2musicbrainz(self):
-        dbfile = os.path.join(save_cache_path('toukka'), 'spotify2musicbrainz')
-        self.sp2mb = Spotify2MusicBrainz(hub=self, dbfile=dbfile)
+        self._sqlite_database_file = os.path.join(save_cache_path('toukka'), 'toukka.sqlite')
+        self.sp2mb = Spotify2MusicBrainz(hub=self, dbfile=self._sqlite_database_file)
 
 
 class Toukka(metaclass=Singleton):
@@ -89,7 +85,6 @@ class Toukka(metaclass=Singleton):
         self.discogs = self.hub.discogs
         self.sp2mb = self.hub.sp2mb
         self.finna = self.hub.finna
-
 
 
 

@@ -81,6 +81,9 @@ class PlayingPrinter:
             print()
             self.toukka.sp2mb.feed_track_id(item.get('id'))
             self._print_musicbrainz()
+
+        if self.args.get('with_discogs'):
+            print()
             self._print_discogs()
 
 

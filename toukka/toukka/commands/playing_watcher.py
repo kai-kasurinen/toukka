@@ -28,10 +28,11 @@ class Watcher:
             'with_track_moods': True,
             'with_track_styles': True,
             'with_track_key_and_mode': False,
-            'with_musicbrainz': True}
+            'with_musicbrainz': True,
+            'wtih_discogs': False
+            }
         self.playing_printer = PlayingPrinter(args=playing_printer_args)
         self.last_seen = None
-        
         self.mainloop = GLib.MainLoop()
 
     def start(self):
@@ -42,7 +43,11 @@ class Watcher:
         try:
             self.mainloop.run()
         except KeyboardInterrupt:
-            print("How rude!")
+            logging.info('Ctrl+C hit, quitting')
+            self._exit()
+
+    def _exit(self):
+        self.mainloop.quit()
 
     def _on_metadata(self, player, metadata):
         logging.debug(metadata)

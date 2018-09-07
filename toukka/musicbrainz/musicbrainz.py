@@ -20,7 +20,7 @@ class MusicBrainz:
         warnings.filterwarnings('ignore', 'The json format is non-official and may change at any time')
         self.mbngs.set_format(fmt='json')
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def search_artists(self, query='', limit=None, offset=None, strict=False, **fields):
         try:
             result = self.mbngs.search_artists(query=query,
@@ -33,7 +33,7 @@ class MusicBrainz:
             raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def search_recordings(self, query='', limit=None, offset=None, strict=False, **fields):
         try:
             result = self.mbngs.search_recordings(query=query,
@@ -46,7 +46,7 @@ class MusicBrainz:
             raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def search_releases(self, query='', limit=None, offset=None, strict=False, **fields):
         try:
             result = self.mbngs.search_releases(query=query,
@@ -59,11 +59,11 @@ class MusicBrainz:
             raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def search_releases_with_upc(self, upc):
         return self.search_releases(barcode=upc)
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def get_recordings_by_isrc(self, isrc):
         includes = self._get_includes('isrc')
         try:
@@ -77,7 +77,7 @@ class MusicBrainz:
         assert(result.get('isrc') == isrc)
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def get_recording(self, mbid):
         logger.debug('get_recording %s', mbid)
         # artists, releases, discids, media, artist-credits, isrcs, annotation, aliases,
@@ -97,7 +97,7 @@ class MusicBrainz:
                 raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def get_release(self, mbid):
         logger.debug('get_release %s', mbid)
         #includes = ['artist-credits', 'tags', 'annotation', 'media', 'labels']
@@ -112,7 +112,7 @@ class MusicBrainz:
                 raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def get_release_group(self, mbid):
         logger.debug('get_release group %s', mbid)
         includes = self._get_includes('release-group')
@@ -126,7 +126,7 @@ class MusicBrainz:
                 raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def get_artist(self, mbid):
         logger.debug('get_artist %s', mbid)
         includes = self._get_includes('artist')
@@ -140,7 +140,7 @@ class MusicBrainz:
                 raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def get_work(self, mbid):
         logger.debug('get_work %s', mbid)
         # artists, aliases, annotation, tags, user-tags, ratings, user-ratings,
@@ -150,7 +150,10 @@ class MusicBrainz:
 
         includes = self._get_includes('work')
         # BUG: 400 Bad request without this
-        includes.remove('artists')
+        try:
+            includes.remove('artists')
+        except ValueError:
+            pass
 
         try:
             result = self.mbngs.get_work_by_id(mbid, includes=includes)
@@ -162,7 +165,7 @@ class MusicBrainz:
                 raise
         return result
 
-    @functools.lru_cache(maxsize=32)
+    @functools.lru_cache(maxsize=128)
     def browse_urls(self, url):
         logger.debug('browse_urls %s', url)
         includes = self._get_includes('url')
