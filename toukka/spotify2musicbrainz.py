@@ -130,7 +130,7 @@ class Spotify2MusicBrainz:
             try:
                 self._search_artist(artist)
             except ValidationFailed as e:
-                logger.debug('found someting but failed validate')
+                logger.debug('found something but failed validate')
 
     def _search_with_extract(self, track):
         album = track.get('album')
@@ -155,11 +155,11 @@ class Spotify2MusicBrainz:
                 logger.debug('found someting but failed validate')
 
         if track_mbid and not album_mbid:
-            logger.debug('track found, trying extract album from it')
-            try:
-                self._extract_album_from_recording(track, self._get_recording_by_track(track))
-            except ValidationFailed as e:
-                logger.debug('found someting but failed validate')
+            logger.debug('track found, trying extract album from it, disabled')
+            #try:
+            #    self._extract_album_from_recording(track, self._get_recording_by_track(track))
+            #except ValidationFailed as e:
+            #    logger.debug('found someting but failed validate')
 
         if album_mbid and not artist_mbid:
             logger.debug('album found, trying extract artist from it')
@@ -422,6 +422,7 @@ class Spotify2MusicBrainz:
 
         for release in releases:
             release_name = release.get('title')
+            # FIXME: this is a bit too much
             if self._compare_strings(track_album_name, release_name):
                 logger.debug('track album name and recording album name matches, so we may found release mbid')
                 mbids.append(release.get('id'))
@@ -803,6 +804,11 @@ class Spotify2MusicBrainz:
 
     def _compare_strings(self, s1, s2):
         logger.debug('comparing strings: "%s", "%s", fuzz: %i', s1, s2, fuzzywuzzy.fuzz.ratio(s1, s2))
+        if type(s1) != str:
+            raise Exception()
+        if type(s2) != str:
+            raise Exception()
+
         if type(s1) != type(s2):
             logger.debug('fail: strings are different python type: %s, %s', type(s1), type(s2))
             return False
@@ -819,8 +825,8 @@ class Spotify2MusicBrainz:
         elif unidecode.unidecode(s1).lower() == unidecode.unidecode(s2).lower():
             logger.debug('ok: strings lowercase transliterated ascii and are same')
             return True
-        elif fuzzywuzzy.fuzz.ratio(s1, s2) >= 95:
-            logger.debug('ok: strings fuzz ratio is >= 95')
+        elif fuzzywuzzy.fuzz.ratio(s1, s2) >= 97:
+            logger.debug('ok: strings fuzz ratio is >= 97')
             return True
         else:
             logger.debug('fail: strings not same')
@@ -887,6 +893,12 @@ class Spotify2MusicBrainz:
         musicbrainz_artists = musicbrainz
 
         # artists list matching
+        spotify_artists_list = self._sort_list([a.get('name') for a in spotify])
+        musicbrainz_artists_list = self._sort_list([ac.get('name') for ac in musicbrainz_artists])
+        logger.debug('spotify_artists_list: %s', spotify_artists_list)
+        logger.debug('musicbrainz_artists_list: %s', musicbrainz_artists_list)
+
+        # artists mbids list matching
         spotify_artists_mbids = self._sort_list([self._get_mbid_silent(a.get('uri')) for a in spotify])
         musicbrainz_artists_mbids = self._sort_list([ac.get('artist').get('id') for ac in musicbrainz_artists])
         logger.debug('spotify_artists_mbids: %s', spotify_artists_mbids)
@@ -902,11 +914,17 @@ class Spotify2MusicBrainz:
         if spotify_artists_mbids == musicbrainz_artists_mbids:
             logger.debug('ok: spotify_artists_mbids == musicbrainz_artists_mbids')
             return True
+        elif spotify_artists_list == musicbrainz_artists_list:
+            logger.debug('ok: spotify_artists_list == musicbrainz_artists_list')
+            return True
+        elif self._compare_strings(', '.join(spotify_artists_list), ', '.join(musicbrainz_artists_list)):
+            logger.debug('ok: string compare spotify_artists_list == musicbrainz_artists_list')
+            return True
         elif self._compare_strings(spotify_artists_string, musicbrainz_artists_string):
-            logger.debug('ok: spotify_artists_string == musicbrainz_artists_string')
+            logger.debug('ok: string compare spotify_artists_string == musicbrainz_artists_string')
             return True
         elif self._compare_strings(spotify_artists_string, musicbrainz_artists_string_without_joinphrase):
-            logger.debug('ok: spotify_artists_string == musicbrainz_artists_string_without_joinphrase')
+            logger.debug('ok: string compare spotify_artists_string == musicbrainz_artists_string_without_joinphrase')
             return True
         else:
             logger.debug('fail: spotify_artists != musicbrainz_artists')
