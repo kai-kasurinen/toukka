@@ -174,7 +174,8 @@ class Spotify2MusicBrainz:
             return
 
         if self.strict_search:
-            self._search_track_by_url(track)
+            # useless
+            #self._search_track_by_url(track)
             self._search_track_by_isrc(track)
 
         if self.fuzzy_search:
