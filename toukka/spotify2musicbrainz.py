@@ -521,6 +521,7 @@ class Spotify2MusicBrainz:
         if not mbids:
             return False
         elif len(mbids) != 1:
+            # TODO: try filter results
             logger.debug('fail: multiple mbids: %s', mbids)
             return False
         elif len(mbids) == 1:

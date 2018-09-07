@@ -48,10 +48,12 @@ class Hub(metaclass=Singleton):
         if not username:
             raise SpotifyException(550, -1, 'no username set')
 
-        cache_path_tokens = save_cache_path('toukka', 'tokens')
+        cache_path_tokens = save_cache_path('toukka', 'spotify', 'tokens')
         cache_file_for_token = os.path.join(cache_path_tokens, username)
 
         scope = " ".join(SCOPES_ALL)
+        # FIXME: handle tokens 
+        # FIXME: move client_id and others to config
         token = prompt_for_user_token(username, scope, cache_path=cache_file_for_token)
 
         self.sp = Spotify(auth=token, requests_session=self._session)

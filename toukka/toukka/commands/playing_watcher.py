@@ -11,13 +11,13 @@ from .playing import PlayingPrinter
 
 def playing_watcher():
     watcher = Watcher()
-    GLib.MainLoop().run()
+    watcher.start()
 
 
 class Watcher:
     def __init__(self):
         self.player = Playerctl.Player(player_name='spotify')
-        self.player.on('metadata', self.on_metadata)
+        self.player.on('metadata', self._on_metadata)
 
         playing_printer_args = {
             'with_artist': True,
@@ -31,9 +31,21 @@ class Watcher:
             'with_musicbrainz': True}
         self.playing_printer = PlayingPrinter(args=playing_printer_args)
         self.last_seen = None
+        
+        self.mainloop = GLib.MainLoop()
 
-    def on_metadata(self, player, metadata):
-        #logging.debug(metadata)
+    def start(self):
+        self._print_callback()
+        self._run()
+
+    def _run(self):
+        try:
+            self.mainloop.run()
+        except KeyboardInterrupt:
+            print("How rude!")
+
+    def _on_metadata(self, player, metadata):
+        logging.debug(metadata)
         track_id = metadata['mpris:trackid']
 
         if track_id == '':
@@ -43,10 +55,15 @@ class Watcher:
         elif 'spotify:ad:' in track_id:
             return
         else:
-            self.playing_printer.print()
+            GLib.timeout_add_seconds(1, self._print_callback)
 
         self.last_seen = track_id
 
+    def _print_callback(self):
+        self.playing_printer.print()
+        print(''.ljust(80, '='))
+        # make Glib happy
+        return False
 
 #
 
