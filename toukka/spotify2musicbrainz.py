@@ -214,6 +214,7 @@ class Spotify2MusicBrainz:
                               with_track_name=True,
                               with_track_position=True,
                               with_release_status=True,
+                              with_duration=True,
                               media_format=None):
 
         if self._get_mbid_silent(track.get('uri')):
@@ -279,6 +280,10 @@ class Spotify2MusicBrainz:
             # Release status (official, promotion, Bootleg, Pseudo-Release)
             fields['status'] = 'official'
 
+        if with_duration:
+            # quantized duration (duration / 2000) 
+            fields['qdur'] = track.get('duration_ms') / 2000
+
         mbids = self._search_recording_by_data_from_musicbrainz(**fields)
         self._found_track_mbids(track, mbids)
 
@@ -328,83 +333,29 @@ class Spotify2MusicBrainz:
             logger.debug('fail: length_difference < 2000')
             raise ValidationFailed()
 
-        self._compare_artists(spotify=track.get('artists'), musicbrainz=recording.get('artist-credit'))
-        # artists list matching
-        track_artists_mbids = self._sort_list([self._get_mbid_silent(a.get('uri')) for a in track.get('artists')])
-        recording_artists_mbids = self._sort_list([ac.get('artist').get('id') for ac in recording.get('artist-credit')])
-        logger.debug('track_artists_mbids: %s', track_artists_mbids)
-        logger.debug('recording_artist_mbids: %s', recording_artists_mbids)
-
-        # artists strings matching
-        track_artists = ', '.join(a.get('name') for a in track.get('artists'))
-        recording_artists = self._musicbrainz_artist_credit_to_string(recording.get('artist-credit'))
-        recording_artists_without_joinphrase = self._musicbrainz_artist_credit_to_string_without_joinphrase(recording.get('artist-credit'))
-        logger.debug('track_artists: %s', track_artists)
-        logger.debug('recording_artists: %s', recording_artists)
-        if self._compare_strings(track_artists, recording_artists):
-            logger.debug('ok: track_artists == recording_artists')
-        elif self._compare_strings(track_artists, recording_artists_without_joinphrase):
-            logger.debug('ok: track_artists == recording_artists_without_joinphrase')
-        else:
-            logger.debug('fail: track_artists != recording_artists')
+        if not self._compare_artists(spotify=track.get('artists'), musicbrainz=recording.get('artist-credit')):
             raise ValidationFailed()
-
-        # check validy
-        is_isrc_ok = False
-        is_name_ok = False
-        is_ok = False
 
         track_isrc = self._fix_isrc(track.get('external_ids').get('isrc'))
         recording_isrcs = recording.get('isrcs')
-
-        if len(recording_isrcs) == 0:
-            logger.debug('warn: recording without ISRCs')
-            is_isrc_ok = True
-        elif len(recording_isrcs) == 1:
-            if track_isrc in recording_isrcs:
-                logger.debug('ok: track_isrc is in recording_isrcs')
-                is_isrc_ok = True
-            else:
-                logger.debug('fail: track_isrc is not in recording_isrcs')
-                is_isrc_ok = False
-        elif len(recording_isrcs) > 1:
-            logger.debug('warn: recording has multiple ISRCs: %s', recording.get('isrcs'))
-            if track_isrc in recording_isrcs:
-                logger.debug('ok: track_isrc is in recording_isrcs')
-                is_isrc_ok = True
-            else:
-                logger.debug('fail: track_isrc is not in recording_isrcs')
-                is_isrc_ok = False
+        if not self._compare_isrcs(spotify=track_isrc, musicbrainz=recording_isrcs):
+            raise ValidationFailed()
 
         track_name = track.get('name')
         recording_name = recording.get('title')
 
         if self._compare_strings(track_name, recording_name):
             logger.debug('ok: track_name == recording_name')
-            is_name_ok = True
         elif track_name.lower() in recording_name.lower():
             logger.debug('warn: track_name in recording_name')
-            is_name_ok = True
         elif recording_name.lower() in track_name.lower():
             logger.debug('warn: recording_name in track_name')
-            is_name_ok = True
         else:
             logger.debug('fail: track_name (%s) != recording_name (%s)', track_name, recording_name)
-            is_name_ok = False
-
-        if is_isrc_ok and is_name_ok:
-            is_ok = True
-        # FIXME: remove when name has fuzzy matching
-        elif is_isrc_ok and not is_name_ok:
-            logger.debug('isrc check is ok and name check failed, forcing ok')
-            is_ok = True
-        else:
-            is_ok = False
             raise ValidationFailed()
 
-        logger.debug('is_isrc_ok %s, is_name_ok %s, is_ok %s', is_isrc_ok, is_name_ok, is_ok)
         # add it to db
-        return is_ok
+        return True
 
     def _get_recording_by_track(self, track):
         logger.debug('_get_recording_by_track')
@@ -581,21 +532,14 @@ class Spotify2MusicBrainz:
             logger.debug('fail: no point check more, failing...')
             return False
 
-
         # TODO: check track counts
         album_tracks_total = album.get('total_tracks')
 
         # album artists vs release artists
-        album_artists = ', '.join([a.get('name') for a in album.get('artists')])
-        release_artists = self._musicbrainz_artist_credit_to_string(release.get('artist-credit'))
-        logger.debug('album_artists: %s', album_artists)
-        logger.debug('release_artists: %s', release_artists)
-        if not self._compare_strings(album_artists, release_artists):
-            logger.debug('fail: album_artists != release_artists')
-            return False
+        if not self._compare_artists(spotify=album.get('artists'), musicbrainz=release.get('artist-credit')):
+            raise ValidationFailed()
 
         # album name vs release name
-        #
         album_name = album.get('name')
         release_name = release.get('title')
         release_name_with_disambiguation = release_name + ' ' + release.get('disambiguation')
@@ -966,6 +910,38 @@ class Spotify2MusicBrainz:
             return True
         else:
             logger.debug('fail: spotify_artists != musicbrainz_artists')
+            return False
+        return False
+
+    def _compare_isrcs(self, spotify=None, musicbrainz=None):
+        logger.debug('comparing isrcs: %s, %s', spotify, musicbrainz)
+
+        if spotify is None:
+            raise Exception()
+        if musicbrainz is None:
+            raise Exception()
+
+        if len(musicbrainz) == 0:
+            logger.debug('ok: musicbrainz do not have any isrcs')
+            return True
+        elif len(musicbrainz) == 1:
+            logger.debug('info: musicbrainz has only one isrc')
+            if spotify == musicbrainz[0]:
+                logger.debug('ok: isrcs is same')
+                return True
+            else:
+                logger.debug('fail: isrcs is not same')
+                return False
+        elif len(musicbrainz) > 1:
+            logger.debug('info: musicbrainz has multiple isrcs')
+            if spotify in musicbrainz:
+                logger.debug('ok: spotify isrc is in musicrainz isrcs')
+                return True
+            else:
+                logger.debug('fail: spotify isrc is not in musicrainz isrcs')
+                return False
+        else:
+            logger.debug('fail: isrcs do not match')
             return False
         return False
 
