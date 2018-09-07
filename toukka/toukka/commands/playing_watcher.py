@@ -2,12 +2,11 @@
 
 import logging
 import gi
-import pulsectl
-
-from .playing import PlayingPrinter
 
 gi.require_version('Playerctl', '1.0')
-from gi.repository import Playerctl, GLib
+from gi.repository import GLib, Playerctl
+
+from .playing import PlayingPrinter
 
 
 def playing_watcher():
@@ -47,7 +46,6 @@ class Watcher:
             self.playing_printer.print()
 
         self.last_seen = track_id
-
 
 
 #
