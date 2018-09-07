@@ -42,6 +42,7 @@ def playing(with_artist: bool=True,
 class PlayingPrinter:
 
     def __init__(self, args={}):
+        # TODO: add default args
         self.args = args
         self.toukka = Toukka()
 
@@ -150,7 +151,7 @@ class PlayingPrinter:
 
     def _print_album_info(self, album_id):
         album = self.toukka.sp.album(album_id)
-        print('album: {name} ({album_type}) ({uri}) ({release_date} {release_date_precision})'.format(**album))
+        print('album: {name} ({album_type}) ({uri}) ({release_date} {release_date_precision}) (popularity: {popularity}, tracks: {total_tracks})'.format(**album))
         print('\tartists: %s' % self._spotify_artists_to_string(album.get('artists')))
         if album.get('genres'):
             print('\tgenres: {genres}'.format(**album))
@@ -158,15 +159,10 @@ class PlayingPrinter:
             print('\texternal ids: {external_ids}'.format(**album))
         if album.get('external_urls'):
             print('\texternal urls: {external_urls}'.format(**album))
-        if album.get('popularity'):
-            print('\tpopularity: {popularity}'.format(**album))
         if album.get('available_markets'):
             print('\tmarkets: %s' % (len(album.get('available_markets'))))
         if album.get('restrictions'):
             print('\trestrictions: {restrictions}'.format(**album))
-        # FIXME: needs get_album_tracks
-        if album.get('tracks'):
-            print('\ttracks: %s' % (album.get('tracks').get('total')))
         if album.get('label'):
             print('\tlabel: {label}'.format(**album))
         if album.get('copyrights'):
@@ -176,7 +172,7 @@ class PlayingPrinter:
 
     def _print_track_info(self, track_id):
         track = self.toukka.sp.track(track_id)
-        print('track: {name} ({uri})'.format(**track))
+        print('track: {name} ({uri}) (popularity: {popularity})'.format(**track))
         print('\tartists: %s' % self._spotify_artists_to_string(track.get('artists')))
         print('\tduration: %s' % (datetime.timedelta(milliseconds=track.get('duration_ms'))))
         print('\ttrack number: {track_number}, disc number: {disc_number}'.format(**track))
@@ -184,8 +180,6 @@ class PlayingPrinter:
             print('\texternal ids: {external_ids}'.format(**track))
         if track.get('external_urls'):
             print('\texternal urls: {external_urls}'.format(**track))
-        if track.get('popularity'):
-            print('\tpopularity: {popularity}'.format(**track))
         if track.get('available_markets'):
             print('\tmarkets: %s' % (len(track.get('available_markets'))))
         if track.get('linked_from'):
