@@ -207,7 +207,7 @@ TypeError: object of type 'NoneType' has no len()
 2018-09-08 19:55:31,961 toukka.spotify2musicbrainz WARNING album_upc is None on album spotify:album:0lnaq6L5rWQIgb8g9qiQVG
 
 
-# 17
+# 17 FIXED
 
 
 track: Water Ripples (spotify:track:60CFGgbdZ315nIOuK5nYmM) (popularity: 68)
@@ -243,7 +243,7 @@ AttributeError: 'NoneType' object has no attribute 'upper'
 playlist, spotify:user:jirihorakpiano:playlist:4LYGEHsb63DhlZwGS0wsbK is good spotting bugs
 
 
-# 18 
+# 18 FIXED
 
 track: Ibaraki Evenings (spotify:track:58LhmjJgvlpMHMnv6w0YQj) (popularity: 50)
         artists: Giuseppe Galvetti (spotify:artist:19inrMSGHkrTZu5veb54pT)

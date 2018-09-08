@@ -214,6 +214,7 @@ class Spotify2MusicBrainz:
         isrc = self._fix_isrc(track.get('external_ids').get('isrc'))
         if isrc is None:
             return False
+
         mbids = self._search_recording_by_isrc_from_musicbrainz(isrc)
         return self._found_track_mbids(track, mbids)
 
@@ -881,14 +882,19 @@ class Spotify2MusicBrainz:
 
     def _fix_isrc(self, isrc):
         if isrc is None:
+            logger.debug('fail: isrc is None')
             return isrc
         elif is_isrc_valid(isrc):
+            logger.debug('ok: isrc is valid')
             return isrc
         else:
+            logger.debug('warn: isrc is not valid, try fixing it')
             isrc_fixed = isrc.upper().replace('-', '')
             if is_isrc_valid(fix):
+                logger.debug('ok: isrc fixed')
                 return isrc_fixed
             else:
+                logger.debug('fail: isrc is still broken')
                 return None
         return None
 
