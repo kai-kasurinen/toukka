@@ -882,11 +882,11 @@ class Spotify2MusicBrainz:
     def _fix_isrc(self, isrc):
         if isrc is None:
             return isrc
-        elif _is_isrc_valid(isrc):
+        elif is_isrc_valid(isrc):
             return isrc
         else:
             isrc_fixed = isrc.upper().replace('-', '')
-            if _is_isrc_valid(fix):
+            if is_isrc_valid(fix):
                 return isrc_fixed
             else:
                 return None
