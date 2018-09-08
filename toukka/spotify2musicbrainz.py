@@ -525,14 +525,18 @@ class Spotify2MusicBrainz:
 
         # FIXME: check release and album type
         album_type = album.get('album_type').lower()
-        release_type = release.get('release-group').get('primary-type').lower()
-
-        if album_type == release_type:
-            logger.debug('ok: album_type == release_type')
+        release_group_type = release.get('release-group').get('primary-type').lower()
+        release_group_secondary_types = [st.lower() for st in release.get('release-group').get('secondary-types')]
+        logger.debug('album_type: %s, release_group_type: %s, release_group_secondary_types: %s',
+                     album_type, release_group_type, release_group_secondary_types)
+        if album_type == release_group_type:
+            logger.debug('ok: album_type == release_group_type')
+        elif album_type in release_group_secondary_types:
+            logger.debug('ok: album_type in release_group_secondary_types')
         else:
-            logger.debug('fail: album_type (%s) != release_type (%s)', album_type, release_type)
-            logger.debug('fail: no point check more, failing...')
-            return False
+            logger.debug('fail: album_type (%s) != release_group_type (%s, %s)',
+                         album_type, release_type_group, release_group_secondary_types)
+            raise ValidationFailed()
 
         # TODO: check track counts
         album_tracks_total = album.get('total_tracks')
@@ -594,9 +598,8 @@ class Spotify2MusicBrainz:
             #self._search_album_by_upc(album, media_format='Digital Media')
             #self._search_album_by_upc(album, media_format='CD')
         if self.fuzzy_search:
-            # not implemented
-            #self._search_album_by_data(album) 
-            pass
+            # just search not add for now
+            self._search_album_by_data(album, with_barcode=False)
 
     def _search_album_by_upc_all(self, album):
         if self._get_mbid_silent(album.get('uri')):
@@ -650,6 +653,47 @@ class Spotify2MusicBrainz:
 
         mbids = self._search_release_by_data_from_musicbrainz(**fields)
         return self._found_album_mbids(album, mbids)
+
+    def _search_album_by_data(self, album,
+                              with_barcode=True,
+                              with_artist=True,
+                              artist=None,
+                              with_name=True,
+                              with_tracks=True):
+        if self._get_mbid_silent(album.get('uri')):
+            return
+
+        logger.debug('searching album by data')
+        fields = dict()
+
+        if with_barcode:
+            fields['barcode'] = album.get('external_ids').get('upc')
+        if with_name:
+            fields['releaseaccent'] = album.get('name')
+        if with_tracks:
+            fields['tracks'] = album.get('total_tracks')
+        if with_artist:
+            # cos musicbrainzngs and musicbrainz search sucks
+            if artist is None:
+                logger.debug('warn: no artist given using first one')
+                artist = album.get('artists')[0]
+
+            artist_mbid = self._get_mbid_silent(artist.get('uri'))
+
+            if artist_mbid:
+                #logger.debug('we already know artist mbid, so use it')
+                # artist id
+                fields['arid'] = artist_mbid
+            else:
+                # artist name is name(s) as it appears on the recording
+                fields['artist'] = artist.get('name')
+
+        fields['status'] = 'official'
+        mbids = self._search_release_by_data_from_musicbrainz(**fields)
+        #return self._found_album_mbids(album, mbids)
+        return None
+
+
 
     def _search_album_by_url(self, album):
         if self._get_mbid_silent(album.get('uri')):

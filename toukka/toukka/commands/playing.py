@@ -101,11 +101,18 @@ class PlayingPrinter:
         if sp_album_mbid:
             self._print_musicbrainz_release(sp_album_mbid)
 
-        for sp_artist in self.currently_playing.get('item').get('artists'):
-                sp_artist_uri = sp_artist.get('uri')
-                sp_artist_mbid = self.toukka.sp2mb.get_mbid(sp_artist_uri)
-                if sp_artist_mbid:
-                    self._print_musicbrainz_artist(sp_artist_mbid)
+        sp_artists = list()
+        sp_artists += self.currently_playing.get('item').get('artists')
+        sp_artists += self.currently_playing.get('item').get('album').get('artists')
+        sp_artists_mbids = set()
+        for sp_artist in sp_artists:
+            mbid = self.toukka.sp2mb.get_mbid(sp_artist.get('uri'))
+            if mbid:
+                sp_artists_mbids.add(mbid)
+
+        for sp_artist_mbid in sp_artists_mbids:
+            self._print_musicbrainz_artist(sp_artist_mbid)
+
 
     def _print_discogs(self):
         print('Discogs:')
