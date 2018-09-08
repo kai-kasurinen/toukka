@@ -221,7 +221,7 @@ class Spotify2MusicBrainz:
         if self._get_mbid_silent(track.get('uri')):
             return
 
-        logger.debug('_search_track_by_data')
+        logger.debug('searching track by data')
 
         fields = dict()
 
@@ -534,7 +534,7 @@ class Spotify2MusicBrainz:
         album_type = album.get('album_type').lower()
         release_group_type = release.get('release-group').get('primary-type').lower()
         release_group_secondary_types = [st.lower() for st in release.get('release-group').get('secondary-types')]
-        logger.debug('album_type: %s, release_group_type: %s, release_group_secondary_types: %s',
+        logger.debug('album_type: "%s", release_group_type: "%s", release_group_secondary_types: %s',
                      album_type, release_group_type, release_group_secondary_types)
         if album_type == release_group_type:
             logger.debug('ok: album_type == release_group_type')
@@ -576,7 +576,7 @@ class Spotify2MusicBrainz:
             logger.debug('ok: album_name in release_name')
             is_name_ok = True
         else:
-            logger.debug('fail: album_name (%s) != release_name (%s)', album_name, release_name)
+            logger.debug('fail: album_name ("%s") != release_name ("%s")', album_name, release_name)
             is_name_ok = False
 
         album_upc = album.get('external_ids').get('upc')

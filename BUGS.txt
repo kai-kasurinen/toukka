@@ -145,7 +145,9 @@ AttributeError: 'list' object has no attribute 'lower'
 2018-09-07 18:28:12,380 toukka.spotify2musicbrainz DEBUG comparing strings: "Kuule minua – körttivirsi kohtaa keskiajan kirkkolaulun", "Kuule minua: Körttivirsi kohtaa keskiajan kirkkolaulun ", fuzz: 95                                 
 2018-09-07 18:28:12,381 toukka.spotify2musicbrainz DEBUG fail: strings not same
 2018-09-07 18:28:12,381 toukka.spotify2musicbrainz DEBUG fail: album_name (Kuule minua – körttivirsi kohtaa keskiajan kirkkolaulun) != release_name (Kuule minua: Körttivirsi kohtaa keskiajan kirkkolaulun)   
-
+2018-09-08 05:54:40,899 toukka.spotify2musicbrainz DEBUG comparing strings: "Reflections 2000-2005, The Best Of Michele Mclaughlin", "Reflections 2000-2005: The Best of Michele McLaughlin ", fuzz: 93
+2018-09-08 05:54:40,899 toukka.spotify2musicbrainz DEBUG fail: strings not same
+2
 
 # 14 
 2018-09-07 18:34:46,779 sqlitedict INFO opening Sqlite table 'sp2mb' in /home/jozo/.cache/toukka/toukka.sqlite
