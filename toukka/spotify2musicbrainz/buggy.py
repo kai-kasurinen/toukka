@@ -881,6 +881,7 @@ class Spotify2MusicBrainz:
         return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
 
     def _fix_isrc(self, isrc):
+        logger.debug('_fix_isrc: %s', isrc)
         if isrc is None:
             logger.debug('fail: isrc is None')
             return isrc
