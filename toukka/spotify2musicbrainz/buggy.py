@@ -10,6 +10,8 @@ import unidecode
 from sqlitedict import SqliteDict
 import json
 
+from toukka.utils.isrc import is_isrc_valid
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -210,6 +212,8 @@ class Spotify2MusicBrainz:
             return
 
         isrc = self._fix_isrc(track.get('external_ids').get('isrc'))
+        if isrc is None:
+            return False
         mbids = self._search_recording_by_isrc_from_musicbrainz(isrc)
         return self._found_track_mbids(track, mbids)
 
@@ -876,7 +880,17 @@ class Spotify2MusicBrainz:
         return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
 
     def _fix_isrc(self, isrc):
-        return isrc.upper().replace('-', '')
+        if isrc is None:
+            return isrc
+        elif _is_isrc_valid(isrc):
+            return isrc
+        else:
+            isrc_fixed = isrc.upper().replace('-', '')
+            if _is_isrc_valid(fix):
+                return isrc_fixed
+            else:
+                return None
+        return None
 
     def _musicbrainz_artist_credit_to_string(self, artist_credit):
         return ''.join(c.get('name') + c.get('joinphrase') for c in artist_credit)
@@ -1017,9 +1031,11 @@ class Spotify2MusicBrainz:
         logger.debug('comparing isrcs: %s, %s', spotify, musicbrainz)
 
         if spotify is None:
-            raise Exception()
+            logger.debug('fail: spotify isrc is None')
+            return False
         if musicbrainz is None:
-            raise Exception()
+            logger.debug('fail: musicbrainz isrc is None')
+            return False
 
         if len(musicbrainz) == 0:
             logger.debug('ok: musicbrainz do not have any isrcs')
