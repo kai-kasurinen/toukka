@@ -88,18 +88,12 @@ class PlayingPrinter:
 
 
     def _print_musicbrainz(self):
-        print()
-        print('MusicBrainz:')
 
         sp_track_uri = self.currently_playing.get('item').get('uri')
         sp_track_mbid = self.toukka.sp2mb.get_mbid(sp_track_uri)
-        if sp_track_mbid:
-            self._print_musicbrainz_recording(sp_track_mbid)
 
         sp_album_uri = self.currently_playing.get('item').get('album').get('uri')
         sp_album_mbid = self.toukka.sp2mb.get_mbid(sp_album_uri)
-        if sp_album_mbid:
-            self._print_musicbrainz_release(sp_album_mbid)
 
         sp_artists = list()
         sp_artists += self.currently_playing.get('item').get('artists')
@@ -110,9 +104,16 @@ class PlayingPrinter:
             if mbid:
                 sp_artists_mbids.add(mbid)
 
+        if (sp_track_mbid or sp_album_mbid or sp_artists_mbids):
+                print()
+                print('MusicBrainz:')
+
+        if sp_track_mbid:
+            self._print_musicbrainz_recording(sp_track_mbid)
+        if sp_album_mbid:
+            self._print_musicbrainz_release(sp_album_mbid)
         for sp_artist_mbid in sp_artists_mbids:
             self._print_musicbrainz_artist(sp_artist_mbid)
-
 
     def _print_discogs(self):
         print('Discogs:')
@@ -273,8 +274,13 @@ class PlayingPrinter:
 
     def _print_musicbrainz_release(self, mbid):
         release = self.toukka.mb.get_release(mbid)
-        print('release: {title} ({disambiguation}) ({id}) ({barcode}) ({date} {country})'.format(**release))
+        print('release: {title} ({disambiguation}) ({id}) (status: {status}) (barcode: {barcode}) ({date} {country})'.format(**release))
         print('\tartists: {}'.format(self._musicbrainz_artist_credit_to_string(release.get('artist-credit'))))
+        if release.get('media'):
+            media_formats = [m.get('format') for m in release.get('media')]
+            tracks_total = sum([m.get('track-count') for m in release.get('media')])
+            print('\tmedia: tracks total {tracks_total}, formats: {media_formats}'.format(
+                media_formats=media_formats, tracks_total=tracks_total))
         if release.get('tags'):
             print('\ttags: {}'.format(self._musicbrainz_tags_to_string(release.get('tags'))))
         #print('\trelease group: {title} ({disambiguation}) ({primary-type}, {secondary-types})'.format(**release.get('release-group'))) 

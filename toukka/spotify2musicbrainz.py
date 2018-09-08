@@ -228,7 +228,7 @@ class Spotify2MusicBrainz:
         if with_artist:
             # cos musicbrainzngs and musicbrainz search sucks
             if artist is None:
-                logger.debug('warn: no artist given using first one')
+                logger.debug('warn: no artist given, using first one')
                 artist = track.get('artists')[0]
 
             artist_mbid = self._get_mbid_silent(artist.get('uri'))
@@ -279,6 +279,7 @@ class Spotify2MusicBrainz:
 
         if with_release_status:
             # Release status (official, promotion, Bootleg, Pseudo-Release)
+            # use -status:* for unknown or null
             fields['status'] = 'official'
 
         if with_duration:
@@ -519,9 +520,15 @@ class Spotify2MusicBrainz:
         album = self.toukka.sp.album(album.get('id'))
         release = self.toukka.mb.get_release(mbid)
 
+        # FIXME: remove
         is_name_ok = False
         is_upc_ok = False
         is_ok = False
+
+        release_status = release.get('status')
+        if release_status != 'Official':
+            logger.debug('fail: release status (%s) != "Official"', release_status)
+            raise ValidationFailed()
 
         # FIXME: check release and album type
         album_type = album.get('album_type').lower()
@@ -538,8 +545,17 @@ class Spotify2MusicBrainz:
                          album_type, release_type_group, release_group_secondary_types)
             raise ValidationFailed()
 
+        # TODO: compare
+        release_media_formats = [m.get('format') for m in release.get('media')]
+        logger.debug('release_media_formats: %s', release_media_formats)
+
         # TODO: check track counts
         album_tracks_total = album.get('total_tracks')
+        release_tracks_total = sum([m.get('track-count') for m in release.get('media')])
+        if album_tracks_total != release_tracks_total:
+            logger.debug('fail: album_tracks_total (%s) != release_tracks_total (%s)',
+                         album_tracks_total, release_tracks_total)
+            raise ValidationFailed()
 
         # album artists vs release artists
         if not self._compare_artists(spotify=album.get('artists'), musicbrainz=release.get('artist-credit')):
@@ -675,7 +691,7 @@ class Spotify2MusicBrainz:
         if with_artist:
             # cos musicbrainzngs and musicbrainz search sucks
             if artist is None:
-                logger.debug('warn: no artist given using first one')
+                logger.debug('warn: no artist given, using first one')
                 artist = album.get('artists')[0]
 
             artist_mbid = self._get_mbid_silent(artist.get('uri'))
