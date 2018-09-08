@@ -891,7 +891,7 @@ class Spotify2MusicBrainz:
         else:
             logger.debug('warn: isrc is not valid, try fixing it')
             isrc_fixed = isrc.upper().replace('-', '')
-            if is_isrc_valid(fix):
+            if is_isrc_valid(isrc_fixed):
                 logger.debug('ok: isrc fixed')
                 return isrc_fixed
             else:
