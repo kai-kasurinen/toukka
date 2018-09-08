@@ -255,7 +255,7 @@ class PlayingPrinter:
 
     def _print_musicbrainz_artist(self, mbid):
         artist = self.toukka.mb.get_artist(mbid)
-        print('artist: {name} ({disambiguation}) ({id}) ({type} {gender})'.format(**artist))
+        print('artist: {name} ({disambiguation}) ({id}) ({type}, {gender})'.format(**artist))
         if artist.get('area'):
             print('\tarea: {name}'.format_map(artist.get('area')))
         if artist.get('tags'):

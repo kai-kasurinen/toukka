@@ -29,6 +29,7 @@ class Spotify2MusicBrainz:
         # FIXME: temporary
         #self._remove_bad_data_from_db()
         self.search_modes = ['strict', 'fuzzy']
+        self._feeded = set()
 
     def get_mbid(self, uri):
         mbid = self.db.get(uri)
@@ -51,11 +52,18 @@ class Spotify2MusicBrainz:
         del self.db[uri]
 
     def _validate_mbid(self, uri, mbid):
+        # FIXME:
         if self._get_mbid_silent(uri):
-            # FIXME: check if it is same
-            logger.warning('FAIL: _validate_mbid: %s uri is already on db', uri)
-            return
-        self.add_mbid(uri, mbid)
+            if self._get_mbid_silent(uri) != mbid:
+                logger.critical(
+                    'FAIL: _validate_mbid: %s uri is already on db, with different mbid %s, %s',
+                    uri, mbid, self._get_mbid_silent(uri))
+                raise Exception()
+            else:
+                # FIXME: check if it is same
+                logger.warning('FAIL: _validate_mbid: %s uri is already on db', uri)
+                return False
+        return self.add_mbid(uri, mbid)
 
     def _validate_mbids(self, uri, mbids):
         if not mbids:
@@ -78,7 +86,13 @@ class Spotify2MusicBrainz:
         self.del_uri('spotify:track:1d4pALmklLIG8xQhXsTNnf')
 
     def feed_track_id(self, track_id):
-        self._search_with_search_modes(track_id)
+        logger.debug('feed track %s', track_id)
+        if track_id in self._feeded:
+            logger.debug('already feeded')
+            return
+        else:
+            self._search_with_search_modes(track_id)
+            self._feeded.add(track_id)
 
     def _search_with_search_modes(self, track_id):
         if 'strict' in self.search_modes:
@@ -155,7 +169,7 @@ class Spotify2MusicBrainz:
                 logger.debug('found someting but failed validate')
 
         if track_mbid and not album_mbid:
-            logger.debug('track found, trying extract album from it, disabled')
+            logger.debug('disabled: track found, trying extract album from it')
             #try:
             #    self._extract_album_from_recording(track, self._get_recording_by_track(track))
             #except ValidationFailed as e:
@@ -259,6 +273,7 @@ class Spotify2MusicBrainz:
                 if media_format:
                     fields['format'] = media_format
 
+                # FIXME: with this search not find most recordings 
                 # number of tracks on release as a whole
                 fields['tracksrelease'] = album.get('total_tracks')
 
@@ -283,8 +298,8 @@ class Spotify2MusicBrainz:
             fields['status'] = 'official'
 
         if with_duration:
-            # quantized duration (duration / 2000) 
-            fields['qdur'] = track.get('duration_ms') / 2000
+            # quantized duration (duration / 2000)
+            fields['qdur'] = int(track.get('duration_ms') / 2000)
 
         mbids = self._search_recording_by_data_from_musicbrainz(**fields)
         self._found_track_mbids(track, mbids)
@@ -294,7 +309,7 @@ class Spotify2MusicBrainz:
             return False
         elif len(mbids) != 1:
             logger.debug('fail: multiple mbids: %s', mbids)
-            return False
+            raise ValidationFailed()
         elif len(mbids) == 1:
             mbid = mbids[0]
             return self._found_track_mbid(track, mbid)
@@ -439,7 +454,7 @@ class Spotify2MusicBrainz:
             return False
         if len(mbids) != 1:
             logger.debug('fail: multiple mbids: %s', mbids)
-            return False
+            raise ValidationFailed()
         elif len(mbids) == 1:
             mbid = mbids[0]
             return self._found_artist_mbid(artist, mbid)
@@ -497,7 +512,7 @@ class Spotify2MusicBrainz:
         elif len(mbids) != 1:
             # TODO: try filter results
             logger.debug('fail: multiple mbids: %s', mbids)
-            return False
+            raise ValidationFailed()
         elif len(mbids) == 1:
             mbid = mbids[0]
             return self._found_album_mbid(album, mbid)
@@ -627,6 +642,12 @@ class Spotify2MusicBrainz:
         barcodes = set()
 
         album_upc = album.get('external_ids').get('upc')
+
+        # FIXME: needs also checked on every other place
+        if album_upc is None:
+            logger.warning('album_upc is %s on album %s', album_upc, album.get('uri'))
+            return
+
         barcodes.add(album_upc)
 
         if len(album_upc) == 12:

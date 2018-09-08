@@ -142,13 +142,134 @@ AttributeError: 'list' object has no attribute 'lower'
 # 13 is 95 too low or high?
 2018-09-07 18:03:42,139 toukka.spotify2musicbrainz DEBUG comparing strings: "John Surman, Nelson Ayres, Rob Waring", "John Surman, Nelson Ayers, Rob Waring", fuzz: 97                                                                     
 2018-09-07 18:03:42,139 toukka.spotify2musicbrainz DEBUG ok: strings fuzz ratio is >= 95               
+
 2018-09-07 18:28:12,380 toukka.spotify2musicbrainz DEBUG comparing strings: "Kuule minua – körttivirsi kohtaa keskiajan kirkkolaulun", "Kuule minua: Körttivirsi kohtaa keskiajan kirkkolaulun ", fuzz: 95                                 
 2018-09-07 18:28:12,381 toukka.spotify2musicbrainz DEBUG fail: strings not same
-2018-09-07 18:28:12,381 toukka.spotify2musicbrainz DEBUG fail: album_name (Kuule minua – körttivirsi kohtaa keskiajan kirkkolaulun) != release_name (Kuule minua: Körttivirsi kohtaa keskiajan kirkkolaulun)   
+
 2018-09-08 05:54:40,899 toukka.spotify2musicbrainz DEBUG comparing strings: "Reflections 2000-2005, The Best Of Michele Mclaughlin", "Reflections 2000-2005: The Best of Michele McLaughlin ", fuzz: 93
 2018-09-08 05:54:40,899 toukka.spotify2musicbrainz DEBUG fail: strings not same
 2
+2018-09-08 06:58:10,263 toukka.spotify2musicbrainz DEBUG comparing strings: "Fiona Joy (Hawkins)", "Fiona Joy Hawkins", fuzz: 94
+2018-09-08 06:58:10,263 toukka.spotify2musicbrainz DEBUG fail: strings not same
+
+2018-09-08 07:34:15,839 toukka.spotify2musicbrainz DEBUG comparing strings: "Renee' Michele", "Reneé Michele", fuzz: 89
+2018-09-08 07:34:15,839 toukka.spotify2musicbrainz DEBUG fail: strings not same
+2018-09-08 07:34:15,839 toukka.spotify2musicbrainz DEBUG fail: spotify_artists != musicbrainz_artists
+
+2018-09-08 08:42:26,484 toukka.spotify2musicbrainz DEBUG comparing strings: "Ahmad Jamal Trio", "The Ahmad Jamal Trio", fuzz: 89
+2018-09-08 08:42:26,484 toukka.spotify2musicbrainz DEBUG fail: strings not same
+
+2018-09-08 10:20:14,027 toukka.spotify2musicbrainz DEBUG comparing strings: "Soil & "Pimp" Sessions", "SOIL&“PIMP”SESSIONS", fuzz: 20                                                                                                                       
+2018-09-08 10:20:14,028 toukka.spotify2musicbrainz DEBUG fail: strings not same
+
 
 # 14 
 2018-09-07 18:34:46,779 sqlitedict INFO opening Sqlite table 'sp2mb' in /home/jozo/.cache/toukka/toukka.sqlite
 hide this
+
+# 15 
+
+with tracksrelease not find recording if its attached to multiple releases, see:
+https://musicbrainz.org/search?query=arid%3A%2223f7ba9d-802d-4748-8659-4b562bbfd430%22+AND+release%3A%22Get+Your+Soul+Washed+%26+Blueland%22+AND+recording%3A%22Bushrette%22+AND+tracksrelease%3A16&type=recording&limit=25&method=advanced
+https://musicbrainz.org/search?query=arid%3A%2223f7ba9d-802d-4748-8659-4b562bbfd430%22+AND+release%3A%22Get+Your+Soul+Washed+%26+Blueland%22+AND+recording%3A%22Creepy+Bird%22+AND+tracksrelease%3A16&type=recording&limit=25&method=advanced
+https://musicbrainz.org/search?query=arid%3A%2223f7ba9d-802d-4748-8659-4b562bbfd430%22+AND+release%3A%22Get+Your+Soul+Washed+%26+Blueland%22+AND+recording%3A%22Bushrette%22+AND&type=recording&limit=25&method=advanced
+
+
+# 16 partially fixed, needs fixed on other places too
+
+album: Leaves (Remastered) (single) (spotify:album:76F0N91HtRgDv83DhWbCnD) (2016-08-01 day) (popularity: 60, tracks: 1)
+        artists: Hermann (spotify:artist:4zh577RymRcidAJia0AAkb)
+        external urls: {'spotify': 'https://open.spotify.com/album/76F0N91HtRgDv83DhWbCnD'}
+        markets: 65
+        label: Hermann
+        copyrights:
+                C: 2016 Hermann
+                P: 2016 Hermann
+
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 68, in _print_callback
+    self.playing_printer.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 82, in print
+    self.toukka.sp2mb.feed_track_id(item.get('id'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 94, in feed_track_id
+    self._search_with_search_modes(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 101, in _search_with_search_modes
+    self._search(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 122, in _search
+    self._search_album(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 628, in _search_album
+    self._search_album_by_upc_all(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 647, in _search_album_by_upc_all
+    if len(album_upc) == 12:
+TypeError: object of type 'NoneType' has no len()
+
+2018-09-08 19:14:37,210 toukka.spotify2musicbrainz WARNING album_upc is None on album spotify:album:10F66F7TGVw00iVtcyneFu
+2018-09-08 19:55:31,961 toukka.spotify2musicbrainz WARNING album_upc is None on album spotify:album:0lnaq6L5rWQIgb8g9qiQVG
+
+
+# 17
+
+
+track: Water Ripples (spotify:track:60CFGgbdZ315nIOuK5nYmM) (popularity: 68)
+        artists: Enno Aare (spotify:artist:7eHcKVhaxOOTKJFZuu3x1h)
+        duration: 0:03:07.477000
+        track number: 3, disc number: 1
+        external urls: {'spotify': 'https://open.spotify.com/track/60CFGgbdZ315nIOuK5nYmM'}
+        markets: 65
+        moods: ['chill']
+        styles: ['instrumental', 'acoustic', 'quiet']
+
+
+2018-09-08 19:17:42,800 toukka.spotify2musicbrainz DEBUG feed track 60CFGgbdZ315nIOuK5nYmM
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 71, in _print_callback
+    # TODO: skip currently_playing api and use mpris:trackid directly
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 82, in print
+    self.toukka.sp2mb.feed_track_id(item.get('id'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 94, in feed_track_id
+    self._search_with_search_modes(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 101, in _search_with_search_modes
+    self._search(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 117, in _search
+    self._search_track(track)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 193, in _search_track
+    self._search_track_by_isrc(track)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 212, in _search_track_by_isrc
+    isrc = self._fix_isrc(track.get('external_ids').get('isrc'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz.py", line 879, in _fix_isrc
+    return isrc.upper().replace('-', '')
+AttributeError: 'NoneType' object has no attribute 'upper'
+
+playlist, spotify:user:jirihorakpiano:playlist:4LYGEHsb63DhlZwGS0wsbK is good spotting bugs
+
+
+# 18 
+
+track: Ibaraki Evenings (spotify:track:58LhmjJgvlpMHMnv6w0YQj) (popularity: 50)
+        artists: Giuseppe Galvetti (spotify:artist:19inrMSGHkrTZu5veb54pT)
+        duration: 0:01:44.166000
+        track number: 1, disc number: 1
+        external ids: {'isrc': 'SEXGF16152'}
+        external urls: {'spotify': 'https://open.spotify.com/track/58LhmjJgvlpMHMnv6w0YQj'}
+        markets: 65
+        moods: ['chill', 'boring']
+        styles: ['instrumental', 'acoustic', 'quiet']
+
+2018-09-08 19:50:29,746 toukka.spotify2musicbrainz DEBUG feed track 58LhmjJgvlpMHMnv6w0YQj
+2018-09-08 19:50:29,754 toukka.spotify2musicbrainz DEBUG searching isrc SEXGF16152 from musicbrainz
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/musicbrainzngs/musicbrainz.py", line 480, in _safe_read
+    f = opener.open(req)
+  File "/usr/lib/python3.6/urllib/request.py", line 532, in open
+    response = meth(req, response)
+  File "/usr/lib/python3.6/urllib/request.py", line 642, in http_response
+    'http', request, response, code, msg, hdrs)
+  File "/usr/lib/python3.6/urllib/request.py", line 570, in error
+    return self._call_chain(*args)
+  File "/usr/lib/python3.6/urllib/request.py", line 504, in _call_chain
+    result = func(*args)
+  File "/usr/lib/python3.6/urllib/request.py", line 650, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 400: Bad Request
+
+https://github.com/ybayle/ISRC

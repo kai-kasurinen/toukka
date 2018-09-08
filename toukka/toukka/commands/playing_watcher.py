@@ -8,6 +8,9 @@ from gi.repository import GLib, Playerctl
 
 from .playing import PlayingPrinter
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 
 def playing_watcher():
     watcher = Watcher()
@@ -50,7 +53,7 @@ class Watcher:
         self.mainloop.quit()
 
     def _on_metadata(self, player, metadata):
-        logging.debug(metadata)
+        logger.debug(metadata)
         track_id = metadata['mpris:trackid']
 
         if track_id == '':
@@ -65,6 +68,7 @@ class Watcher:
         self.last_seen = track_id
 
     def _print_callback(self):
+        # TODO: skip currently_playing api and use mpris:trackid directly
         self.playing_printer.print()
         print(''.ljust(80, '='))
         # make Glib happy
