@@ -88,7 +88,7 @@ class Spotify2MusicBrainz:
         self.del_uri('spotify:track:1d4pALmklLIG8xQhXsTNnf')
 
     def feed_track_id(self, track_id):
-        logger.debug('feed track %s', track_id)
+        #logger.debug('feed track %s', track_id)
         if track_id in self._feeded:
             logger.debug('already feeded')
             return
@@ -196,8 +196,8 @@ class Spotify2MusicBrainz:
 
         if self.fuzzy_search:
             for artist in track.get('artists'):
-                self._search_track_by_data(track, artist=artist, media_format='Digital Media')
-                self._search_track_by_data(track, artist=artist, media_format='CD')
+                #self._search_track_by_data(track, artist=artist, media_format='Digital Media')
+                #self._search_track_by_data(track, artist=artist, media_format='CD')
                 # other than Digital Media or CD most likely is bad choice
                 self._search_track_by_data(track, artist=artist)
                 # this is even worse choice
@@ -351,8 +351,8 @@ class Spotify2MusicBrainz:
         length_difference = abs(track_length-recording_length)
         logger.debug('track length: %i, recording length: %i, difference: %i',
                      track_length, recording_length, length_difference)
-        if length_difference > 2000:   # 2s
-            logger.debug('fail: length_difference < 2000')
+        if length_difference > 3000:   # 3s
+            logger.debug('fail: length_difference < 3000')
             raise ValidationFailed()
 
         if not self._compare_artists(spotify=track.get('artists'), musicbrainz=recording.get('artist-credit')):
@@ -413,6 +413,8 @@ class Spotify2MusicBrainz:
     def _extract_artists_from_release(self, album, release):
         logger.debug('trying extract artists from release')
         mbids = list()
+
+        # FIXME:
         if len(album.get('artists')) != 1:
             logger.debug('multiple album artists, not implemented')
             return False
@@ -422,8 +424,14 @@ class Spotify2MusicBrainz:
 
         album_artist = album.get('artists')[0]
         album_artist_name = album_artist.get('name')
+
+        # FIXME: move somewhere
+        if self._get_mbid_silent(artist.get('uri')):
+            return
+
         release_artist = release.get('artist-credit')[0].get('artist')
         release_artist_name = release_artist.get('name')
+
         if self._compare_strings(album_artist_name, release_artist_name):
             logger.debug('album artist name and release artist name matches, so we may found artist mbid')
             mbids.append(release_artist.get('id'))
@@ -643,7 +651,8 @@ class Spotify2MusicBrainz:
 
         logger.debug('searching album by upc all variants')
 
-        media_formats = ['Digital Media', 'CD', None]
+        #media_formats = ['Digital Media', 'CD', None]
+        media_formats = [None]
         barcodes = set()
 
         album_upc = album.get('external_ids').get('upc')
@@ -902,7 +911,12 @@ class Spotify2MusicBrainz:
         return ', '.join(c.get('name') for c in artist_credit)
 
     def _compare_strings(self, s1, s2):
-        logger.debug('comparing strings: "%s", "%s", fuzz: %i', s1, s2, fuzzywuzzy.fuzz.ratio(s1, s2))
+        logger.debug('comparing strings: "%s", "%s"', s1, s2)
+        logger.debug('fuzz ratio: %i, fuzz partial ratio: %i, token sort ratio: %i',
+                     fuzzywuzzy.fuzz.ratio(s1, s2),
+                     fuzzywuzzy.fuzz.partial_ratio(s1, s2),
+                     fuzzywuzzy.fuzz.token_sort_ratio(s1, s2))
+
         if type(s1) != str:
             raise Exception()
         if type(s2) != str:
@@ -927,6 +941,10 @@ class Spotify2MusicBrainz:
         elif fuzzywuzzy.fuzz.ratio(s1, s2) >= 97:
             logger.debug('ok: strings fuzz ratio is >= 97')
             return True
+        ## disabled... we do not want artist name partial matches
+        #elif fuzzywuzzy.fuzz.partial_ratio(s1, s2) == 100:
+        #    logger.debug('ok: strings fuzz partial ratio == 100')
+        #    return True
         else:
             logger.debug('fail: strings not same')
             return False

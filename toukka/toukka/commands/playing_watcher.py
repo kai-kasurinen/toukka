@@ -62,8 +62,10 @@ class Watcher:
             return
         elif 'spotify:ad:' in track_id:
             return
-        else:
+        elif 'spotify:track:' in track_id:
             GLib.timeout_add_seconds(1, self._print_callback)
+        else:
+            return
 
         self.last_seen = track_id
 

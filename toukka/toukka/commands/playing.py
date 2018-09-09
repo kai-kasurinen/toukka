@@ -203,8 +203,9 @@ class PlayingPrinter:
         if flags:
             print('\tflags: %s' % flags)
 
-        # FIXME:
-        self._print_track_features(track.get('id'))
+        # FIXME: need check delivered too or something
+        if self.args.get('with_track_features'):
+            self._print_track_features(track.get('id'))
 
     def _print_track_features(self, track_id):
 
@@ -379,7 +380,7 @@ class PlayingPrinter:
         return ''.join(c.get('name') + c.get('joinphrase') for c in artist_credit)
 
     def _musicbrainz_tags_to_string(self, tags):
-        return ", ".join("%s (%s)" % (tag.get('name'), tag.get('count')) for tag in tags)
+        return ", ".join("%s (%s)" % (tag.get('name'), tag.get('count')) for tag in tags if tag.get('count') > 0)
 
     def _discogs_artists_to_string(self, artists):
         return ", ".join("%s (%s)" % (artist.name, artist.id) for artist in artists)
