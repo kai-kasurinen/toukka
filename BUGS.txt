@@ -274,7 +274,7 @@ urllib.error.HTTPError: HTTP Error 400: Bad Request
 
 https://github.com/ybayle/ISRC
 
-# 19
+# 19 fixed, huoh
 
 
 track: Natascha's Bee Song (spotify:track:68QOd4SYU6J7UMXaauOzlB) (popularity: 0)
