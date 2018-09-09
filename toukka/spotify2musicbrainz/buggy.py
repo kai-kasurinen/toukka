@@ -884,19 +884,15 @@ class Spotify2MusicBrainz:
         logger.debug('_fix_isrc: %s', isrc)
         if isrc is None:
             logger.debug('fail: isrc is None')
-            return isrc
-        elif is_isrc_valid(isrc):
+            return None
+        # always fix
+        isrc = isrc.upper().replace('-', '')
+        if is_isrc_valid(isrc):
             logger.debug('ok: isrc is valid')
             return isrc
         else:
-            logger.debug('warn: isrc is not valid, try fixing it')
-            isrc_fixed = isrc.upper().replace('-', '')
-            if is_isrc_valid(isrc_fixed):
-                logger.debug('ok: isrc fixed')
-                return isrc_fixed
-            else:
-                logger.debug('fail: isrc is still broken')
-                return None
+            logger.debug('fail: isrc is not valid')
+            return None
         return None
 
     def _musicbrainz_artist_credit_to_string(self, artist_credit):
