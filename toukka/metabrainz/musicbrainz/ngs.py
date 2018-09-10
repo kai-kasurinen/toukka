@@ -10,9 +10,6 @@ from .search import MusicBrainzSearch
 from .ws2 import MusicBrainzWS2
 from .exceptions import HTTPErrorFake
 
-from requests.packages.urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
-
 logger = logging.getLogger(__name__)
 
 
@@ -110,10 +107,7 @@ class MusicBrainzNGS:
                                       release_type=release_type)
 
     def get_series_by_id(self, mbid, includes=[]):
-        return self._get_entity_by_id('series', mbid,
-                                      includes=includes,
-                                      release_status=release_status,
-                                      release_type=release_type)
+        return self._get_entity_by_id('series', mbid, includes=includes)
 
     def get_work_by_id(self, mbid, includes=[]):
         return self._get_entity_by_id('work', mbid, includes=includes)
@@ -269,7 +263,6 @@ class MusicBrainzNGS:
                 raise
 
         return ret
-
 
     def _do_mb_search_params(self, entity, query='', fields={}, limit=None, offset=None, strict=False):
         query_parts = []
