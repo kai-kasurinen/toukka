@@ -8,56 +8,36 @@ import functools
 import pprint
 import musicbrainzngs
 
+from toukka.metabrainz.musicbrainz.ngs import MusicBrainzNGS
 
 logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
 
 
 class MusicBrainz:
-    def __init__(self):
+    def __init__(self, session=None):
         self.mbngs = musicbrainzngs
         self.mbngs.set_useragent('toukka', '0.0.0')
         warnings.filterwarnings('ignore', 'The json format is non-official and may change at any time')
         self.mbngs.set_format(fmt='json')
+        self.mbngs_emulated = MusicBrainzNGS(session=session)
+
 
     @functools.lru_cache(maxsize=1024)
     def search_artists(self, query='', limit=None, offset=None, strict=False, **fields):
-        try:
-            result = self.mbngs.search_artists(query=query,
-                                                  limit=limit,
-                                                  offset=offset,
-                                                  strict=strict,
-                                                  **fields)
-        except musicbrainzngs.ResponseError as error:
-            logger.debug('HTTP error %s', error.cause.code)
-            raise
-        return result
+        return self.mbngs_emulated.search_artists(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_recordings(self, query='', limit=None, offset=None, strict=False, **fields):
-        try:
-            result = self.mbngs.search_recordings(query=query,
-                                                  limit=limit,
-                                                  offset=offset,
-                                                  strict=strict,
-                                                  **fields)
-        except musicbrainzngs.ResponseError as error:
-            logger.debug('HTTP error %s', error.cause.code)
-            raise
-        return result
+        return self.mbngs_emulated.search_recordings(query=query, limit=limit, offset=offset, strict=strict, **fields)
+
+    @functools.lru_cache(maxsize=1024)
+    def search_tracks(self, query='', limit=None, offset=None, strict=False, **fields):
+        return self.mbngs_emulated.search_tracks(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_releases(self, query='', limit=None, offset=None, strict=False, **fields):
-        try:
-            result = self.mbngs.search_releases(query=query,
-                                                  limit=limit,
-                                                  offset=offset,
-                                                  strict=strict,
-                                                  **fields)
-        except musicbrainzngs.ResponseError as error:
-            logger.debug('HTTP error %s', error.cause.code)
-            raise
-        return result
+        return self.mbngs_emulated.search_releases(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_releases_with_upc(self, upc):

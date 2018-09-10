@@ -4,11 +4,31 @@ import pprint
 import argh
 from .. import MusicBrainzSearch
 
+
 def search_artist(query):
     search = MusicBrainzSearch()
     return pprint.pformat(search.artist(query))
 
 
-COMMANDS = [search_artist]
+def search_release(query):
+    search = MusicBrainzSearch()
+    return pprint.pformat(search.release(query))
+
+
+def search_recording(query):
+    search = MusicBrainzSearch()
+    return pprint.pformat(search.recording(query))
+
+
+def search_track(query):
+    search = MusicBrainzSearch()
+    return pprint.pformat(search.track(query))
+
+
+COMMANDS = [
+    search_artist,
+    search_release,
+    search_recording,
+    search_track]
 
 # END

@@ -60,7 +60,7 @@ class Hub(metaclass=Singleton):
         self.sp.max_get_retries = 1  # default is 10
 
     def _init_musicbrainz(self):
-        self.mb = MusicBrainz()
+        self.mb = MusicBrainz(session=self._session)
         self.mbngs = self.mb.mbngs
         self.acousticbrainz = AcousticBrainz(session=self._session)
 

@@ -855,7 +855,8 @@ class Spotify2MusicBrainz:
         logger.debug('searching recording by data from musicbrainz')
         logger.debug('search fields: %s', fields)
         mbids = list()
-        result = self.toukka.mb.search_recordings(strict=True, **fields)
+        # result = self.toukka.mb.search_recordings(strict=True, **fields)
+        result = self.toukka.mb.search_tracks(strict=True, **fields)
         if result:
             logger.debug('found %s recordings from musicbrainz', result.get('count'))
             for r in result.get('recordings'):
