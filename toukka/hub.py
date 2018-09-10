@@ -88,7 +88,7 @@ class Toukka(metaclass=Singleton):
         self.discogs = self.hub.discogs
         self.sp2mb = self.hub.sp2mb
         self.finna = self.hub.finna
-
+        self.mbngs_emulated = self.mb.mbngs_emulated
 
 
 # END

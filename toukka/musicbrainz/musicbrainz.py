@@ -16,28 +16,28 @@ logger = logging.getLogger(__name__)
 
 class MusicBrainz:
     def __init__(self, session=None):
-        self.mbngs = musicbrainzngs
-        self.mbngs.set_useragent('toukka', '0.0.0')
-        warnings.filterwarnings('ignore', 'The json format is non-official and may change at any time')
-        self.mbngs.set_format(fmt='json')
         self.mbngs_emulated = MusicBrainzNGS(session=session)
-
+        self.mbngs = self.mbngs_emulated
+        #self.mbngs = musicbrainzngs
+        #self.mbngs.set_useragent('toukka', '0.0.0')
+        #warnings.filterwarnings('ignore', 'The json format is non-official and may change at any time')
+        #self.mbngs.set_format(fmt='json')
 
     @functools.lru_cache(maxsize=1024)
     def search_artists(self, query='', limit=None, offset=None, strict=False, **fields):
-        return self.mbngs_emulated.search_artists(query=query, limit=limit, offset=offset, strict=strict, **fields)
+        return self.mbngs.search_artists(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_recordings(self, query='', limit=None, offset=None, strict=False, **fields):
-        return self.mbngs_emulated.search_recordings(query=query, limit=limit, offset=offset, strict=strict, **fields)
+        return self.mbngs.search_recordings(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_tracks(self, query='', limit=None, offset=None, strict=False, **fields):
-        return self.mbngs_emulated.search_tracks(query=query, limit=limit, offset=offset, strict=strict, **fields)
+        return self.mbngs.search_tracks(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_releases(self, query='', limit=None, offset=None, strict=False, **fields):
-        return self.mbngs_emulated.search_releases(query=query, limit=limit, offset=offset, strict=strict, **fields)
+        return self.mbngs.search_releases(query=query, limit=limit, offset=offset, strict=strict, **fields)
 
     @functools.lru_cache(maxsize=1024)
     def search_releases_with_upc(self, upc):

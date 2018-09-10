@@ -812,44 +812,33 @@ class Spotify2MusicBrainz:
             logger.debug('failed, no result')
         return mbids
 
-    def _search_artist_by_url_from_musicbrainz(self, url):
-        logger.debug('searching artist by url %s from musicbrainz', url)
+    def _get_entity_mbids_by_url_from_musicbrainz(self, entity_type, url):
+        logger.debug('get entity (%s) mbids by url %s from musicbrainz', entity_type, url)
         result = self.toukka.mb.browse_urls(url)
         mbids = list()
         if result:
-            #pprint.pprint(result)
             logger.debug('found %s relations from musicbrainz', len(result.get('relations')))
             for relation in result.get('relations'):
-                mbids.append(relation.get('artist').get('id'))
+                target_type = relation.get('target-type')
+                if target_type == entity_type:
+                    mbids.append(relation.get(entity_type).get('id'))
+                else:
+                    logger.debug('warn: wrong target_type (%s != %s) on relation', target_type, entity_type)
         else:
             logger.debug('failed, no result')
         return mbids
+
+    def _search_artist_by_url_from_musicbrainz(self, url):
+        logger.debug('searching artist by url %s from musicbrainz', url)
+        return self._get_entity_mbids_by_url_from_musicbrainz('artist', url)
 
     def _search_release_by_url_from_musicbrainz(self, url):
         logger.debug('searching release by url %s from musicbrainz', url)
-        mbids = list()
-        result = self.toukka.mb.browse_urls(url)
-        if result:
-            #pprint.pprint(result)
-            logger.debug('found {} relations from musicbrainz'.format(len(result.get('relations'))))
-            for relation in result.get('relations'):
-                mbids.append(relation.get('release').get('id'))
-        else:
-            logger.debug('failed, no result')
-        return mbids
+        return self._get_entity_mbids_by_url_from_musicbrainz('release', url)
 
     def _search_recording_by_url_from_musicbrainz(self, url):
         logger.debug('searching recording by url %s from musicbrainz', url)
-        mbids = list()
-        result = self.toukka.mb.browse_urls(url)
-        if result:
-            #pprint.pprint(result)
-            logger.debug('found {} relations from musicbrainz'.format(len(result.get('relations'))))
-            for relation in result.get('relations'):
-                mbids.append(relation.get('recording').get('id'))
-        else:
-            logger.debug('failed, no result')
-        return mbids
+        return self._get_entity_mbids_by_url_from_musicbrainz('recording', url)
 
     def _search_recording_by_data_from_musicbrainz(self, **fields):
         logger.debug('searching recording by data from musicbrainz')

@@ -313,3 +313,46 @@ Traceback (most recent call last):
 urllib.error.HTTPError: HTTP Error 400: Bad Request
 
 During handling of the above exception, another exception occurred:
+    
+    
+# 20 Fixed
+
+2018-09-10 12:27:39,561 musicbrainzngs DEBUG GET request for http://musicbrainz.org/ws/2/url/?fmt=json&inc=area-rels+artist-rels+label-rels+place-rels+event-rels+recording-rels+release-rels+release-group-rels+series-rels+url-rels+work-rels+instrument-rels&resource=https%3A%2F%2Fopen.spotify.com%2Fartist%2F7guDJrEfX3qb6FEbdPA5qi
+2018-09-10 12:27:39,563 musicbrainzngs DEBUG requesting with UA toukka/0.0.0 python-musicbrainzngs/0.6
+2018-09-10 12:27:39,774 toukka.spotify2musicbrainz.buggy DEBUG found 2 relations from musicbrainz
+Traceback (most recent call last):
+  File "/home/jozo/bin/toukka", line 10, in <module>
+    sys.exit(main())
+  File "/home/jozo/git/toukka/toukka/main.py", line 78, in main
+    parser.dispatch()
+  File "/usr/lib/python3/dist-packages/argh/helpers.py", line 55, in dispatch
+    return dispatch(self, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 174, in dispatch
+    for line in lines:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 277, in _execute_command
+    for line in result:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 260, in _call
+    result = function(*positional, **keywords)
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 38, in playing
+    p.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 82, in print
+    self.toukka.sp2mb.feed_track_id(item.get('id'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 96, in feed_track_id
+    self._search_with_search_modes(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 103, in _search_with_search_modes
+    self._search(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 129, in _search
+    self._search_artists(artists)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 147, in _search_artists
+    self._search_artist(artist)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 767, in _search_artist
+    self._search_artist_by_url(artist)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 776, in _search_artist_by_url
+    mbids = self._search_artist_by_url_from_musicbrainz(url)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 823, in _search_artist_by_url_from_musicbrainz
+    mbids.append(relation.get('artist').get('id'))
+AttributeError: 'NoneType' object has no attribute 'get'
+
+https://musicbrainz.org/url/207ef23c-b8f0-4389-8267-9a97ade56707
+artist and release
+http://musicbrainz.org/ws/2/url/?fmt=json&inc=area-rels+artist-rels+label-rels+place-rels+event-rels+recording-rels+release-rels+release-group-rels+series-rels+url-rels+work-rels+instrument-rels&resource=https%3A%2F%2Fopen.spotify.com%2Fartist%2F7guDJrEfX3qb6FEbdPA5qi

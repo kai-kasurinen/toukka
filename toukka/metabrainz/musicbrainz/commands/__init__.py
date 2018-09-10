@@ -1,6 +1,7 @@
 #
 
 from . import search
+from . import entity
 
 NAMESPACE = 'musicbrainz'
 
@@ -10,6 +11,7 @@ NAMESPACE_KWARGS = {
     'help': 'help, help, help'
     }
 
-COMMANDS = [*search.COMMANDS]
+COMMANDS = [*search.COMMANDS,
+            *entity.COMMANDS]
 
 # END
