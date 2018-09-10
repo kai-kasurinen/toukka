@@ -400,6 +400,11 @@ class Spotify2MusicBrainz:
         # it may be better to try id vs mbid matching
         track_artist = track.get('artists')[0]
         track_artist_name = track_artist.get('name')
+
+        # FIXME: move somewhere
+        if self._get_mbid_silent(track_artist.get('uri')):
+            return
+
         recording_artist = recording.get('artist-credit')[0].get('artist')
         recording_artist_name = recording_artist.get('name')
         if self._compare_strings(track_artist_name, recording_artist_name):
@@ -426,7 +431,7 @@ class Spotify2MusicBrainz:
         album_artist_name = album_artist.get('name')
 
         # FIXME: move somewhere
-        if self._get_mbid_silent(artist.get('uri')):
+        if self._get_mbid_silent(album_artist.get('uri')):
             return
 
         release_artist = release.get('artist-credit')[0].get('artist')
