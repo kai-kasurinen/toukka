@@ -15,7 +15,7 @@ import toukka.finna.commands
 import toukka.wikidata.commands
 import toukka.metabrainz.listenbrainz.commands
 import toukka.metabrainz.acousticbrainz.commands
-
+import toukka.metabrainz.musicbrainz.commands
 
 def main():
     """main, main, main, main"""
@@ -41,6 +41,10 @@ def main():
     parser.add_commands(toukka.musicbrainz.commands.COMMANDS,
                         namespace=toukka.musicbrainz.commands.NAMESPACE,
                         namespace_kwargs=toukka.musicbrainz.commands.NAMESPACE_KWARGS)
+
+    parser.add_commands(toukka.metabrainz.musicbrainz.commands.COMMANDS,
+                        namespace=toukka.metabrainz.musicbrainz.commands.NAMESPACE,
+                        namespace_kwargs=toukka.metabrainz.musicbrainz.commands.NAMESPACE_KWARGS)
 
     parser.add_commands(toukka.metabrainz.acousticbrainz.commands.COMMANDS,
                         namespace=toukka.metabrainz.acousticbrainz.commands.NAMESPACE,

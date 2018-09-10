@@ -5,10 +5,10 @@
 from . import commands
 
 
-NAMESPACE = 'musicbrainz'
+NAMESPACE = 'musicbrainzngs'
 
 NAMESPACE_KWARGS = {
-    'title': 'Musicbrainz',
+    'title': 'Musicbrainz with python-musicbrainzngs',
     'description': 'musicbrainz, musicbrainz, musicbrainz',
     'help': 'help, help, help'
     }

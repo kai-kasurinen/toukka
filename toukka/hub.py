@@ -45,7 +45,10 @@ class Hub(metaclass=Singleton):
     def _init_session(self):
         cache_path_cachecontrol = save_cache_path('toukka', 'cachecontrol')
         cache = FileCache(cache_path_cachecontrol)
-        self._session = CacheControl(requests.Session(), cache)
+        self._session_plain = requests.Session()
+        self._session_plain.headers.update({'User-Agent': 'toukka/0.0.0'})
+        self._session_cached = CacheControl(self._session_plain, cache)
+        self._session = self._session_cached
 
     def _init_spotify(self):
         # TODO: add tokens to sqlite
