@@ -13,8 +13,12 @@ def is_isrc_valid(isrc):
     if len(isrc) == 12:
         pattern = re.compile("[a-zA-Z]{2}[a-zA-Z0-9]{3}[0-9]{7}")
         if pattern.match(isrc):
-            int_isrc = int(isrc[5:7])
-            if int_isrc >= 40 or int_isrc <= 16:
-                return True
+            return True
+            # year checking, bad year not make isrc invalid
+            # example: TCADU1828857
+            #
+            #int_isrc = int(isrc[5:7])
+            #if int_isrc >= 40 or int_isrc <= 16:
+            #    return True
     return False
 

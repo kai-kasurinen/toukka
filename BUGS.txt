@@ -356,3 +356,18 @@ AttributeError: 'NoneType' object has no attribute 'get'
 https://musicbrainz.org/url/207ef23c-b8f0-4389-8267-9a97ade56707
 artist and release
 http://musicbrainz.org/ws/2/url/?fmt=json&inc=area-rels+artist-rels+label-rels+place-rels+event-rels+recording-rels+release-rels+release-group-rels+series-rels+url-rels+work-rels+instrument-rels&resource=https%3A%2F%2Fopen.spotify.com%2Fartist%2F7guDJrEfX3qb6FEbdPA5qi
+
+# 21 
+
+not found:
+2018-09-10 22:06:54,073 toukka.spotify2musicbrainz.buggy DEBUG search fields: {'releaseaccent': 'The Best Of The Mediaeval Baebes', 'tracks': 20, 'arid': '278fe007-ee33-410c-be59-eabb4b87b68f', 'status': 'official'}
+
+change releaseaccent -> release: 
+https://musicbrainz.org/search?query=release%3A%22The+Best+Of+The+Mediaeval+Baebes%22&type=release&limit=25&method=advanced&chrome_dont_add_custom_search_engines_srsly=
+
+# 22 Fixed?
+
+2018-09-11 04:19:01,027 toukka.spotify2musicbrainz.buggy DEBUG _fix_isrc: TCADU1828857
+2018-09-11 04:19:01,027 toukka.spotify2musicbrainz.buggy DEBUG fail: isrc is not valid
+
+ whY? cos year validation is a bit too much

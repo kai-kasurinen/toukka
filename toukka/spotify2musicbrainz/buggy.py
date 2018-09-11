@@ -725,7 +725,8 @@ class Spotify2MusicBrainz:
         if with_barcode:
             fields['barcode'] = album.get('external_ids').get('upc')
         if with_name:
-            fields['releaseaccent'] = album.get('name')
+            #fields['releaseaccent'] = album.get('name')
+            fields['release'] = album.get('name')
         if with_tracks:
             fields['tracks'] = album.get('total_tracks')
         if with_artist:
