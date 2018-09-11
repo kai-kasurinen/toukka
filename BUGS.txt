@@ -371,3 +371,48 @@ https://musicbrainz.org/search?query=release%3A%22The+Best+Of+The+Mediaeval+Baeb
 2018-09-11 04:19:01,027 toukka.spotify2musicbrainz.buggy DEBUG fail: isrc is not valid
 
  whY? cos year validation is a bit too much
+
+# 23 
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/musicbrainz/commands/commands.py", line 182, in get_url_by_id
+    result = toukka.mbngs.get_url_by_id(iid)
+  File "/home/jozo/git/toukka/toukka/metabrainz/musicbrainz/ngs.py", line 116, in get_url_by_id
+    return self._get_entity_by_id('url', mbid, includes=includes)
+  File "/home/jozo/git/toukka/toukka/metabrainz/musicbrainz/ngs.py", line 204, in _get_entity_by_id
+    return self._do_mb_query(entity_type, mbid, includes, params)
+  File "/home/jozo/git/toukka/toukka/metabrainz/musicbrainz/ngs.py", line 230, in _do_mb_query
+    ret = self._get_entity(entity, mbid, includes=args['inc'])
+KeyError: 'inc'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/jozo/bin/toukka", line 10, in <module>
+    sys.exit(main())
+  File "/home/jozo/git/toukka/toukka/main.py", line 78, in main
+    parser.dispatch()
+  File "/usr/lib/python3/dist-packages/argh/helpers.py", line 55, in dispatch
+    return dispatch(self, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 174, in dispatch
+    for line in lines:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 277, in _execute_command
+    for line in result:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 260, in _call
+    result = function(*positional, **keywords)
+  File "/home/jozo/git/toukka/toukka/musicbrainz/commands/commands.py", line 183, in get_url_by_id
+    except toukka.mbngs.ResponseError as error:
+AttributeError: 'MusicBrainzNGS' object has no attribute 'ResponseError'
+
+# 24
+use url credited as "	Trent Reznor and Atticus Ross "
+https://musicbrainz.org/url/3a227f5a-da2c-46bb-8a62-a75071bbf425
+
+# 25
+
+session.mount('https://musicbrainz.org', HTTPAdapter(max_retries=retries))
+overwrites cachecontrol
+
+# 26
+
+2018-09-11 19:48:34,913 cachecontrol.controller DEBUG Status code 404 not in (200, 203, 300, 301)
+
