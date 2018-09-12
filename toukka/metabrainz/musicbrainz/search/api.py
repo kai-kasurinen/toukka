@@ -1,37 +1,35 @@
 #
 
 import logging
-import requests
 
 from beanbag.v2 import BeanBag, GET, BeanBagException
-from requests.packages.urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
 
 from ..exceptions import MusicBrainzRateLimitException
-from ..ratelimiter import musicbrainz_server_ratelimit_sleeper
+from ..ratelimiter import musicbrainz_server_ratelimit_sleeper, musicbrainz_search_server_ratelimit_sleeper
 
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 class MusicBrainzSearch:
-    def __init__(self, session=None):
-        if session is None:
-            session = requests.Session()
-            retries = Retry(total=10, backoff_factor=2, status_forcelist=[500, 502, 503])
-            session.mount('https://search.musicbrainz.org/ws/2/', HTTPAdapter(max_retries=retries))
-
+    def __init__(self, session=None, use_ratelimiter=True):
+        self._use_ratelimiter = use_ratelimiter
         self.api = BeanBag('https://search.musicbrainz.org/ws/2/', session=session, use_attrdict=False)
         self.fmt = 'jsonnew'
 
+    def _ratelimiter(self):
+        return musicbrainz_server_ratelimit_sleeper()
+
     def _GET(self, url, body=None):
-        musicbrainz_server_ratelimit_sleeper()
+        if self._use_ratelimiter:
+            self._ratelimiter()
         try:
             return GET(url)
         except BeanBagException as error:
             if error.response.status_code == 503:
-                logger.debug('hit musicbrainz ratelimiting')
-                raise MusicBrainzRateLimitException(error.response, 'MusicBrainz server ratelimiting')
+                logger.debug('got musicbrainz ratelimiting error')
+                logger.debug(error.response.headers)
+                raise MusicBrainzRateLimitException(error.response, 'MusicBrainz search server ratelimiting')
             else:
                 raise
 

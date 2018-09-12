@@ -48,10 +48,10 @@ class Hub(metaclass=Singleton):
     def _init_session(self):
         cache_path_cachecontrol = save_cache_path('toukka', 'cachecontrol')
         cache = FileCache(cache_path_cachecontrol)
-        retries = Retry(total=10, backoff_factor=2, status_forcelist=[500, 502, 503])
-        #adapter = cachecontrol.CacheControlAdapter(cache, cache_etags=False, max_retries=retries)
+        retries = Retry(total=5, backoff_factor=2, status_forcelist=[500, 502, 503])
+        adapter = cachecontrol.CacheControlAdapter(cache, cache_etags=False, max_retries=retries)
         #adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retries)
-        adapter = cachecontrol.CacheControlAdapter(cache)
+        #adapter = cachecontrol.CacheControlAdapter(cache)
         self._session = requests.Session()
         self._session.headers.update({'User-Agent': 'toukka/0.0.0'})
         self._session.mount('http://', adapter)

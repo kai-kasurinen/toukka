@@ -350,7 +350,8 @@ class PlayingPrinter:
     def _print_acousticbrainz_info(self, mbid):
         count = self.toukka.acousticbrainz.get_count(mbid)
         url = self.toukka.acousticbrainz.get_url(mbid)
-        print('\tacousticbrainz: {count} entries, {url}'.format(**count, url=url))
+        if count.get('count') > 0:
+            print('\tacousticbrainz: {count} entries, {url}'.format(**count, url=url))
 
     def _print_discogs_release_by_url(self, url):
         self._print_discogs_release(ResourceURL(url).entity_id)

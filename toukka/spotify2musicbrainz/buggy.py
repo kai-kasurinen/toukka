@@ -512,7 +512,9 @@ class Spotify2MusicBrainz:
             mb_artist_aliases = mb_artist.get('aliases')
             mb_artist_aliases_filtered = list()
             for a in mb_artist_aliases:
-                if (a.get('type') == 'Artist name' and a.get('primary') is True and a.get('locale') == 'en'):
+                # FIXME: move to somewhere
+                #if (a.get('type') == 'Artist name' and a.get('primary') is True and a.get('locale') == 'en'):
+                if (a.get('type') == 'Artist name'):
                     mb_artist_aliases_filtered.append(a.get('name'))
             logger.debug('mb_artist_aliases_filtered: %s', mb_artist_aliases_filtered)
             if sp_artist_name in mb_artist_aliases_filtered:
