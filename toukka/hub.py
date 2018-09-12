@@ -5,8 +5,11 @@ import logging
 import requests
 import warnings
 
+import cachecontrol
 from cachecontrol import CacheControl
 from cachecontrol.caches.file_cache import FileCache
+from requests.packages.urllib3.util.retry import Retry
+
 from xdg.BaseDirectory import save_cache_path
 
 
@@ -45,10 +48,14 @@ class Hub(metaclass=Singleton):
     def _init_session(self):
         cache_path_cachecontrol = save_cache_path('toukka', 'cachecontrol')
         cache = FileCache(cache_path_cachecontrol)
-        self._session_plain = requests.Session()
-        self._session_plain.headers.update({'User-Agent': 'toukka/0.0.0'})
-        self._session_cached = CacheControl(self._session_plain, cache)
-        self._session = self._session_cached
+        retries = Retry(total=10, backoff_factor=2, status_forcelist=[500, 502, 503])
+        #adapter = cachecontrol.CacheControlAdapter(cache, cache_etags=False, max_retries=retries)
+        #adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retries)
+        adapter = cachecontrol.CacheControlAdapter(cache)
+        self._session = requests.Session()
+        self._session.headers.update({'User-Agent': 'toukka/0.0.0'})
+        self._session.mount('http://', adapter)
+        self._session.mount('https://', adapter)
 
     def _init_spotify(self):
         # TODO: add tokens to sqlite
@@ -60,6 +67,7 @@ class Hub(metaclass=Singleton):
         self.sp.max_get_retries = 1  # default is 10
 
     def _init_musicbrainz(self):
+        # FIXME: testing use _session_plain instead of _session_cached
         self.mb = MusicBrainz(session=self._session)
         self.mbngs = self.mb.mbngs
         self.acousticbrainz = AcousticBrainz(session=self._session)
