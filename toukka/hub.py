@@ -18,7 +18,7 @@ import wikidata.client
 
 from toukka.spotify import Spotify
 from toukka.spotify.client_credentials_manager import ClientCredentialsManager
-from toukka.musicbrainz import MusicBrainz
+from toukka.toukka.deprecated.musicbrainz import MusicBrainz
 from toukka.metabrainz.acousticbrainz import AcousticBrainz
 from toukka.utils import Singleton
 from toukka.spotify2musicbrainz import Spotify2MusicBrainz

@@ -1,3 +1,3 @@
 #
 
-from .musicbrainz import MusicBrainz
+from .deprecated import MusicBrainz

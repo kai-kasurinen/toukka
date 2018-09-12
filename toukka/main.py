@@ -7,7 +7,7 @@ import argh
 
 import toukka
 import toukka.spotify.commands
-import toukka.musicbrainz.commands
+import toukka.musicbrainzngs.commands
 import toukka.discogs.commands
 import toukka.pandas.commands
 import toukka.toukka.commands
@@ -38,9 +38,9 @@ def main():
                         namespace=toukka.spotify.commands.NAMESPACE,
                         namespace_kwargs=toukka.spotify.commands.NAMESPACE_KWARGS)
 
-    parser.add_commands(toukka.musicbrainz.commands.COMMANDS,
-                        namespace=toukka.musicbrainz.commands.NAMESPACE,
-                        namespace_kwargs=toukka.musicbrainz.commands.NAMESPACE_KWARGS)
+    parser.add_commands(toukka.musicbrainzngs.commands.COMMANDS,
+                        namespace=toukka.musicbrainzngs.commands.NAMESPACE,
+                        namespace_kwargs=toukka.musicbrainzngs.commands.NAMESPACE_KWARGS)
 
     parser.add_commands(toukka.metabrainz.musicbrainz.commands.COMMANDS,
                         namespace=toukka.metabrainz.musicbrainz.commands.NAMESPACE,

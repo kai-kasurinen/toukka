@@ -13,7 +13,7 @@ import argh
 import simplejson as json
 
 from toukka import Toukka
-from toukka.models.track_features import TrackFeaturesDelivered
+from toukka.spotify.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
 from toukka.utils import _get_flags, _list_to_string
 

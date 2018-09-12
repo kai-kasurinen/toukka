@@ -2,7 +2,7 @@
 
 import pprint
 import argh
-from toukka.toukka import Toukka
+from toukka import Toukka
 from musicbrainzngs import VALID_INCLUDES
 
 def get_area_by_id(area_id):
