@@ -18,10 +18,6 @@ class MusicBrainz:
     def __init__(self, session=None):
         self.mbngs_emulated = MusicBrainzNGS(session=session)
         self.mbngs = self.mbngs_emulated
-        #self.mbngs = musicbrainzngs
-        #self.mbngs.set_useragent('toukka', '0.0.0')
-        #warnings.filterwarnings('ignore', 'The json format is non-official and may change at any time')
-        #self.mbngs.set_format(fmt='json')
 
     @functools.lru_cache(maxsize=1024)
     def search_artists(self, query='', limit=None, offset=None, strict=False, **fields):
