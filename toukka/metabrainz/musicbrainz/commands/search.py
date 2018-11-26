@@ -25,10 +25,16 @@ def search_track(query):
     return pprint.pformat(search.track(query))
 
 
+def search_url(query):
+    search = MusicBrainzSearch()
+    return pprint.pformat(search.url(query))
+
+
 COMMANDS = [
     search_artist,
     search_release,
     search_recording,
-    search_track]
+    search_track,
+    search_url]
 
 # END

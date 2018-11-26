@@ -12,6 +12,7 @@ import json
 
 from toukka.utils.isrc import is_isrc_valid
 
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -567,6 +568,9 @@ class Spotify2MusicBrainz:
 
         # FIXME: check release and album type
         album_type = album.get('album_type').lower()
+        if release.get('release-group').get('primary-type') is None:
+            logger.debug('fail: release-group primary-type is None')
+            raise ValidationFailed()
         release_group_type = release.get('release-group').get('primary-type').lower()
         release_group_secondary_types = [st.lower() for st in release.get('release-group').get('secondary-types')]
         logger.debug('album_type: "%s", release_group_type: "%s", release_group_secondary_types: %s',
@@ -577,7 +581,7 @@ class Spotify2MusicBrainz:
             logger.debug('ok: album_type in release_group_secondary_types')
         else:
             logger.debug('fail: album_type (%s) != release_group_type (%s, %s)',
-                         album_type, release_type_group, release_group_secondary_types)
+                         album_type, release_group_type, release_group_secondary_types)
             raise ValidationFailed()
 
         # TODO: compare

@@ -25,7 +25,7 @@ def main():
         format='%(asctime)s %(name)s %(levelname)s %(message)s')
     logging.captureWarnings(True)
 
-    parser = argh.ArghParser()
+    parser = argh.ArghParser(prog='toukka')
 
     parser.add_argument('--debug',
                         help='Print lots of debugging statements',

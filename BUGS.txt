@@ -416,3 +416,149 @@ overwrites cachecontrol
 
 2018-09-11 19:48:34,913 cachecontrol.controller DEBUG Status code 404 not in (200, 203, 300, 301)
 
+# 27
+2018-09-13 11:37:48,024 toukka.spotify2musicbrainz.buggy DEBUG validating album (spotify:album:3ZwEW80peItQ2vrByTc78e) mbid (6d9ef64f-5c5d-444f-a346-a142842846ac)                                                                                          
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 74, in _print_callback
+    self.playing_printer.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 82, in print
+    self.toukka.sp2mb.feed_track_id(item.get('id'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 96, in feed_track_id
+    self._search_with_search_modes(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 103, in _search_with_search_modes
+    self._search(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 124, in _search
+    self._search_album(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 648, in _search_album
+    self._search_album_by_upc_all(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 693, in _search_album_by_upc_all
+    self._search_album_by_upc(album, barcode=barcode, media_format=media_format)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 713, in _search_album_by_upc
+    return self._found_album_mbids(album, mbids)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 538, in _found_album_mbids
+    return self._found_album_mbid(album, mbid)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 544, in _found_album_mbid
+    elif self._validate_album_mbid(album, mbid):
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 570, in _validate_album_mbid
+    release_group_type = release.get('release-group').get('primary-type').lower()
+AttributeError: 'NoneType' object has no attribute 'lower'
+
+
+# 28 fixed
+
+2018-09-20 10:51:31,972 toukka.spotify2musicbrainz.buggy DEBUG _fix_isrc: USC4R0511542
+2018-09-20 10:51:31,972 toukka.spotify2musicbrainz.buggy DEBUG ok: isrc is valid
+2018-09-20 10:51:31,972 toukka.spotify2musicbrainz.buggy DEBUG searching isrc USC4R0511542 from musicbrainz
+2018-09-20 10:51:32,291 toukka.spotify2musicbrainz.buggy DEBUG failed, no result
+2018-09-20 10:51:32,293 toukka.spotify2musicbrainz.buggy DEBUG searching release by url https://open.spotify.com/album/2es5VG5ZUq4Z6WPTNyTrKf from musicbrainz                                                                                              
+2018-09-20 10:51:32,294 toukka.spotify2musicbrainz.buggy DEBUG get entity (release) mbids by url https://open.spotify.com/album/2es5VG5ZUq4Z6WPTNyTrKf from musicbrainz                                                                                     
+2018-09-20 10:51:33,360 toukka.spotify2musicbrainz.buggy DEBUG failed, no result
+2018-09-20 10:51:33,361 toukka.spotify2musicbrainz.buggy DEBUG searching album by upc all variants
+2018-09-20 10:51:33,361 toukka.spotify2musicbrainz.buggy DEBUG warn: album_upc (00013431480327) is unknown format
+2018-09-20 10:51:33,361 toukka.spotify2musicbrainz.buggy DEBUG media_formats: [None]
+2018-09-20 10:51:33,361 toukka.spotify2musicbrainz.buggy DEBUG barcodes: {'0013431480327', '00013431480327', '013431480327'}
+2018-09-20 10:51:33,361 toukka.spotify2musicbrainz.buggy DEBUG search album by upc: barcode 0013431480327, media_format None
+2018-09-20 10:51:33,361 toukka.spotify2musicbrainz.buggy DEBUG searching release by data from musicbrainz
+2018-09-20 10:51:33,362 toukka.spotify2musicbrainz.buggy DEBUG search fields: {'barcode': '0013431480327', 'status': 'official'}                                                                                                                            
+2018-09-20 10:51:34,993 toukka.spotify2musicbrainz.buggy DEBUG found 1 releases from musicbrainz
+2018-09-20 10:51:34,994 toukka.spotify2musicbrainz.buggy DEBUG validating album (spotify:album:2es5VG5ZUq4Z6WPTNyTrKf) mbid (d4186065-674a-4884-af67-b341e1c2e051)                                                                                          
+2018-09-20 10:51:36,409 toukka.spotify2musicbrainz.buggy DEBUG album_type: "compilation", release_group_type: "album", release_group_secondary_types: []                                                                                                    
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 74, in _print_callback
+    self.playing_printer.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 82, in print
+    self.toukka.sp2mb.feed_track_id(item.get('id'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 97, in feed_track_id
+    self._search_with_search_modes(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 104, in _search_with_search_modes
+    self._search(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 125, in _search
+    self._search_album(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 652, in _search_album
+    self._search_album_by_upc_all(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 697, in _search_album_by_upc_all
+    self._search_album_by_upc(album, barcode=barcode, media_format=media_format)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 717, in _search_album_by_upc
+    return self._found_album_mbids(album, mbids)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 539, in _found_album_mbids
+    return self._found_album_mbid(album, mbid)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 545, in _found_album_mbid
+    elif self._validate_album_mbid(album, mbid):
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 584, in _validate_album_mbid
+    album_type, release_type_group, release_group_secondary_types)
+NameError: name 'release_type_group' is not defined
+
+
+# 29 fixed
+
+Traceback (most recent call last):
+  File "/home/jozo/bin/toukka", line 9, in <module>
+    sys.exit(main())
+  File "/home/jozo/git/toukka/toukka/main.py", line 78, in main
+    parser.dispatch()
+  File "/usr/lib/python3/dist-packages/argh/helpers.py", line 55, in dispatch
+    return dispatch(self, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 174, in dispatch
+    for line in lines:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 277, in _execute_command
+    for line in result:
+  File "/usr/lib/python3/dist-packages/argh/dispatching.py", line 260, in _call
+    result = function(*positional, **keywords)
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 17, in playing_watcher
+    watcher.start()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 42, in start
+    self._print_callback()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 74, in _print_callback
+    self.playing_printer.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 83, in print
+    self._print_musicbrainz()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 114, in _print_musicbrainz
+    self._print_musicbrainz_release(sp_album_mbid)
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 278, in _print_musicbrainz_release
+    print('release: {title} ({disambiguation}) ({id}) (status: {status}) (barcode: {barcode}) ({date} {country})'.format(**release))
+KeyError: 'date'
+
+
+# 30 
+
+
+album: The Cheap Show (album) (spotify:album:3JnzpVc0Wx4c46enGLAHi7) (2005-01-01 day) (popularity: 32, tracks: 14)                                                                                                                           
+        artists: Anaïs (spotify:artist:6uwKWDKLDlM0PXvXQ97sRT)
+        external ids: {'upc': '05033197462721'}
+        external urls: {'spotify': 'https://open.spotify.com/album/3JnzpVc0Wx4c46enGLAHi7'}
+        markets: 65
+        label: Universal Music Division Polydor
+        copyrights:
+                C: © 2006 Polydor (France)
+                P: ℗ 2005 Polydor (France)
+
+
+2018-09-27 17:33:06,768 toukka.spotify2musicbrainz.buggy DEBUG comparing barcodes: "05033197462721", "5033197462721"
+Traceback (most recent call last):
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing_watcher.py", line 74, in _print_callback
+    self.playing_printer.print()
+  File "/home/jozo/git/toukka/toukka/toukka/commands/playing.py", line 82, in print
+    self.toukka.sp2mb.feed_track_id(item.get('id'))
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 97, in feed_track_id
+    self._search_with_search_modes(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 104, in _search_with_search_modes
+    self._search(track_id)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 125, in _search
+    self._search_album(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 652, in _search_album
+    self._search_album_by_upc_all(album)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 697, in _search_album_by_upc_all
+    self._search_album_by_upc(album, barcode=barcode, media_format=media_format)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 717, in _search_album_by_upc
+    return self._found_album_mbids(album, mbids)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 539, in _found_album_mbids
+    return self._found_album_mbid(album, mbid)
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 545, in _found_album_mbid
+    elif self._validate_album_mbid(album, mbid):
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 624, in _validate_album_mbid
+    if self._compare_barcodes(album_upc, release_barcode):
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 968, in _compare_barcodes
+    elif self._convert_barcode_to_ean13(b1) == self._convert_barcode_to_ean13(b2):
+  File "/home/jozo/git/toukka/toukka/spotify2musicbrainz/buggy.py", line 988, in _convert_barcode_to_ean13
+    raise Exception()
+Exception

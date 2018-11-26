@@ -167,6 +167,9 @@ https://github.com/Josef-Friedrich/audiorename
 
 
 -- listenbrainz
+
+https://gitlab.com/kaliko/python-listenbrainz
+
 https://beta.listenbrainz.org/user/iliekcomputers
 
 

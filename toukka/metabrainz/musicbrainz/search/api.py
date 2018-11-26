@@ -45,5 +45,9 @@ class MusicBrainzSearch:
     def release(self, query, limit=25, offset=None):
         return self._GET(self.api.release(type='release', fmt=self.fmt, limit=limit, offset=offset, query=query))
 
+    # FIXME: not work?
+    def url(self, query, limit=25, offset=None):
+        return self._GET(self.api.url(type='url', fmt=self.fmt, limit=limit, offset=offset, query=query))
+
 
 # END

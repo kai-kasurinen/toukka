@@ -29,7 +29,7 @@ def playing(with_artist: bool=True,
             with_track_moods: bool=True,
             with_track_styles: bool=True,
             with_track_key_and_mode: bool=False,
-            with_musicbrainz: bool=True):
+            with_musicbrainz: bool=False):
     """show information about current user playing track"""
     # pylint: disable=unused-argument, too-many-arguments
 
@@ -275,13 +275,18 @@ class PlayingPrinter:
 
     def _print_musicbrainz_release(self, mbid):
         release = self.toukka.mb.get_release(mbid)
-        print('release: {title} ({disambiguation}) ({id}) (status: {status}) (barcode: {barcode}) ({date} {country})'.format(**release))
+        print('release: {title} ({disambiguation}) ({id}) (status: {status}) (barcode: {barcode})'.format(**release))
         print('\tartists: {}'.format(self._musicbrainz_artist_credit_to_string(release.get('artist-credit'))))
+        if release.get('date'):
+            print('\treleased: {date} {country}'.format_map(release))
         if release.get('media'):
             media_formats = [m.get('format') for m in release.get('media')]
             tracks_total = sum([m.get('track-count') for m in release.get('media')])
             print('\tmedia: tracks total {tracks_total}, formats: {media_formats}'.format(
                 media_formats=media_formats, tracks_total=tracks_total))
+        if release.get('label-info'):
+            for label in release.get('label-info'):
+                print('\tlabel: {label[name]} {catalog-number}'.format_map(label))
         if release.get('tags'):
             print('\ttags: {}'.format(self._musicbrainz_tags_to_string(release.get('tags'))))
         #print('\trelease group: {title} ({disambiguation}) ({primary-type}, {secondary-types})'.format(**release.get('release-group'))) 
