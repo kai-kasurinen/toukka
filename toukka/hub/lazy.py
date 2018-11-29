@@ -71,7 +71,6 @@ class Hub(metaclass=Singleton):
         mb = MusicBrainz(session=self.session)
         return mb
 
-
     @lazy_property.LazyProperty
     def mbngs(self):
         return self.musicbrainz.mbngs

@@ -1,20 +1,17 @@
 #
 
 
-from . import toukka
-from . import fun
-from . import url
-from . import playing
-from . import playing_watcher
-from . import caching_test
+#from . import toukka
+#from . import fun
+#from . import url
+from . import spotify_playing
+from . import spotify_playing_watcher
+from . import spotify_playlist_manager
 
 COMMANDS = [
-    *toukka.COMMANDS,
-    *url.COMMANDS,
-    *playing.COMMANDS,
-    *playing_watcher.COMMANDS,
-    *fun.COMMANDS,
-    *caching_test.COMMANDS]
+    *spotify_playing.COMMANDS,
+    *spotify_playing_watcher.COMMANDS,
+    *spotify_playlist_manager.COMMANDS]
 
 NAMESPACE = 'experimental'
 

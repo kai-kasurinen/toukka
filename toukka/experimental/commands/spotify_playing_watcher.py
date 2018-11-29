@@ -6,7 +6,7 @@ import gi
 gi.require_version('Playerctl', '1.0')
 from gi.repository import GLib, Playerctl
 
-from .playing import PlayingPrinter
+from .spotify_playing import PlayingPrinter
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
