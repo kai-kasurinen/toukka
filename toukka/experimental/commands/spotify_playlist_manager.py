@@ -1,20 +1,9 @@
 #
 
-import argh
-import re
-import logging
-import datetime
-import humanize
-import iso8601
-import statistics
-
-import simplejson as json
-
-
 from toukka.utils import _get_flags, _list_to_string
+from toukka.experimental.spotify.playlist_manager import Playlists
 
-
-def user_playlists_cached(user,
+def playlists(user,
                    filter_own=False,
                    filter_public=False,
                    filter_collaborative=False,
@@ -37,16 +26,16 @@ def user_playlists_cached(user,
     if filter_by_userid:
         playlists = [p for p in playlists if p.get('owner').get('id') == filter_by_userid]
 
-    _print_playlists(playlists)
+    _print_playlists(playlists, one_line=True)
     print('\nfiltered to {} of total {}'.format(len(playlists), total))
 
 
 def _print_playlists(playlists, one_line=True):
 
     if one_line:
-        line = "name: {name:40} id: {id:30} owner: {owner[id]:30} tracks: {tracks[total]:5} flags: {flags}"
+        line = 'id: {id} name: {name:40}  owner: {owner[id]:30} tracks: {tracks[total]:5} flags: {flags}'
     else:
-        line = "name: {name}\nid: {id}\nowner: {owner[id]}\nflags: {flags}\ntracks: {tracks[total]}\n"
+        line = 'name: {name}\nid: {id}\nowner: {owner[id]}\nflags: {flags}\ntracks: {tracks[total]}\n'
 
     for playlist in playlists:
         print(line.format(
@@ -56,6 +45,6 @@ def _print_playlists(playlists, one_line=True):
 
 # 
 
-COMMANDS = [user_playlists_cached]
+COMMANDS = [playlists]
 
 # END
