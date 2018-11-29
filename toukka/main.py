@@ -9,7 +9,6 @@ import toukka
 import toukka.spotify.commands
 import toukka.musicbrainzngs.commands
 import toukka.discogs.commands
-import toukka.pandas.commands
 import toukka.experimental.commands
 import toukka.finna.commands
 import toukka.wikidata.commands
