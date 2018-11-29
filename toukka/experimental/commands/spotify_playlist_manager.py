@@ -10,18 +10,8 @@ import statistics
 
 import simplejson as json
 
-from toukka import Toukka
+
 from toukka.utils import _get_flags, _list_to_string
-from toukka.cache.diskcache import cache
-
-
-class Playlists:
-    @cache.memoize(expire=86400, typed=True)
-    def user_playlists_all(self, user):
-        toukka = Toukka()
-        paging = toukka.sp.user_playlists(user)
-        playlists = toukka.sp.aggregate_paging_results(paging)
-        return playlists
 
 
 def user_playlists_cached(user,
@@ -30,10 +20,7 @@ def user_playlists_cached(user,
                    filter_collaborative=False,
                    filter_by_userid=None):
 
-    toukka = Toukka()
-    #paging = toukka.sp.user_playlists(user)
-    #total = paging.get('total')
-    #playlists = toukka.sp.aggregate_paging_results(paging)
+
     playlists = Playlists().user_playlists_all(user)
     total = len(playlists)
 
