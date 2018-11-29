@@ -16,11 +16,11 @@ COMMANDS = [
     *fun.COMMANDS,
     *caching_test.COMMANDS]
 
-NAMESPACE = 'toukka'
+NAMESPACE = 'experimental'
 
 NAMESPACE_KWARGS = {
-    'title': 'Toukka',
-    'description': 'toukka, toukka, toukka',
+    'title': 'Experimental',
+    'description': 'Experimental, experimental, experimental',
     'help': 'help, help, help'
     }
 
