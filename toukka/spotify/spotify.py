@@ -5,6 +5,10 @@ import functools
 import spotipy
 
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
 class Spotify(spotipy.Spotify):
 
     @functools.lru_cache(maxsize=1024)
@@ -27,8 +31,14 @@ class Spotify(spotipy.Spotify):
         playlist_id = uri.split(':')[4]
         return self.user_playlist(username, playlist_id)
 
+    def aggregate_paging_results(self, paging):
+        results = paging.get('items')
+        while paging.get('next'):
+            logger.debug('getting results %s/%s', paging.get('offset'), paging.get('total'))
+            paging = self.next(paging)
+            results.extend(paging.get('items'))
+        return results
 
 
 
-
-#
+# END

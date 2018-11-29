@@ -6,3 +6,6 @@ __pycache__/
 .kdev4/
 *.kdev4
 
+#
+.mypy_cache/
+

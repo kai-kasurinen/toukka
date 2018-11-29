@@ -45,6 +45,8 @@ def user_playlists(user,
 
     paging = toukka.sp.user_playlists(user)
     playlists = toukka.sp.aggregate_paging_results(paging)
+    #playlists = toukka.sp.user_playlists_all(user)
+
 
     if filter_own:
         playlists = [p for p in playlists if p.get('owner').get('id') == user]
