@@ -71,6 +71,7 @@ class Hub(metaclass=Singleton):
         mb = MusicBrainz(session=self.session)
         return mb
 
+
     @lazy_property.LazyProperty
     def mbngs(self):
         return self.musicbrainz.mbngs
@@ -105,6 +106,10 @@ class Hub(metaclass=Singleton):
         sqlite_database_file = os.path.join(save_cache_path('toukka'), 'toukka.sqlite')
         sp2mb = Spotify2MusicBrainz(hub=self, dbfile=sqlite_database_file)
         return sp2mb
+
+    # FIXME: remove
+    sp = spotify
+    mb = musicbrainz
 
 
 class Toukka(metaclass=Singleton):
