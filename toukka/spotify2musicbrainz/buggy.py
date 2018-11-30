@@ -14,7 +14,7 @@ from toukka.utils.isrc import is_isrc_valid
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 
 class Spotify2MusicBrainz:

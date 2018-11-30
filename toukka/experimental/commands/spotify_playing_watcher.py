@@ -32,7 +32,7 @@ class Watcher:
             'with_track_styles': True,
             'with_track_key_and_mode': False,
             'with_musicbrainz': True,
-            'wtih_discogs': False
+            'with_discogs': True
             }
         self.playing_printer = PlayingPrinter(args=playing_printer_args)
         self.last_seen = None
@@ -53,7 +53,7 @@ class Watcher:
         self.mainloop.quit()
 
     def _on_metadata(self, player, metadata):
-        logger.debug(metadata)
+        #logger.debug(metadata)
         track_id = metadata['mpris:trackid']
 
         if track_id == '':

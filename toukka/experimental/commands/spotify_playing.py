@@ -16,7 +16,7 @@ from toukka import Toukka, ResourceURL
 from toukka.spotify.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
 from toukka.utils import _get_flags, _list_to_string
-
+from toukka.spotify_history.first import SpotifyHistory
 
 
 
@@ -29,8 +29,10 @@ def playing(with_artist: bool=True,
             with_track_moods: bool=True,
             with_track_styles: bool=True,
             with_track_key_and_mode: bool=False,
-            with_musicbrainz: bool=False):
-    """show information about current user playing track"""
+            with_musicbrainz: bool=False,
+            with_discogs: bool=False):
+
+    '''show information about current user playing track'''
     # pylint: disable=unused-argument, too-many-arguments
 
     args = locals()
@@ -76,6 +78,7 @@ class PlayingPrinter:
         if self.args.get('with_track'):
             print()
             self._print_track_info(item.get('id'))
+            self._print_history()
 
         if self.args.get('with_musicbrainz'):
             print()
@@ -86,6 +89,15 @@ class PlayingPrinter:
             print()
             self._print_discogs()
 
+
+    def _get_track_id(self):
+        return self.currently_playing.get('item').get('uri')
+
+    def _print_history(self):
+        sh = SpotifyHistory()
+        count = sh.count_by_track_id(self._get_track_id())
+        print()
+        print('played count: %i' % count)
 
     def _print_musicbrainz(self):
 
@@ -116,12 +128,12 @@ class PlayingPrinter:
             self._print_musicbrainz_artist(sp_artist_mbid)
 
     def _print_discogs(self):
-        print('Discogs:')
-
         sp_album_uri = self.currently_playing.get('item').get('album').get('uri')
         sp_album_mbid = self.toukka.sp2mb.get_mbid(sp_album_uri)
         if sp_album_mbid:
             urls = self.toukka.mb.get_release_url_relations_by_type(sp_album_mbid, 'discogs')
+            if urls:
+                print('Discogs:')
             for u in urls:
                 self._print_discogs_release_by_url(u)
 

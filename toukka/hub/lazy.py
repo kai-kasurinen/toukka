@@ -77,7 +77,7 @@ class Hub(metaclass=Singleton):
 
     @lazy_property.LazyProperty
     def acousticbrainz(self):
-        logger.debug('init acoustibrainz')
+        logger.debug('init acousticbrainz')
         acousticbrainz = AcousticBrainz(session=self.session)
         return acousticbrainz
 
@@ -131,7 +131,7 @@ class Toukka(metaclass=Singleton):
 
     @lazy_property.LazyProperty
     def acousticbrainz(self):
-        return self.hub.acoustibrainz
+        return self.hub.acousticbrainz
 
     @lazy_property.LazyProperty
     def discogs(self):
