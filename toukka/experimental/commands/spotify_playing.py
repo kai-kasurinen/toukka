@@ -12,11 +12,13 @@ import tabulate
 import argh
 import simplejson as json
 
+import toukka.wikidata.printer
+
 from toukka import Toukka, ResourceURL
 from toukka.spotify.models.track_features import TrackFeaturesDelivered
 from toukka.utils import json_dump, json_dump_print, format_as_table
 from toukka.utils import _get_flags, _list_to_string
-from toukka.spotify_history.first import SpotifyHistory
+
 
 
 
@@ -30,7 +32,9 @@ def playing(with_artist: bool=True,
             with_track_styles: bool=True,
             with_track_key_and_mode: bool=False,
             with_musicbrainz: bool=False,
-            with_discogs: bool=False):
+            with_discogs: bool=False,
+            with_wikidata: bool=True):
+
 
     '''show information about current user playing track'''
     # pylint: disable=unused-argument, too-many-arguments
@@ -78,24 +82,18 @@ class PlayingPrinter:
         if self.args.get('with_track'):
             print()
             self._print_track_info(item.get('id'))
-            self._print_history()
 
         if self.args.get('with_musicbrainz'):
             print()
             self.toukka.sp2mb.feed_track_id(item.get('id'))
             self._print_musicbrainz()
 
-        if self.args.get('with_discogs'):
-            print()
-            self._print_discogs()
-
 
     def _get_track_id(self):
         return self.currently_playing.get('item').get('uri')
 
     def _print_history(self):
-        sh = SpotifyHistory()
-        count = sh.count_by_track_id(self._get_track_id())
+        count = self.toukka.hub.spotify_history.count_by_track_id(self._get_track_id())
         print()
         print('played count: %i' % count)
 
@@ -127,15 +125,32 @@ class PlayingPrinter:
         for sp_artist_mbid in sp_artists_mbids:
             self._print_musicbrainz_artist(sp_artist_mbid)
 
-    def _print_discogs(self):
-        sp_album_uri = self.currently_playing.get('item').get('album').get('uri')
-        sp_album_mbid = self.toukka.sp2mb.get_mbid(sp_album_uri)
-        if sp_album_mbid:
-            urls = self.toukka.mb.get_release_url_relations_by_type(sp_album_mbid, 'discogs')
-            if urls:
-                print('Discogs:')
-            for u in urls:
-                self._print_discogs_release_by_url(u)
+        if self.args.get('with_discogs'):
+            print('Discogs:')
+            if sp_album_mbid:
+                urls = self.toukka.mb.get_release_url_relations_by_type(sp_album_mbid, 'discogs')
+                if urls:
+                    for u in urls:
+                        self._print_discogs_release_by_url(u)
+
+
+        if self.args.get('with_wikidata'):
+            print('Wikidata:')
+            if sp_artists_mbids:
+                for sp_artist_mbid in sp_artists_mbids:
+                    urls = self.toukka.mb.get_artist_url_relations_by_type(sp_artist_mbid, 'wikidata')
+                    if urls:
+                        for u in urls:
+                            self._print_wikidata_by_url(u)
+
+            if sp_album_mbid:
+                    release = self.toukka.mb.get_release(sp_album_mbid)
+                    release_group_mbid = release.get('release-group').get('id')
+                    urls = self.toukka.mb.get_release_group_url_relations_by_type(release_group_mbid, 'wikidata')
+                    if urls:
+                        for u in urls:
+                            self._print_wikidata_by_url(u)
+
 
 
     def _print_is_playing(self):
@@ -171,6 +186,10 @@ class PlayingPrinter:
 
         if artist.get('external_urls'):
             print('\texternal urls: {external_urls}'.format(**artist))
+
+
+        print('\tplayed: %s' % self.toukka.hub.spotify_history.count_by_artist_name(artist.get('name')))
+
 
     def _print_album_info(self, album_id):
         album = self.toukka.sp.album(album_id)
@@ -218,6 +237,8 @@ class PlayingPrinter:
         # FIXME: need check delivered too or something
         if self.args.get('with_track_features'):
             self._print_track_features(track.get('id'))
+
+        print('\tplayed: %s' % self.toukka.hub.spotify_history.count_by_track_id(track.get('uri')))
 
     def _print_track_features(self, track_id):
 
@@ -402,6 +423,13 @@ class PlayingPrinter:
 
     def _discogs_artists_to_string(self, artists):
         return ", ".join("%s (%s)" % (artist.name, artist.id) for artist in artists)
+
+    def _print_wikidata_by_url(self, url):
+        self._print_wikidata_entity(ResourceURL(url).entity_id)
+
+    def _print_wikidata_entity(self, entity_id):
+        entity = self.toukka.hub.wikidata.get(entity_id, load=True)
+        toukka.wikidata.printer.print_entity(entity)
 
 
 #

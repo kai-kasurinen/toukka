@@ -30,3 +30,6 @@ class SpotifyHistory:
     def count_by_track_id(self, track_id):
         return self.session.query(self.history).filter(self.history.mpris_track_id == track_id).count()
 
+
+    def count_by_artist_name(self, artist_name):
+        return self.session.query(self.history).filter(self.history.xesam_artist == artist_name).count()

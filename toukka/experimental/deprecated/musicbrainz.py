@@ -165,6 +165,9 @@ class MusicBrainz:
         relations = recording.get('relations')
         return self._filter_url_relations(relations)
 
+    def get_artist_url_relations_by_type(self, mbid, rtype):
+        return self._filter_url_relations_by_type(rtype, self.get_artist_url_relations(mbid))
+
     def get_recording_work_relations(self, mbid):
         return self._filter_work_relations(
             self.get_recording_relations_by_target_type(mbid, 'work'))
@@ -185,6 +188,9 @@ class MusicBrainz:
         release = self.get_release_group(mbid)
         relations = release.get('relations')
         return self._filter_url_relations(relations)
+
+    def get_release_group_url_relations_by_type(self, mbid, rtype):
+        return self._filter_url_relations_by_type(rtype, self.get_release_group_url_relations(mbid))
 
     def _filter_relations_by_target_type(self, relations, target_type):
         return [r for r in relations if r.get('target-type') == target_type]

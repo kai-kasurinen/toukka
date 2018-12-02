@@ -1,5 +1,7 @@
 #
 
+from toukka import Toukka
+
 from toukka.utils import _get_flags, _list_to_string
 from toukka.experimental.spotify.playlist_manager import Playlists
 
@@ -11,6 +13,7 @@ def playlists(user,
 
 
     playlists = Playlists().user_playlists_all(user)
+    #playlists = Toukka().sp.user_playlists_all(user)
     total = len(playlists)
 
 

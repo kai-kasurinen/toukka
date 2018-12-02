@@ -1,7 +1,12 @@
 #
 
+import logging
+
 from urlobject import URLObject
 
+
+logger = logging.getLogger(__name__)
+#logger.setLevel(logging.DEBUG)
 
 class ResourceURL:
 
@@ -33,8 +38,13 @@ class ResourceURL:
         # https://viola.linneanet.fi/vwebv/holdingsInfo?bibId=632917
         elif self.url.hostname == 'viola.linneanet.fi':
             self.service = 'viola'
+        elif self.url.hostname == 'www.wikidata.org':
+            self.service = 'wikidata'
+            self.entity_id = self.url.path.segments[1]
         else:
             self.service = None
+
+        logger.debug('%s:%s:%s', self.service, self.entity_type, self.entity_id)
 
 
 class ResourceURI:

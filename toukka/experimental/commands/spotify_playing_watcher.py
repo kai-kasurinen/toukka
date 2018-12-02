@@ -3,9 +3,10 @@
 import logging
 import gi
 
+import toukka.log.to_file
+
 gi.require_version('Playerctl', '1.0')
 from gi.repository import GLib, Playerctl
-
 from .spotify_playing import PlayingPrinter
 
 logger = logging.getLogger(__name__)
@@ -32,11 +33,13 @@ class Watcher:
             'with_track_styles': True,
             'with_track_key_and_mode': False,
             'with_musicbrainz': True,
-            'with_discogs': True
+            'with_discogs': True,
+            'with_wikidata': True,
             }
         self.playing_printer = PlayingPrinter(args=playing_printer_args)
         self.last_seen = None
         self.mainloop = GLib.MainLoop()
+        #toukka.log.to_file.set_logging_file()
 
     def start(self):
         self._print_callback()

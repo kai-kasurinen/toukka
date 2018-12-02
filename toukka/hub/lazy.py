@@ -25,6 +25,8 @@ from toukka.metabrainz.acousticbrainz import AcousticBrainz
 from toukka.utils import Singleton
 from toukka.spotify2musicbrainz import Spotify2MusicBrainz
 from toukka.finna import Finna
+from toukka.spotify_history.first import SpotifyHistory
+
 
 logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
@@ -96,8 +98,9 @@ class Hub(metaclass=Singleton):
     @lazy_property.LazyProperty
     def wikidata(self):
         logger.debug('init wikidata')
-        wikidata = wikidata.client.Client()
-        return wikidata
+        wikidata_client = wikidata.client.Client(cache_policy=wikidata.cache.MemoryCachePolicy(max_size=1024))
+        #wikidata_client = wikidata.client.Client()
+        return wikidata_client
 
     @lazy_property.LazyProperty
     def spotify2musicbrainz(self):
@@ -105,6 +108,13 @@ class Hub(metaclass=Singleton):
         sqlite_database_file = os.path.join(save_cache_path('toukka'), 'toukka.sqlite')
         sp2mb = Spotify2MusicBrainz(hub=self, dbfile=sqlite_database_file)
         return sp2mb
+
+    @lazy_property.LazyProperty
+    def spotify_history(self):
+        logger.debug('init spotify_history')
+        sh = SpotifyHistory()
+        return sh
+
 
     # FIXME: remove
     sp = spotify
