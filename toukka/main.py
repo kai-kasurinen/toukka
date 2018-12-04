@@ -12,6 +12,7 @@ import toukka.discogs.commands
 import toukka.experimental.commands
 import toukka.finna.commands
 import toukka.wikidata.commands
+import toukka.itunes.commands
 import toukka.metabrainz.listenbrainz.commands
 import toukka.metabrainz.acousticbrainz.commands
 import toukka.metabrainz.musicbrainz.commands
@@ -64,6 +65,10 @@ def main():
     parser.add_commands(toukka.wikidata.commands.COMMANDS,
                         namespace=toukka.wikidata.commands.NAMESPACE,
                         namespace_kwargs=toukka.wikidata.commands.NAMESPACE_KWARGS)
+
+    parser.add_commands(toukka.itunes.commands.COMMANDS,
+                        namespace=toukka.itunes.commands.NAMESPACE,
+                        namespace_kwargs=toukka.itunes.commands.NAMESPACE_KWARGS)
 
     parser.add_commands(toukka.experimental.commands.COMMANDS,
                         namespace=toukka.experimental.commands.NAMESPACE,

@@ -2,6 +2,7 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import sys
+
 from toukka.main import main
 
 

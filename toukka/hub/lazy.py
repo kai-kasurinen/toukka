@@ -17,6 +17,11 @@ import discogs_client
 import wikidata.client
 
 import lazy_property
+import memcache
+
+import itunes
+
+from werkzeug.contrib.cache import SimpleCache, FileSystemCache
 
 from toukka.spotify import Spotify
 from toukka.spotify.client_credentials_manager import ClientCredentialsManager
@@ -36,8 +41,17 @@ logger = logging.getLogger(__name__)
 class Hub(metaclass=Singleton):
 
     @lazy_property.LazyProperty
-    def cache_path(self):
+    def _cache_path(self):
         return save_cache_path('toukka')
+
+    @lazy_property.LazyProperty
+    def cache(self):
+        logger.debug('init cache')
+        #cache = SimpleCache(threshold=1000, default_timeout=3600)
+        #_cache_dir = save_cache_path('toukka', 'werkzeug', 'filesystemcache')
+        #cache = FileSystemCache(_cache_dir, threshold=1000, default_timeout=3600)
+        cache = memcache.Client(['127.0.0.1:11211'], debug=1)
+        return cache
 
     @lazy_property.LazyProperty
     def session(self):
@@ -98,7 +112,9 @@ class Hub(metaclass=Singleton):
     @lazy_property.LazyProperty
     def wikidata(self):
         logger.debug('init wikidata')
-        wikidata_client = wikidata.client.Client(cache_policy=wikidata.cache.MemoryCachePolicy(max_size=1024))
+        #cache_policy=wikidata.cache.MemoryCachePolicy(max_size=1024)
+        cache_policy=wikidata.cache.ProxyCachePolicy(self.cache, timeout=3600, property_timeout=86400)
+        wikidata_client = wikidata.client.Client(cache_policy=cache_policy)
         #wikidata_client = wikidata.client.Client()
         return wikidata_client
 
@@ -114,6 +130,11 @@ class Hub(metaclass=Singleton):
         logger.debug('init spotify_history')
         sh = SpotifyHistory()
         return sh
+
+    @lazy_property.LazyProperty
+    def itunes(self):
+        itunes.base.SESSION = self.session
+        return itunes
 
 
     # FIXME: remove

@@ -67,6 +67,8 @@ https://github.com/sdimi/spotifav
 https://dev.to/ericbonfadini/finding-my-new-favorite-song-on-spotify-4lgc
 https://www.kaggle.com/daztron/spotify-machine-learning
 
+https://github.com/keithf4/spotify_pm Spotify Playlist Manager 
+
 
 BUGS:
 
@@ -181,3 +183,8 @@ https://github.com/metabrainz/musicbrainz-server/blob/master/lib/MusicBrainz/Ser
 spotify podcasts:
     2018-09-08 13:00:16|Kympin tytöt||spotify:episode:3VzKRRiAaYx7hSa8SoUddf
 
+
+
+python+memcached:
+https://github.com/linsomniac/python-memcached
+https://github.com/1stvamp/memorised

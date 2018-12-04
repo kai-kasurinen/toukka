@@ -1,14 +1,13 @@
 #
 
-import argh
 import re
 import logging
 import datetime
 import humanize
 import iso8601
 import statistics
-
-import simplejson as json
+import pprint
+import argh
 
 from toukka import Toukka
 from toukka.utils import _get_flags, _list_to_string
@@ -77,25 +76,29 @@ def _print_playlists(playlists, one_line=True):
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
-def playlist_info(uri, with_tracks=False):
+def playlist_info(uri, dump=False, with_tracks=False):
     toukka = Toukka()
-
     playlist = toukka.sp.get_playlist_by_uri(uri)
-    _print_playlist_info(playlist)
 
-    if with_tracks:
-        playlist_tracks = toukka.sp.aggregate_paging_results(playlist['tracks'])
-        _print_playlist_tracks(playlist_tracks)
+    if dump:
+        pprint.pprint(playlist)
+        return
+    else:
+        _print_playlist_info(playlist)
+
+        if with_tracks:
+            playlist_tracks = toukka.sp.aggregate_paging_results(playlist['tracks'])
+            _print_playlist_tracks(playlist_tracks)
 
 
 def _print_playlist_info(playlist):
-    print('uri: %s' % playlist['uri'])
-    print('name: %s' % playlist['name'])
-    print('desc: %s' % playlist['description'])
-    print('owner: %s (%s)' % (playlist['owner']['id'], playlist['owner']['uri']))
-    print('followers: %s' % playlist['followers']['total'])
-    print('track count: %s' % playlist['tracks']['total'])
-    print('flags: %s' % _list_to_string(_get_flags(playlist, ['public', 'collaborative'])))
+    print('playlist: {name} ({uri}) (followers: {followers[total]}, tracks: {tracks[total]}'.format(**playlist))
+    print('\tdescription: {description}'.format(**playlist))
+    print('\towner: {owner[display_name]} ({owner[id]}) ({owner[uri]})'.format(**playlist))
+    print('\tsnapshot: {snapshot_id}'.format(**playlist))
+    if playlist.get('external_urls'):
+            print('\texternal urls: {external_urls}'.format(**playlist))
+    print('\tflags: {}'.format(_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
 def _print_playlist_tracks(playlist_tracks):

@@ -21,7 +21,7 @@ NAMESPACE_KWARGS = {
 
 def entity(entity_id, dump=False):
     toukka = Toukka()
-    entity = toukka.hub.wikidata.get(entity_id, load=True)
+    entity = toukka.hub.wikidata.get(entity_id)
 
     if dump:
         pprint.pprint(entity)

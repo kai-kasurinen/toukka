@@ -1,21 +1,23 @@
 #
 
+import pprint
+
 from toukka import Toukka
 
+from toukka.experimental.spotify.playlist_manager  import Playlists
 from toukka.utils import _get_flags, _list_to_string
-from toukka.experimental.spotify.playlist_manager import Playlists
 
-def playlists(user,
+def playlists(user=None,
                    filter_own=False,
                    filter_public=False,
                    filter_collaborative=False,
                    filter_by_userid=None):
 
 
-    playlists = Playlists().user_playlists_all(user)
-    #playlists = Toukka().sp.user_playlists_all(user)
+    #toukka = Toukka()
+    #playlists = toukka.sp.user_playlists_all(user)
+    playlists = Playlists().playlists()
     total = len(playlists)
-
 
     if filter_own:
         playlists = [p for p in playlists if p.get('owner').get('id') == user]
@@ -41,9 +43,12 @@ def _print_playlists(playlists, one_line=True):
         line = 'name: {name}\nid: {id}\nowner: {owner[id]}\nflags: {flags}\ntracks: {tracks[total]}\n'
 
     for playlist in playlists:
+        pprint.pprint(playlist)
         print(line.format(
             **playlist,
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
+
+
 
 
 # 
