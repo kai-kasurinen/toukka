@@ -18,10 +18,10 @@ import wikidata.client
 
 import lazy_property
 import memcache
+import diskcache
+import werkzeug.contrib.cache
 
 import itunes
-
-from werkzeug.contrib.cache import SimpleCache, FileSystemCache
 
 from toukka.spotify import Spotify
 from toukka.spotify.client_credentials_manager import ClientCredentialsManager
@@ -37,7 +37,6 @@ logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
 
 
-
 class Hub(metaclass=Singleton):
 
     @lazy_property.LazyProperty
@@ -45,13 +44,30 @@ class Hub(metaclass=Singleton):
         return save_cache_path('toukka')
 
     @lazy_property.LazyProperty
-    def cache(self):
-        logger.debug('init cache')
-        #cache = SimpleCache(threshold=1000, default_timeout=3600)
-        #_cache_dir = save_cache_path('toukka', 'werkzeug', 'filesystemcache')
-        #cache = FileSystemCache(_cache_dir, threshold=1000, default_timeout=3600)
-        cache = memcache.Client(['127.0.0.1:11211'], debug=1)
-        return cache
+    def werkzeug_simplecache(self):
+        logger.debug('init werkzeug simplecache')
+        simplecache = werkzeug.contrib.cache.SimpleCache(threshold=1000, default_timeout=3600)
+        return simplecache
+
+    @lazy_property.LazyProperty
+    def werkzeug_filesystemcache(self):
+        logger.debug('init werkzeug filesystemcache')
+        cache_dir = save_cache_path('toukka', 'werkzeug', 'filesystemcache')
+        filesystemcache = werkzeug.contrib.cache.FileSystemCache(cache_dir, threshold=1000, default_timeout=3600)
+        return filesystemcache
+
+    @lazy_property.LazyProperty
+    def diskcache_fanoutcache(self):
+        logger.debug('init diskcache fanoutcache')
+        cache_dir = save_cache_path('toukka', 'diskcache', 'fanoutcache')
+        fanoutcache = diskcache.FanoutCache(cache_dir, timeout=10)
+        return fanoutcache
+
+    @lazy_property.LazyProperty
+    def memcache(self):
+        logger.debug('init memcache')
+        mcache = memcache.Client(['127.0.0.1:11211'], debug=1)
+        return mcache
 
     @lazy_property.LazyProperty
     def session(self):
@@ -113,7 +129,7 @@ class Hub(metaclass=Singleton):
     def wikidata(self):
         logger.debug('init wikidata')
         #cache_policy=wikidata.cache.MemoryCachePolicy(max_size=1024)
-        cache_policy=wikidata.cache.ProxyCachePolicy(self.cache, timeout=3600, property_timeout=86400)
+        cache_policy = wikidata.cache.ProxyCachePolicy(self.diskcache_fanoutcache, timeout=3600, property_timeout=86400)
         wikidata_client = wikidata.client.Client(cache_policy=cache_policy)
         #wikidata_client = wikidata.client.Client()
         return wikidata_client

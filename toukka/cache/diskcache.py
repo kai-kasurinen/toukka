@@ -5,8 +5,8 @@ import atexit
 from diskcache import FanoutCache
 from xdg.BaseDirectory import save_cache_path
 
-
-cache = FanoutCache(save_cache_path('toukka', 'diskcache', 'fanoutcache'), timeout=10)
+# works with functions, not methods
+#cache = FanoutCache(save_cache_path('toukka', 'diskcache', 'fanoutcache'), timeout=10)
 #cache.check(fix=True)
 
 

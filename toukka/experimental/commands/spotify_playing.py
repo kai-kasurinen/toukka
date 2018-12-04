@@ -31,8 +31,8 @@ def playing(with_artist: bool=True,
             with_track_moods: bool=True,
             with_track_styles: bool=True,
             with_track_key_and_mode: bool=False,
-            with_musicbrainz: bool=False,
-            with_discogs: bool=False,
+            with_musicbrainz: bool=True,
+            with_discogs: bool=True,
             with_wikidata: bool=True):
 
 

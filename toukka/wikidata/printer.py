@@ -26,6 +26,7 @@ def print_entity(entity):
 def _print_entity_oneline(entity):
     print('{}: {} ({})'.format(entity.id, entity.label, entity.description))
 
+
 def _print_entity_multiline(entity):
     print('label: {}'.format(entity.label))
     print('id: {}'.format(entity.id))
