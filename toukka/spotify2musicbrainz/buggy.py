@@ -95,7 +95,8 @@ class Spotify2MusicBrainz:
             return
         else:
             self._search_with_search_modes(track_id)
-            self._feeded.add(track_id)
+            # FIXME:
+            #self._feeded.add(track_id)
 
     def _search_with_search_modes(self, track_id):
         if 'strict' in self.search_modes:
@@ -662,7 +663,7 @@ class Spotify2MusicBrainz:
 
         logger.debug('searching album by upc all variants')
 
-        #media_formats = ['Digital Media', 'CD', None]
+        media_formats = ['Digital Media', 'CD', None]
         media_formats = [None]
         barcodes = set()
 
