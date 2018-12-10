@@ -96,7 +96,7 @@ class Spotify2MusicBrainz:
         else:
             self._search_with_search_modes(track_id)
             # FIXME:
-            #self._feeded.add(track_id)
+            self._feeded.add(track_id)
 
     def _search_with_search_modes(self, track_id):
         if 'strict' in self.search_modes:
@@ -682,8 +682,8 @@ class Spotify2MusicBrainz:
             # check if country code is 0
             if album_upc[0] == '0':
                 barcodes.add(self._convert_barcode_ean13_to_upc12(album_upc))
+        # GTIN
         elif len(album_upc) == 14:
-            logger.debug('warn: album_upc (%s) is unknown format', album_upc)
             if len(album_upc) == 14 and album_upc[0] == '0' and album_upc[1] == '0':
                 barcodes.add(album_upc[1:])
                 barcodes.add(album_upc[2:])
