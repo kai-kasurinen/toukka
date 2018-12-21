@@ -21,7 +21,7 @@ import memcache
 import diskcache
 import werkzeug.contrib.cache
 
-import itunes
+import toukka.discogs.fetchers
 
 from toukka.spotify import Spotify
 from toukka.spotify.client_credentials_manager import ClientCredentialsManager
@@ -31,6 +31,7 @@ from toukka.utils import Singleton
 from toukka.spotify2musicbrainz import Spotify2MusicBrainz
 from toukka.finna import Finna
 from toukka.spotify_history.first import SpotifyHistory
+
 
 
 logger = logging.getLogger(__name__)
@@ -117,6 +118,8 @@ class Hub(metaclass=Singleton):
     def discogs(self):
         logger.debug('init discogs')
         discogs = discogs_client.Client('toukka/0.0.0')
+        # FIXME: not caching, probably need custom caching strategy
+        #discogs._fetcher = toukka.discogs.fetchers.RequestsFetcherSession(session=self.session)
         return discogs
 
     @lazy_property.LazyProperty
@@ -129,7 +132,8 @@ class Hub(metaclass=Singleton):
     def wikidata(self):
         logger.debug('init wikidata')
         #cache_policy=wikidata.cache.MemoryCachePolicy(max_size=1024)
-        cache_policy = wikidata.cache.ProxyCachePolicy(self.diskcache_fanoutcache, timeout=3600, property_timeout=86400)
+        cache_policy = wikidata.cache.ProxyCachePolicy(self.diskcache_fanoutcache, timeout=86400, property_timeout=604800)
+        #cache_policy = wikidata.cache.ProxyCachePolicy(self.diskcache_fanoutcache, timeout=3600, property_timeout=86400)
         wikidata_client = wikidata.client.Client(cache_policy=cache_policy)
         #wikidata_client = wikidata.client.Client()
         return wikidata_client

@@ -2,6 +2,7 @@
 
 import logging
 import wikidata
+import urllib.error
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -13,7 +14,9 @@ def _iterlists(entity):
         try:
             v = entity.getlist(prop)
         except wikidata.datavalue.DatavalueError as error:
-            logger.error(error)
+            logger.error('%s: %s', prop, error)
+        except KeyError as error:
+            logger.error('%s: %s', prop, error)
         yield prop, v
 
 
@@ -40,6 +43,10 @@ def _print_entity_all_props(entity):
         values_to_print = list()
         for value in values:
             if isinstance(value, wikidata.entity.Entity):
+                value = _load_entity(value)
+                # not found
+                if value is None:
+                    continue
                 values_to_print.append(value.label)
             else:
                 values_to_print.append(value)
@@ -47,3 +54,14 @@ def _print_entity_all_props(entity):
            values_to_print  = values_to_print[0]
         print('\t{}: {}'.format(key.label, values_to_print))
 
+
+def _load_entity(entity):
+    try:
+        entity.load()
+    except urllib.error.HTTPError as error:
+        if error.getcode() == 404:
+            logger.error('load entity: %s not found', entity.id)
+            entity = None
+        else:
+            raise
+    return entity

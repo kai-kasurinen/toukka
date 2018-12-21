@@ -62,31 +62,42 @@ class PlayingPrinter:
 
         self._print_is_playing()
 
-        item = currently_playing.get('item')
+        track = currently_playing.get('item')
 
-        if item is None:
+        if track is None:
             print('No track information available...')
             return
 
         if self.args.get('with_artist'):
-            artists = item.get('artists')
-            for artist in artists:
+            for artist_id in self._get_all_artist_ids():
                 print()
-                self._print_artist_info(artist.get('id'))
+                self._print_artist_info(artist_id)
 
         if self.args.get('with_album'):
-            album = item.get('album')
+            album = track.get('album')
             print()
             self._print_album_info(album.get('id'))
 
         if self.args.get('with_track'):
             print()
-            self._print_track_info(item.get('id'))
+            self._print_track_info(track.get('id'))
 
         if self.args.get('with_musicbrainz'):
             print()
-            self.toukka.sp2mb.feed_track_id(item.get('id'))
+            self.toukka.sp2mb.feed_track_id(track.get('id'))
             self._print_musicbrainz()
+
+
+    def _get_all_artist_ids(self):
+        track = self.currently_playing.get('item')
+        album = track.get('album')
+        # FIXME: use ordered set or something
+        artist_ids = set()
+        for artist in track.get('artists'):
+            artist_ids.add(artist.get('id'))
+        for artist in album.get('artists'):
+            artist_ids.add(artist.get('id'))
+        return artist_ids
 
 
     def _get_track_id(self):
@@ -216,6 +227,7 @@ class PlayingPrinter:
         track = self.toukka.sp.track(track_id)
         print('track: {name} ({uri}) (popularity: {popularity})'.format(**track))
         print('\tartists: %s' % self._spotify_artists_to_string(track.get('artists')))
+        print('\talbum: {name} ({uri})'.format(**track.get('album')))
         print('\tduration: %s' % (datetime.timedelta(milliseconds=track.get('duration_ms'))))
         print('\ttrack number: {track_number}, disc number: {disc_number}'.format(**track))
         if track.get('external_ids'):

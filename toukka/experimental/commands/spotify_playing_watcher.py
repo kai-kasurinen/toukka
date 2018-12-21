@@ -33,8 +33,8 @@ class Watcher:
             'with_track_styles': True,
             'with_track_key_and_mode': False,
             'with_musicbrainz': True,
-            'with_discogs': True,
-            'with_wikidata': True,
+            'with_discogs': False,
+            'with_wikidata': False,
             }
         self.playing_printer = PlayingPrinter(args=playing_printer_args)
         self.last_seen = None
