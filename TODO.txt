@@ -188,3 +188,7 @@ spotify podcasts:
 python+memcached:
 https://github.com/linsomniac/python-memcached
 https://github.com/1stvamp/memorised
+
+
+== musicbrainz, redirect mbid, api
+https://tickets.metabrainz.org/browse/MBS-3946

@@ -58,6 +58,9 @@ class ClientCredentialsManager:
         if self.sp_oauth.is_token_expired(self.token_info):
             logger.debug('token is expired, trying refresh it')
             self.token_info = self.sp_oauth.refresh_access_token(self.token_info['refresh_token'])
+            # for example 50x
+            if self.token_info is None:
+                raise Exception('update expired token failed')
 
     def _prompt_for_user_token(self):
         if not self.token_info:
