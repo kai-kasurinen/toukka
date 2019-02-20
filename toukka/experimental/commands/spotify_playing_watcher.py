@@ -5,7 +5,7 @@ import gi
 
 import toukka.log.to_file
 
-gi.require_version('Playerctl', '1.0')
+gi.require_version('Playerctl', '2.0')
 from gi.repository import GLib, Playerctl
 from .spotify_playing import PlayingPrinter
 
@@ -21,7 +21,7 @@ def playing_watcher():
 class Watcher:
     def __init__(self):
         self.player = Playerctl.Player(player_name='spotify')
-        self.player.on('metadata', self._on_metadata)
+        self.player.connect('metadata', self._on_metadata)
 
         playing_printer_args = {
             'with_artist': True,
