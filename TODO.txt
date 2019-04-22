@@ -147,38 +147,6 @@ http://ykl.kirjastot.fi/ Yleisten kirjastojen luokitusjärjestelmä
 
 
 
---- Musicbrainz
-
-https://community.metabrainz.org/t/gsoc-2018-a-way-to-associate-listens-with-mbids/367667/3
-
-ftp://ftp.eu.metabrainz.org/pub/musicbrainz/mbspotify/
-ftp://ftp.eu.metabrainz.org/pub/musicbrainz/messybrainz/
-
-
-
-
-
-
-
-
-
-
-
-https://github.com/Josef-Friedrich/audiorename
-
-
-
--- listenbrainz
-
-https://gitlab.com/kaliko/python-listenbrainz
-
-https://beta.listenbrainz.org/user/iliekcomputers
-
-
-musicbrainz solr + webservice
-https://github.com/metabrainz/musicbrainz-server/blob/master/lib/MusicBrainz/Server/Data/WebService.pm
-
-
 
 spotify podcasts:
     2018-09-08 13:00:16|Kympin tytöt||spotify:episode:3VzKRRiAaYx7hSa8SoUddf
@@ -190,5 +158,3 @@ https://github.com/linsomniac/python-memcached
 https://github.com/1stvamp/memorised
 
 
-== musicbrainz, redirect mbid, api
-https://tickets.metabrainz.org/browse/MBS-3946
