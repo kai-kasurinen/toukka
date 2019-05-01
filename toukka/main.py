@@ -7,15 +7,11 @@ import argh
 
 import toukka
 import toukka.spotify.commands
-import toukka.musicbrainzngs.commands
 import toukka.discogs.commands
 import toukka.experimental.commands
 import toukka.finna.commands
 import toukka.wikidata.commands
 import toukka.itunes.commands
-import toukka.metabrainz.listenbrainz.commands
-import toukka.metabrainz.acousticbrainz.commands
-import toukka.metabrainz.musicbrainz.commands
 
 def main():
     """main, main, main, main"""
@@ -37,22 +33,6 @@ def main():
     parser.add_commands(toukka.spotify.commands.COMMANDS,
                         namespace=toukka.spotify.commands.NAMESPACE,
                         namespace_kwargs=toukka.spotify.commands.NAMESPACE_KWARGS)
-
-    parser.add_commands(toukka.musicbrainzngs.commands.COMMANDS,
-                        namespace=toukka.musicbrainzngs.commands.NAMESPACE,
-                        namespace_kwargs=toukka.musicbrainzngs.commands.NAMESPACE_KWARGS)
-
-    parser.add_commands(toukka.metabrainz.musicbrainz.commands.COMMANDS,
-                        namespace=toukka.metabrainz.musicbrainz.commands.NAMESPACE,
-                        namespace_kwargs=toukka.metabrainz.musicbrainz.commands.NAMESPACE_KWARGS)
-
-    parser.add_commands(toukka.metabrainz.acousticbrainz.commands.COMMANDS,
-                        namespace=toukka.metabrainz.acousticbrainz.commands.NAMESPACE,
-                        namespace_kwargs=toukka.metabrainz.acousticbrainz.commands.NAMESPACE_KWARGS)
-
-    parser.add_commands(toukka.metabrainz.listenbrainz.commands.COMMANDS,
-                        namespace=toukka.metabrainz.listenbrainz.commands.NAMESPACE,
-                        namespace_kwargs=toukka.metabrainz.listenbrainz.commands.NAMESPACE_KWARGS)
 
     parser.add_commands(toukka.finna.commands.COMMANDS,
                         namespace=toukka.finna.commands.NAMESPACE,

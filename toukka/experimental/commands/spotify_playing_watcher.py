@@ -32,7 +32,7 @@ class Watcher:
             'with_track_moods': True,
             'with_track_styles': True,
             'with_track_key_and_mode': False,
-            'with_musicbrainz': True,
+            'with_musicbrainz': False,
             'with_discogs': False,
             'with_wikidata': False,
             }
