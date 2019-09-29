@@ -4,7 +4,7 @@
 
 import argh
 
-from toukka import Toukka
+from toukka.hub import Toukka
 
 
 

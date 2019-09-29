@@ -7,7 +7,7 @@ import argh
 import urllib.error
 
 
-from toukka import Toukka
+from toukka.hub import Toukka
 from toukka.wikidata.printer import print_entity
 
 

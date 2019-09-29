@@ -7,7 +7,7 @@ import argh
 
 import toukka.itunes.lookup_countries
 
-from toukka import Toukka
+from toukka.hub import Toukka
 from toukka.itunes.itunes import iTunes
 
 

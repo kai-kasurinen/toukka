@@ -2,7 +2,7 @@
 
 import logging
 
-from toukka import Toukka
+from toukka.hub import Toukka
 from memorised.decorators import memorise
 
 logger = logging.getLogger(__name__)

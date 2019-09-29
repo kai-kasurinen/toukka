@@ -6,7 +6,7 @@ import random
 import simplejson as json
 import argh
 
-from toukka import Toukka
+from toukka.hub import Toukka
 
 
 def find_songs_that_start_with_word(word):

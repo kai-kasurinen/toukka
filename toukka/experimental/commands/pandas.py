@@ -4,7 +4,7 @@
 
 import pandas
 
-from toukka import Toukka
+from toukka.hub import Toukka
 from toukka.utils import json_dump, json_dump_print
 
 

@@ -9,7 +9,7 @@ import statistics
 import pprint
 import argh
 
-from toukka import Toukka
+from toukka.hub import Toukka
 from toukka.utils import _get_flags, _list_to_string
 
 

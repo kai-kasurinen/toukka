@@ -2,7 +2,7 @@
 
 import pprint
 from urlobject import URLObject
-from toukka import ResourceURL
+from toukka.resource import ResourceURL
 
 
 def parse_url(url_string):
