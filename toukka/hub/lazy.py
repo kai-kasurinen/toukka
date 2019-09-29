@@ -70,16 +70,16 @@ class Hub(metaclass=Singleton):
     @lazy_property.LazyProperty
     def session(self):
         logger.debug('init session')
-        cache_path_cachecontrol = save_cache_path('toukka', 'cachecontrol')
-        cache = FileCache(cache_path_cachecontrol)
-        retries = Retry(total=5, backoff_factor=2, status_forcelist=[500, 502, 503])
-        adapter = cachecontrol.CacheControlAdapter(cache, cache_etags=False, max_retries=retries)
+        #cache_path_cachecontrol = save_cache_path('toukka', 'cachecontrol')
+        #cache = FileCache(cache_path_cachecontrol)
+        #retries = Retry(total=5, backoff_factor=2, status_forcelist=[500, 502, 503])
+        #adapter = cachecontrol.CacheControlAdapter(cache, cache_etags=False, max_retries=retries)
         #adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retries)
         #adapter = cachecontrol.CacheControlAdapter(cache)
         session = requests.Session()
         session.headers.update({'User-Agent': 'toukka/0.0.0'})
-        session.mount('http://', adapter)
-        session.mount('https://', adapter)
+        #session.mount('http://', adapter)
+        #session.mount('https://', adapter)
         return session
 
     @lazy_property.LazyProperty

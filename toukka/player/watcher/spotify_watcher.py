@@ -7,20 +7,20 @@ import toukka.log.to_file
 
 gi.require_version('Playerctl', '2.0')
 from gi.repository import GLib, Playerctl
-from .spotify_playing import PlayingPrinter
+from ..printer.spotify_printer import PlayingPrinter
+from .player_watcher import PlayerWatcher
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def playing_watcher():
-    watcher = Watcher()
-    watcher.start()
+
 
 
 class Watcher:
     def __init__(self):
         self.player = Playerctl.Player(player_name='spotify')
+        # spotify only emits metadata and plaback_status signals
         self.player.connect('metadata', self._on_metadata)
 
         playing_printer_args = {
@@ -61,16 +61,22 @@ class Watcher:
 
         if track_id == '':
             return
-        elif track_id == self.last_seen:
+
+        if track_id == self.last_seen:
             return
-        elif 'spotify:ad:' in track_id:
+
+        if 'spotify:ad:' in track_id:
+            logger.info('advertisement: %s', track_id)
+            self.last_seen = track_id
             return
         elif 'spotify:track:' in track_id:
             GLib.timeout_add_seconds(1, self._print_callback)
+            self.last_seen = track_id
+            return
         else:
+            logger.warning('unsupported track id: %s', track_id)
             return
 
-        self.last_seen = track_id
 
     def _print_callback(self):
         # TODO: skip currently_playing api and use mpris:trackid directly
@@ -81,6 +87,10 @@ class Watcher:
 
 #
 
-COMMANDS = [playing_watcher]
+def watcher():
+    watcher = Watcher()
+    watcher.start()
+
+COMMANDS = [watcher]
 
 # END

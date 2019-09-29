@@ -12,6 +12,8 @@ import toukka.experimental.commands
 import toukka.finna.commands
 import toukka.wikidata.commands
 import toukka.itunes.commands
+import toukka.player.commands
+
 
 def main():
     """main, main, main, main"""
@@ -53,6 +55,10 @@ def main():
     parser.add_commands(toukka.experimental.commands.COMMANDS,
                         namespace=toukka.experimental.commands.NAMESPACE,
                         namespace_kwargs=toukka.experimental.commands.NAMESPACE_KWARGS)
+
+    parser.add_commands(toukka.player.commands.COMMANDS,
+                        namespace=toukka.player.commands.NAMESPACE,
+                        namespace_kwargs=toukka.player.commands.NAMESPACE_KWARGS)
 
     args = parser.parse_args()
 
