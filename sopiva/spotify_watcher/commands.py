@@ -16,7 +16,7 @@ def watch_all_players():
 
 COMMANDS = [watch_spotify, watch_all_players]
 
-NAMESPACE = 'spotify'
+NAMESPACE = 'spotify_watcher'
 NAMESPACE_KWARGS = {
     'title': 'Spotify',
     'description': 'spotify, spotify, spotify',

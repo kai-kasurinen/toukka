@@ -2,6 +2,7 @@
 
 import logging
 import spotipy
+import spotipy.util
 
 import sopiva.spotify.client_cached
 import sopiva.config
@@ -20,7 +21,8 @@ def get_spotify_with_client_credentials():
     client_id, client_secret, client_redirect = _read_from_config()
     credentials = spotipy.auth.Credentials(client_id, client_secret, client_redirect)
     token = credentials.request_client_token()
-    client = sopiva.spotify.client_cached.CachedSpotify(token,
+    token_refresh = spotipy.util.RefreshingToken(token, credentials)
+    client = sopiva.spotify.client_cached.CachedSpotify(token_refresh,
                                                         sender=spotipy.sender.PersistentSender())
     return client
 

@@ -11,7 +11,7 @@ import sopiva.spotify_watcher.commands
 import sopiva.version
 
 __program_name__ = 'sopiva-spotify-watcher'
-__program_description__ = 'spotify client experimental'
+__program_description__ = 'spotify watcher'
 
 def main():
     """main, main, main, main"""
