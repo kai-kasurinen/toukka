@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# KDevelop
+.kdev4/
+*.kdev4
+
+#
+.mypy_cache/
+
+# 
+.credits_env
+
