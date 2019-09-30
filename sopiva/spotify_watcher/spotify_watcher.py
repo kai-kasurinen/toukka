@@ -51,7 +51,7 @@ class SpotifyWatcher(PlayerCtlManager):
 
     def print_spotify_metadata(self):
         print(''.ljust(80, '='))
-        self.spotify_printer.print_all_from_track(self.last_seen)
+        self.spotify_printer.print_all_from_track_uri(self.last_seen)
         print(''.ljust(80, '='))
 
 
