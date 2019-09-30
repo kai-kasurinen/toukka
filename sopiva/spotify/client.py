@@ -17,7 +17,7 @@ def _read_from_config():
 
 
 def get_spotify_with_client_credentials():
-    #client_id, client_secret, client_redirect = spotipy.util.read_environment()
+    # client_id, client_secret, client_redirect = spotipy.util.read_environment()
     client_id, client_secret, client_redirect = _read_from_config()
     credentials = spotipy.auth.Credentials(client_id, client_secret, client_redirect)
     token = credentials.request_client_token()
@@ -30,7 +30,7 @@ def get_spotify_with_client_credentials():
 def get_spotify_with_user_credentials():
     client_id, client_secret, client_redirect = read_environment()
     scope = spotipy.Scope(*spotipy.scopes)
-    token = spotipy.util.prompt_for_user_token(client_id, client_secret, client_redirect_uri, scope)
+    token = spotipy.util.prompt_for_user_token(client_id, client_secret, client_redirect, scope)
     client = spotipy.Spotify(token)
     return client
 
