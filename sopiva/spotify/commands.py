@@ -5,11 +5,16 @@ import sopiva.spotify.experimental
 
 #
 
+
+def testing():
+    return sopiva.spotify.experimental.testing()
+
+
 def print_track(track_id):
     return sopiva.spotify.experimental.print_track(track_id)
 
 
-COMMANDS = [print_track]
+COMMANDS = [testing, print_track]
 
 NAMESPACE = 'spotify'
 NAMESPACE_KWARGS = {

@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 class SpotifyPrinter:
     def __init__(self):
-        self.spotify = client.get_spotify_with_client_credentials()
+        self.spotify = client.get_spotify()
         self.market = 'FI'
 
     def print_all_from_track_uri(self, track_uri):
@@ -32,7 +32,7 @@ class SpotifyPrinter:
     def print_all_from_track_id(self, track_id):
         track = self.spotify.track(track_id, market=None)
         album = self.spotify.album(track.album.id, market=None)
-           
+
         artists = set()
         artists.update(_get_all_artist_ids_from_item(track))
         artists.update(_get_all_artist_ids_from_item(album))

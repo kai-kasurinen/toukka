@@ -4,4 +4,4 @@ spotify:
    client_id:
    client_secret:
    redirect_uri:
-   user:
+   refresh_token:

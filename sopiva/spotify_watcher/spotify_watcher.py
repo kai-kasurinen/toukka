@@ -16,11 +16,11 @@ class SpotifyWatcher(PlayerCtlManager):
         super().__init__(watch_only='spotify')
 
     def on_player_metadata(self, player, metadata):
-        #super().on_player_metadata(player, metadata)
+        super().on_player_metadata(player, metadata)
         self.on_spotify_metadata(player, metadata)
 
     def on_manager_player_appeared(self, manager, player):
-        #super().on_manager_player_appeared(manager, player)
+        super().on_manager_player_appeared(manager, player)
         self.on_spotify_metadata(player, player.props.metadata)
 
     def on_spotify_metadata(self, player, metadata):
@@ -33,7 +33,7 @@ class SpotifyWatcher(PlayerCtlManager):
             return
 
         if 'spotify:ad:' in track_id:
-            logger.debug('advertisement: %s', track_id)
+            logger.info('advertisement: %s', track_id)
             self.last_seen = track_id
             return
         elif 'spotify:track:' in track_id:

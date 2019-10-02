@@ -4,8 +4,13 @@ from . import client
 from . import printer
 
 
+def testing():
+    spotify = client.get_spotify()
+
+
 def print_track(track_id):
-    spotify = client.get_spotify_with_client_credentials()
+    #spotify = client.get_spotify_with_client_credentials()
+    spotify = client.get_spotify()
 
     track = spotify.track(track_id, market=None)
     album = spotify.album(track.album.id, market=None)
