@@ -8,16 +8,16 @@ import spotipy.util
 
 import sopiva.spotify.client_cached
 import sopiva.spotify.state
-import sopiva.config
+import toukka.config
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
 def _read_from_config():
-    client_id = sopiva.config.lazy_config['spotify']['client_id'].get()
-    client_secret = sopiva.config.lazy_config['spotify']['client_secret'].get()
-    redirect_uri = sopiva.config.lazy_config['spotify']['redirect_uri'].get()
+    client_id = toukka.config.lazy_config['spotify']['client_id'].get()
+    client_secret = toukka.config.lazy_config['spotify']['client_secret'].get()
+    redirect_uri = toukka.config.lazy_config['spotify']['redirect_uri'].get()
     return client_id, client_secret, redirect_uri
 
 
