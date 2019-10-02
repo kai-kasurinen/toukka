@@ -12,6 +12,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 from xdg.BaseDirectory import save_cache_path
 
+import deprecated
 
 import discogs_client
 import wikidata.client
@@ -23,8 +24,8 @@ import werkzeug.contrib.cache
 
 import toukka.discogs.fetchers
 
-from toukka.spotify import Spotify
-from toukka.spotify.client_credentials_manager import ClientCredentialsManager
+#from toukka.spotify import Spotify
+#from toukka.spotify.client_credentials_manager import ClientCredentialsManager
 from toukka.utils import Singleton
 from toukka.finna import Finna
 from toukka.spotify_history.first import SpotifyHistory
@@ -35,6 +36,7 @@ logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
 
 
+@deprecated.deprecated
 class Hub(metaclass=Singleton):
 
     @lazy_property.LazyProperty
@@ -159,9 +161,9 @@ class Hub(metaclass=Singleton):
     mb = musicbrainz
 
 
+@deprecated.deprecated
 class Toukka(metaclass=Singleton):
 
-    @lazy_property.LazyProperty
     def hub(self):
         return Hub()
 
