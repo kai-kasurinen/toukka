@@ -7,31 +7,34 @@ from .. import toukkain
 
 
 def print_track(track, use_play_count=True):
-    print('track: {track.name} ({track.uri}) (popularity: {track.popularity})'.format(track=track))
+    print(f'track: {track.name} ({track.uri})',
+          f'(popularity: {track.popularity})')
 
-    print('\talbum: {track.album.name} ({track.album.uri})'.format(track=track))
-    print('\tartists: %s' % _artists_to_string(track.artists))
-    print('\tduration: %s' % (datetime.timedelta(milliseconds=track.duration_ms)))
-    print('\ttrack number: {track.track_number}, disc number: {track.disc_number}'.format(track=track))
+    print(f'\talbum: {track.album.name} ({track.album.uri})')
+    print(f'\tartists: {_artists_to_string(track.artists)})')
+    print(f'\tduration: {datetime.timedelta(milliseconds=track.duration_ms)}')
+    print(f'\ttrack number: {track.track_number}',
+          f', disc number: {track.disc_number}')
 
     if track.external_ids:
-        print('\texternal ids: {track.external_ids}'.format(track=track))
+        print(f'\texternal ids: {track.external_ids}')
     if track.external_urls:
-        print('\texternal urls: {track.external_urls}'.format(track=track))
+        print(f'\texternal urls: {track.external_urls}')
     if track.available_markets:
-        print('\tmarkets: %s' % (len(track.available_markets)))
+        print(f'\tmarkets: {len(track.available_markets)}')
     if track.linked_from:
-        print('\tlinked from: {track.linked_from}'.format(track=track))
+        print(f'\tlinked from: {track.linked_from}')
     if track.restrictions:
-        print('\trestrictions: {track.restrictions}'.format(track=track))
+        print(f'\trestrictions: {track.restrictions}')
 
     flags = _get_flags(dataclasses.asdict(track), ['explicit', 'is_playable', 'is_local'])
     if flags:
-        print('\tflags: %s' % flags)
+        print(f'\tflags: {flags}')
 
     if use_play_count:
         spotify_history = toukkain.get_spotify_history_object()
-        print('\tplayed: %s' % spotify_history.count_by_track_id(track.uri))
+        played_count = spotify_history.count_by_track_id(track.uri)
+        print(f'\tplayed: {played_count}')
 
 
 def print_album(album):
