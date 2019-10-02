@@ -6,7 +6,7 @@ from dogpile.cache import make_region
 from xdg.BaseDirectory import save_cache_path
 
 
-_cache_path = save_cache_path('toukka-sopiva', 'dogpile')
+_cache_path = save_cache_path('toukka', 'dogpile')
 _cache_file = os.path.join(_cache_path, 'cache.dbm')
 
 

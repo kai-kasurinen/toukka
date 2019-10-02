@@ -2,7 +2,7 @@
 
 import confuse
 
-lazy_config = confuse.LazyConfig('toukka-sopiva', __name__)
+lazy_config = confuse.LazyConfig('toukka', __name__)
 
 
 def print_configuration(library=None, directory=None):

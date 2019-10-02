@@ -30,7 +30,7 @@ class StateDB:
 
 
 def get_statedb():
-    database_path = xdg.BaseDirectory.save_cache_path('toukka-sopiva', 'state')
+    database_path = xdg.BaseDirectory.save_cache_path('toukka', 'state')
     database_file = os.path.join(database_path, 'spotify.db')
     return StateDB(database_file, 'state')
 
