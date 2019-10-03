@@ -5,6 +5,7 @@ from . import album
 from . import artist
 from . import browse
 from . import me
+from . import personalization
 from . import player
 from . import playlist
 from . import search
@@ -17,6 +18,7 @@ COMMANDS = [
     *artist.COMMANDS,
     *browse.COMMANDS,
     *me.COMMANDS,
+    *personalization.COMMANDS,
     *player.COMMANDS,
     *playlist.COMMANDS,
     *search.COMMANDS,
