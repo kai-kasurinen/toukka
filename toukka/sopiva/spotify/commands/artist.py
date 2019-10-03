@@ -3,16 +3,21 @@
 '''spotify artist commands'''
 
 import argh
+import spotipy
+
+from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.printer import first as printer
 
 from toukka.hub import Toukka
 from toukka.utils import json_dump, json_dump_print
 
 
 def artist_info(uri):
-    '''Get artist info'''
-    toukka = Toukka()
-    artist = toukka.sp.artist(uri)
-    _print_artist(artist)
+    '''get artist info'''
+    spotify = get_spotify()
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    artist = spotify.artist(uri_id)
+    printer.print_artist(artist)
 
 
 def artist_albums(uri, album_type=None, country=None):
@@ -40,11 +45,15 @@ def artist_top_tracks(uri, country='FI'):
 
 
 def artist_related_artists(uri):
-    '''Get artist related artists'''
-    toukka = Toukka()
-    results = toukka.sp.artist_related_artists(uri)
-    artists = results.get('artists')
-    _print_artists(artists)
+    '''get artist related artists'''
+    spotify = get_spotify()
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    artists = spotify.artist_related_artists(uri_id)
+
+    print()
+    for artist in artists:
+        printer.print_artist(artist)
+        print()
 
 
 def _print_artists(artists):
