@@ -3,7 +3,7 @@
 import logging
 import gi
 
-import toukka.log.to_file
+import toukka.logger.to_file
 
 gi.require_version('Playerctl', '2.0')
 from gi.repository import GLib, Playerctl

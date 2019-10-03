@@ -6,6 +6,9 @@ import logging
 import argh
 
 import toukka
+import toukka.logger.simple
+import toukka.config
+
 import toukka.spotify.commands
 import toukka.discogs.commands
 import toukka.experimental.commands
@@ -14,14 +17,13 @@ import toukka.wikidata.commands
 import toukka.itunes.commands
 import toukka.player.commands
 
+__program_name__ = 'toukka'
+__program_description__ = 'toukka multifunctional tool'
 
 def main():
     """main, main, main, main"""
-    logging.basicConfig(
-        level=logging.INFO,
-        #format='%(name)s %(levelname)s %(message)s'
-        format='%(asctime)s %(name)s %(levelname)s %(message)s')
-    logging.captureWarnings(True)
+
+    toukka.logger.simple.init_logging()
 
     parser = argh.ArghParser(prog='toukka')
 
@@ -62,8 +64,8 @@ def main():
 
     args = parser.parse_args()
 
-    logging.getLogger().setLevel(args.loglevel)
-    logging.debug('%s %s', toukka.__prog_name__, toukka.__version__)
+    toukka.config.lazy_config.set_args(args)
+    toukka.logger.simple.set_logging_level(args.loglevel)
 
     parser.dispatch()
 
