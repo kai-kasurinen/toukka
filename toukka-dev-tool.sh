@@ -7,7 +7,8 @@ case "$1" in
         ;;
 
     clean)
-        py3clean -v toukka
+        #py3clean -v toukka
+        find . -regex '^.*\(__pycache__\|\.py[co]\)$' -delete
         ;;
 
     pylint)
