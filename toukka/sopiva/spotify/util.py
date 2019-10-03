@@ -8,8 +8,8 @@ import spotipy.util
 
 import toukka.config
 
-import sopiva.spotify.client.cached
-import sopiva.spotify.state
+import toukka.sopiva.spotify.client.cached
+import toukka.sopiva.spotify.state
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
@@ -28,7 +28,7 @@ def get_spotify_with_client_credentials():
     credentials = spotipy.auth.Credentials(client_id, client_secret, redirect_uri)
     token = credentials.request_client_token()
     # FIXME: current RefreshingToken does not work with client credentials
-    client = sopiva.spotify.client_cached.CachedSpotify(
+    client = toukka.sopiva.spotify.client_cached.CachedSpotify(
         token=token,
         sender=spotipy.sender.PersistentSender())
     return client
@@ -36,14 +36,14 @@ def get_spotify_with_client_credentials():
 
 def get_user_refresh_token():
     logger.debug('get user refresh token from statedb')
-    db = sopiva.spotify.state.get_statedb()
-    return db.get('user_refresh_token')
+    statedb = toukka.sopiva.spotify.state.get_statedb()
+    return statedb.get('user_refresh_token')
 
 
 def set_user_refresh_token(refresh_token):
     logger.debug('set user refresh token to statedb')
-    db = sopiva.spotify.state.get_statedb()
-    db.set('user_refresh_token', refresh_token)
+    statedb = toukka.sopiva.spotify.state.get_statedb()
+    statedb.set('user_refresh_token', refresh_token)
 
 
 def get_user_token():
@@ -63,7 +63,7 @@ def get_user_token():
 
 def get_spotify_with_user_credentials():
     token = get_user_token()
-    client = sopiva.spotify.client.cached.CachedSpotify(
+    client = toukka.sopiva.spotify.client.cached.CachedSpotify(
         token=token,
         sender=spotipy.sender.PersistentSender())
     return client
