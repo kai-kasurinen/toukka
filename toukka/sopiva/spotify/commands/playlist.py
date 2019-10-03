@@ -10,7 +10,7 @@ import pprint
 import argh
 
 from toukka.hub import Toukka
-from toukka.utils import _get_flags, _list_to_string
+from toukka.util import _get_flags, _list_to_string
 
 
 def user_playlists_info(user):

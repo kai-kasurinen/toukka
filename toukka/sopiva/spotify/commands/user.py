@@ -5,7 +5,7 @@
 import argh
 
 from toukka.hub import Toukka
-from toukka.utils import json_dump
+from toukka.util import json_dump
 
 
 def user_info(user_id):

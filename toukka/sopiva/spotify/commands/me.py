@@ -13,8 +13,8 @@ import simplejson as json
 
 from toukka.hub import Toukka
 #from toukka.spotify.models.track_features import TrackFeaturesDelivered
-from toukka.utils import json_dump, json_dump_print, format_as_table
-from toukka.utils import _get_flags, _list_to_string
+from toukka.util import json_dump, json_dump_print, format_as_table
+from toukka.util import _get_flags, _list_to_string
 
 
 def current_user():

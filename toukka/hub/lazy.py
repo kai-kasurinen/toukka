@@ -26,7 +26,7 @@ import toukka.sopiva.discogs.fetchers
 
 #from toukka.spotify import Spotify
 #from toukka.spotify.client_credentials_manager import ClientCredentialsManager
-from toukka.utils import Singleton
+from toukka.util import Singleton
 from toukka.sopiva.finna import Finna
 from toukka.sopiva.spotify_history.first import SpotifyHistory
 
