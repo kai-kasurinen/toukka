@@ -19,6 +19,9 @@ case "$1" in
         flake8
         ;;
 
+    mypy)
+        mypy toukka
+        ;;
 
     *)
         echo "Unknown command"
