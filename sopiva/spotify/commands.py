@@ -17,7 +17,8 @@ def print_track(track_id):
 
 
 @argh.named('top-artists')
-def current_user_top_artists(time_range: 'short, medium or long'):
+@argh.arg('--time-range', choices=['short', 'medium', 'long'])
+def current_user_top_artists(time_range='long'):
     return sopiva.spotify.work.experimental.current_user_top_artists(time_range)
 
 

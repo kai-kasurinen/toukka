@@ -2,8 +2,8 @@
 
 """main, main, main"""
 
-import argh
 import logging
+import argh
 
 import toukka.logger.simple
 import toukka.config

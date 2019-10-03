@@ -57,8 +57,8 @@ def print_album(album):
         print('\tlabel: {album.label}'.format(album=album))
     if album.copyrights:
         print('\tcopyrights:')
-        for copyright in album.copyrights:
-            print('\t\t{copyright.type}: {copyright.text}'.format(copyright=copyright))
+        for copyright_ in album.copyrights:
+            print(f'\t\t{copyright_.type}: {copyright_.text}')
 
     flags = _get_flags(dataclasses.asdict(album), ['is_playable'])
     if flags:
