@@ -3,7 +3,7 @@
 import datetime
 import dataclasses
 
-from .. import toukkain
+from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
 def print_track(track, use_play_count=True):
@@ -32,7 +32,7 @@ def print_track(track, use_play_count=True):
         print(f'\tflags: {flags}')
 
     if use_play_count:
-        spotify_history = toukkain.get_spotify_history_object()
+        spotify_history = get_spotify_history()
         played_count = spotify_history.count_by_track_id(track.uri)
         print(f'\tplayed: {played_count}')
 
@@ -76,7 +76,7 @@ def print_artist(artist, use_play_count=True):
         print('\texternal urls: {artist.external_urls}'.format(artist=artist))
 
     if use_play_count:
-        spotify_history = toukkain.get_spotify_history_object()
+        spotify_history = get_spotify_history()
         print('\tplayed: %s' % spotify_history.count_by_artist_name(artist.name))
 
 

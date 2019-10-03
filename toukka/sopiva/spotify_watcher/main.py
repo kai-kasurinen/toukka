@@ -31,7 +31,7 @@ def main():
     parser.add_commands(toukka.config.COMMANDS)
     parser.add_commands(toukka.sopiva.spotify_watcher.commands.COMMANDS)
     # HACK
-    parser.set_default_command(sopiva.spotify_watcher.commands.COMMANDS[0])
+    parser.set_default_command(toukka.sopiva.spotify_watcher.commands.COMMANDS[0])
     args = parser.parse_args()
 
     toukka.config.lazy_config.set_args(args)

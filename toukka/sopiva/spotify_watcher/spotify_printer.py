@@ -3,8 +3,8 @@
 import logging
 import spotipy
 
-from ..spotify import client
-from ..spotify import printer
+import toukka.sopiva.spotify.printer.first as printer
+from toukka.sopiva.spotify.util import get_spotify
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 class SpotifyPrinter:
     def __init__(self):
-        self.spotify = client.get_spotify()
+        self.spotify = get_spotify()
         self.market = 'FI'
 
     def print_all_from_track_uri(self, track_uri):
