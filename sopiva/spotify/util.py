@@ -6,7 +6,7 @@ import pprint
 import spotipy
 import spotipy.util
 
-import sopiva.spotify.client_cached
+import sopiva.spotify.client.cached
 import sopiva.spotify.state
 import toukka.config
 
@@ -29,7 +29,7 @@ def get_spotify_with_client_credentials():
     #token_refresh = spotipy.util.RefreshingToken(token, credentials)
     #client = sopiva.spotify.client_cached.CachedSpotify(token_refresh,
     #                                                    sender=spotipy.sender.PersistentSender())
-    client = sopiva.spotify.client_cached.CachedSpotify(token)
+    client = sopiva.spotify.client.cached.CachedSpotify(token)
     return client
 
 
@@ -62,7 +62,7 @@ def get_user_token():
 
 def get_spotify_with_user_credentials():
     token = get_user_token()
-    client = sopiva.spotify.client_cached.CachedSpotify(token=token)
+    client = sopiva.spotify.client.cached.CachedSpotify(token=token)
     return client
 
 

@@ -1,20 +1,29 @@
 #
 
-import sopiva.spotify.experimental
+import argh
 
+import sopiva.spotify.work
+import sopiva.spotify.work.experimental
 
 #
 
 
 def testing():
-    return sopiva.spotify.experimental.testing()
+    return sopiva.spotify.work.experimental.testing()
 
 
 def print_track(track_id):
-    return sopiva.spotify.experimental.print_track(track_id)
+    return sopiva.spotify.work.experimental.print_track(track_id)
 
 
-COMMANDS = [testing, print_track]
+@argh.named('top-artists')
+def current_user_top_artists(time_range: 'short, medium or long'):
+    return sopiva.spotify.work.experimental.current_user_top_artists(time_range)
+
+
+#
+
+COMMANDS = [testing, print_track, current_user_top_artists]
 
 NAMESPACE = 'spotify'
 NAMESPACE_KWARGS = {
