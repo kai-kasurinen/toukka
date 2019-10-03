@@ -1,16 +1,16 @@
 #
 
-import sopiva.spotify_watcher.spotify_watcher
-import sopiva.spotify_watcher.playerctl_manager
+import toukka.sopiva.spotify_watcher.spotify_watcher
+import toukka.sopiva.spotify_watcher.playerctl_manager
 
 
 def watch_spotify():
-    return sopiva.spotify_watcher.spotify_watcher.run()
+    return toukka.sopiva.spotify_watcher.spotify_watcher.run()
 
 
 def watch_all_players():
-    manager = sopiva.spotify_watcher.playerctl_manager.PlayerCtlManager(watch_only=['spotify'])
-    mainloop = sopiva.spotify_watcher.playerctl_manager.MainLoop()
+    manager = toukka.sopiva.spotify_watcher.playerctl_manager.PlayerCtlManager(watch_only=['spotify'])
+    mainloop = toukka.sopiva.spotify_watcher.playerctl_manager.MainLoop()
     mainloop.run()
 
 

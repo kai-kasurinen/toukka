@@ -1,8 +1,7 @@
 #
 
 import sys
-from .main import main
-
-sys.exit(main())
+from . import main
+sys.exit(main.main())
 
 # END

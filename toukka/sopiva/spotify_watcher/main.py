@@ -9,7 +9,7 @@ import toukka.logger.simple
 import toukka.config
 import toukka.version
 
-import sopiva.spotify_watcher.commands
+import toukka.sopiva.spotify_watcher.commands
 
 __program_name__ = 'toukka-spotify-watcher'
 __program_description__ = 'spotify playing metadata watcher'
@@ -29,7 +29,7 @@ def main():
                         const=logging.DEBUG,
                         default=logging.INFO)
     parser.add_commands(toukka.config.COMMANDS)
-    parser.add_commands(sopiva.spotify_watcher.commands.COMMANDS)
+    parser.add_commands(toukka.sopiva.spotify_watcher.commands.COMMANDS)
     # HACK
     parser.set_default_command(sopiva.spotify_watcher.commands.COMMANDS[0])
     args = parser.parse_args()

@@ -1,6 +1,6 @@
 #
 
-"""main, main, main"""
+'''main, main, main'''
 
 import logging
 import argh
@@ -14,8 +14,9 @@ import toukka.sopiva.spotify.commands
 __program_name__ = 'toukka-spotify'
 __program_description__ = 'spotify client'
 
+
 def main():
-    """main, main, main"""
+    '''main, main, main'''
     toukka.logger.simple.init_logging()
 
     parser = argh.ArghParser(prog=__program_name__, description=__program_description__)
@@ -28,7 +29,7 @@ def main():
                         const=logging.DEBUG,
                         default=logging.INFO)
     parser.add_commands(toukka.config.COMMANDS)
-    parser.add_commands(sopiva.spotify.commands.COMMANDS)
+    parser.add_commands(toukka.sopiva.spotify.commands.COMMANDS)
     args = parser.parse_args()
 
     toukka.config.lazy_config.set_args(args)
