@@ -6,12 +6,13 @@ import pprint
 import spotipy
 import spotipy.util
 
-import sopiva.spotify.client.cached
-import sopiva.spotify.state
 import toukka.config
 
+import sopiva.spotify.client.cached
+import sopiva.spotify.state
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 def _read_from_config():
@@ -26,10 +27,10 @@ def get_spotify_with_client_credentials():
     client_id, client_secret, redirect_uri = _read_from_config()
     credentials = spotipy.auth.Credentials(client_id, client_secret, redirect_uri)
     token = credentials.request_client_token()
-    #token_refresh = spotipy.util.RefreshingToken(token, credentials)
-    #client = sopiva.spotify.client_cached.CachedSpotify(token_refresh,
-    #                                                    sender=spotipy.sender.PersistentSender())
-    client = sopiva.spotify.client.cached.CachedSpotify(token)
+    # FIXME: current RefreshingToken does not work with client credentials
+    client = sopiva.spotify.client_cached.CachedSpotify(
+        token=token,
+        sender=spotipy.sender.PersistentSender())
     return client
 
 
@@ -62,7 +63,9 @@ def get_user_token():
 
 def get_spotify_with_user_credentials():
     token = get_user_token()
-    client = sopiva.spotify.client.cached.CachedSpotify(token=token)
+    client = sopiva.spotify.client.cached.CachedSpotify(
+        token=token,
+        sender=spotipy.sender.PersistentSender())
     return client
 
 

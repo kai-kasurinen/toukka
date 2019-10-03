@@ -1,6 +1,7 @@
 #!/bin/bash
 
 case "$1" in
+
     test)
         nose2-3
         ;;
@@ -8,9 +9,20 @@ case "$1" in
     clean)
         py3clean -v toukka
         ;;
+
+    pylint)
+        pylint3 toukka
+        ;;
+
+    flake8)
+        flake8
+        ;;
+
+
     *)
         echo "Unknown command"
         exit 1
         ;;
+
 esac
 
