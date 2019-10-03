@@ -22,13 +22,13 @@ import memcache
 import diskcache
 import werkzeug.contrib.cache
 
-import toukka.discogs.fetchers
+import toukka.sopiva.discogs.fetchers
 
 #from toukka.spotify import Spotify
 #from toukka.spotify.client_credentials_manager import ClientCredentialsManager
 from toukka.utils import Singleton
-from toukka.finna import Finna
-from toukka.spotify_history.first import SpotifyHistory
+from toukka.sopiva.finna import Finna
+from toukka.sopiva.spotify_history.first import SpotifyHistory
 
 
 

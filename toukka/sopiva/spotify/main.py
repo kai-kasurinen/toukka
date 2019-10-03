@@ -9,7 +9,7 @@ import toukka.logger.simple
 import toukka.config
 import toukka.version
 
-import sopiva.spotify.commands
+import toukka.sopiva.spotify.commands
 
 __program_name__ = 'toukka-spotify'
 __program_description__ = 'spotify client'

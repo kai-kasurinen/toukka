@@ -3,7 +3,7 @@
 import logging
 import pycountry
 
-from toukka.itunes.itunes import iTunes
+from toukka.sopiva.itunes.itunes import iTunes
 from beanbag import BeanBagException
 
 logger = logging.getLogger(__name__)

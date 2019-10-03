@@ -5,10 +5,10 @@
 import pprint
 import argh
 
-import toukka.itunes.lookup_countries
+import toukka.sopiva.itunes.lookup_countries
 
 from toukka.hub import Toukka
-from toukka.itunes.itunes import iTunes
+from toukka.sopiva.itunes.itunes import iTunes
 
 
 #

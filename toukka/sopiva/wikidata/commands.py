@@ -8,7 +8,7 @@ import urllib.error
 
 
 from toukka.hub import Toukka
-from toukka.wikidata.printer import print_entity
+from toukka.sopiva.wikidata.printer import print_entity
 
 
 NAMESPACE = 'wikidata'

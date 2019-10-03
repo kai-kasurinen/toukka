@@ -9,13 +9,13 @@ import toukka
 import toukka.logger.simple
 import toukka.config
 
-import toukka.spotify.commands
-import toukka.discogs.commands
-import toukka.experimental.commands
-import toukka.finna.commands
-import toukka.wikidata.commands
-import toukka.itunes.commands
-import toukka.player.commands
+#import toukka.sopiva.spotify.commands
+#import toukka.sopiva.discogs.commands
+#import toukka.sopiva.experimental.commands
+#import toukka.sopiva.finna.commands
+#import toukka.sopiva.wikidata.commands
+#import toukka.sopiva.itunes.commands
+#import toukka.sopiva.player.commands
 
 __program_name__ = 'toukka'
 __program_description__ = 'toukka multifunctional tool'
@@ -33,7 +33,7 @@ def main():
                         dest='loglevel',
                         const=logging.DEBUG,
                         default=logging.INFO)
-
+    '''
     parser.add_commands(toukka.spotify.commands.COMMANDS,
                         namespace=toukka.spotify.commands.NAMESPACE,
                         namespace_kwargs=toukka.spotify.commands.NAMESPACE_KWARGS)
@@ -61,7 +61,7 @@ def main():
     parser.add_commands(toukka.player.commands.COMMANDS,
                         namespace=toukka.player.commands.NAMESPACE,
                         namespace_kwargs=toukka.player.commands.NAMESPACE_KWARGS)
-
+    '''
     args = parser.parse_args()
 
     toukka.config.lazy_config.set_args(args)
