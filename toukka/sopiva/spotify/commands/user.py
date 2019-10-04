@@ -2,16 +2,12 @@
 
 '''spotify user information'''
 
-import argh
-
-from toukka.hub import Toukka
-from toukka.util import json_dump
+from toukka.sopiva.spotify.util import get_spotify
 
 
-def user_info(user_id):
-    ''' Get public profile information about a Spotify user.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.user(user_id))
+def user_info(user_id: str):
+    ''' get public profile information about a Spotify user.'''
+    return get_spotify().user(user_id).pprint()
 
 
 #

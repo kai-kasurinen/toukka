@@ -6,6 +6,7 @@ from . import artist
 from . import browse
 from . import me
 from . import personalization
+from . import library
 from . import player
 from . import playlist
 from . import search
@@ -18,6 +19,7 @@ COMMANDS = [
     *browse.COMMANDS,
     *me.COMMANDS,
     *personalization.COMMANDS,
+    *library.COMMANDS,
     *player.COMMANDS,
     *playlist.COMMANDS,
     *search.COMMANDS,

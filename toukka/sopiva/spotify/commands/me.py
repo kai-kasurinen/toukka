@@ -11,6 +11,10 @@ import tabulate
 import argh
 import simplejson as json
 
+from toukka.sopiva.spotify.util import get_spotify
+
+
+# FIXME: remove
 from toukka.hub import Toukka
 #from toukka.spotify.models.track_features import TrackFeaturesDelivered
 from toukka.util import json_dump, json_dump_print, format_as_table
@@ -18,20 +22,9 @@ from toukka.util import _get_flags, _list_to_string
 
 
 def current_user():
-    toukka = Toukka()
-    return json_dump(toukka.sp.me())
-
-
-@argh.named('saved-albums')
-def current_user_saved_albums():
-    toukka = Toukka()
-    return json_dump(toukka.sp.current_user_saved_albums())
-
-
-@argh.named('saved-tracks')
-def current_user_saved_tracks():
-    toukka = Toukka()
-    return json_dump(toukka.sp.current_user_saved_tracks())
+    '''get current user information'''
+    # FIXME: TypeError: __init__() got an unexpected keyword argument 'birthdate'
+    return get_spotify().current_user().pprint()
 
 
 @argh.named('followed-artists')
@@ -39,24 +32,6 @@ def current_user_followed_artists():
     toukka = Toukka()
     return json_dump(toukka.sp.current_user_followed_artists())
 
-
-
-
-@argh.named('playlists')
-def current_user_playlists():
-    toukka = Toukka()
-
-    playlists = toukka.sp.current_user_playlists()
-
-    print("total: {}".format(
-        playlists['total']))
-
-    print()
-    for playlist in playlists['items']:
-        print("name: {}, number of songs: {}, playlist ID: {} ".format(
-            playlist['name'],
-            playlist['tracks']['total'],
-            playlist['id']))
 
 
 @argh.named('recently-played')
@@ -101,10 +76,7 @@ def _get_string_from_artists(artists):
 #
 
 COMMANDS = [current_user,
-            current_user_saved_albums,
-            current_user_saved_tracks,
             current_user_followed_artists,
-            current_user_playlists,
             current_user_recently_played
             ]
 
