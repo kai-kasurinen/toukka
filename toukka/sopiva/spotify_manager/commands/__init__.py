@@ -1,5 +1,6 @@
 #
 
+from . import spotify_playlist_manager
 
 '''
 from . import spotify_artist
@@ -14,7 +15,7 @@ from . import spotify_artist
 #
 
 COMMANDS = [
-#    *spotify_playlist_manager.COMMANDS
+    *spotify_playlist_manager.COMMANDS
 ]
 
 NAMESPACE = 'experimental'
