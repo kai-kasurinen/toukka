@@ -1,5 +1,6 @@
 #
 
+import argh
 import spotipy.convert
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -10,6 +11,14 @@ def playlist(uri: str,
              remove_played_tracks: bool = False
              ):
     '''get and modify playlist'''
+
+    if uri == 'current':
+        uri_current =_playlist_current()
+        if uri_current:
+            uri = uri_current
+        else:
+            raise argh.exceptions.CommandError('not currently playing playlist?')
+        
 
     uri_type, uri_id = spotipy.convert.from_uri(uri)
 
@@ -51,8 +60,25 @@ def playlist(uri: str,
             print(f'new snapshot id: {snapshot_id}')
 
 
+def _playlist_current():
+    '''get currently playing playlist'''
+    spotify = get_spotify()
+    playing = spotify.playback_currently_playing()
+
+    if playing.context and playing.context.type.name == 'playlist':
+            uri = playing.context.uri
+            username = uri.split(':')[2]
+            playlist_id = uri.split(':')[4]
+            new_uri = spotipy.convert.to_uri('playlist', playlist_id)
+            return new_uri
+    else:
+        return False
+
+
 #
 
-COMMANDS = [playlist]
+COMMANDS = [
+    playlist,
+    ]
 
 # END
