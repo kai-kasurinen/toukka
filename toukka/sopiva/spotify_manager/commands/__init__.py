@@ -1,12 +1,14 @@
 #
 
-from . import playlist
+from . import playlist_cleaner
+from . import playlist_creator
 from . import playlists
 
 #
 
 COMMANDS = [
-    *playlist.COMMANDS,
+    *playlist_cleaner.COMMANDS,
+    *playlist_creator.COMMANDS,
     *playlists.COMMANDS
 ]
 

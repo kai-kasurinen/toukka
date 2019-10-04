@@ -7,18 +7,17 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
-def playlist(uri: str,
-             remove_played_tracks: bool = False
-             ):
-    '''get and modify playlist'''
+def playlist_cleaner(uri: str,
+                     remove_played_tracks: bool = False
+                     ):
+    '''clean playlist'''
 
     if uri == 'current':
-        uri_current =_playlist_current()
+        uri_current = _playlist_current()
         if uri_current:
             uri = uri_current
         else:
             raise argh.exceptions.CommandError('not currently playing playlist?')
-        
 
     uri_type, uri_id = spotipy.convert.from_uri(uri)
 
@@ -66,11 +65,11 @@ def _playlist_current():
     playing = spotify.playback_currently_playing()
 
     if playing.context and playing.context.type.name == 'playlist':
-            uri = playing.context.uri
-            username = uri.split(':')[2]
-            playlist_id = uri.split(':')[4]
-            new_uri = spotipy.convert.to_uri('playlist', playlist_id)
-            return new_uri
+        uri = playing.context.uri
+        username = uri.split(':')[2]
+        playlist_id = uri.split(':')[4]
+        new_uri = spotipy.convert.to_uri('playlist', playlist_id)
+        return new_uri
     else:
         return False
 
@@ -78,7 +77,7 @@ def _playlist_current():
 #
 
 COMMANDS = [
-    playlist,
+    playlist_cleaner,
     ]
 
 # END
