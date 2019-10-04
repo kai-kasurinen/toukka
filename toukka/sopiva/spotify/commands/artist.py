@@ -19,21 +19,29 @@ def artist_info(uri):
     artist = spotify.artist(uri_id)
     printer.print_artist(artist)
 
-
-def artist_albums(uri, album_type=None, country=None):
+def artist_albums(uri):
     '''get artist albums'''
-    toukka = Toukka()
-    paging = toukka.sp.artist_albums(uri)
-    albums = toukka.sp.aggregate_paging_results(paging)
+    spotify = get_spotify()
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    # FIXME: got type error with default market
+    paging = spotify.artist_albums(uri_id, market='FI')
 
+    for album in spotify.all_items_from_paging(paging):
+        # FIXME: on items albums are simple and printer only supports full
+        # FIXME: we lose album group
+        album_full = spotify.album(album.id)
+        print()
+        # FIXME: print oneline
+        printer.print_album(album_full)
+
+    '''
     grouped = False
     if grouped:
         group_album = [a for a in albums if a.get('album_group') == 'album']
         group_single = [a for a in albums if a.get('album_group') == 'single']
         group_compilation = [a for a in albums if a.get('album_group') == 'compilation']
         group_appears_on = [a for a in albums if a.get('album_group') == 'appears_on']
-
-    _print_albums(albums)
+    '''
 
 
 def artist_top_tracks(uri, country='FI'):

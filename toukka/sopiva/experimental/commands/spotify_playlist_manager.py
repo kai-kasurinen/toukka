@@ -3,8 +3,8 @@
 import pprint
 
 from toukka.hub import Toukka
-from toukka.experimental.spotify.playlist_manager  import Playlists
-from toukka.utils import _get_flags, _list_to_string
+from toukka.sopiva.experimental.spotify.playlist_manager import Playlists
+from toukka.util import _get_flags, _list_to_string
 
 def playlists(user=None,
                    filter_own=False,

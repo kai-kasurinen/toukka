@@ -29,7 +29,7 @@ def main():
                         dest='loglevel',
                         const=logging.DEBUG,
                         default=logging.INFO)
-    parser.add_commands(toukka.config.COMMANDS)
+    # parser.add_commands(toukka.config.COMMANDS)
     parser.add_commands(commands.COMMANDS)
     args = parser.parse_args()
 
