@@ -3,10 +3,13 @@
 import datetime
 import dataclasses
 
+import spotipy.model
+
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
 def print_track(track, use_play_count=True):
+    '''print track'''
     print(f'track: {track.name} ({track.uri})',
           f'(popularity: {track.popularity})')
 
@@ -37,7 +40,16 @@ def print_track(track, use_play_count=True):
         print(f'\tplayed: {played_count}')
 
 
-def print_album(album):
+def print_tracks(tracks):
+    '''print tracks'''
+    print()
+    for track in tracks:
+        print_track(track)
+        print()
+
+
+def print_album(album: spotipy.model.FullAlbum):
+    '''print album'''
     print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
           '({album.release_date} {album.release_date_precision.name})'.format(album=album),
           '(popularity: {album.popularity}, tracks: {album.total_tracks})'.format(album=album))
@@ -65,6 +77,12 @@ def print_album(album):
         print('\tflags: %s' % flags)
 
 
+def print_albums(albums):
+    print()
+    for album in albums:
+        print_album(album)
+        print()
+
 def print_artist(artist, use_play_count=True):
     print('artist: {artist.name} ({artist.uri})'.format(artist=artist),
           '(popularity: {artist.popularity},'.format(artist=artist),
@@ -78,6 +96,13 @@ def print_artist(artist, use_play_count=True):
     if use_play_count:
         spotify_history = get_spotify_history()
         print('\tplayed: %s' % spotify_history.count_by_artist_name(artist.name))
+
+
+def print_artists(artists):
+    print()
+    for artist in artists:
+        print_artist(artist)
+        print()
 
 
 def _artists_to_string(artists):

@@ -21,7 +21,7 @@ def artist_info(uri):
 
 
 def artist_albums(uri, album_type=None, country=None):
-    '''Get artist albums'''
+    '''get artist albums'''
     toukka = Toukka()
     paging = toukka.sp.artist_albums(uri)
     albums = toukka.sp.aggregate_paging_results(paging)
@@ -37,11 +37,11 @@ def artist_albums(uri, album_type=None, country=None):
 
 
 def artist_top_tracks(uri, country='FI'):
-    '''Get artist top tracks'''
-    toukka = Toukka()
-    results = toukka.sp.artist_top_tracks(uri)
-    tracks = results.get('tracks')
-    _print_tracks(tracks)
+    '''get artist top tracks'''
+    spotify = get_spotify()
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    tracks = spotify.artist_top_tracks(uri_id, country=country)
+    printer.print_tracks(tracks)
 
 
 def artist_related_artists(uri):
@@ -49,17 +49,10 @@ def artist_related_artists(uri):
     spotify = get_spotify()
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     artists = spotify.artist_related_artists(uri_id)
-
-    print()
-    for artist in artists:
-        printer.print_artist(artist)
-        print()
+    printer.print_artists(artists)
 
 
-def _print_artists(artists):
-    for artist in artists:
-        _print_artist_oneline(artist)
-
+#
 
 def _print_artist(artist):
 
@@ -91,11 +84,6 @@ def _print_album_multiline(album):
     print('type: {album_type}'.format(**album))
     print('group: {album_group}'.format(**album))
     print()
-
-
-def _print_tracks(tracks):
-    for track in tracks:
-        _print_track_oneline(track)
 
 
 def _print_track_oneline(track):

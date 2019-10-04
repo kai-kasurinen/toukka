@@ -1,10 +1,11 @@
 #
 
-import spotipy
 import toukka.cache.dogpile
 
+from .extented import SpotifyExtended
 
-class CachedSpotify(spotipy.Spotify):
+
+class SpotifyCached(SpotifyExtended):
 
     @toukka.cache.dogpile.region.cache_on_arguments()
     def track(self, track_id, market=None):

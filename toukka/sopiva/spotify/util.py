@@ -28,7 +28,7 @@ def get_spotify_with_client_credentials():
     credentials = spotipy.auth.Credentials(client_id, client_secret, redirect_uri)
     token = credentials.request_client_token()
     # FIXME: current RefreshingToken does not work with client credentials
-    client = toukka.sopiva.spotify.client_cached.CachedSpotify(
+    client = toukka.sopiva.spotify.client_cached.SpotifyCached(
         token=token,
         sender=spotipy.sender.PersistentSender())
     return client
@@ -63,7 +63,7 @@ def get_user_token():
 
 def get_spotify_with_user_credentials():
     token = get_user_token()
-    client = toukka.sopiva.spotify.client.cached.CachedSpotify(
+    client = toukka.sopiva.spotify.client.cached.SpotifyCached(
         token=token,
         sender=spotipy.sender.PersistentSender())
     return client
