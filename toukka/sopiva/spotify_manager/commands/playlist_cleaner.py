@@ -31,7 +31,8 @@ def playlist_cleaner(uri: str,
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
     playlist.pprint(depth=2)
 
-    playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
+    # NOTE: make list from iterable
+    playlist_tracks = list(spotify.all_items_from_paging(playlist.tracks))
     tracks_to_remove = set()
 
     if filter_played:
@@ -45,9 +46,9 @@ def playlist_cleaner(uri: str,
 
     if filter_duplicate_isrc:
         isrcs = set()
-        for track in playlist_tracks:
-            track_full = spotify.track(track.id)
-            isrc = track_full.external_ids.get('isrc')
+        for playlist_track in playlist_tracks:
+            track = playlist_track.track
+            isrc = track.external_ids.get('isrc')
             if isrc in isrcs:
                 print(f'{track.uri}: isrc {isrc} is already seen')
                 tracks_to_remove.add(track.id)
