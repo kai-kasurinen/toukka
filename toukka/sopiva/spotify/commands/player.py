@@ -7,6 +7,8 @@ import argh
 from toukka.hub import Toukka
 from toukka.util import json_dump
 
+from toukka.sopiva.spotify.util import get_spotify
+
 
 def play(uri=None, offset=None, uris=None, device=None):
     ''' Start or resume user's playback.'''
@@ -75,8 +77,7 @@ def current_playback(market=None):
 
 def currently_playing(market=None):
     ''' Get user's currently playing track.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.currently_playing(market))
+    return get_spotify().playback_currently_playing(market=None).pprint(depth=2)
 
 
 def transfer_playback(device, force_play=True):
