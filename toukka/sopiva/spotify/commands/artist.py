@@ -19,6 +19,7 @@ def artist_info(uri):
     artist = spotify.artist(uri_id)
     printer.print_artist(artist)
 
+
 def artist_albums(uri):
     '''get artist albums'''
     spotify = get_spotify()
