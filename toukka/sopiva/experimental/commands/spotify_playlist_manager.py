@@ -2,27 +2,29 @@
 
 import spotipy.convert
 
-from toukka.hub import Toukka
-from toukka.sopiva.experimental.spotify.playlist_manager import Playlists
 from toukka.util import _get_flags, _list_to_string
-
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
-
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
-def playlists(user=None,
-                   filter_own=False,
-                   filter_public=False,
-                   filter_collaborative=False,
-                   filter_by_userid=None):
 
+def playlists(
+        user=None,
+        filter_own: bool = False,
+        filter_public: bool = False,
+        filter_collaborative: bool = False,
+        filter_by_userid: bool = None
+        ):
+    '''get user playlists'''
 
-    #toukka = Toukka()
-    #playlists = toukka.sp.user_playlists_all(user)
-    playlists = Playlists().playlists()
-    total = len(playlists)
+    spotify = get_spotify()
+    paging = spotify.playlists()
 
+    print(f'user has {paging.total} playlists')
+    playlists = spotify.all_items_from_paging(paging)
+
+    # FIXME:
+    '''
     if filter_own:
         playlists = [p for p in playlists if p.get('owner').get('id') == user]
 
@@ -37,8 +39,10 @@ def playlists(user=None,
 
     _print_playlists(playlists, one_line=True)
     print('\nfiltered to {} of total {}'.format(len(playlists), total))
+    '''
 
 
+'''
 def _print_playlists(playlists, one_line=True):
 
     if one_line:
@@ -51,11 +55,13 @@ def _print_playlists(playlists, one_line=True):
         print(line.format(
             **playlist,
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
+'''
 
 
 def playlist(uri: str,
              remove_played_tracks: bool = False
              ):
+    '''get and modify playlist'''
 
     uri_type, uri_id = spotipy.convert.from_uri(uri)
 
