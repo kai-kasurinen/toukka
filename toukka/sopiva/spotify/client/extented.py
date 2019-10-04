@@ -2,6 +2,8 @@
 
 import logging
 import spotipy
+import spotipy.convert
+import spotipy.model
 import spotipy.model.paging
 
 

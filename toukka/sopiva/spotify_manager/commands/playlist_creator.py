@@ -23,6 +23,8 @@ def playlist_creator(from_artist: str = None):
     spotify_history = get_spotify_history()
 
     # FIXME:
+    # 'album', 'single', 'appears_on', 'compilation'
+    include_album_groups = ['album', 'sinlge', 'compilation']
     bad_word_in_album_names = ['christmas']
     filter_played = True
     filter_duplicate_isrc = True
@@ -31,7 +33,7 @@ def playlist_creator(from_artist: str = None):
         ret = list()
         album_paging = spotify.artist_albums(
             artist_id,
-            include_groups=['album'],
+            include_groups=include_album_groups,
             market='FI')
         for album in spotify.all_items_from_paging(album_paging):
             print(f'{album.name}')
