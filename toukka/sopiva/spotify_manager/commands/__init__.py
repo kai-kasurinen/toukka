@@ -1,21 +1,13 @@
 #
 
-from . import spotify_playlist_manager
-
-'''
-from . import spotify_artist
-from . import toukka
-from . import fun
-from . import url
-from . import spotify_playing
-from . import spotify_playing_watcher
-from . import spotify_artist
-'''
+from . import playlist
+from . import playlists
 
 #
 
 COMMANDS = [
-    *spotify_playlist_manager.COMMANDS
+    *playlist.COMMANDS,
+    *playlists.COMMANDS
 ]
 
 NAMESPACE = 'experimental'
