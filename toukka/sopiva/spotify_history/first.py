@@ -33,5 +33,9 @@ class SpotifyHistory:
     def count_by_artist_name(self, artist_name):
         return self.session.query(self.history).filter(self.history.xesam_artist == artist_name).count()
 
+    def get_all_unique_track_ids(self):
+        '''return list of all unique track_ids from history'''
+        return [value for value, in self.session.query(self.history.mpris_track_id).distinct().all()]
+
 
 # END
