@@ -3,7 +3,7 @@
 from . import playlist_cleaner
 from . import playlist_creator
 from . import playlists
-from . import isrc_test
+from . import isrc_database
 
 #
 
@@ -11,7 +11,7 @@ COMMANDS = [
     *playlist_cleaner.COMMANDS,
     *playlist_creator.COMMANDS,
     *playlists.COMMANDS,
-    *isrc_test.COMMANDS
+    *isrc_database.COMMANDS
 ]
 
 NAMESPACE = 'spotify-manager'
