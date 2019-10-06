@@ -71,7 +71,7 @@ def track_to_isrc_update():
         print(f'{counter} {track_uri} {isrc}')
 
 
-# FIXME: hack
+# FIXME: hack and slow
 def get_listened_isrcs():
     '''get listened isrcs'''
 

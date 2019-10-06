@@ -9,7 +9,10 @@ import toukka.sopiva.spotify_manager.database.track_to_isrc
 
 
 def playlist_cleaner(uri: str,
-                     remove_tracks: bool = False
+                     remove_tracks: bool = False,
+                     filter_played_tracks: bool = False,
+                     filter_played_isrcs: bool = False,
+                     filter_duplicate_isrc: bool = False
                      ):
     '''clean playlist'''
 
@@ -24,11 +27,6 @@ def playlist_cleaner(uri: str,
 
     spotify = toukka.sopiva.spotify.util.get_spotify()
     spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
-
-    # FIXME
-    filter_played = True
-    filter_played_isrcs = True
-    filter_duplicate_isrc = True
 
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
     playlist.pprint(depth=2)
@@ -52,7 +50,7 @@ def playlist_cleaner(uri: str,
             else:
                 isrcs.add(isrc)
 
-    if filter_played:
+    if filter_played_tracks:
         print('filter played tracks')
         for playlist_track in playlist_tracks:
             track = playlist_track.track
@@ -72,7 +70,7 @@ def playlist_cleaner(uri: str,
             if isrc is None:
                 continue
             if isrc in played_isrcs:
-                print(f'{track.uri}: isrc {isrc} is already seen')
+                print(f'{track.uri}: isrc {isrc} is already played')
                 tracks_to_remove.add(track.id)
 
     print(f'{playlist.tracks.total} total tracks')
@@ -100,7 +98,7 @@ def _playlist_current():
     '''get currently playing playlist'''
 
     # FIXME: do not init spotifys
-    spotify = toukka.spotify.util.get_spotify()
+    spotify = toukka.sopiva.spotify.util.get_spotify()
     playing = spotify.playback_currently_playing()
 
     if playing.context and playing.context.type.name == 'playlist':
