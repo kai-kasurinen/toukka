@@ -35,25 +35,29 @@ def playlist_cleaner(uri: str,
     playlist_tracks = list(spotify.all_items_from_paging(playlist.tracks))
     tracks_to_remove = set()
 
-    if filter_played:
-        for playlist_track in playlist_tracks:
-            track = playlist_track.track
-            played_count = spotify_history.count_by_track_id(track.uri)
-
-            if played_count > 0:
-                print(f'{track.uri} played {played_count} times')
-                tracks_to_remove.add(track.id)
-
     if filter_duplicate_isrc:
+        print('filter duplicate isrcs')
         isrcs = set()
         for playlist_track in playlist_tracks:
             track = playlist_track.track
             isrc = track.external_ids.get('isrc')
+            if isrc is None:
+                continue
             if isrc in isrcs:
                 print(f'{track.uri}: isrc {isrc} is already seen')
                 tracks_to_remove.add(track.id)
             else:
                 isrcs.add(isrc)
+
+    if filter_played:
+        print('filter played tracks')
+        for playlist_track in playlist_tracks:
+            track = playlist_track.track
+            played_count = spotify_history.count_by_track_id(track.uri)
+
+            if played_count > 0:
+                print(f'{track.uri}: played {played_count} times')
+                tracks_to_remove.add(track.id)
 
     print(f'{playlist.tracks.total} total tracks')
     print(f'{len(tracks_to_remove)} tracks remove')

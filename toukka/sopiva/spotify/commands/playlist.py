@@ -9,6 +9,8 @@ import statistics
 import pprint
 import argh
 
+import spotipy.convert
+
 from toukka.hub import Toukka
 from toukka.util import _get_flags, _list_to_string
 
@@ -90,21 +92,14 @@ def _print_playlists(playlists, one_line=True):
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
-def playlist_info(uri, dump=False, with_tracks=False):
-    toukka = Toukka()
-    playlist = toukka.sp.get_playlist_by_uri(uri)
-
-    if dump:
-        pprint.pprint(playlist)
-        return
-    else:
-        _print_playlist_info(playlist)
-
-        if with_tracks:
-            playlist_tracks = toukka.sp.aggregate_paging_results(playlist['tracks'])
-            _print_playlist_tracks(playlist_tracks)
+def playlist_info(uri: str):
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    spotify = get_spotify()
+    playlist = spotify.playlist(playlist_id=uri_id, market=None)
+    playlist.pprint(depth=2)
 
 
+# FIXME: move
 def _print_playlist_info(playlist):
     print('playlist: {name} ({uri}) (followers: {followers[total]}, tracks: {tracks[total]}'.format(**playlist))
     print('\tdescription: {description}'.format(**playlist))

@@ -33,10 +33,17 @@ def featured_playlists(country: str = None,
         print(f'{playlist.id}: {playlist.name}')
 
 
+def recommendation_genre_seeds():
+    '''get list of available genre seeds'''
+    return get_spotify().recommendation_genre_seeds()
+
+
 #
 
-COMMANDS = [categories,
-            featured_playlists
-            ]
+COMMANDS = [
+    categories,
+    featured_playlists,
+    recommendation_genre_seeds
+]
 
 # END

@@ -71,6 +71,8 @@ def playlist_creator(from_artist: str = None):
         for track in tracks.copy():
             track_full = spotify.track(track.id)
             isrc = track_full.external_ids.get('isrc')
+            if isrc is None:
+                continue
             if isrc in isrcs:
                 print(f'{track.uri}: isrc {isrc} is already seen')
                 tracks.remove(track)
@@ -88,10 +90,45 @@ def playlist_creator(from_artist: str = None):
     print('done')
 
 
+def recommendations_test(artist_id: str = None,
+                         track_id: str = None,
+                         genre: str = None):
+    '''get recommendations'''
+    spotify = get_spotify()
+    spotify_history = get_spotify_history()
+
+    # FIXME
+    seed_artists = None
+    seed_tracks = None
+    seed_genres = None
+
+    if artist_id:
+        seed_artists = [artist_id]
+    if track_id:
+        seed_tracks = [track_id]
+    if genre:
+        seed_genres = [genre]
+
+    recommendations = spotify.recommendations(
+        artist_ids=seed_artists,
+        track_ids=seed_tracks,
+        genres=seed_genres,
+        limit=100,
+        market=None)
+
+    for seed in recommendations.seeds:
+        seed.pprint()
+
+    for track in recommendations.tracks:
+        printer.print_track(track)
+
+
+
 #
 
 COMMANDS = [
     playlist_creator,
-    ]
+    recommendations_test
+]
 
 # END
