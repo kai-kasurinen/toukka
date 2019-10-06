@@ -12,7 +12,8 @@ def playlist_cleaner(uri: str,
                      remove_tracks: bool = False,
                      filter_played_tracks: bool = False,
                      filter_played_isrcs: bool = False,
-                     filter_duplicate_isrc: bool = False
+                     filter_duplicate_isrc: bool = False,
+                     filter_not_playable: bool = False
                      ):
     '''clean playlist'''
 
@@ -28,6 +29,8 @@ def playlist_cleaner(uri: str,
     spotify = toukka.sopiva.spotify.util.get_spotify()
     spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
 
+    # NOTE: not setting market, we should get market from token and relinking information
+    #       but it fails with TypeError
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
     playlist.pprint(depth=2)
 
@@ -35,12 +38,22 @@ def playlist_cleaner(uri: str,
     playlist_tracks = list(spotify.all_items_from_paging(playlist.tracks))
     tracks_to_remove = set()
 
-    # FIXME: use only one loop for playlist_tracks
-    if filter_duplicate_isrc:
-        print('filter duplicate isrcs')
-        isrcs = set()
-        for playlist_track in playlist_tracks:
-            track = playlist_track.track
+    # prepare for main loop
+    isrcs = set()
+    # FIXME: SLOW
+    isrcs_played = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
+
+    # main loop for doing things
+    for playlist_track in playlist_tracks:
+        track = playlist_track.track
+
+        # NOTE: not work when market is None
+        if filter_not_playable:
+            if track.is_playable is False:
+                print(f'{track.uri}: not playable')
+                tracks_to_remove.add(track.id)
+
+        if filter_duplicate_isrc:
             isrc = track.external_ids.get('isrc')
             if isrc is None:
                 continue
@@ -50,26 +63,17 @@ def playlist_cleaner(uri: str,
             else:
                 isrcs.add(isrc)
 
-    if filter_played_tracks:
-        print('filter played tracks')
-        for playlist_track in playlist_tracks:
-            track = playlist_track.track
+        if filter_played_tracks:
             played_count = spotify_history.count_by_track_id(track.uri)
-
             if played_count > 0:
                 print(f'{track.uri}: played {played_count} times')
                 tracks_to_remove.add(track.id)
 
-    if filter_played_isrcs:
-        print('filter played track isrcs')
-        played_isrcs = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
-        for playlist_track in playlist_tracks:
-            track = playlist_track.track
-            played_count = spotify_history.count_by_track_id(track.uri)
+        if filter_played_isrcs:
             isrc = track.external_ids.get('isrc')
             if isrc is None:
                 continue
-            if isrc in played_isrcs:
+            if isrc in isrcs_played:
                 print(f'{track.uri}: isrc {isrc} is already played')
                 tracks_to_remove.add(track.id)
 
