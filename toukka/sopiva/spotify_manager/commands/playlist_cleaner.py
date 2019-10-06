@@ -34,11 +34,11 @@ def playlist_cleaner(uri: str,
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
     playlist.pprint(depth=2)
 
-    # NOTE: make list from iterable
-    playlist_tracks = list(spotify.all_items_from_paging(playlist.tracks))
-    tracks_to_remove = set()
+    # NOTE: returns iterator
+    playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
 
     # prepare for main loop
+    tracks_to_remove = set()
     isrcs = set()
     # FIXME: SLOW
     isrcs_played = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
@@ -46,6 +46,7 @@ def playlist_cleaner(uri: str,
     # main loop for doing things
     for playlist_track in playlist_tracks:
         track = playlist_track.track
+        isrc = track.external_ids.get('isrc')
 
         # NOTE: not work when market is None
         if filter_not_playable:
@@ -53,10 +54,7 @@ def playlist_cleaner(uri: str,
                 print(f'{track.uri}: not playable')
                 tracks_to_remove.add(track.id)
 
-        if filter_duplicate_isrc:
-            isrc = track.external_ids.get('isrc')
-            if isrc is None:
-                continue
+        if filter_duplicate_isrc and isrc is not None:
             if isrc in isrcs:
                 print(f'{track.uri}: isrc {isrc} is already seen')
                 tracks_to_remove.add(track.id)
@@ -69,10 +67,7 @@ def playlist_cleaner(uri: str,
                 print(f'{track.uri}: played {played_count} times')
                 tracks_to_remove.add(track.id)
 
-        if filter_played_isrcs:
-            isrc = track.external_ids.get('isrc')
-            if isrc is None:
-                continue
+        if filter_played_isrcs and isrc is not None:
             if isrc in isrcs_played:
                 print(f'{track.uri}: isrc {isrc} is already played')
                 tracks_to_remove.add(track.id)
