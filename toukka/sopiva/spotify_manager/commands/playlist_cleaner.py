@@ -3,8 +3,9 @@
 import argh
 import spotipy.convert
 
-from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify_history.util import get_spotify_history
+import toukka.sopiva.spotify.util
+import toukka.sopiva.spotify_history.util
+import toukka.sopiva.spotify_manager.database.track_to_isrc
 
 
 def playlist_cleaner(uri: str,
@@ -21,11 +22,12 @@ def playlist_cleaner(uri: str,
 
     uri_type, uri_id = spotipy.convert.from_uri(uri)
 
-    spotify = get_spotify()
-    spotify_history = get_spotify_history()
+    spotify = toukka.sopiva.spotify.util.get_spotify()
+    spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
 
     # FIXME
     filter_played = True
+    filter_played_isrcs = True
     filter_duplicate_isrc = True
 
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
@@ -35,6 +37,7 @@ def playlist_cleaner(uri: str,
     playlist_tracks = list(spotify.all_items_from_paging(playlist.tracks))
     tracks_to_remove = set()
 
+    # FIXME: use only one loop for playlist_tracks
     if filter_duplicate_isrc:
         print('filter duplicate isrcs')
         isrcs = set()
@@ -57,6 +60,19 @@ def playlist_cleaner(uri: str,
 
             if played_count > 0:
                 print(f'{track.uri}: played {played_count} times')
+                tracks_to_remove.add(track.id)
+
+    if filter_played_isrcs:
+        print('filter played track isrcs')
+        played_isrcs = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
+        for playlist_track in playlist_tracks:
+            track = playlist_track.track
+            played_count = spotify_history.count_by_track_id(track.uri)
+            isrc = track.external_ids.get('isrc')
+            if isrc is None:
+                continue
+            if isrc in played_isrcs:
+                print(f'{track.uri}: isrc {isrc} is already seen')
                 tracks_to_remove.add(track.id)
 
     print(f'{playlist.tracks.total} total tracks')
@@ -82,7 +98,9 @@ def playlist_cleaner(uri: str,
 
 def _playlist_current():
     '''get currently playing playlist'''
-    spotify = get_spotify()
+
+    # FIXME: do not init spotifys
+    spotify = toukka.spotify.util.get_spotify()
     playing = spotify.playback_currently_playing()
 
     if playing.context and playing.context.type.name == 'playlist':
