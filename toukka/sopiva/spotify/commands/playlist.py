@@ -15,6 +15,7 @@ from toukka.hub import Toukka
 from toukka.util import _get_flags, _list_to_string
 
 from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.printer import first as printer
 
 
 # FIXME: should be same as user_playlists?
@@ -92,11 +93,20 @@ def _print_playlists(playlists, one_line=True):
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
-def playlist_info(uri: str):
+def playlist_info(uri: str,
+                  print_tracks: bool = False):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
     playlist.pprint(depth=2)
+    
+    if print_tracks:
+        playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
+        for playlist_track in playlist_tracks:
+            track = playlist_track.track
+            printer.print_track(track)
+        
+
 
 
 # FIXME: move
@@ -110,10 +120,7 @@ def _print_playlist_info(playlist):
     print('\tflags: {}'.format(_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
-def _print_playlist_tracks(playlist_tracks):
-    line = "{track[name]}"
-    for playlist_track in playlist_tracks:
-        print(line.format(**playlist_track))
+
 
 
 #

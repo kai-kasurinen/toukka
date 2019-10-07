@@ -8,7 +8,7 @@ from .extented import SpotifyExtended
 class SpotifyCached(SpotifyExtended):
 
     @toukka.cache.dogpile.region.cache_on_arguments()
-    def track(self, track_id, market=None):
+    def track(self, track_id):
         return super().track(track_id, market=market)
 
     @toukka.cache.dogpile.region.cache_on_arguments()
@@ -16,7 +16,7 @@ class SpotifyCached(SpotifyExtended):
         return super().artist(artist_id)
 
     @toukka.cache.dogpile.region.cache_on_arguments()
-    def album(self, album_id, market=None):
+    def album(self, album_id):
         return super().album(album_id, market=market)
 
 

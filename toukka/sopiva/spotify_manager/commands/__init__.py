@@ -1,7 +1,7 @@
 #
 
 from . import playlist_cleaner
-from . import playlist_creator
+from . import playlist_generator_commands
 from . import playlists
 from . import isrc_database
 
@@ -9,7 +9,7 @@ from . import isrc_database
 
 COMMANDS = [
     *playlist_cleaner.COMMANDS,
-    *playlist_creator.COMMANDS,
+    *playlist_generator_commands.COMMANDS,
     *playlists.COMMANDS,
     *isrc_database.COMMANDS
 ]

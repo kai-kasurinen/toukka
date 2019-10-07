@@ -35,7 +35,7 @@ def playlist_cleaner(uri: str,
     playlist.pprint(depth=2)
 
     # NOTE: returns iterator
-    playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
+    playlist_tracks = spotify.iterate_items_from_paging(playlist.tracks)
 
     # prepare for main loop
     tracks_to_remove = set()

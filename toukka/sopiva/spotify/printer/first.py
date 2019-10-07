@@ -8,7 +8,8 @@ import spotipy.model
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
-def print_track(track, use_play_count=True):
+def print_track(track: spotipy.model.FullTrack,
+                use_play_count=True):
     '''print track'''
     print(f'track: {track.name} ({track.uri})',
           f'(popularity: {track.popularity})')
