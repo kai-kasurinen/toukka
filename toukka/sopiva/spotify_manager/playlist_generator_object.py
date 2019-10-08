@@ -3,8 +3,11 @@
 
 import logging
 import pprint
+import itertools
 
 import spotipy.convert
+import spotipy.model.track
+
 import toukka.config
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -24,13 +27,21 @@ class PlaylistGenerator:
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
 
+        # NOTE: BUG: market='from_token' fails on unplayeble track with TypeError
+        self._market = None
+
+        # init empty
+        self._isrc_seen = set()
+        # FIXME: SLOW
+        self._isrcs_played = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
+        # self._isrcs_played = set()
+
+        # get playlist
         if playlist_uri is None:
             playlist_uri = _get_playlist_uri_from_config()
         playlist_uri_type, playlist_uri_id = spotipy.convert.from_uri(playlist_uri)
-        self.playlist = self.spotify.playlist(playlist_uri_id)
+        self.playlist = self.spotify.playlist(playlist_uri_id, market=self._market)
         self.playlist_snapshot_id = self.playlist.snapshot_id
-
-        self._isrc_seen = set()
 
         # FIXME:
         filter_played = True
@@ -40,12 +51,16 @@ class PlaylistGenerator:
         track_ids_to_playlist = list()
 
         for track in tracks:
-            printer.print_track(track)
+            assert isinstance(track, spotipy.model.track.FullTrack)
+
+            if track.id in track_ids_to_playlist:
+                print(f'{track.id}: already added')
 
             if self.is_track_ok_to_add(track):
+                printer.print_track(track)
                 track_ids_to_playlist.append(track.id)
 
-            if len(track_ids_to_playlist) >= 200:
+            if len(track_ids_to_playlist) >= 1000:
                 print('we have enough tracks to add')
                 break
 
@@ -59,6 +74,9 @@ class PlaylistGenerator:
     def generate_playlist_from_artist_id(self, artist_id):
         self.looper(self.iterate_artist_all_tracks(artist_id))
 
+    def generate_playlist_from_related_artists(self, artist_id):
+        self.looper(self.iterate_related_artists_all_tracks(artist_id))
+
     def generate_playlist_from_recommendations(self,
                                                seed_artist_ids: list = None,
                                                seed_track_ids: list = None,
@@ -66,7 +84,8 @@ class PlaylistGenerator:
 
         self.looper(self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
                                                  seed_track_ids=seed_track_ids,
-                                                 seed_genres=seed_genres))
+                                                 seed_genres=seed_genres,
+                                                 call_times=10))
 
     def is_track_ok_to_add(self, track):
         if self.is_track_isrc_already_added(track):
@@ -74,6 +93,9 @@ class PlaylistGenerator:
             return False
         elif self.is_track_already_played(track):
             print(f'{track.id}: already played')
+            return False
+        elif self.is_track_isrc_already_played(track):
+            print(f'{track.id}: isrc already played')
             return False
         elif not self.is_track_playeable(track):
             print(f'{track.id}: not playeable')
@@ -83,6 +105,15 @@ class PlaylistGenerator:
 
     def is_track_already_played(self, track):
         if self.spotify_history.count_by_track_id(track.uri) > 0:
+            return True
+        else:
+            return False
+
+    def is_track_isrc_already_played(self, track):
+        isrc = track.external_ids.get('isrc')
+        if isrc is None:
+            return False
+        if isrc in self._isrcs_played:
             return True
         else:
             return False
@@ -138,7 +169,7 @@ class PlaylistGenerator:
         albums = self.spotify.artist_albums(
             artist_id,
             include_groups=include_album_groups,
-            market='FI')
+            market=self._market)
 
         for album in self.spotify.iterate_items_from_paging(albums):
             print(f'{album.name}')
@@ -149,28 +180,40 @@ class PlaylistGenerator:
                 continue
 
             album_tracks = self.spotify.iterate_items_from_paging(
-                self.spotify.album_tracks(album.id, market=None, limit=50))
+                self.spotify.album_tracks(album.id,
+                                          market=self._market,
+                                          limit=50))
 
             for simple_track in album_tracks:
-                track = self.spotify.track(simple_track.id)
+                track = self.spotify.track(simple_track.id, market=self._market)
                 yield track
 
     def iterate_recommendations(self,
                                 seed_artist_ids: list = None,
                                 seed_track_ids: list = None,
-                                seed_genres: list = None):
+                                seed_genres: list = None,
+                                call_times: int = 1,
+                                **attributes):
 
-        recommendations = self.spotify.recommendations(
+        # FIXME: hack
+        for n in range(call_times):
+            recommendations = self.spotify.recommendations(
                                                     artist_ids=seed_artist_ids,
                                                     track_ids=seed_track_ids,
                                                     genres=seed_genres,
-                                                    limit=100)
+                                                    market=self._market,
+                                                    limit=100,
+                                                    **attributes)
 
-        for seed in recommendations.seeds:
-            seed.pprint()
+            for seed in recommendations.seeds:
+                seed.pprint()
 
-        for track in recommendations.tracks:
-            yield track
+            for track in recommendations.tracks:
+                yield track
 
+    def iterate_related_artists_all_tracks(self, artist_id):
+        for artist in self.spotify.artist_related_artists(artist_id):
+            for track in self.iterate_artist_all_tracks(artist.id):
+                yield track
 
 # END

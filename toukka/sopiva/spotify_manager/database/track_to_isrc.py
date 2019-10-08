@@ -13,6 +13,7 @@ import spotipy.convert
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
+logger = logging.getLogger(__name__)
 
 
 class TrackToISRC:
@@ -49,26 +50,26 @@ def track_to_isrc_update():
     track_to_isrc = TrackToISRC()
 
     history_unique_tracks_ids = spotify_history.get_all_unique_track_ids()
-    print(f'history has {len(history_unique_tracks_ids)} unique track ids')
+    logger.info(f'history has {len(history_unique_tracks_ids)} unique track ids')
 
     for counter, track_uri in enumerate(history_unique_tracks_ids, start=1):
 
         # 'cos convert.from_uri does not handle podcasts and other
         if 'spotify:track:' not in track_uri:
-            print(f'{counter} {track_uri}: unsupported type')
+            logger.info(f'{counter} {track_uri}: unsupported type')
             continue
 
         track_uri_type, track_uri_id = spotipy.convert.from_uri(track_uri)
 
         # check before we get track from spotify api
         if track_to_isrc.get(track_uri_id):
-            print(f'{counter} {track_uri}: already on database')
+            logger.info(f'{counter} {track_uri}: already on database')
             continue
 
         track = spotify.track(track_uri_id)
         isrc = track.external_ids.get('isrc')
         track_to_isrc.set(track.id, isrc)
-        print(f'{counter} {track_uri} {isrc}')
+        logger.info(f'{counter} {track_uri} {isrc}')
 
 
 # FIXME: hack and slow
@@ -78,7 +79,7 @@ def get_listened_isrcs():
     spotify_history = get_spotify_history()
     track_to_isrc = TrackToISRC()
     history_unique_tracks_ids = spotify_history.get_all_unique_track_ids()
-    print(f'history has {len(history_unique_tracks_ids)} unique track ids')
+    logger.debug(f'history has {len(history_unique_tracks_ids)} unique track ids')
 
     isrcs = set()
     for counter, track_uri in enumerate(history_unique_tracks_ids, start=1):
@@ -91,9 +92,8 @@ def get_listened_isrcs():
         if isrc is None:
             continue
         isrcs.add(isrc)
-    print(f'history has {len(isrcs)} unique ISRCs')
+    logger.debug(f'history has {len(isrcs)} unique ISRCs')
     return isrcs
-
 
 
 # END
