@@ -17,8 +17,8 @@ def print_track(track: spotipy.model.FullTrack,
     print(f'\talbum: {track.album.name} ({track.album.uri})')
     print(f'\tartists: {_artists_to_string(track.artists)})')
     print(f'\tduration: {datetime.timedelta(milliseconds=track.duration_ms)}')
-    print(f'\ttrack number: {track.track_number}',
-          f', disc number: {track.disc_number}')
+    print(f'\ttrack number: {track.track_number},',
+          f'disc number: {track.disc_number}')
 
     if track.external_ids:
         print(f'\texternal ids: {track.external_ids}')
@@ -84,6 +84,7 @@ def print_albums(albums):
         print_album(album)
         print()
 
+
 def print_artist(artist, use_play_count=True):
     print('artist: {artist.name} ({artist.uri})'.format(artist=artist),
           '(popularity: {artist.popularity},'.format(artist=artist),
@@ -104,6 +105,21 @@ def print_artists(artists):
     for artist in artists:
         print_artist(artist)
         print()
+
+
+def print_track_audio_features(features):
+    print(f'track features: {features.uri}')
+    print(f'\tacousticness: {features.acousticness},',
+          f'danceability: {features.danceability},',
+          f'energy: {features.energy}')
+    print(f'\tinstrumentalness: {features.instrumentalness},',
+          f'liveness: {features.liveness},',
+          f'speechiness: {features.speechiness},',
+          f'valence: {features.valence}')
+    print(f'\tloudness: {features.loudness}')
+    print(f'\tkey: {features.key}',
+          f'mode: {features.mode}',
+          f'tempo: {features.tempo}')
 
 
 def _artists_to_string(artists):

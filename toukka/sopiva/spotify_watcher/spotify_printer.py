@@ -46,8 +46,9 @@ class SpotifyPrinter:
         printer.print_album(album)
         print()
         printer.print_track(track)
-        print()
         self.check_and_print_relink(track_id)
+        print()
+        printer.print_track_audio_features(self.spotify.track_audio_features(track_id))
 
 
 def _get_all_artist_ids_from_item(item):

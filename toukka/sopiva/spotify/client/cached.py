@@ -25,5 +25,8 @@ class SpotifyCached(SpotifyExtended):
               market: Union[str, None] = 'from_token'):
         return super().album(album_id, market=market)
 
+    @toukka.cache.dogpile.region.cache_on_arguments()
+    def track_audio_features(self, track_id: str):
+        return super().track_audio_features(track_id)
 
 # END

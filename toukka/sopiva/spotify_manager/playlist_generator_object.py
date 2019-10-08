@@ -78,15 +78,20 @@ class PlaylistGenerator:
     def generate_playlist_from_related_artists(self, artist_id):
         self.looper(self.iterate_related_artists_all_tracks(artist_id))
 
+    def generate_playlist_from_playlist_id(self, playlist_id):
+        self.looper(self.iterate_playlist_all_tracks(playlist_id))
+
     def generate_playlist_from_recommendations(self,
                                                seed_artist_ids: list = None,
                                                seed_track_ids: list = None,
-                                               seed_genres: list = None):
+                                               seed_genres: list = None,
+                                               **attributes):
 
         self.looper(self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
                                                  seed_track_ids=seed_track_ids,
                                                  seed_genres=seed_genres,
-                                                 call_times=10))
+                                                 call_times=1,
+                                                 **attributes))
 
     def is_track_ok_to_add(self, track):
         if self.is_track_isrc_already_added(track):
@@ -149,7 +154,6 @@ class PlaylistGenerator:
         else:
             return False
 
-
     # playlist modify methods
 
     def playlist_change_details(self, **kwargs):
@@ -210,8 +214,11 @@ class PlaylistGenerator:
                                 call_times: int = 1,
                                 **attributes):
 
+        # grr
+        logger.debug(attributes)
         # FIXME: hack
         for n in range(call_times):
+            # BUG: attributes not used on spotipy
             recommendations = self.spotify.recommendations(
                                                     artist_ids=seed_artist_ids,
                                                     track_ids=seed_track_ids,
@@ -221,7 +228,7 @@ class PlaylistGenerator:
                                                     **attributes)
 
             for seed in recommendations.seeds:
-                seed.pprint()
+                logger.debug(seed)
 
             for track in recommendations.tracks:
                 yield track
@@ -237,6 +244,15 @@ class PlaylistGenerator:
                                      limit=50,
                                      market=self._market)
         # FIXME: continue when BUG in next() fixed
+
+    def iterate_playlist_all_tracks(self, playlist_id: str):
+        playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
+        playlist_tracks = self.spotify.iterate_items_from_paging(playlist.tracks)
+        for playlist_track in playlist_tracks:
+            track = playlist_track.track
+            yield track
+
+
 
 
 # END
