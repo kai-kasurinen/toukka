@@ -22,28 +22,47 @@ def generate_playlist_from_related_artists(artist_uri):
     generator.generate_playlist_from_related_artists(artist_uri_id)
 
 
-def generate_playlist_from_recommendation_seeded_by_artists(artist_uri):
-    artist_uri_type, artist_uri_id = spotipy.convert.from_uri(artist_uri)
+@argh.arg('--artist-uris', nargs='*')
+@argh.arg('--track-uris', nargs='*')
+@argh.arg('--genres', nargs='*')
+def generate_playlist_from_recommendation(artist_uris: list = None,
+                                          track_uris: list = None,
+                                          genres: list = None,
+                                          call_times: int = 1,
+                                          min_instrumentalness: float = None,
+                                          max_instrumentalness: float = None,
+                                          target_instrumentalness: float = None):
+    '''generate playlist from recommendation'''
+    def convert_uris_to_ids(uris):
+        ret = list()
+        for uri in uris:
+            uri_type, uri_id = spotipy.convert.from_uri(uri)
+            ret.append(uri_id)
+        return ret
+
+    params = dict()
+    if artist_uris is not None:
+        params['seed_artist_ids'] = convert_uris_to_ids(artist_uris)
+    if track_uris is not None:
+        params['seed_track_ids'] = convert_uris_to_ids(track_uris)
+    if genres is not None:
+        params['seed_genres'] = genres
+    if call_times is not None:
+        params['call_times'] = call_times
+
+    # TODO: add min_/max_/target_ things when they are fixed from spotipy
     generator = PlaylistGenerator()
-    generator.generate_playlist_from_recommendations(seed_artist_ids=[artist_uri_id])
+    generator.generate_playlist_from_recommendations(**params)
 
 
-def generate_playlist_from_recommendation_seeded_by_genre(genre: str,
-                                                          min_instrumentalness: float = None,
-                                                          max_instrumentalness: float = None,
-                                                          target_instrumentalness: float = None
-                                                          ):
-    generator = PlaylistGenerator()
-    generator.generate_playlist_from_recommendations(seed_genres=[genre],
-                                                     min_instrumentalness=min_instrumentalness,
-                                                     max_instrumentalness=max_instrumentalness,
-                                                     target_instrumentalness=target_instrumentalness)
-
-
-def generate_playlist_from_playlist(playlist_uri):
+def generate_playlist_from_playlist(playlist_uri,
+                                    expand_album: bool = False,
+                                    expand_artist: bool = False):
     playlist_uri_type, playlist_uri_id = spotipy.convert.from_uri(playlist_uri)
     generator = PlaylistGenerator()
-    generator.generate_playlist_from_playlist_id(playlist_uri_id)
+    generator.generate_playlist_from_playlist_id(playlist_uri_id,
+                                                 expand_album=expand_album,
+                                                 expand_artist=expand_artist)
 
 
 #
@@ -51,8 +70,7 @@ def generate_playlist_from_playlist(playlist_uri):
 COMMANDS = [
     generate_playlist_from_artist,
     generate_playlist_from_playlist,
-    generate_playlist_from_recommendation_seeded_by_artists,
-    generate_playlist_from_recommendation_seeded_by_genre,
+    generate_playlist_from_recommendation,
     generate_playlist_from_related_artists
 ]
 

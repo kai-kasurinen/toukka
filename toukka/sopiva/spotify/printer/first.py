@@ -116,10 +116,10 @@ def print_track_audio_features(features):
           f'liveness: {features.liveness},',
           f'speechiness: {features.speechiness},',
           f'valence: {features.valence}')
-    print(f'\tloudness: {features.loudness}')
     print(f'\tkey: {features.key}',
           f'mode: {features.mode}',
-          f'tempo: {features.tempo}')
+          f'tempo: {features.tempo},',
+          f'loudness: {features.loudness}')
 
 
 def _artists_to_string(artists):

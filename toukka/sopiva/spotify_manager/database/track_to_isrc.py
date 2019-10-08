@@ -50,26 +50,26 @@ def track_to_isrc_update():
     track_to_isrc = TrackToISRC()
 
     history_unique_tracks_ids = spotify_history.get_all_unique_track_ids()
-    logger.info(f'history has {len(history_unique_tracks_ids)} unique track ids')
+    logger.debug(f'history has {len(history_unique_tracks_ids)} unique track ids')
 
     for counter, track_uri in enumerate(history_unique_tracks_ids, start=1):
 
         # 'cos convert.from_uri does not handle podcasts and other
         if 'spotify:track:' not in track_uri:
-            logger.info(f'{counter} {track_uri}: unsupported type')
+            logger.debug(f'{counter} {track_uri}: unsupported type')
             continue
 
         track_uri_type, track_uri_id = spotipy.convert.from_uri(track_uri)
 
         # check before we get track from spotify api
         if track_to_isrc.get(track_uri_id):
-            logger.info(f'{counter} {track_uri}: already on database')
+            logger.debug(f'{counter} {track_uri}: already on database')
             continue
 
         track = spotify.track(track_uri_id, market=None)
         isrc = track.external_ids.get('isrc')
         track_to_isrc.set(track.id, isrc)
-        logger.info(f'{counter} {track_uri} {isrc}')
+        logger.debug(f'{counter} {track_uri} {isrc}')
 
 
 # FIXME: hack and slow
