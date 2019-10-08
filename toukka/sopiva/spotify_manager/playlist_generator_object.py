@@ -27,8 +27,9 @@ class PlaylistGenerator:
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
 
-        # NOTE: BUG: market='from_token' fails on unplayeble track with TypeError
+        # NOTE: BUG: with market='from_token' fails on unplayeble track -> TypeError
         self._market = None
+        self._market_country_code = 'FI'
 
         # init empty
         self._isrc_seen = set()
@@ -100,6 +101,9 @@ class PlaylistGenerator:
         elif not self.is_track_playeable(track):
             print(f'{track.id}: not playeable')
             return False
+        elif not self.is_track_on_market(track, self._market_country_code):
+            print(f'{track.id}: is not available on {self._market_country_code}')
+            return False
         else:
             return True
 
@@ -134,6 +138,17 @@ class PlaylistGenerator:
             return True
         else:
             return track.is_playable
+
+    def is_track_on_market(self, track, market):
+        markets = track.available_markets
+        if markets is None:
+            # hjum?
+            return True
+        elif market in markets:
+            return True
+        else:
+            return False
+
 
     # playlist modify methods
 
