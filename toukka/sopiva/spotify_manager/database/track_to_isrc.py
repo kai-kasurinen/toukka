@@ -66,7 +66,7 @@ def track_to_isrc_update():
             logger.info(f'{counter} {track_uri}: already on database')
             continue
 
-        track = spotify.track(track_uri_id)
+        track = spotify.track(track_uri_id, market=None)
         isrc = track.external_ids.get('isrc')
         track_to_isrc.set(track.id, isrc)
         logger.info(f'{counter} {track_uri} {isrc}')
