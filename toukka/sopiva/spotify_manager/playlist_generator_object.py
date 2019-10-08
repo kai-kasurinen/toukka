@@ -231,4 +231,12 @@ class PlaylistGenerator:
             for track in self.iterate_artist_all_tracks(artist.id):
                 yield track
 
+    def iterate_search_tracks(self, query: str):
+        '''search tracks'''
+        search = self.spotify.search(query=query,
+                                     limit=50,
+                                     market=self._market)
+        # FIXME: continue when BUG in next() fixed
+
+
 # END
