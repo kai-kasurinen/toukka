@@ -1,7 +1,10 @@
 #
 
 import logging
+
+import simplejson
 import deprecated
+
 import spotipy
 import spotipy.convert
 import spotipy.model
@@ -38,6 +41,18 @@ class SpotifyExtended(spotipy.Spotify):
     def all_items_from_paging(self,
                               paging: spotipy.model.paging.OffsetPaging):
         return self.iterate_items_from_paging(paging)
+
+    # NOTE: requests uses simplejson when available
+    # NOTE: and spotipy except json exception
+    # NOTE: so fix it until it fixes somewhere else
+    # SEE: https://github.com/psf/requests/issues/4842
+    # SEE: https://github.com/linkedin/cruise-control/issues/927
+    @staticmethod
+    def _parse_json(response):
+        try:
+            return response.json()
+        except simplejson.decoder.JSONDecodeError:
+            return None
 
 
 # END

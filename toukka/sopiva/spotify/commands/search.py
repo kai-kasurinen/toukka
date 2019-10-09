@@ -10,10 +10,10 @@ def search(query: str):
     search = spotify.search(query=query, market=None)
     # GRR
     tracks_paging = search[0]
-    tracks_paging.pprint()
+    #tracks_paging.pprint()
     # BUG: TypeError: __init__() got an unexpected keyword argument 'tracks'
-    #for track in spotify.iterate_items_from_paging(tracks_paging):
-    #    printer.print_track(track)
+    for track in spotify.iterate_items_from_paging(tracks_paging):
+        printer.print_track(track)
 
 #
 

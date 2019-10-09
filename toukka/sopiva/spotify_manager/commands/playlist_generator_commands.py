@@ -56,13 +56,13 @@ def generate_playlist_from_recommendation(artist_uris: list = None,
 
 
 def generate_playlist_from_playlist(playlist_uri,
-                                    expand_album: bool = False,
-                                    expand_artist: bool = False):
+                                    expand_albums: bool = False,
+                                    expand_artists: bool = False):
     playlist_uri_type, playlist_uri_id = spotipy.convert.from_uri(playlist_uri)
     generator = PlaylistGenerator()
     generator.generate_playlist_from_playlist_id(playlist_uri_id,
-                                                 expand_album=expand_album,
-                                                 expand_artist=expand_artist)
+                                                 expand_albums=expand_albums,
+                                                 expand_artists=expand_artists)
 
 
 #

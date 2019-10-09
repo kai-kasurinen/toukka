@@ -43,6 +43,7 @@ class PlaylistGenerator:
         playlist_uri_type, playlist_uri_id = spotipy.convert.from_uri(playlist_uri)
         self.playlist = self.spotify.playlist(playlist_uri_id, market=self._market)
         self.playlist_snapshot_id = self.playlist.snapshot_id
+        self.playlist_description = None
 
         # FIXME:
         filter_played = True
@@ -74,7 +75,7 @@ class PlaylistGenerator:
 
         self.playlist_clear()
         self.playlist_tracks_add(track_ids_to_playlist)
-
+        # self.playlist_details_update()
         print('done')
 
     def generate_playlist_from_artist_id(self, artist_id):
@@ -84,11 +85,12 @@ class PlaylistGenerator:
         self.looper(self.iterate_related_artists_all_tracks(artist_id))
 
     def generate_playlist_from_playlist_id(self, playlist_id,
-                                           expand_album: bool = False,
-                                           expand_artist: bool = False):
+                                           expand_albums: bool = False,
+                                           expand_artists: bool = False):
+        self.playlist_description_from_playlist(playlist_id)
         self.looper(self.iterate_playlist_all_tracks(playlist_id,
-                                                     expand_album=expand_album,
-                                                     expand_artist=expand_artist))
+                                                     expand_albums=expand_albums,
+                                                     expand_artists=expand_artists))
 
     def generate_playlist_from_recommendations(self,
                                                seed_artist_ids: list = None,
@@ -260,24 +262,32 @@ class PlaylistGenerator:
 
     def iterate_playlist_all_tracks(self,
                                     playlist_id: str,
-                                    expand_album: bool = False,
-                                    expand_artist: bool = False):
+                                    expand_albums: bool = False,
+                                    expand_artists: bool = False):
         logger.debug(locals())
         playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
         playlist_tracks = self.spotify.iterate_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
             track = playlist_track.track
-            if expand_album:
+            if expand_albums:
                 for track in self.iterate_album_tracks(track.album.id):
                     yield track
-            elif expand_artist:
+            elif expand_artists:
                 for artist in track.artists:
                     for track in self.iterate_artist_all_tracks(artist.id):
                         yield track
             else:
                 yield track
 
+    # FIXME: stupid me
+    def playlist_details_update(self):
+        if self.playlist_description:
+            self.playlist_change_details(description=self.playlist_description)
 
+    def playlist_description_from_playlist(self, playlist_id):
+        playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
+        # NOTE: html/links only available for verified accounts
+        self.playlist_description = f'Source: {playlist.name} ({playlist.uri})'
 
 
 # END
