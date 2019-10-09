@@ -28,7 +28,9 @@ def generate_playlist_from_related_artists(artist_uri):
 def generate_playlist_from_recommendation(artist_uris: list = None,
                                           track_uris: list = None,
                                           genres: list = None,
-                                          call_times: int = 1,
+                                          call_times: int = None,
+                                          expand_albums: bool = False,
+                                          expand_artists: bool = False,
                                           min_instrumentalness: float = None,
                                           max_instrumentalness: float = None,
                                           target_instrumentalness: float = None):
@@ -48,7 +50,12 @@ def generate_playlist_from_recommendation(artist_uris: list = None,
     if genres is not None:
         params['seed_genres'] = genres
     if call_times is not None:
-        params['call_times'] = call_times
+        # FIXME: why str?
+        params['call_times'] = int(call_times)
+    if expand_albums is not None:
+        params['expand_albums'] = expand_albums
+    if expand_artists is not None:
+        params['expand_artists'] = expand_artists
 
     # TODO: add min_/max_/target_ things when they are fixed from spotipy
     generator = PlaylistGenerator()
