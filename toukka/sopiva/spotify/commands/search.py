@@ -4,12 +4,12 @@ import pprint
 import argh
 
 from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify.printer.second import printer
+from toukka.sopiva.spotify.printer import first as printer
 
 
 @argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
 def search(type: str,
-            query: str):
+           query: str):
     spotify = get_spotify()
     search = spotify.search(query=query,
                             types=[type],
@@ -18,7 +18,7 @@ def search(type: str,
     paging = search[0]
     # NOTE: next() not compatible with search results
     for count, item in enumerate(spotify.iterate_items_from_paging(paging), start=1):
-        print(f'{item.id}: {item.name} : {item.uri}')
+        printer.printer(item)
 
         # FIXME: break before next() so we do not hit bugs
         if count >= 50:

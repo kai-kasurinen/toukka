@@ -4,6 +4,7 @@
 
 import logging
 import argh
+import autologging
 
 import toukka.logger.simple
 import toukka.config
@@ -28,6 +29,10 @@ def main():
                         dest='loglevel',
                         const=logging.DEBUG,
                         default=logging.INFO)
+    parser.add_argument('--trace',
+                        action='store_const',
+                        dest='loglevel',
+                        const=autologging.TRACE)
     parser.add_commands(toukka.config.COMMANDS)
     parser.add_commands(toukka.sopiva.spotify.commands.COMMANDS)
     args = parser.parse_args()

@@ -3,17 +3,34 @@
 import datetime
 import dataclasses
 import functools
+import pprint
+import logging
+
+import autologging
+import deprecated
 
 import spotipy.model
+import spotipy.model.base
+import spotipy.model.playlist
 
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
+logger = logging.getLogger(__name__)
+
 
 @functools.singledispatch
+@autologging.traced
 def printer(arg):
     print(arg)
 
 
+@printer.register
+@autologging.traced
+def print_item(item: spotipy.model.base.Item):
+    print(f'{item.type}, {item.id}, {item.uri}')
+
+
+@printer.register
 def print_track(track: spotipy.model.FullTrack,
                 use_play_count=True):
     '''print track'''
@@ -47,14 +64,23 @@ def print_track(track: spotipy.model.FullTrack,
         print(f'\tplayed: {played_count}')
 
 
-def print_tracks(tracks):
-    '''print tracks'''
-    print()
-    for track in tracks:
-        print_track(track)
-        print()
+@printer.register
+def print_track_audio_features(features: spotipy.model.AudioFeatures):
+    print(f'track features: {features.uri}')
+    print(f'\tacousticness: {features.acousticness},',
+          f'danceability: {features.danceability},',
+          f'energy: {features.energy}')
+    print(f'\tinstrumentalness: {features.instrumentalness},',
+          f'liveness: {features.liveness},',
+          f'speechiness: {features.speechiness},',
+          f'valence: {features.valence}')
+    print(f'\tkey: {features.key}',
+          f'mode: {features.mode}',
+          f'tempo: {features.tempo},',
+          f'loudness: {features.loudness}')
 
 
+@printer.register
 def print_album(album: spotipy.model.FullAlbum):
     '''print album'''
     print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
@@ -84,14 +110,9 @@ def print_album(album: spotipy.model.FullAlbum):
         print('\tflags: %s' % flags)
 
 
-def print_albums(albums):
-    print()
-    for album in albums:
-        print_album(album)
-        print()
-
-
-def print_artist(artist, use_play_count=True):
+@printer.register
+def print_artist(artist: spotipy.model.FullArtist,
+                 use_play_count=True):
     print('artist: {artist.name} ({artist.uri})'.format(artist=artist),
           '(popularity: {artist.popularity},'.format(artist=artist),
           'followers: {artist.followers.total})'.format(artist=artist))
@@ -106,26 +127,37 @@ def print_artist(artist, use_play_count=True):
         print('\tplayed: %s' % spotify_history.count_by_artist_name(artist.name))
 
 
+@printer.register
+def print_playlist(playlist: spotipy.model.playlist.Playlist):
+    print(f'playlist: {playlist.name} ({playlist.uri})')
+    print(f'\towner: {playlist.owner.display_name} ({playlist.owner.uri})')
+
+
+# OLD
+
+@deprecated.deprecated
+def print_tracks(tracks):
+    '''print tracks'''
+    print()
+    for track in tracks:
+        print_track(track)
+        print()
+
+
+@deprecated.deprecated
+def print_albums(albums):
+    print()
+    for album in albums:
+        print_album(album)
+        print()
+
+
+@deprecated.deprecated
 def print_artists(artists):
     print()
     for artist in artists:
         print_artist(artist)
         print()
-
-
-def print_track_audio_features(features):
-    print(f'track features: {features.uri}')
-    print(f'\tacousticness: {features.acousticness},',
-          f'danceability: {features.danceability},',
-          f'energy: {features.energy}')
-    print(f'\tinstrumentalness: {features.instrumentalness},',
-          f'liveness: {features.liveness},',
-          f'speechiness: {features.speechiness},',
-          f'valence: {features.valence}')
-    print(f'\tkey: {features.key}',
-          f'mode: {features.mode}',
-          f'tempo: {features.tempo},',
-          f'loudness: {features.loudness}')
 
 
 def _artists_to_string(artists):
