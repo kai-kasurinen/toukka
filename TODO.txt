@@ -162,3 +162,7 @@ oauth:
     https://oauthlib.readthedocs.io/en/v3.0.1/
     https://github.com/requests/requests-oauthlib
     https://requests-oauthlib.readthedocs.io/en/latest/oauth2_workflow.html
+
+
+logging:
+    https://pythonhosted.org/Autologging/index.html

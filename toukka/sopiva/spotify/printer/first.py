@@ -12,10 +12,9 @@ import deprecated
 import spotipy.model
 import spotipy.model.base
 import spotipy.model.playlist
+import spotipy.model.album
 
 from toukka.sopiva.spotify_history.util import get_spotify_history
-
-logger = logging.getLogger(__name__)
 
 
 @functools.singledispatch
@@ -78,6 +77,20 @@ def print_track_audio_features(features: spotipy.model.AudioFeatures):
           f'mode: {features.mode}',
           f'tempo: {features.tempo},',
           f'loudness: {features.loudness}')
+
+
+# TODO: compine Album and FullAlbum prints
+@printer.register
+def print_album_(album: spotipy.model.album.Album):
+    # NOTE: popularity is only on FullAlbum
+    print(f'album: {album.name} ({album.album_type.name}) ({album.uri})',
+          f'({album.release_date} {album.release_date_precision.name})',
+          f'(tracks: {album.total_tracks})')
+    print('\tartists: %s' % _artists_to_string(album.artists))
+    if album.available_markets:
+        print(f'\tmarkets: {len(album.available_markets)}')
+    if album.restrictions:
+        print(f'\trestrictions: {album.restrictions}')
 
 
 @printer.register
