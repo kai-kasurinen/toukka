@@ -14,6 +14,7 @@ import spotipy.model.base
 import spotipy.model.playlist
 import spotipy.model.album
 
+# FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
@@ -65,7 +66,7 @@ def print_track(track: spotipy.model.FullTrack,
 
 @printer.register
 def print_track_audio_features(features: spotipy.model.AudioFeatures):
-    print(f'track features: {features.uri}')
+    print(f'track features: ({features.uri})')
     print(f'\tacousticness: {features.acousticness},',
           f'danceability: {features.danceability},',
           f'energy: {features.energy}')
