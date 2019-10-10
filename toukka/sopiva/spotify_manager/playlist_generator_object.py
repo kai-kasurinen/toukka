@@ -60,7 +60,7 @@ class PlaylistGenerator:
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
-                print(f'{track.id}: already added')
+                logger.debug(f'{track.id}: already added')
 
             if self.is_track_ok_to_add(track):
                 printer.print_track(track)
@@ -144,19 +144,19 @@ class PlaylistGenerator:
 
     def is_track_ok_to_add(self, track):
         if self.is_track_isrc_already_added(track):
-            print(f'{track.id}: isrc already added')
+            logger.debug(f'{track.id}: isrc already added')
             return False
         elif self.is_track_already_played(track):
-            print(f'{track.id}: already played')
+            logger.debug(f'{track.id}: already played')
             return False
         elif self.is_track_isrc_already_played(track):
-            print(f'{track.id}: isrc already played')
+            logger.debug(f'{track.id}: isrc already played')
             return False
         elif not self.is_track_playeable(track):
-            print(f'{track.id}: not playeable')
+            logger.debug(f'{track.id}: not playeable')
             return False
         elif not self.is_track_on_market(track, self._market_country_code):
-            print(f'{track.id}: is not available on {self._market_country_code}')
+            logger.debug(f'{track.id}: is not available on {self._market_country_code}')
             return False
         else:
             return True
@@ -249,7 +249,7 @@ class PlaylistGenerator:
 
             # FIXME: move?
             if any(bad in album.name.lower() for bad in bad_word_in_album_names):
-                print('bad album name, skipping')
+                logger.debug('bad album name, skipping')
                 continue
             for track in self.iterate_album_tracks(album.id):
                 yield track

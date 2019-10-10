@@ -1,22 +1,34 @@
 #
 
 import pprint
+import argh
 
 from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify.printer import first as printer
+from toukka.sopiva.spotify.printer.second import printer
 
-def search(query: str):
+
+@argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
+def search(type: str,
+            query: str):
     spotify = get_spotify()
-    search = spotify.search(query=query, market=None)
-    # GRR
-    tracks_paging = search[0]
-    #tracks_paging.pprint()
-    # BUG: TypeError: __init__() got an unexpected keyword argument 'tracks'
-    for track in spotify.iterate_items_from_paging(tracks_paging):
-        printer.print_track(track)
+    search = spotify.search(query=query,
+                            types=[type],
+                            market=None,
+                            limit=50)
+    paging = search[0]
+    # NOTE: next() not compatible with search results
+    for count, item in enumerate(spotify.iterate_items_from_paging(paging), start=1):
+        print(f'{item.id}: {item.name} : {item.uri}')
+
+        # FIXME: break before next() so we do not hit bugs
+        if count >= 50:
+            break
 
 #
 
-COMMANDS = [search]
+
+COMMANDS = [
+    search
+]
 
 # END

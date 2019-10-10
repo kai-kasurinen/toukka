@@ -3,17 +3,17 @@
 import datetime
 import dataclasses
 import functools
+import pprint
 
 import spotipy.model
 
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
-
 @functools.singledispatch
 def printer(arg):
-    print(arg)
 
 
+@printer.register
 def print_track(track: spotipy.model.FullTrack,
                 use_play_count=True):
     '''print track'''
@@ -54,7 +54,7 @@ def print_tracks(tracks):
         print_track(track)
         print()
 
-
+@printer.
 def print_album(album: spotipy.model.FullAlbum):
     '''print album'''
     print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
