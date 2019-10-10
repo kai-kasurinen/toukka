@@ -23,7 +23,12 @@ def _get_playlist_uri_from_config():
 
 
 class PlaylistGenerator:
-    def __init__(self, playlist_uri=None):
+    '''generates playlist'''
+
+    def __init__(self,
+                 playlist_uri=None,
+                 **kwargs
+                 ):
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
 

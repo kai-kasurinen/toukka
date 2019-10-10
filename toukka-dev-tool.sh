@@ -22,7 +22,14 @@ case "$1" in
     mypy)
         mypy toukka
         ;;
-
+    dev-test)
+        python3 -X dev ./toukka-cmd --version
+        python3 -X dev ./toukka-experimental --version
+        python3 -X dev ./toukka-spotify --version
+        python3 -X dev ./toukka-spotify-manager --version
+        python3 -X dev ./toukka-spotify-watcher --version
+        ;;
+    # TODO: python3 -X importtime
     *)
         echo "Unknown command"
         exit 1
