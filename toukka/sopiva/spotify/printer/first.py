@@ -54,7 +54,7 @@ def print_track(track: spotipy.model.FullTrack,
     if track.restrictions:
         print(f'\trestrictions: {track.restrictions}')
 
-    flags = _get_flags(dataclasses.asdict(track), ['explicit', 'is_playable', 'is_local'])
+    flags = _get_flags(track.asdict(), ['explicit', 'is_playable', 'is_local'])
     if flags:
         print(f'\tflags: {flags}')
 
@@ -131,6 +131,10 @@ def print_artist(artist: spotipy.model.FullArtist,
 def print_playlist(playlist: spotipy.model.playlist.Playlist):
     print(f'playlist: {playlist.name} ({playlist.uri})')
     print(f'\towner: {playlist.owner.display_name} ({playlist.owner.uri})')
+
+    flags = _get_flags(playlist.asdict(), ['public', 'collaborative'])
+    if flags:
+        print(f'\tflags: {flags}')
 
 
 # OLD
