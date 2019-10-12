@@ -88,6 +88,9 @@ def print_album_(album: spotipy.model.album.Album):
           f'({album.release_date} {album.release_date_precision.name})',
           f'(tracks: {album.total_tracks})')
     print('\tartists: %s' % _artists_to_string(album.artists))
+    # FIXME: not on Album, but on SimpleAlbum
+    if album.album_group:
+        print(f'\talbum group: {album.album_group}')
     if album.available_markets:
         print(f'\tmarkets: {len(album.available_markets)}')
     if album.restrictions:

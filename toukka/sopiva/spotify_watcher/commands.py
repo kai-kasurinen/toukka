@@ -9,7 +9,7 @@ def watch_spotify():
 
 
 def watch_all_players():
-    manager = toukka.sopiva.spotify_watcher.playerctl_manager.PlayerCtlManager(watch_only=['spotify'])
+    manager = toukka.sopiva.spotify_watcher.playerctl_manager.PlayerCtlManager()
     mainloop = toukka.sopiva.spotify_watcher.playerctl_manager.MainLoop()
     mainloop.run()
 
