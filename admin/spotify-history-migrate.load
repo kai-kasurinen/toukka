@@ -1,0 +1,9 @@
+/* for pgloader */
+load database
+     from sqlite:///{{HOME}}/.local/share/spotify-saver/spotify-saver.db
+     into postgresql:///toukka
+     with data only, truncate
+
+ALTER TABLE NAMES MATCHING 'history' RENAME TO 'spotify_mpris_history'
+
+;
