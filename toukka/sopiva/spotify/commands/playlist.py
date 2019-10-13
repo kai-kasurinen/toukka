@@ -98,13 +98,14 @@ def playlist_info(uri: str,
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
     playlist = spotify.playlist(playlist_id=uri_id, market=None)
-    playlist.pprint(depth=2)
+    printer.printer(playlist)
 
     if print_tracks:
         playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
+            printer.printer(playlist_track)
             track = playlist_track.track
-            printer.print_track(track)
+            printer.printer(track)
 
 
 def playlist_tracks(uri: str):

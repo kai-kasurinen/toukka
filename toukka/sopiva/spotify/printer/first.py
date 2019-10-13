@@ -156,6 +156,21 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
         print(f'\tflags: {flags}')
 
 
+@printer.register
+def print_playlist(playlisttrack: spotipy.model.playlist.PlaylistTrack):
+    plt = playlisttrack
+    # TODOE: added_at and added_by may be None
+    print(f'playlist track:',
+          f'added at {plt.added_at} by {plt.added_by.display_name or plt.added_by.id} ({plt.added_by.uri})')
+    if plt.primary_color:
+        print(f'\tprimary color: {plt.primary_color}')
+    # TODO: video_thumbnail?
+    flags = _get_flags(plt.asdict(), ['is_local'])
+    if flags:
+        print(f'\tflags: {flags}')
+
+
+
 # OLD
 
 @deprecated.deprecated

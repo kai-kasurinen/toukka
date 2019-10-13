@@ -13,7 +13,7 @@ from .database.first import SpotifyDB, SpotifyTrackISRC
 from .util import get_database_uri_from_config
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 def update():
