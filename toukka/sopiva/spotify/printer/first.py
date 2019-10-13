@@ -63,7 +63,7 @@ def print_track(track: spotipy.model.FullTrack,
         played_count_track = spotify_history.count_by_track_id(track.uri)
         isrc = track.external_ids.get('isrc')
         played_count_isrc = spotify_history.count_by_track_isrc(isrc)
-        print(f'\tplayed: {played_count_track} (isrc: {played_count_isrc})')
+        print(f'\tplayed: {played_count_track} track, {played_count_isrc} isrc')
 
 
 @printer.register
