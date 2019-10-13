@@ -5,7 +5,6 @@ import spotipy.convert
 
 import toukka.sopiva.spotify.util
 import toukka.sopiva.spotify_history.util
-import toukka.sopiva.spotify_manager.database.track_to_isrc
 
 
 def playlist_cleaner(uri: str,
@@ -40,8 +39,6 @@ def playlist_cleaner(uri: str,
     # prepare for main loop
     tracks_to_remove = set()
     isrcs = set()
-    # FIXME: SLOW
-    isrcs_played = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
 
     # main loop for doing things
     for playlist_track in playlist_tracks:
@@ -68,8 +65,9 @@ def playlist_cleaner(uri: str,
                 tracks_to_remove.add(track.id)
 
         if filter_played_isrcs and isrc is not None:
-            if isrc in isrcs_played:
-                print(f'{track.uri}: isrc {isrc} is already played')
+            played_count_isrc = spotify_history.count_by_track_isrc(isrc)
+            if played_count_isrc > 0:
+                print(f'{track.uri}: {isrc} played {played_count_isrc} times')
                 tracks_to_remove.add(track.id)
 
     print(f'{playlist.tracks.total} total tracks')

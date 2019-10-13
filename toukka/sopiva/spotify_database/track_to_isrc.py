@@ -10,19 +10,16 @@ import toukka.config
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_mpris_history.database.current import SpotifyMprisHistory
 from .database.first import SpotifyDB, SpotifyTrackISRC
+from .util import get_database_uri_from_config
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def _get_database_uri_from_config():
-    return toukka.config.lazy_config['spotify_database']['database_uri'].get()
-
-
 def update():
     spotify = get_spotify()
 
-    database_uri = _get_database_uri_from_config()
+    database_uri = get_database_uri_from_config()
     logger.debug(database_uri)
     db = SpotifyDB(database_uri)
     db._create()

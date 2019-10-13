@@ -1,10 +1,10 @@
 #
 
-import toukka.sopiva.spotify_history.first
+import toukka.sopiva.spotify_history.current
 
 
 def get_spotify_history():
-    return toukka.sopiva.spotify_history.first.SpotifyHistory()
+    return toukka.sopiva.spotify_history.current.SpotifyHistory()
 
 
 # END

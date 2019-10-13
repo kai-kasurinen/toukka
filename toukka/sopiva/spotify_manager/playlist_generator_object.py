@@ -38,9 +38,6 @@ class PlaylistGenerator:
 
         # init empty
         self._isrc_seen = set()
-        # FIXME: SLOW
-        self._isrcs_played = toukka.sopiva.spotify_manager.database.track_to_isrc.get_listened_isrcs()
-        # self._isrcs_played = set()
 
         # get playlist
         if playlist_uri is None:
@@ -171,7 +168,7 @@ class PlaylistGenerator:
         isrc = track.external_ids.get('isrc')
         if isrc is None:
             return False
-        if isrc in self._isrcs_played:
+        if self.spotify_history.count_by_track_isrc(isrc) > 0:
             return True
         else:
             return False
