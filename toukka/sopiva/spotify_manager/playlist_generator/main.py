@@ -132,7 +132,7 @@ class PlaylistGenerator:
         s = self.iterate_search(query_type=query_type, query=query)
         e = self.expander(s, **expander_params)
         self.add_source(e)
-        self.playlist_description = f'source: search {query_type} {query}'
+        self.playlist_description = f'source: search {query_type} "{query}"'
         self.generate()
 
     def generate_playlist_from_recommendations(self,
