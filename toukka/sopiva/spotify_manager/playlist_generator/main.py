@@ -136,27 +136,38 @@ class PlaylistGenerator:
         self.generate()
 
     def generate_playlist_from_recommendations(self,
-                                               seed_artist_ids: list = None,
-                                               seed_track_ids: list = None,
+                                               seed_artist_uris: list = None,
+                                               seed_track_uris: list = None,
                                                seed_genres: list = None,
                                                call_times: int = 1,
                                                expand_albums: bool = False,
                                                expand_artists: bool = False,
-                                               **attributes):
+                                               **kwargs):
         '''generate playlist from recommendations'''
 
-        def update_description():
-            self.playlist_description = f'source: recommendations'
+        self.dry_run = kwargs.get('dry_run', True)
 
-        update_description()
-        source = self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
-                                              seed_track_ids=seed_track_ids,
-                                              seed_genres=seed_genres,
-                                              call_times=call_times,
-                                              expand_albums=expand_albums,
-                                              expand_artists=expand_artists,
-                                              **attributes)
-        self.add_source(source)
+        seed_artist_ids = list()
+        if seed_artist_uris is not None:
+            for artist in self.expand_uris(seed_artist_uris):
+                seed_artist_ids.append(artist.id)
+        seed_track_ids = list()
+        if seed_track_uris is not None:
+            for artist in self.expand_uris(seed_track_uris):
+                seed_artist_ids.append(artist.id)
+
+        # TODO: add support attributes
+        s = self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
+                                         seed_track_ids=seed_track_ids,
+                                         seed_genres=seed_genres,
+                                         call_times=call_times)
+        expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
+        e = self.expander(s, **expander_params)
+        self.add_source(e)
+        self.playlist_description = (f'source: recommendations',
+                                     f'{seed_artist_uris}',
+                                     f'{seed_track_uris}',
+                                     f'{seed_genres}')
         self.generate()
 
     def is_track_ok_to_add(self, track):
@@ -415,7 +426,6 @@ class PlaylistGenerator:
         for uri in uris:
             uri_type, uri_id = spotipy.convert.from_uri(uri)
             logger.debug('%s: %s', uri_type, uri_id)
-
             if uri_type == 'artist':
                 items.append(self.spotify.artist(uri_id))
             elif uri_type == 'album':
