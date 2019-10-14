@@ -38,6 +38,7 @@ class PlaylistGenerator:
 
         # init empty
         self._isrc_seen = set()
+        self._sources = list()
 
         # get playlist
         if playlist_uri is None:
@@ -49,6 +50,14 @@ class PlaylistGenerator:
         # defaults
         self.playlist_name = '< g e n e r a t e d >'
         self.playlist_description = None
+
+    def add_source(self, source):
+        self._sources.append(source)
+
+    def generate(self):
+        # FIXME: remove argument
+        self.looper(itertools.chain(*self._sources))
+        # FIXME: continue
 
     def looper(self, tracks):
         track_ids_to_playlist = list()
@@ -91,7 +100,9 @@ class PlaylistGenerator:
             self.playlist_description = f'source: {artist.name} ({artist.uri})'
 
         update_description()
-        self.looper(self.iterate_artist_all_tracks(artist_id))
+        source = self.iterate_artist_all_tracks(artist_id)
+        self.add_source(source)
+        self.generate()
 
     def generate_playlist_from_related_artists(self, artist_id):
         '''generate playlist from artist related artists'''
@@ -101,7 +112,9 @@ class PlaylistGenerator:
             self.playlist_description = f'source: {artist.name} ({artist.uri}) related artists'
 
         update_description()
-        self.looper(self.iterate_related_artists_all_tracks(artist_id))
+        source = self.iterate_related_artists_all_tracks(artist_id)
+        self.add_source(source)
+        self.generate()
 
     def generate_playlist_from_playlist_id(self, playlist_id,
                                            expand_albums: bool = False,
@@ -113,9 +126,11 @@ class PlaylistGenerator:
             self.playlist_description = f'source: {playlist.name} ({playlist.uri})'
 
         update_description()
-        self.looper(self.iterate_playlist_all_tracks(playlist_id,
-                                                     expand_albums=expand_albums,
-                                                     expand_artists=expand_artists))
+        source = self.iterate_playlist_all_tracks(playlist_id,
+                                                  expand_albums=expand_albums,
+                                                  expand_artists=expand_artists)
+        self.add_source(source)
+        self.generate()
 
     def generate_playlist_from_recommendations(self,
                                                seed_artist_ids: list = None,
@@ -131,13 +146,15 @@ class PlaylistGenerator:
             self.playlist_description = f'source: recommendations'
 
         update_description()
-        self.looper(self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
-                                                 seed_track_ids=seed_track_ids,
-                                                 seed_genres=seed_genres,
-                                                 call_times=call_times,
-                                                 expand_albums=expand_albums,
-                                                 expand_artists=expand_artists,
-                                                 **attributes))
+        source = self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
+                                              seed_track_ids=seed_track_ids,
+                                              seed_genres=seed_genres,
+                                              call_times=call_times,
+                                              expand_albums=expand_albums,
+                                              expand_artists=expand_artists,
+                                              **attributes)
+        self.add_source(source)
+        self.generate()
 
     def is_track_ok_to_add(self, track):
         if self.is_track_isrc_already_added(track):

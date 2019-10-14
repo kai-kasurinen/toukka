@@ -12,7 +12,7 @@ case "$1" in
         ;;
 
     pylint)
-        pylint3 toukka
+        pylint toukka
         ;;
 
     flake8)

@@ -7,7 +7,7 @@ import pprint
 import argh
 import spotipy.convert
 
-from toukka.sopiva.spotify_manager.playlist_generator_object import PlaylistGenerator
+from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
 
 
 def generate_playlist_from_artist(artist_uri):
