@@ -341,7 +341,7 @@ class PlaylistGenerator:
         for playlist_track in playlist_tracks:
             yield playlist_track.track
 
-    # FIXME: move inside expander
+    # FIXME: not used?
     def track_expand(self, track,
                      expand_album: bool = False,
                      expand_artist: bool = False):
@@ -388,11 +388,20 @@ class PlaylistGenerator:
             if expand_generator_to_items:
                 for item_ in item:
                     yield from self.expander(item_, **expander_params)
+
         # track
         elif isinstance(item, spotipy.model.track.FullTrack):
-            yield from self.track_expand(item,
-                                         expand_album=expand_track_to_album,
-                                         expand_artist=expand_track_to_artist)
+            # FIXME: if elif else? order?
+            if expand_track_to_album:
+                # FIXME: yield album
+                yield from self.iterate_album_tracks(item.album.id)
+            elif expand_track_to_artist:
+                # FIXME: yield artist
+                for artist in item.artists:
+                    yield from self.iterate_artist_all_tracks(artist.id)
+            else:
+                yield item
+
         # artist
         elif isinstance(item, spotipy.model.artist.Artist):
             # FIXME: if elif else? order?
@@ -407,16 +416,19 @@ class PlaylistGenerator:
                 # FIXME: move to method? and add support different countries
                 yield from self.spotify.artist_top_tracks(item.id,
                                                           country=self._market_country_code)
+
         # album
         elif isinstance(item, spotipy.model.album.Album):
             if expand_album_to_tracks:
                 logger.debug('expand album to tracks')
                 yield from self.iterate_album_tracks(item.id)
+
         # playlist
         elif isinstance(item, spotipy.model.playlist.Playlist):
             if expand_playlist_to_tracks:
                 yield from self.expander(self.iterate_playlist_all_tracks(item.id),
                                          **expander_params)
+        # ? raise exception
         else:
             logger.warning('not yet supported: %s', type(item))
             yield item
