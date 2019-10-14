@@ -355,7 +355,7 @@ class PlaylistGenerator:
         else:
             yield track
 
-    # FIXME: move inside expander
+    # FIXME: not used?
     def artist_expand(self, artist,
                       expand_albums: bool = False,
                       expand_top_tracks: bool = False):
@@ -382,27 +382,37 @@ class PlaylistGenerator:
                  ):
         logger.debug('%s: %s', type(item), item)
         expander_params = {key: value for key, value in locals().items() if key.startswith('expand')}
+
+        # generators
         if isinstance(item, types.GeneratorType):
             if expand_generator_to_items:
                 for item_ in item:
                     yield from self.expander(item_, **expander_params)
+        # track
         elif isinstance(item, spotipy.model.track.FullTrack):
             yield from self.track_expand(item,
                                          expand_album=expand_track_to_album,
                                          expand_artist=expand_track_to_artist)
+        # artist
         elif isinstance(item, spotipy.model.artist.Artist):
+            # FIXME: if elif else? order?
             if expand_artist_to_related_artists:
                 expander_params.pop('expand_artist_to_related_artists')
                 yield from self.expander(self.iterate_related_artists(item.id),
                                          **expander_params)
-            else:
-                yield from self.artist_expand(item,
-                                              expand_albums=expand_artist_to_albums,
-                                              expand_top_tracks=expand_artist_to_top_tracks)
+            if expand_artist_to_albums:
+                # FIXME: yield albumns?
+                yield from self.iterate_artist_all_tracks(item.id)
+            if expand_artist_to_top_tracks:
+                # FIXME: move to method? and add support different countries
+                yield from self.spotify.artist_top_tracks(item.id,
+                                                          country=self._market_country_code)
+        # album
         elif isinstance(item, spotipy.model.album.Album):
             if expand_album_to_tracks:
                 logger.debug('expand album to tracks')
                 yield from self.iterate_album_tracks(item.id)
+        # playlist
         elif isinstance(item, spotipy.model.playlist.Playlist):
             if expand_playlist_to_tracks:
                 yield from self.expander(self.iterate_playlist_all_tracks(item.id),
