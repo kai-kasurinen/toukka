@@ -267,7 +267,7 @@ class PlaylistGenerator:
         for i in range(0, len(l), n):
             yield l[i:i + n]
 
-    # track iterators
+    # generators
 
     def iterate_artist_all_tracks(self, artist_id: str):
         '''iterate artist all tracks'''
@@ -281,7 +281,6 @@ class PlaylistGenerator:
             market=self._market)
 
         for album in self.spotify.items_from_paging(albums_paging):
-
             yield from self.iterate_album_tracks(album.id)
 
     def iterate_album_tracks(self, album_id):
@@ -313,6 +312,7 @@ class PlaylistGenerator:
                 logger.debug(seed)
             yield from recommendations.tracks
 
+    # FIXME: not used?
     def iterate_related_artists_all_tracks(self, artist_id):
         for artist in self.spotify.artist_related_artists(artist_id):
             yield from self.iterate_artist_all_tracks(artist.id)
@@ -335,16 +335,13 @@ class PlaylistGenerator:
                 break
 
     def iterate_playlist_all_tracks(self,
-                                    playlist_id: str,
-                                    expand_albums: bool = False,
-                                    expand_artists: bool = False):
-        logger.debug(locals())
+                                    playlist_id: str):
         playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
         playlist_tracks = self.spotify.iterate_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
-            track = playlist_track.track
-            yield from self.track_expand(track, expand_album=expand_albums, expand_artist=expand_artists)
+            yield playlist_track.track
 
+    # FIXME: move inside expander
     def track_expand(self, track,
                      expand_album: bool = False,
                      expand_artist: bool = False):
@@ -358,6 +355,7 @@ class PlaylistGenerator:
         else:
             yield track
 
+    # FIXME: move inside expander
     def artist_expand(self, artist,
                       expand_albums: bool = False,
                       expand_top_tracks: bool = False):
@@ -413,6 +411,7 @@ class PlaylistGenerator:
             logger.warning('not yet supported: %s', type(item))
             yield item
 
+    # FIXME: better name?
     def expand_uris(self, uris: list):
         items = list()
         for uri in uris:
