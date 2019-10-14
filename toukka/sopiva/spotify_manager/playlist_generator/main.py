@@ -419,13 +419,13 @@ class PlaylistGenerator:
             uri_type, uri_id = spotipy.convert.from_uri(uri)
             logger.debug('%s: %s', uri_type, uri_id)
             if uri_type == 'artist':
-                items.append(self.spotify.artist(uri_id))
+                items.append(self.spotify.artist(uri_id, market=self._market))
             elif uri_type == 'album':
-                items.append(self.spotify.album(uri_id))
+                items.append(self.spotify.album(uri_id, market=self._market))
             elif uri_type == 'track':
-                items.append(self.spotify.track(uri_id))
+                items.append(self.spotify.track(uri_id, market=self._market))
             elif uri_type == 'playlist':
-                items.append(self.spotify.playlist(uri_id))
+                items.append(self.spotify.playlist(uri_id, market=self._market))
             else:
                 logger.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
         return items
