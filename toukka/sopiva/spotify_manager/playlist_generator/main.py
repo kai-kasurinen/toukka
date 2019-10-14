@@ -370,7 +370,6 @@ class PlaylistGenerator:
         else:
             return
 
-    # FIXME: infinite loop somewhere when album expanded
     def expander(self, item):
         if isinstance(item, types.GeneratorType):
             for item_ in item:
