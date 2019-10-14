@@ -19,18 +19,16 @@ class SpotifyExtended(spotipy.Spotify):
 
     def iterate_pages_from_paging(self,
                                   paging: spotipy.model.paging.OffsetPaging):
-        '''iteraple pages from Paging'''
+        '''pages from Paging generator'''
         yield paging
         while paging.next:
-            paging = self.next(paging)
-            yield paging
+            yield self.next(paging)
 
     def iterate_items_from_paging(self,
                                   paging: spotipy.model.paging.OffsetPaging):
-        '''iteraple items from paging'''
+        '''all items from Paging generator'''
         for page in self.iterate_pages_from_paging(paging):
-            for item in page.items:
-                yield item
+            yield from page.items
 
     @deprecated.deprecated
     def pager(self,

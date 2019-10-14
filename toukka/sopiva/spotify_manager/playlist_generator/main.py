@@ -56,7 +56,7 @@ class PlaylistGenerator:
 
     def generate(self):
         # FIXME: remove argument
-        self.looper(itertools.chain(*self._sources))
+        self.looper(itertools.chain.from_iterable(self._sources))
         # FIXME: continue
 
     def looper(self, tracks):
