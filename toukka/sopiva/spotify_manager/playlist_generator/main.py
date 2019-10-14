@@ -296,13 +296,9 @@ class PlaylistGenerator:
                                 seed_track_ids: list = None,
                                 seed_genres: list = None,
                                 call_times: int = 1,
-                                expand_albums: bool = False,
-                                expand_artists: bool = False,
                                 **attributes):
 
-        # grr
-        logger.debug(locals())
-        # FIXME: hack
+        # FIXME: call_times is hack
         for n in range(call_times):
             # BUG: attributes not used on spotipy
             recommendations = self.spotify.recommendations(
@@ -315,11 +311,7 @@ class PlaylistGenerator:
 
             for seed in recommendations.seeds:
                 logger.debug(seed)
-
-            for track in recommendations.tracks:
-                yield from self.track_expand(track,
-                                             expand_album=expand_albums,
-                                             expand_artist=expand_artists)
+            yield from recommendations.tracks
 
     def iterate_related_artists_all_tracks(self, artist_id):
         for artist in self.spotify.artist_related_artists(artist_id):
