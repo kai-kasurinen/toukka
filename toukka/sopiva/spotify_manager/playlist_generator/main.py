@@ -329,10 +329,10 @@ class PlaylistGenerator:
         for count, item in enumerate(self.spotify.items_from_paging(paging), start=1):
             # NOTE: item can me track, album, artist, playlist ...
             yield item
-
             # FIXME: break before next() so we do not hit bugs
-            if count >= 50:
+            if count >= 40:
                 break
+
 
     def iterate_playlist_all_tracks(self,
                                     playlist_id: str,
@@ -372,17 +372,12 @@ class PlaylistGenerator:
         else:
             return
 
-    def expander(self, generator):
-        for item in generator:
-            yield from self.expander_(item)
-
     # FIXME: infinite loop somewhere when album expanded
-    def expander_(self, item):
-        logger.debug('%s: %s', type(item), item)
-        # if isinstance(item, types.GeneratorType):
-        #    for item_ in item:
-        #        yield from self.expander(item_)
-        if isinstance(item, spotipy.model.track.FullTrack):
+    def expander(self, item):
+        if isinstance(item, types.GeneratorType):
+            for item_ in item:
+                yield from self.expander(item_)
+        elif isinstance(item, spotipy.model.track.FullTrack):
             yield from self.track_expand(item)
         elif isinstance(item, spotipy.model.artist.Artist):
             yield from self.artist_expand(item, expand_top_tracks=True)
