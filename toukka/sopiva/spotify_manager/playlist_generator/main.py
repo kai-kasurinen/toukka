@@ -40,6 +40,9 @@ class PlaylistGenerator:
         self._market = None
         self._market_country_code = 'FI'
 
+        # FIXME: from config?
+        self.bad_words_in_album_names = ['christmas']
+
         # init empty
         self._isrc_seen = set()
         self._sources = list()
@@ -109,44 +112,27 @@ class PlaylistGenerator:
             logger.info('dry_run is True, not committing')
         logger.info('done')
 
-    def generate_playlist_from_artist_id(self, artist_id):
-        '''generate playlist from artist'''
-
-        def update_description():
-            artist = self.spotify.artist(artist_id)
-            self.playlist_description = f'source: {artist.name} ({artist.uri})'
-
-        update_description()
-        source = self.iterate_artist_all_tracks(artist_id)
-        self.add_source(source)
+    def generate_playlist_from_uris(self,
+                                    uris: list,
+                                    **kwargs):
+        expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
+        self.dry_run = kwargs.get('dry_run', True)
+        items = self.expand_uris(uris)
+        for item in items:
+            self.add_source(self.expander(item, **expander_params))
+        self.playlist_description = f'source: {uris}'
         self.generate()
 
-    def generate_playlist_from_related_artists(self, artist_id):
-        '''generate playlist from artist related artists'''
-
-        def update_description():
-            artist = self.spotify.artist(artist_id)
-            self.playlist_description = f'source: {artist.name} ({artist.uri}) related artists'
-
-        update_description()
-        source = self.iterate_related_artists_all_tracks(artist_id)
-        self.add_source(source)
-        self.generate()
-
-    def generate_playlist_from_playlist_id(self, playlist_id,
-                                           expand_albums: bool = False,
-                                           expand_artists: bool = False):
-        '''generate playlist from other playlist'''
-
-        def update_description():
-            playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
-            self.playlist_description = f'source: {playlist.name} ({playlist.uri})'
-
-        update_description()
-        source = self.iterate_playlist_all_tracks(playlist_id,
-                                                  expand_albums=expand_albums,
-                                                  expand_artists=expand_artists)
-        self.add_source(source)
+    def generate_playlist_from_search(self,
+                                      query_type: str,
+                                      query: str,
+                                      **kwargs):
+        expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
+        self.dry_run = kwargs.get('dry_run', True)
+        s = self.iterate_search(query_type=query_type, query=query)
+        e = self.expander(s, **expander_params)
+        self.add_source(e)
+        self.playlist_description = f'source: search {query_type} {query}'
         self.generate()
 
     def generate_playlist_from_recommendations(self,
@@ -188,6 +174,9 @@ class PlaylistGenerator:
             return False
         elif not self.is_track_on_market(track, self._market_country_code):
             logger.debug(f'{track.id}: is not available on {self._market_country_code}')
+            return False
+        elif not self.is_track_album_name_good(track):
+            logger.debug(f'{track.id}: album name "{track.album.name}" not good')
             return False
         else:
             return True
@@ -234,6 +223,12 @@ class PlaylistGenerator:
         else:
             return False
 
+    def is_track_album_name_good(self, track):
+        if any(bad in track.album.name.lower() for bad in self.bad_words_in_album_names):
+            return False
+        else:
+            return True
+
     # playlist modify methods
 
     def playlist_clear(self):
@@ -268,7 +263,6 @@ class PlaylistGenerator:
         # FIXME: move
         # NOTE: 'album', 'single', 'appears_on', 'compilation'
         include_album_groups = ['album', 'sinlge', 'compilation']
-        bad_word_in_album_names = ['christmas']
 
         albums_paging = self.spotify.artist_albums(
             artist_id,
@@ -277,10 +271,6 @@ class PlaylistGenerator:
 
         for album in self.spotify.items_from_paging(albums_paging):
 
-            # FIXME: move?
-            if any(bad in album.name.lower() for bad in bad_word_in_album_names):
-                logger.debug('bad album name, skipping')
-                continue
             yield from self.iterate_album_tracks(album.id)
 
     def iterate_album_tracks(self, album_id):
@@ -414,9 +404,28 @@ class PlaylistGenerator:
                 yield from self.iterate_album_tracks(item.id)
         elif isinstance(item, spotipy.model.playlist.Playlist):
             if expand_playlist_to_tracks:
-                yield from self.iterate_playlist_all_tracks(item.id)
+                yield from self.expander(self.iterate_playlist_all_tracks(item.id),
+                                         **expander_params)
         else:
             logger.warning('not yet supported: %s', type(item))
             yield item
+
+    def expand_uris(self, uris: list):
+        items = list()
+        for uri in uris:
+            uri_type, uri_id = spotipy.convert.from_uri(uri)
+            logger.debug('%s: %s', uri_type, uri_id)
+
+            if uri_type == 'artist':
+                items.append(self.spotify.artist(uri_id))
+            elif uri_type == 'album':
+                items.append(self.spotify.album(uri_id))
+            elif uri_type == 'track':
+                items.append(self.spotify.track(uri_id))
+            elif uri_type == 'playlist':
+                items.append(self.spotify.playlist(uri_id))
+            else:
+                logger.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
+        return items
 
 # END
