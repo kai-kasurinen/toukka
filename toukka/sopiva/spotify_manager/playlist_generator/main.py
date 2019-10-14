@@ -419,7 +419,7 @@ class PlaylistGenerator:
             uri_type, uri_id = spotipy.convert.from_uri(uri)
             logger.debug('%s: %s', uri_type, uri_id)
             if uri_type == 'artist':
-                items.append(self.spotify.artist(uri_id, market=self._market))
+                items.append(self.spotify.artist(uri_id))
             elif uri_type == 'album':
                 items.append(self.spotify.album(uri_id, market=self._market))
             elif uri_type == 'track':
