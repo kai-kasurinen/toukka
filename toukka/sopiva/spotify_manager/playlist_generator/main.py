@@ -67,8 +67,7 @@ class PlaylistGenerator:
 
         track_ids_to_playlist = list()
         logger.debug('sources: %s', self._sources)
-        #sources = itertools.chain.from_iterable(self._sources)
-        sources = self._sources[0]
+        sources = itertools.chain.from_iterable(self._sources)
 
         for counter, track in enumerate(sources):
             logger.debug('counter: %s', counter)
@@ -248,7 +247,7 @@ class PlaylistGenerator:
             description=self.playlist_description)
 
     # util functions
-    def list_to_chunks(self, l, n):
+    def list_to_chunks(self, l: list, n: int):
         """Yield successive n-sized chunks from l."""
         for i in range(0, len(l), n):
             yield l[i:i + n]
@@ -267,8 +266,7 @@ class PlaylistGenerator:
             include_groups=include_album_groups,
             market=self._market)
 
-        for album in self.spotify.iterate_items_from_paging(albums_paging):
-            logger.debug(album.name)
+        for album in self.spotify.items_from_paging(albums_paging):
 
             # FIXME: move?
             if any(bad in album.name.lower() for bad in bad_word_in_album_names):
@@ -280,7 +278,7 @@ class PlaylistGenerator:
         paging = self.spotify.album_tracks(album_id,
                                            market=self._market,
                                            limit=50)
-        for simple_track in self.spotify.iterate_items_from_paging(paging):
+        for simple_track in self.spotify.items_from_paging(paging):
             yield self.spotify.track(simple_track.id, market=self._market)
 
     def iterate_recommendations(self,
@@ -328,9 +326,8 @@ class PlaylistGenerator:
             # NOTE: item can me track, album, artist, playlist ...
             yield item
             # FIXME: break before next() so we do not hit bugs
-            if count >= 40:
+            if count >= 50:
                 break
-
 
     def iterate_playlist_all_tracks(self,
                                     playlist_id: str,
