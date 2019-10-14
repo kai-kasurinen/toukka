@@ -60,7 +60,6 @@ class PlaylistGenerator:
         self._sources.append(source)
 
     def generate(self):
-        # FIXME: remove argument
         self.looper()
         # FIXME: continue
 
@@ -68,7 +67,8 @@ class PlaylistGenerator:
 
         track_ids_to_playlist = list()
         logger.debug('sources: %s', self._sources)
-        sources = itertools.chain.from_iterable(self._sources.copy())
+        #sources = itertools.chain.from_iterable(self._sources)
+        sources = self._sources[0]
 
         for counter, track in enumerate(sources):
             logger.debug('counter: %s', counter)
@@ -274,16 +274,14 @@ class PlaylistGenerator:
             if any(bad in album.name.lower() for bad in bad_word_in_album_names):
                 logger.debug('bad album name, skipping')
                 continue
-            for track in self.iterate_album_tracks(album.id):
-                yield track
+            yield from self.iterate_album_tracks(album.id)
 
     def iterate_album_tracks(self, album_id):
         paging = self.spotify.album_tracks(album_id,
                                            market=self._market,
                                            limit=50)
-        for simple_track in self.spotify.items_from_paging(paging):
-            track = self.spotify.track(simple_track.id, market=self._market)
-            yield track
+        for simple_track in self.spotify.iterate_items_from_paging(paging):
+            yield self.spotify.track(simple_track.id, market=self._market)
 
     def iterate_recommendations(self,
                                 seed_artist_ids: list = None,
