@@ -75,7 +75,7 @@ def generate_playlist_from_playlist(playlist_uri,
 @argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
 def generate_playlist_from_search(type: str, query: str):
     generator = PlaylistGenerator()
-    generator.add_source(generator.iterate_search(query_type=type, query=query))
+    generator.add_source(generator.expander(generator.iterate_search(query_type=type, query=query)))
     generator.generate()
 
 

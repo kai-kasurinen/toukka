@@ -4,10 +4,13 @@
 import logging
 import pprint
 import itertools
+import types
 
 import spotipy.convert
 import spotipy.model.track
 import spotipy.model.artist
+import spotipy.model.playlist
+import spotipy.model.album
 
 import toukka.config
 
@@ -63,23 +66,12 @@ class PlaylistGenerator:
 
     def looper(self):
 
-        # NOTE: this is not good idea, remove?
-        def inner_looper(sources):
-            # NOTE: item can be track, album, artist, playlist ...
-            for item in itertools.chain.from_iterable(sources):
-                if isinstance(item, spotipy.model.track.FullTrack):
-                    # FIXME: expand here?
-                    yield item
-                elif isinstance(item, spotipy.model.artist.Artist):
-                    # FIXME: options?
-                    yield from self.artist_expand(item, expand_top_tracks=True)
-                else:
-                    logger.warning('%s not supported yet', type(item))
-
         track_ids_to_playlist = list()
-        sources = self._sources.copy()
+        logger.debug('sources: %s', self._sources)
+        sources = itertools.chain.from_iterable(self._sources.copy())
 
-        for counter, track in enumerate(inner_looper(sources)):
+        for counter, track in enumerate(sources):
+            logger.debug('counter: %s', counter)
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
@@ -94,7 +86,7 @@ class PlaylistGenerator:
                 break
 
             # safety
-            if counter > 10000:
+            if counter > 2000:
                 print('we have tried too many tracks, breaking loop')
                 break
 
@@ -286,12 +278,10 @@ class PlaylistGenerator:
                 yield track
 
     def iterate_album_tracks(self, album_id):
-        album_tracks_paging = self.spotify.album_tracks(album_id,
-                                                        market=self._market,
-                                                        limit=50)
-        album_tracks = self.spotify.iterate_items_from_paging(album_tracks_paging)
-
-        for simple_track in album_tracks:
+        paging = self.spotify.album_tracks(album_id,
+                                           market=self._market,
+                                           limit=50)
+        for simple_track in self.spotify.items_from_paging(paging):
             track = self.spotify.track(simple_track.id, market=self._market)
             yield track
 
@@ -381,5 +371,27 @@ class PlaylistGenerator:
                                                       country=self._market_country_code)
         else:
             return
+
+    def expander(self, generator):
+        for item in generator:
+            yield from self.expander_(item)
+
+    # FIXME: infinite loop somewhere when album expanded
+    def expander_(self, item):
+        logger.debug('%s: %s', type(item), item)
+        # if isinstance(item, types.GeneratorType):
+        #    for item_ in item:
+        #        yield from self.expander(item_)
+        if isinstance(item, spotipy.model.track.FullTrack):
+            yield from self.track_expand(item)
+        elif isinstance(item, spotipy.model.artist.Artist):
+            yield from self.artist_expand(item, expand_top_tracks=True)
+        elif isinstance(item, spotipy.model.album.Album):
+            yield from self.iterate_album_tracks(item.id)
+        elif isinstance(item, spotipy.model.playlist.Playlist):
+            yield from self.iterate_playlist_all_tracks(item.id)
+        else:
+            logger.warning('not yet supported: %s', type(item))
+            yield item
 
 # END
