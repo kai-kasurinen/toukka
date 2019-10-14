@@ -72,13 +72,21 @@ def generate_playlist_from_playlist(playlist_uri,
                                                  expand_artists=expand_artists)
 
 
+@argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
+def generate_playlist_from_search(type: str, query: str):
+    generator = PlaylistGenerator()
+    generator.add_source(generator.iterate_search(query_type=type, query=query))
+    generator.generate()
+
+
 #
 
 COMMANDS = [
     generate_playlist_from_artist,
     generate_playlist_from_playlist,
     generate_playlist_from_recommendation,
-    generate_playlist_from_related_artists
+    generate_playlist_from_related_artists,
+    generate_playlist_from_search
 ]
 
 

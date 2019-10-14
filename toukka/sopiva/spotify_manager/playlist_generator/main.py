@@ -7,6 +7,7 @@ import itertools
 
 import spotipy.convert
 import spotipy.model.track
+import spotipy.model.artist
 
 import toukka.config
 
@@ -32,7 +33,7 @@ class PlaylistGenerator:
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
 
-        # NOTE: BUG: with market='from_token' fails on unplayeble track -> TypeError
+        # NOTE: bug with market='from_token' fails on unplayeble track -> TypeError
         self._market = None
         self._market_country_code = 'FI'
 
@@ -49,20 +50,36 @@ class PlaylistGenerator:
 
         # defaults
         self.playlist_name = '< g e n e r a t e d >'
-        self.playlist_description = None
+        # NOTE: not None -> get updated. '' -> fails
+        self.playlist_description = '<empty>'
 
     def add_source(self, source):
         self._sources.append(source)
 
     def generate(self):
         # FIXME: remove argument
-        self.looper(itertools.chain.from_iterable(self._sources))
+        self.looper()
         # FIXME: continue
 
-    def looper(self, tracks):
-        track_ids_to_playlist = list()
+    def looper(self):
 
-        for counter, track in enumerate(tracks):
+        # NOTE: this is not good idea, remove?
+        def inner_looper(sources):
+            # NOTE: item can be track, album, artist, playlist ...
+            for item in itertools.chain.from_iterable(sources):
+                if isinstance(item, spotipy.model.track.FullTrack):
+                    # FIXME: expand here?
+                    yield item
+                elif isinstance(item, spotipy.model.artist.Artist):
+                    # FIXME: options?
+                    yield from self.artist_expand(item, expand_top_tracks=True)
+                else:
+                    logger.warning('%s not supported yet', type(item))
+
+        track_ids_to_playlist = list()
+        sources = self._sources.copy()
+
+        for counter, track in enumerate(inner_looper(sources)):
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
@@ -312,12 +329,20 @@ class PlaylistGenerator:
         for artist in self.spotify.artist_related_artists(artist_id):
             yield from self.iterate_artist_all_tracks(artist.id)
 
-    def iterate_search_tracks(self, query: str):
-        '''search tracks'''
+    def iterate_search(self, query_type: str, query: str):
+        '''search'''
         search = self.spotify.search(query=query,
+                                     types=[query_type],
                                      limit=50,
                                      market=self._market)
-        # FIXME: continue when BUG in next() fixed
+        paging = search[0]
+        for count, item in enumerate(self.spotify.items_from_paging(paging), start=1):
+            # NOTE: item can me track, album, artist, playlist ...
+            yield item
+
+            # FIXME: break before next() so we do not hit bugs
+            if count >= 50:
+                break
 
     def iterate_playlist_all_tracks(self,
                                     playlist_id: str,
@@ -343,5 +368,18 @@ class PlaylistGenerator:
         else:
             yield track
 
+    def artist_expand(self, artist,
+                      expand_albums: bool = False,
+                      expand_top_tracks: bool = False):
+        if expand_albums:
+            # FIXME: yield albumns?
+            for track in self.iterate_artist_all_tracks(artist.id):
+                yield track
+        elif expand_top_tracks:
+            # FIXME: move to method? and add support different countries
+            yield from self.spotify.artist_top_tracks(artist.id,
+                                                      country=self._market_country_code)
+        else:
+            return
 
 # END

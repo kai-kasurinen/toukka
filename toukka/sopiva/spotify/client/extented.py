@@ -30,6 +30,10 @@ class SpotifyExtended(spotipy.Spotify):
         for page in self.iterate_pages_from_paging(paging):
             yield from page.items
 
+    # FIXME: better?
+    pages_from_paging = iterate_pages_from_paging
+    items_from_paging = iterate_items_from_paging
+
     @deprecated.deprecated
     def pager(self,
               paging: spotipy.model.paging.OffsetPaging):
