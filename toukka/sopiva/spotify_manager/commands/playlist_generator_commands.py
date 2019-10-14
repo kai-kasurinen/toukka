@@ -72,10 +72,25 @@ def generate_playlist_from_playlist(playlist_uri,
                                                  expand_artists=expand_artists)
 
 
-@argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
-def generate_playlist_from_search(type: str, query: str):
+@argh.arg('query_type', choices=['artist', 'album', 'track', 'playlist'])
+def generate_playlist_from_search(query_type: str, query: str,
+                                  dry_run: bool = False,
+                                  expand_track_to_album: bool = False,
+                                  expand_track_to_artist: bool = False,
+                                  expand_artist_to_albums: bool = False,
+                                  expand_artist_to_top_tracks: bool = False,
+                                  expand_artist_to_related_artists: bool = False,
+                                  expand_album_to_tracks: bool = False,
+                                  expand_playlist_to_tracks: bool = False,
+                                  expand_generator_to_items: bool = False):
+    print(locals())
+    expander_params = {key: value for key, value in locals().items() if key.startswith('expand')}
+    print(expander_params)
     generator = PlaylistGenerator()
-    generator.add_source(generator.expander(generator.iterate_search(query_type=type, query=query)))
+    generator.dry_run = dry_run
+    s = generator.iterate_search(query_type=query_type, query=query)
+    e = generator.expander(s, **expander_params)
+    generator.add_source(e)
     generator.generate()
 
 

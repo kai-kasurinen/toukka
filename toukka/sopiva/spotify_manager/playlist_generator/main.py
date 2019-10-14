@@ -55,12 +55,15 @@ class PlaylistGenerator:
         self.playlist_name = '< g e n e r a t e d >'
         # NOTE: not None -> get updated. '' -> fails
         self.playlist_description = '<empty>'
+        # for debugging
+        self.dry_run = False
 
     def add_source(self, source):
         self._sources.append(source)
 
     def generate(self):
         self.looper()
+        self.commit()
         # FIXME: continue
 
     def looper(self):
@@ -74,31 +77,37 @@ class PlaylistGenerator:
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
-                logger.debug(f'{track.id}: already added')
+                logger.debug('%s: already added', track.id)
 
             if self.is_track_ok_to_add(track):
-                printer.print_track(track)
+                # printer.print_track(track)
                 track_ids_to_playlist.append(track.id)
+                logger.debug('%s: added', track.id)
 
             if len(track_ids_to_playlist) >= 1000:
-                print('we have enough tracks to add')
+                logger.info('we have enough tracks to add')
                 break
 
             # safety
             if counter > 2000:
-                print('we have tried too many tracks, breaking loop')
+                logger.info('we have tried too many tracks, breaking loop')
                 break
 
-        print(f'{len(track_ids_to_playlist)} tracks to add')
+        self.track_ids_to_playlist = track_ids_to_playlist
+        logger.info(f'{len(track_ids_to_playlist)} tracks to add')
 
-        if len(track_ids_to_playlist) > 0:
-            self.playlist_clear()
-            self.playlist_tracks_add(track_ids_to_playlist)
-            self.playlist_details_update()
+    def commit(self):
+        track_ids_to_playlist = self.track_ids_to_playlist
+        if not self.dry_run:
+            if len(track_ids_to_playlist) > 0:
+                self.playlist_clear()
+                self.playlist_tracks_add(track_ids_to_playlist)
+                self.playlist_details_update()
+            else:
+                logger.info('try something else?')
         else:
-            print('try something else?')
-
-        print('done')
+            logger.info('dry_run is True, not committing')
+        logger.info('done')
 
     def generate_playlist_from_artist_id(self, artist_id):
         '''generate playlist from artist'''
@@ -315,6 +324,9 @@ class PlaylistGenerator:
         for artist in self.spotify.artist_related_artists(artist_id):
             yield from self.iterate_artist_all_tracks(artist.id)
 
+    def iterate_related_artists(self, artist_id):
+        yield from self.spotify.artist_related_artists(artist_id)
+
     def iterate_search(self, query_type: str, query: str):
         '''search'''
         search = self.spotify.search(query=query,
@@ -367,18 +379,42 @@ class PlaylistGenerator:
         else:
             return
 
-    def expander(self, item):
+    def expander(self, item,
+                 expand_track_to_album: bool = False,
+                 expand_track_to_artist: bool = False,
+                 expand_artist_to_albums: bool = False,
+                 expand_artist_to_top_tracks: bool = False,
+                 expand_artist_to_related_artists: bool = False,
+                 expand_album_to_tracks: bool = False,
+                 expand_playlist_to_tracks: bool = False,
+                 expand_generator_to_items: bool = False
+                 ):
+        logger.debug('%s: %s', type(item), item)
+        expander_params = {key: value for key, value in locals().items() if key.startswith('expand')}
         if isinstance(item, types.GeneratorType):
-            for item_ in item:
-                yield from self.expander(item_)
+            if expand_generator_to_items:
+                for item_ in item:
+                    yield from self.expander(item_, **expander_params)
         elif isinstance(item, spotipy.model.track.FullTrack):
-            yield from self.track_expand(item)
+            yield from self.track_expand(item,
+                                         expand_album=expand_track_to_album,
+                                         expand_artist=expand_track_to_artist)
         elif isinstance(item, spotipy.model.artist.Artist):
-            yield from self.artist_expand(item, expand_top_tracks=True)
+            if expand_artist_to_related_artists:
+                expander_params.pop('expand_artist_to_related_artists')
+                yield from self.expander(self.iterate_related_artists(item.id),
+                                         **expander_params)
+            else:
+                yield from self.artist_expand(item,
+                                              expand_albums=expand_artist_to_albums,
+                                              expand_top_tracks=expand_artist_to_top_tracks)
         elif isinstance(item, spotipy.model.album.Album):
-            yield from self.iterate_album_tracks(item.id)
+            if expand_album_to_tracks:
+                logger.debug('expand album to tracks')
+                yield from self.iterate_album_tracks(item.id)
         elif isinstance(item, spotipy.model.playlist.Playlist):
-            yield from self.iterate_playlist_all_tracks(item.id)
+            if expand_playlist_to_tracks:
+                yield from self.iterate_playlist_all_tracks(item.id)
         else:
             logger.warning('not yet supported: %s', type(item))
             yield item
