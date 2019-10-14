@@ -1,6 +1,10 @@
 #
 
+import argh
+import spotipy.convert
+
 from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.printer import first as printer
 
 
 def categories(country: str = None,
@@ -38,12 +42,54 @@ def recommendation_genre_seeds():
     return get_spotify().recommendation_genre_seeds()
 
 
+@argh.arg('--seed-artist-uris', nargs='*')
+@argh.arg('--seed-track-uris', nargs='*')
+@argh.arg('--seed-genres', nargs='*')
+def recommendations(seed_artist_uris: list = None,
+                    seed_track_uris: list = None,
+                    seed_genres: list = None,
+                    market: str = None,
+                    limit: int = 100):
+    '''get a list of recommended tracks for seeds'''
+
+    def uris_to_ids(uris: list):
+        ids = list()
+        for uri in uris:
+            uri_type, uri_id = spotipy.convert.from_uri(uri)
+            ids.append(uri_id)
+        return ids
+
+    seed_artist_ids = None
+    seed_track_ids = None
+    if seed_artist_uris is not None:
+        seed_artist_ids = uris_to_ids(seed_artist_uris)
+    if seed_track_uris is not None:
+        seed_track_ids = uris_to_ids(seed_artist_uris)
+
+    spotify = get_spotify()
+    # BUG: attributes not used on spotipy
+    attributes = dict()
+    recommendations = spotify.recommendations(
+                                            artist_ids=seed_artist_ids,
+                                            track_ids=seed_track_ids,
+                                            genres=seed_genres,
+                                            market=market,
+                                            limit=limit,
+                                            **attributes)
+
+    for seed in recommendations.seeds:
+        printer.printer(seed)
+
+    for track in recommendations.tracks:
+        printer.printer(track)
+
 #
 
 COMMANDS = [
     categories,
     featured_playlists,
-    recommendation_genre_seeds
+    recommendation_genre_seeds,
+    recommendations
 ]
 
 # END
