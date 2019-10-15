@@ -6,11 +6,14 @@ name = "pypi"
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [packages]
 CacheControl = "*"
 SQLAlchemy = "*"
+confuse = "*"
+sqlitedict = "*"
+autologging = "*"
 
 [packages.spotipy]
 git = "https://github.com/felix-hilden/spotipy.git"
