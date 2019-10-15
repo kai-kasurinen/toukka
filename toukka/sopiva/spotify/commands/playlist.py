@@ -11,7 +11,7 @@ import argh
 
 import spotipy.convert
 
-from toukka.hub import Toukka
+#from toukka.hub import Toukka
 from toukka.util import _get_flags, _list_to_string
 
 from toukka.sopiva.spotify.util import get_spotify

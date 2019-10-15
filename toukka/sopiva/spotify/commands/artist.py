@@ -8,8 +8,8 @@ import spotipy
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
 
-from toukka.hub import Toukka
-from toukka.util import json_dump, json_dump_print
+# from toukka.hub import Toukka
+# from toukka.util import json_dump, json_dump_print
 
 
 def artist_info(uri):
