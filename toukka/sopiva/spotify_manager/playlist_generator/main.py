@@ -72,7 +72,7 @@ class PlaylistGenerator:
     def looper(self):
 
         track_ids_to_playlist = list()
-        logger.debug('sources: %s', self._sources)
+        #logger.debug('sources: %s', self._sources)
         sources = itertools.chain.from_iterable(self._sources)
 
         for counter, track in enumerate(sources):
@@ -391,7 +391,7 @@ class PlaylistGenerator:
                  expand_playlist_to_tracks: bool = False,
                  expand_generator_to_items: bool = False
                  ):
-        logger.debug('%s: %s', type(item), item)
+        logger.debug('%s', type(item))
         expander_params = {key: value for key, value in locals().items() if key.startswith('expand')}
 
         # generators
@@ -429,19 +429,23 @@ class PlaylistGenerator:
                 yield from self.spotify.artist_top_tracks(item.id,
                                                           country=self._market_country_code)
             else:
-                pass
+                logger.warning('did not do anything with artist: %s', item.id)
 
         # album
         elif isinstance(item, spotipy.model.album.Album):
             if expand_album_to_tracks:
                 # FIXME: use expander
                 yield from self.iterate_album_tracks(item.id)
+            else:
+                logger.warning('did not do anything with album: %s', item.id)
 
         # playlist
         elif isinstance(item, spotipy.model.playlist.Playlist):
             if expand_playlist_to_tracks:
                 yield from self.expander(self.iterate_playlist_all_tracks(item.id),
                                          **expander_params)
+            else:
+                logger.warning('did not do anything with artist: %s', item.id)
         else:
             logger.warning('not yet supported: %s', type(item))
             raise Exception()
