@@ -24,8 +24,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-
-
 def _get_playlist_uri_from_config():
     return toukka.config.lazy_config['spotify_manager']['playlist_generator']['playlist_uri'].get()
 
@@ -445,22 +443,22 @@ class PlaylistGenerator:
         # track
         elif isinstance(item, spotipy.model.track.FullTrack):
 
-            # FIXME: if elif else 
+            # FIXME: if elif else
             if expand_track_to_artist:
                 # add artist as new source
-                expander_params_ = expander_params.copy()
-                expander_params_['expand_track_to_artist'] = False
+                _expander_params = expander_params.copy()
+                _expander_params['expand_track_to_artist'] = False
                 for artist in item.artists:
                     self.add_source(
                         self.expander(
                             self.spotify.artist(artist.id),
-                            **expander_params_))
+                            **_expander_params))
 
             elif expand_track_to_album:
-                expander_params_ = expander_params.copy()
-                expander_params_['expand_track_to_album'] = False
+                _expander_params = expander_params.copy()
+                _expander_params['expand_track_to_album'] = False
                 yield from self.expander(self.spotify.album(item.album.id, market=self._market),
-                                         **expander_params_)
+                                         **_expander_params)
             else:
                 # FIXME: if we first expand and later try again, we never yield track
                 if self.is_uri_already_seen(item.uri):
@@ -498,9 +496,7 @@ class PlaylistGenerator:
             if self.is_uri_already_seen(item.uri):
                 return
             if expand_album_to_tracks:
-                expander_params_ = expander_params.copy()
-                expander_params_['expand_album_to_tracks'] = False
-                yield from self.expander(self.iterate_album_tracks(item.id), **expander_params_)
+                yield from self.expander(self.iterate_album_tracks(item.id), **expander_params)
             else:
                 logger.warning('did not do anything with album: %s', item.id)
 
