@@ -9,11 +9,12 @@ name = "pypi"
 python_version = "3.8"
 
 [packages]
-CacheControl = "*"
-SQLAlchemy = "*"
 confuse = "*"
 sqlitedict = "*"
 autologging = "*"
+sqlalchemy = "*"
+argh = "*"
+argcomplete = "*"
 
 [packages.spotipy]
 git = "https://github.com/felix-hilden/spotipy.git"

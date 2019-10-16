@@ -5,6 +5,7 @@ import logging
 import pprint
 import itertools
 import types
+import collections
 
 import spotipy.convert
 import spotipy.model.track
@@ -20,6 +21,8 @@ from toukka.sopiva.spotify.printer import first as printer
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+
 
 
 def _get_playlist_uri_from_config():
@@ -61,8 +64,23 @@ class PlaylistGenerator:
         # for debugging
         self.dry_run = False
 
+        self.looper_target_count = 1000
+        self.looper_max_tries = 10000
+
+        # FIXME: move to Sources class
+        self.sources_queue = collections.deque()
+
+    # FIXME: move to Sources class
     def add_source(self, source):
-        self._sources.append(source)
+        self.sources_queue.append(source)
+
+    # FIXME: move to Sources class
+    def sources_queue_generator(self):
+        while True:
+            try:
+                yield from self.sources_queue.popleft()
+            except IndexError:
+                break
 
     def generate(self):
         self.looper()
@@ -73,10 +91,15 @@ class PlaylistGenerator:
 
         track_ids_to_playlist = list()
         #logger.debug('sources: %s', self._sources)
-        sources = itertools.chain.from_iterable(self._sources)
+        #sources = itertools.chain.from_iterable(self.sources_queue)
+        sources = self.sources_queue_generator()
 
         for counter, track in enumerate(sources):
-            logger.debug('counter: %s', counter)
+            logger.debug('counter: %i, tracks: %i, sources: %i',
+                         counter,
+                         len(track_ids_to_playlist),
+                         len(self.sources_queue))
+            #logger.debug(type(track))
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
@@ -87,12 +110,12 @@ class PlaylistGenerator:
                 track_ids_to_playlist.append(track.id)
                 logger.debug('%s: added', track.id)
 
-            if len(track_ids_to_playlist) >= 1000:
+            if len(track_ids_to_playlist) >= self.looper_target_count:
                 logger.info('we have enough tracks to add')
                 break
 
             # safety
-            if counter > 2000:
+            if counter > self.looper_max_tries:
                 logger.info('we have tried too many tracks, breaking loop')
                 break
 
@@ -403,13 +426,17 @@ class PlaylistGenerator:
         # track
         elif isinstance(item, spotipy.model.track.FullTrack):
             # FIXME: if elif else? order?
+            if expand_track_to_artist:
+                # TODO: add duplicate check
+                for artist in item.artists:
+                    self.add_source(
+                        self.expander(
+                            self.spotify.artist(artist.id),
+                            **expander_params))
+
             if expand_track_to_album:
                 yield from self.expander(self.spotify.album(item.album.id, market=self._market),
                                          **expander_params)
-            elif expand_track_to_artist:
-                for artist in item.artists:
-                    yield from self.expander(self.spotify.album(artist.id, market=self._market),
-                                             **expander_params)
             else:
                 yield item
 
@@ -417,10 +444,14 @@ class PlaylistGenerator:
         elif isinstance(item, spotipy.model.artist.Artist):
             # FIXME: if elif else? order?
             if expand_artist_to_related_artists:
-                expander_params.pop('expand_artist_to_related_artists')
-                yield from self.expander(self.iterate_related_artists(item.id),
-                                         **expander_params)
-            elif expand_artist_to_albums:
+                # TODO: add duplicate check
+                # add artists as new source
+                self.add_source(
+                    self.expander(
+                        self.iterate_related_artists(item.id),
+                        **expander_params))
+
+            if expand_artist_to_albums:
                 yield from self.expander(self.artist_albums(item.id),
                                          **expander_params)
             elif expand_artist_to_top_tracks:

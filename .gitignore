@@ -16,3 +16,6 @@ spotipy
 
 #
 Pipfile.lock
+.env
+
+
