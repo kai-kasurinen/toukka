@@ -2,7 +2,6 @@
 
 import logging
 
-import simplejson
 import deprecated
 
 import spotipy
@@ -50,12 +49,14 @@ class SpotifyExtended(spotipy.Spotify):
     # NOTE: so fix it until it fixes somewhere else
     # SEE: https://github.com/psf/requests/issues/4842
     # SEE: https://github.com/linkedin/cruise-control/issues/927
-    @staticmethod
-    def _parse_json(response):
-        try:
-            return response.json()
-        except simplejson.decoder.JSONDecodeError:
-            return None
+    # https://github.com/felix-hilden/spotipy/issues/44
+    # removed simplejson, so not my problem anymore
+    # @staticmethod
+    # def _parse_json(response):
+    #   try:
+    #       return response.json()
+    #   except simplejson.decoder.JSONDecodeError:
+    #        return None
 
 
 # END

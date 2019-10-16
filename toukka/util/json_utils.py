@@ -1,10 +1,12 @@
 #
+# FIXME: remove
 
-import simplejson
+import json
+
 
 def json_dump(obj):
     """dumps json with indent"""
-    return simplejson.dumps(obj, indent='  ')
+    return json.dumps(obj, indent='  ')
 
 
 def json_dump_print(obj):

@@ -9,7 +9,6 @@ import iso8601
 import humanize
 import tabulate
 import argh
-import simplejson as json
 
 from toukka.sopiva.spotify.util import get_spotify
 
