@@ -443,8 +443,13 @@ class PlaylistGenerator:
         # track
         elif isinstance(item, spotipy.model.track.FullTrack):
 
+            if expand_track_to_artist and expand_track_to_album:
+                logger.warning('expand_track_to_artist AND expand_track_to_album')
+
             # FIXME: if elif else
             if expand_track_to_artist:
+                if self.is_uri_already_seen(item.uri + '#artists'):
+                    return
                 # add artist as new source
                 _expander_params = expander_params.copy()
                 _expander_params['expand_track_to_artist'] = False
@@ -455,6 +460,8 @@ class PlaylistGenerator:
                             **_expander_params))
 
             elif expand_track_to_album:
+                if self.is_uri_already_seen(item.uri + '#album'):
+                    return
                 _expander_params = expander_params.copy()
                 _expander_params['expand_track_to_album'] = False
                 yield from self.expander(self.spotify.album(item.album.id, market=self._market),
@@ -469,6 +476,7 @@ class PlaylistGenerator:
         elif isinstance(item, spotipy.model.artist.Artist):
             if self.is_uri_already_seen(item.uri):
                 return
+
             if expand_artist_to_related_artists:
                 # add artists as new source
                 self.add_source(
