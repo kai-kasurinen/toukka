@@ -8,6 +8,7 @@ import types
 import collections
 
 import spotipy.convert
+import spotipy.serialise
 import spotipy.model.track
 import spotipy.model.artist
 import spotipy.model.playlist
@@ -68,6 +69,7 @@ class PlaylistGenerator:
         self.looper_max_tries = 10000
 
         # FIXME: move to Sources class
+        # TODO: use PriorityQueue or something
         self.sources_queue = collections.deque()
 
     # FIXME: move to Sources class
@@ -265,6 +267,7 @@ class PlaylistGenerator:
 
     def is_uri_already_seen(self, uri):
         if uri in self._uris_seen:
+            logger.debug('%s is already seen', uri)
             return True
         else:
             self._uris_seen.add(uri)
@@ -411,6 +414,7 @@ class PlaylistGenerator:
         else:
             return
 
+    # FIXME: this was very stupid idea
     def expander(self, item,
                  expand_track_to_album: bool = False,
                  expand_track_to_artist: bool = False,
@@ -429,48 +433,64 @@ class PlaylistGenerator:
             if expand_generator_to_items:
                 for item_ in item:
                     yield from self.expander(item_, **expander_params)
+            else:
+                logger.warning('did not do anything with generator: %s', item)
+
+        # modellist
+        elif isinstance(item, spotipy.serialise.ModelList):
+            # FIXME: add if expand_modellist_to_items:
+            for item_ in item:
+                yield from self.expander(item_, **expander_params)
 
         # track
         elif isinstance(item, spotipy.model.track.FullTrack):
-            if self.is_uri_already_seen(item.uri):
-                return
-            # FIXME: if elif else? order?
+
+            # FIXME: if elif else 
             if expand_track_to_artist:
-                # TODO: add duplicate check
+                # add artist as new source
+                expander_params_ = expander_params.copy()
+                expander_params_['expand_track_to_artist'] = False
                 for artist in item.artists:
                     self.add_source(
                         self.expander(
                             self.spotify.artist(artist.id),
-                            **expander_params))
+                            **expander_params_))
 
-            if expand_track_to_album:
+            elif expand_track_to_album:
+                expander_params_ = expander_params.copy()
+                expander_params_['expand_track_to_album'] = False
                 yield from self.expander(self.spotify.album(item.album.id, market=self._market),
-                                         **expander_params)
+                                         **expander_params_)
             else:
+                # FIXME: if we first expand and later try again, we never yield track
+                if self.is_uri_already_seen(item.uri):
+                    return
                 yield item
 
         # artist
         elif isinstance(item, spotipy.model.artist.Artist):
             if self.is_uri_already_seen(item.uri):
                 return
-            # FIXME: if elif else? order?
             if expand_artist_to_related_artists:
-                # TODO: add duplicate check
                 # add artists as new source
                 self.add_source(
                     self.expander(
                         self.iterate_related_artists(item.id),
                         **expander_params))
 
+            # FIXME: if elif else? order?
             if expand_artist_to_albums:
                 yield from self.expander(self.artist_albums(item.id),
                                          **expander_params)
             elif expand_artist_to_top_tracks:
                 # FIXME: use expander
                 # FIXME: move to method? and add support different countries
-                yield from self.spotify.artist_top_tracks(item.id,
-                                                          country=self._market_country_code)
+                yield from self.expander(
+                    self.spotify.artist_top_tracks(item.id,
+                                                   country=self._market_country_code),
+                    **expander_params)
             else:
+                # FIXME: can be sfalse alarm
                 logger.warning('did not do anything with artist: %s', item.id)
 
         # album
@@ -478,8 +498,9 @@ class PlaylistGenerator:
             if self.is_uri_already_seen(item.uri):
                 return
             if expand_album_to_tracks:
-                # FIXME: use expander
-                yield from self.iterate_album_tracks(item.id)
+                expander_params_ = expander_params.copy()
+                expander_params_['expand_album_to_tracks'] = False
+                yield from self.expander(self.iterate_album_tracks(item.id), **expander_params_)
             else:
                 logger.warning('did not do anything with album: %s', item.id)
 
