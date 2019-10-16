@@ -48,7 +48,7 @@ class PlaylistGenerator:
 
         # init empty
         self._isrc_seen = set()
-        self._sources = list()
+        self._uris_seen = set()
 
         # get playlist
         if playlist_uri is None:
@@ -263,6 +263,13 @@ class PlaylistGenerator:
         else:
             return True
 
+    def is_uri_already_seen(self, uri):
+        if uri in self._uris_seen:
+            return True
+        else:
+            self._uris_seen.add(uri)
+            return False
+
     # playlist modify methods
 
     def playlist_clear(self):
@@ -425,6 +432,8 @@ class PlaylistGenerator:
 
         # track
         elif isinstance(item, spotipy.model.track.FullTrack):
+            if self.is_uri_already_seen(item.uri):
+                return
             # FIXME: if elif else? order?
             if expand_track_to_artist:
                 # TODO: add duplicate check
@@ -442,6 +451,8 @@ class PlaylistGenerator:
 
         # artist
         elif isinstance(item, spotipy.model.artist.Artist):
+            if self.is_uri_already_seen(item.uri):
+                return
             # FIXME: if elif else? order?
             if expand_artist_to_related_artists:
                 # TODO: add duplicate check
@@ -464,6 +475,8 @@ class PlaylistGenerator:
 
         # album
         elif isinstance(item, spotipy.model.album.Album):
+            if self.is_uri_already_seen(item.uri):
+                return
             if expand_album_to_tracks:
                 # FIXME: use expander
                 yield from self.iterate_album_tracks(item.id)
@@ -472,6 +485,8 @@ class PlaylistGenerator:
 
         # playlist
         elif isinstance(item, spotipy.model.playlist.Playlist):
+            if self.is_uri_already_seen(item.uri):
+                return
             if expand_playlist_to_tracks:
                 yield from self.expander(self.iterate_playlist_all_tracks(item.id),
                                          **expander_params)
