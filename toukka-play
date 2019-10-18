@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
+
+'''main, main, main'''
+
+import sys
+import logging
+import pprint
+import argh
+import dataclasses
+
+import toukka.logger.simple
+
+from toukka.sopiva.spotify_manager.commands.playlist_generator_commands import (
+    generate_playlist_from_uris,
+    generate_playlist_from_search,
+    generate_playlist_from_recommendation
+)
+
+from toukka.sopiva.spotify_manager.commands.genres import _genres_completer
+
+__version__ = 0
+__program_name__ = 'toukka-play'
+__program_description__ = ''
+
+##
+
+kwargs_default = {
+    'expand_track_to_album': False,
+    'expand_track_to_artist': False,
+    'expand_artist_to_albums': False,
+    'expand_artist_to_top_tracks': False,
+    'expand_artist_to_related_artists': False,
+    'expand_album_to_tracks': False,
+    'expand_playlist_to_tracks': False,
+    'expand_generator_to_items': False
+}
+
+kwargs_for_playlist = {
+    'expand_generator_to_items': True,
+    'expand_playlist_to_tracks': True,
+    'expand_track_to_album': True,
+    'expand_album_to_tracks': True
+}
+
+kwargs_for_related_artists = {
+    'expand_generator_to_items': True,
+    'expand_album_to_tracks': True,
+    'expand_artist_to_related_artists': True,
+    'expand_artist_to_albums': True
+}
+
+kwargs_for_uris = {
+    'expand_generator_to_items': True,
+    'expand_playlist_to_tracks': True,
+    'expand_track_to_album': True,
+    'expand_album_to_tracks': True,
+    'expand_artist_to_albums': True,
+    'expand_artist_to_related_artists': True
+}
+
+
+def nordic_post_rock():
+    uris = [
+        'spotify:playlist:3E6HUWCMr6NUqK6vOgQKod',
+        'spotify:playlist:0KTT7vvBohnpfzXUcdkz8F',
+        'spotify:playlist:0my3JQPuWJX7rHnX2Hvp2U'
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def instrumental_post_rock():
+    uris = [
+        'spotify:playlist:7m4SvnJOObW34xVsLdXx30',
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def atmospheric_post_rock():
+    uris = [
+        'spotify:playlist:2sTxdHJ1Nf5vve4zmir510',
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def jazz_piano():
+    uris = [
+        'spotify:playlist:5KudWqpwRKdH5CY6yQ1nwA'
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def new_age_piano():
+    uris = [
+        'spotify:playlist:3z3YJH7rEJWuaVqggQaHnI',
+        'spotify:playlist:06ErX6daanvbqhBp7LXPc7',
+        'spotify:playlist:6AUtSj2kOPTITWGMo02bkU'
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def sleep():
+    uris = [
+        'spotify:playlist:0cuaFpexE9V0zr3s7l6yjR'
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def female_fronted_metal():
+    uris = [
+        'spotify:playlist:6VLyqry0Zrr5EdTbKT7SVa'
+    ]
+
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+def from_deuter():
+    uris = [
+        'spotify:artist:3AGvwnXbUo9LoAU2P5qYHB'
+    ]
+    generate_playlist_from_uris(uris, **kwargs_for_related_artists)
+
+
+def post_rock():
+    generate_playlist_from_search('playlist',
+                                  'sound of post-rock',
+                                  **kwargs_for_playlist)
+
+
+@argh.arg('uris', nargs='*')
+def uri(uris: list):
+    generate_playlist_from_uris(uris, **kwargs_for_uris)
+
+
+@argh.arg('name', completer=_genres_completer)
+def genre(name: str):
+    genres = toukka.sopiva.spotify_manager.genres.genres()
+    genre = genres.get(name)
+    if genre is None:
+        return False
+    print(genre)
+    # FIXME: select only some? or sort?
+    playlists = dataclasses.asdict(genre.playlists)
+    uris = [uri for uri in playlists.values() if uri is not None]
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
+
+
+##
+
+
+COMMANDS = [
+    nordic_post_rock,
+    instrumental_post_rock,
+    atmospheric_post_rock,
+    jazz_piano,
+    new_age_piano,
+    sleep,
+    female_fronted_metal,
+    from_deuter,
+    post_rock,
+    uri,
+    genre
+]
+
+
+def main():
+    '''main'''
+    toukka.logger.simple.init_logging()
+
+    parser = argh.ArghParser(prog=__program_name__, description=__program_description__)
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {version}'.format(version=__version__))
+    parser.add_argument('--debug',
+                        help='Print lots of debugging statements',
+                        action='store_const',
+                        dest='loglevel',
+                        const=logging.DEBUG,
+                        default=logging.INFO)
+
+    parser.add_commands(COMMANDS)
+    args = parser.parse_args()
+    parser.dispatch()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+
+# END
