@@ -304,9 +304,7 @@ class PlaylistGenerator:
         '''artist all albumns'''
 
         # NOTE: 'album', 'single', 'appears_on', 'compilation'
-        #include_album_groups = ['album', 'single', 'compilation']
-        # NOTE: bug on spotipy. list not unpacked to str
-        include_album_groups = 'album,single,compilation'
+        include_album_groups = ['album', 'single', 'compilation']
 
         paging = self.spotify.artist_albums(
             artist_id,
@@ -371,9 +369,6 @@ class PlaylistGenerator:
         for count, item in enumerate(self.spotify.items_from_paging(paging), start=1):
             # NOTE: item can me track, album, artist, playlist ...
             yield item
-            # FIXME: break before next() so we do not hit bugs
-            if count >= 50:
-                break
 
     # FIXME: rename
     def iterate_playlist_all_tracks(self,
@@ -457,6 +452,7 @@ class PlaylistGenerator:
                             self.spotify.artist(artist.id),
                             **_expander_params))
 
+            # FIXME: expand_track_to_album and expand_album_to_tracks causes infinite loop?
             elif expand_track_to_album and not self.is_uri_already_seen(item.uri + '#album'):
                 _expander_params = expander_params.copy()
                 _expander_params['expand_track_to_album'] = False
@@ -498,8 +494,12 @@ class PlaylistGenerator:
         elif isinstance(item, spotipy.model.album.Album):
             if self.is_uri_already_seen(item.uri):
                 return
-            if expand_album_to_tracks:
-                yield from self.expander(self.iterate_album_tracks(item.id), **expander_params)
+            if expand_album_to_tracks and not self.is_uri_already_seen(item.uri + '#tracks'):
+                # hopefully this and seen #tracks fixes infitine loop
+                # if both expand_album_to_tracks and expand_track_to_album is True
+                _expander_params = expander_params.copy()
+                _expander_params['expand_track_to_album'] = False
+                yield from self.expander(self.iterate_album_tracks(item.id), **_expander_params)
             else:
                 logger.warning('did not do anything with album: %s', item.id)
 

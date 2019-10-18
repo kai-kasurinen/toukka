@@ -18,4 +18,5 @@ spotipy
 Pipfile.lock
 .env
 
+toukka-play
 

@@ -155,6 +155,9 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
     if flags:
         print(f'\tflags: {flags}')
 
+    # only on FullPlaylist
+    #print(f'\tdesc: {playlist.description}')
+
 
 @printer.register
 def print_playlist(playlisttrack: spotipy.model.playlist.PlaylistTrack):

@@ -9,7 +9,13 @@ from toukka.sopiva.spotify.printer import first as printer
 
 @argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
 def search(type: str,
-           query: str):
+           query: str,
+           limit: int = None):
+
+    # NOTE: cos default is None, argh (or some else) set it as str
+    if limit is not None:
+        limit = int(limit)
+
     spotify = get_spotify()
     search = spotify.search(query=query,
                             types=[type],
@@ -20,8 +26,7 @@ def search(type: str,
     for count, item in enumerate(spotify.iterate_items_from_paging(paging), start=1):
         printer.printer(item)
 
-        # FIXME: break before next() so we do not hit bugs
-        if count >= 50:
+        if limit is not None and count >= limit:
             break
 
 #

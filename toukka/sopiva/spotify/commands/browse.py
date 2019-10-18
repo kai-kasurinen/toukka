@@ -13,9 +13,7 @@ def categories(country: str = None,
     spotify = get_spotify()
     paging = spotify.categories(country=country, locale=locale, limit=50)
     print(f'found {paging.total} categories')
-    # FIXME: TypeError if we really get more than one page
-    # 'cos "response body contains an object with a categories field"
-    categories = spotify.all_items_from_paging(paging)
+    categories = spotify.items_from_paging(paging)
     for category in categories:
         print(f'{category.id:20}: {category.name}')
 
@@ -67,7 +65,7 @@ def recommendations(seed_artist_uris: list = None,
         seed_track_ids = uris_to_ids(seed_artist_uris)
 
     spotify = get_spotify()
-    # BUG: attributes not used on spotipy
+    # TODO: support attributes
     attributes = dict()
     recommendations = spotify.recommendations(
                                             artist_ids=seed_artist_ids,
