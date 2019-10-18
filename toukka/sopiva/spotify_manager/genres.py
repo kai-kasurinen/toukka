@@ -17,15 +17,20 @@ logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 
 
-@dataclass
-class Genre:
-    name: str
-    # TODO: move playlists to playlists dict
-    sound: str = None
+@dataclass(frozen=True)
+class GenrePlaylists:
     intro: str = None
+    sound: str = None
     pulse: str = None
     edge: str = None
     female: str = None
+    year_2018: str = None
+    year_2019: str = None
+
+@dataclass(frozen=True)
+class Genre:
+    name: str
+    playlists: GenrePlaylists = None
 
 
 class Genres(dict):
@@ -38,9 +43,8 @@ def genres_make():
     sound_of_spotify_id = 'thesoundsofspotify'
     particle_detector_id = 'particledetector'
     particle_filter_id = 'particlefilter'
-    # TODO: support years; name format '2018 in {genre}',
-    #       also '2017 in {genre}' on particledetector
     particle_detector_2018_id = 'particledetector2018'
+    particle_detector_2019_id = 'particledetector2019'
 
     @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def playlists_cached(user_id: str):
@@ -54,11 +58,12 @@ def genres_make():
         return spotify.playlist(playlist_id, market=None)
 
     def process_sound_of_spotify():
-        playlists = playlists_cached(sound_of_spotify_id)
-        logger.info('sound of spotify playlists len: %i', len(playlists))
+        user_id = sound_of_spotify_id
+        playlists = playlists_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
         sounds = dict()
         for playlist in playlists:
-            if playlist.owner.id != sound_of_spotify_id:
+            if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
                 continue
 
@@ -68,6 +73,8 @@ def genres_make():
 
                 playlist_full = playlist_cached(playlist.id)
                 playlist_destriction = playlist_full.description
+
+                # TODO: parse description and get see also genres
 
                 if playlist_destriction.startswith('See also'):
                     genre_name = thing.lower()
@@ -87,13 +94,14 @@ def genres_make():
         return sounds
 
     def process_particle_detector():
-        playlists = playlists_cached(particle_detector_id)
-        logger.info('particle detector playlists len: %i', len(playlists))
+        user_id = particle_detector_id
+        playlists = playlists_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
         intros = dict()
         pulses = dict()
         edges = dict()
         for playlist in playlists:
-            if playlist.owner.id != particle_detector_id:
+            if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
                 continue
 
@@ -117,11 +125,12 @@ def genres_make():
         return intros, pulses, edges
 
     def process_particle_filter():
-        playlists = playlists_cached(particle_filter_id)
-        logger.info('particle filter playlists len: %i', len(playlists))
+        user_id = particle_filter_id
+        playlists = playlists_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
         females = dict()
         for playlist in playlists:
-            if playlist.owner.id != particle_filter_id:
+            if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
                 continue
             if playlist.name.startswith('A ♀Filter for'):
@@ -132,19 +141,65 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return females
 
+    # TODO: make generic for years
+    def process_particle_detector_2018():
+        user_id = particle_detector_2018_id
+        playlists = playlists_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
+        year_2018 = dict()
+        for playlist in playlists:
+            if playlist.owner.id != user_id:
+                logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
+                continue
+            if playlist.name.startswith('2018 in'):
+                thing = playlist.name.split('2018 in ')[1]
+                genre_name = thing.lower()
+                year_2018[genre_name] = playlist.uri
+            else:
+                logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+        return year_2018
+
+    def process_particle_detector_2019():
+        user_id = particle_detector_2019_id
+        playlists = playlists_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
+        year_2019 = dict()
+        for playlist in playlists:
+            if playlist.owner.id != user_id:
+                logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
+                continue
+            if playlist.name.startswith('2019 in'):
+                thing = playlist.name.split('2019 in ')[1]
+                genre_name = thing.lower()
+                year_2019[genre_name] = playlist.uri
+            else:
+                logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+        return year_2019
+
     sounds = process_sound_of_spotify()
     intros, pulses, edges = process_particle_detector()
     females = process_particle_filter()
+    year_2018 = process_particle_detector_2018()
+    year_2019 = process_particle_detector_2019()
     genres = dict()
 
     for genre_name in sounds.keys():
-        genre = Genre(name=genre_name,
-                      sound=sounds.get(genre_name),
-                      intro=intros.get(genre_name),
-                      pulse=pulses.get(genre_name),
-                      edge=edges.get(genre_name),
-                      female=females.get(genre_name)
-                      )
+
+        genre_playlists = GenrePlaylists(
+            intro=intros.get(genre_name),
+            sound=sounds.get(genre_name),
+            pulse=pulses.get(genre_name),
+            edge=edges.get(genre_name),
+            female=females.get(genre_name),
+            year_2018=year_2018.get(genre_name),
+            year_2019=year_2019.get(genre_name)
+            )
+
+        genre = Genre(
+            name=genre_name,
+            playlists=genre_playlists
+            )
+
         genres[genre.name] = genre
 
     # and after loop

@@ -40,7 +40,7 @@ def user_playlists_info(user):
     spotify = get_spotify()
     paging = spotify.playlists(user)
     print(f'user has {paging.total} playlists')
-    playlists = spotify.all_items_from_paging(paging)
+    playlists = spotify.items_from_paging(paging)
 
     own = [p for p in playlists if p.owner.id == user]
     public = [p for p in playlists if p.public is True]
