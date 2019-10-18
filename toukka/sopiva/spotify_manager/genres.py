@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Genre:
     name: str
+    # TODO: move playlists to playlists dict
     sound: str = None
     intro: str = None
     pulse: str = None
@@ -51,12 +52,6 @@ def genres_make():
     @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def playlist_cached(playlist_id: str):
         return spotify.playlist(playlist_id, market=None)
-
-    HTML_TAG_REGEX = re.compile(r'<a[^<>]+?href=([\'\"])(.*?)\1', re.IGNORECASE)
-
-    # not used yet
-    def extract_links(content: str):
-        return [match[1] for match in HTML_TAG_REGEX.findall(content)]
 
     sound_of_spotify_playlists = playlists_cached(sound_of_spotify_id)
     logger.info('sound of spotify playlists len: %i', len(sound_of_spotify_playlists))
