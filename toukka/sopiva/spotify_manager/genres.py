@@ -37,6 +37,9 @@ def genres_make():
     sound_of_spotify_id = 'thesoundsofspotify'
     particle_detector_id = 'particledetector'
     particle_filter_id = 'particlefilter'
+    # TODO: support years; name format '2018 in {genre}',
+    #       also '2017 in {genre}' on particledetector
+    particle_detector_2018_id = 'particledetector2018'
 
     @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def playlists_cached(user_id: str):
