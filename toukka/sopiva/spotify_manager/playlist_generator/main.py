@@ -63,8 +63,8 @@ class PlaylistGenerator:
         # for debugging
         self.dry_run = False
 
-        self.looper_target_count = 1000
-        self.looper_max_tries = 10000
+        self.looper_target_count = 500
+        self.looper_max_tries = 5000
 
         # FIXME: move to Sources class
         # TODO: use PriorityQueue or something
