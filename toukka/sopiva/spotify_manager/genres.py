@@ -53,36 +53,27 @@ def genres_make():
     def playlist_cached(playlist_id: str):
         return spotify.playlist(playlist_id, market=None)
 
-    sound_of_spotify_playlists = playlists_cached(sound_of_spotify_id)
-    logger.info('sound of spotify playlists len: %i', len(sound_of_spotify_playlists))
+    def process_sound_of_spotify():
+        playlists = playlists_cached(sound_of_spotify_id)
+        logger.info('sound of spotify playlists len: %i', len(playlists))
+        sounds = dict()
+        for playlist in playlists:
+            if playlist.owner.id != sound_of_spotify_id:
+                logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
+                continue
 
-    particle_detector_playlists = playlists_cached(particle_detector_id)
-    logger.info('particle detector playlists len: %i', len(particle_detector_playlists))
-
-    particle_filter_playlists = playlists_cached(particle_filter_id)
-    logger.info('particle filter playlists len: %i', len(particle_filter_playlists))
-
-    playlists = itertools.chain(sound_of_spotify_playlists,
-                                particle_detector_playlists,
-                                particle_filter_playlists)
-    genres = Genres()
-
-    for counter, playlist in enumerate(playlists):
-
-        if playlist.owner.id == sound_of_spotify_id:
             if playlist.name.startswith('The Sound of'):
                 thing = playlist.name.split('The Sound of ')[1]
                 logger.debug(f'thing: {thing}')
 
                 playlist_full = playlist_cached(playlist.id)
-                # print(f'\tdesc: {playlist_full.description:.60}')
-
                 playlist_destriction = playlist_full.description
 
                 if playlist_destriction.startswith('See also'):
-                    genre = Genre(name=thing.lower(), sound=playlist.uri)
-                    genres[genre.name] = genre
+                    genre_name = thing.lower()
+                    sounds[genre_name] = playlist.uri
                 elif playlist_destriction.startswith('The songs that define'):
+                    # places?
                     pass
                 else:
                     logger.warning('%s: not supported desc: %s', playlist.uri, playlist_destriction)
@@ -93,62 +84,68 @@ def genres_make():
                 pass
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+        return sounds
 
-        elif playlist.owner.id == particle_detector_id:
+    def process_particle_detector():
+        playlists = playlists_cached(particle_detector_id)
+        logger.info('particle detector playlists len: %i', len(playlists))
+        intros = dict()
+        pulses = dict()
+        edges = dict()
+        for playlist in playlists:
+            if playlist.owner.id != particle_detector_id:
+                logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
+                continue
 
             if playlist.name.startswith('Intro to'):
                 thing = playlist.name.split('Intro to ')[1]
                 genre_name = thing.lower()
-                genre = genres.get(genre_name)
-
-                if genre is None:
-                    logger.warning('%s: intro for not found genre: %s', playlist.uri, genre_name)
-                    continue
-                else:
-                    genre.intro = playlist.uri
+                intros[genre_name] = playlist.uri
 
             elif playlist.name.startswith('The Pulse of'):
                 thing = playlist.name.split('The Pulse of ')[1]
-
                 genre_name = thing.lower()
-                genre = genres.get(genre_name)
-
-                if genre is None:
-                    logger.warning('%s: pulse for not found genre: %s', playlist.uri, genre_name)
-                    continue
-                else:
-                    genre.pulse = playlist.uri
+                pulses[genre_name] = playlist.uri
 
             elif playlist.name.startswith('The Edge of'):
                 thing = playlist.name.split('The Edge of ')[1]
-
                 genre_name = thing.lower()
-                genre = genres.get(genre_name)
-
-                if genre is None:
-                    logger.warning('%s: edge for not found genre: %s', playlist.uri, genre_name)
-                    continue
-                else:
-                    genre.edge = playlist.uri
+                edges[genre_name] = playlist.uri
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
 
-        elif playlist.owner.id == particle_filter_id:
+        return intros, pulses, edges
 
+    def process_particle_filter():
+        playlists = playlists_cached(particle_filter_id)
+        logger.info('particle filter playlists len: %i', len(playlists))
+        females = dict()
+        for playlist in playlists:
+            if playlist.owner.id != particle_filter_id:
+                logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
+                continue
             if playlist.name.startswith('A ♀Filter for'):
                 thing = playlist.name.split('A ♀Filter for ')[1]
                 genre_name = thing.lower()
-                genre = genres.get(genre_name)
-                if genre is None:
-                    logger.warning('%s: female filter for not found genre: %s', playlist.uri, genre_name)
-                    continue
-                else:
-                    genre.female = playlist.uri
+                females[genre_name] = playlist.uri
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+        return females
 
-        else:
-            logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
+    sounds = process_sound_of_spotify()
+    intros, pulses, edges = process_particle_detector()
+    females = process_particle_filter()
+    genres = dict()
+
+    for genre_name in sounds.keys():
+        genre = Genre(name=genre_name,
+                      sound=sounds.get(genre_name),
+                      intro=intros.get(genre_name),
+                      pulse=pulses.get(genre_name),
+                      edge=edges.get(genre_name),
+                      female=females.get(genre_name)
+                      )
+        genres[genre.name] = genre
 
     # and after loop
     logger.info('genres total: %i', len(genres))
