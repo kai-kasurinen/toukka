@@ -65,7 +65,8 @@ class SpotifySaver:
 
         history_entry = SpotifyMprisHistory(**columns)
         self.db.session.add(history_entry)
-        # FIXME: if commit fails, use rollback
+        # TODO: use contextmanager manager
+        # FIXME: if commit fails rollback
         self.db.session.commit()
         self.last_saved = track_id
         logger.debug('saved %s', track_id)
