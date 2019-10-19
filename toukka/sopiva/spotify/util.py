@@ -64,7 +64,7 @@ def get_user_token():
 def get_spotify_with_user_credentials():
     token = get_user_token()
     #sender = spotipy.sender.PersistentSender()
-    sender = spotipy.sender.RetryingSender(retries=10, sender=spotipy.sender.PersistentSender())
+    sender = spotipy.sender.RetryingSender(retries=2, sender=spotipy.sender.PersistentSender())
     client = toukka.sopiva.spotify.client.cached.SpotifyCached(
         token=token,
         sender=sender)

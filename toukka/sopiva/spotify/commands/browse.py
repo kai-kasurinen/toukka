@@ -2,6 +2,7 @@
 
 import argh
 import spotipy.convert
+import spotipy.client.browse.validate
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
@@ -43,9 +44,11 @@ def recommendation_genre_seeds():
 @argh.arg('--seed-artist-uris', nargs='*')
 @argh.arg('--seed-track-uris', nargs='*')
 @argh.arg('--seed-genres', nargs='*')
+@argh.arg('--recommendation-attributes-list', nargs='*')
 def recommendations(seed_artist_uris: list = None,
                     seed_track_uris: list = None,
                     seed_genres: list = None,
+                    recommendation_attributes_list: list = None,
                     market: str = None,
                     limit: int = 100):
     '''get a list of recommended tracks for seeds'''
@@ -64,20 +67,25 @@ def recommendations(seed_artist_uris: list = None,
     if seed_track_uris is not None:
         seed_track_ids = uris_to_ids(seed_artist_uris)
 
+    recommendation_attributes_dict = {}
+    if recommendation_attributes_list is not None:
+        recommendation_attributes_dict = {k: v for k, v in (x.split(':') for x in recommendation_attributes_list)}
+        print(recommendation_attributes_dict)
+        spotipy.client.browse.validate.validate_attributes(recommendation_attributes_dict)
+
     spotify = get_spotify()
-    # TODO: support attributes
-    attributes = dict()
     recommendations = spotify.recommendations(
-                                            artist_ids=seed_artist_ids,
-                                            track_ids=seed_track_ids,
-                                            genres=seed_genres,
-                                            market=market,
-                                            limit=limit,
-                                            **attributes)
+        artist_ids=seed_artist_ids,
+        track_ids=seed_track_ids,
+        genres=seed_genres,
+        market=market,
+        limit=limit,
+        **recommendation_attributes_dict)
 
     for seed in recommendations.seeds:
         printer.printer(seed)
 
+    print(type(recommendations.tracks))
     for track in recommendations.tracks:
         printer.printer(track)
 

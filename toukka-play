@@ -130,8 +130,7 @@ def post_rock():
                                   **kwargs_for_playlist)
 
 
-@argh.arg('uris', nargs='*')
-def uri(uris: list):
+def uri(*uris: list):
     generate_playlist_from_uris(uris, **kwargs_for_uris)
 
 

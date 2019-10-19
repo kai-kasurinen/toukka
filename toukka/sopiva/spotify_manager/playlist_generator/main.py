@@ -163,8 +163,7 @@ class PlaylistGenerator:
                                                seed_track_uris: list = None,
                                                seed_genres: list = None,
                                                call_times: int = 1,
-                                               expand_albums: bool = False,
-                                               expand_artists: bool = False,
+                                               recommendation_attributes: dict = None,
                                                **kwargs):
         '''generate playlist from recommendations'''
 
@@ -183,14 +182,17 @@ class PlaylistGenerator:
         s = self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
                                          seed_track_ids=seed_track_ids,
                                          seed_genres=seed_genres,
-                                         call_times=call_times)
+                                         call_times=call_times,
+                                         recommendation_attributes=recommendation_attributes)
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
         e = self.expander(s, **expander_params)
         self.add_source(e)
-        self.playlist_description = (f'source: recommendations',
-                                     f'{seed_artist_uris}',
-                                     f'{seed_track_uris}',
-                                     f'{seed_genres}')
+        # FIXME: long description causes http error 500
+        self.playlist_description = (f'source: recommendations')
+        #self.playlist_description = (f'source: recommendations',
+        #                             f'{seed_artist_uris}',
+        #                             f'{seed_track_uris}',
+        #                             f'{seed_genres}')
         self.generate()
 
     def is_track_ok_to_add(self, track):
@@ -332,7 +334,10 @@ class PlaylistGenerator:
                                 seed_track_ids: list = None,
                                 seed_genres: list = None,
                                 call_times: int = 1,
-                                **attributes):
+                                recommendation_attributes: dict = None
+                                ):
+        if recommendation_attributes is None:
+            recommendation_attributes = {}
 
         # FIXME: call_times is hack
         for n in range(call_times):
@@ -343,7 +348,7 @@ class PlaylistGenerator:
                                                     genres=seed_genres,
                                                     market=self._market,
                                                     limit=100,
-                                                    **attributes)
+                                                    **recommendation_attributes)
 
             for seed in recommendations.seeds:
                 logger.debug(seed)
