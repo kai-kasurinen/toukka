@@ -90,8 +90,8 @@ class PlaylistGenerator:
     def looper(self):
 
         track_ids_to_playlist = list()
-        #logger.debug('sources: %s', self._sources)
-        #sources = itertools.chain.from_iterable(self.sources_queue)
+        # logger.debug('sources: %s', self._sources)
+        # sources = itertools.chain.from_iterable(self.sources_queue)
         sources = self.sources_queue_generator()
 
         for counter, track in enumerate(sources):
@@ -179,20 +179,21 @@ class PlaylistGenerator:
                 seed_artist_ids.append(artist.id)
 
         # TODO: add support attributes
-        s = self.iterate_recommendations(seed_artist_ids=seed_artist_ids,
-                                         seed_track_ids=seed_track_ids,
-                                         seed_genres=seed_genres,
-                                         call_times=call_times,
-                                         recommendation_attributes=recommendation_attributes)
+        s = self.iterate_recommendations(
+            seed_artist_ids=seed_artist_ids,
+            seed_track_ids=seed_track_ids,
+            seed_genres=seed_genres,
+            call_times=call_times,
+            recommendation_attributes=recommendation_attributes)
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
         e = self.expander(s, **expander_params)
         self.add_source(e)
-        # FIXME: long description causes http error 500
-        self.playlist_description = (f'source: recommendations')
-        #self.playlist_description = (f'source: recommendations',
-        #                             f'{seed_artist_uris}',
-        #                             f'{seed_track_uris}',
-        #                             f'{seed_genres}')
+        self.playlist_description = ', '.join((
+            f'source: recommendations',
+            f'{seed_artist_uris}',
+            f'{seed_track_uris}',
+            f'{seed_genres}'))
+        print(self.playlist_description)
         self.generate()
 
     def is_track_ok_to_add(self, track):
