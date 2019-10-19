@@ -4,11 +4,10 @@
 
 import argh
 
-#from toukka.hub import Toukka
-#from toukka.util import json_dump
-
 from toukka.sopiva.spotify.util import get_spotify
 
+# NOTE: most of current player commands needs premium account
+# FIXME: update all commands use new spotipy
 
 def play(uri=None, offset=None, uris=None, device=None):
     ''' Start or resume user's playback.'''
@@ -19,10 +18,10 @@ def play(uri=None, offset=None, uris=None, device=None):
                                               device_id=device))
 
 
-def pause(device=None):
+@argh.decorators.wrap_errors([Exception])
+def pause(device_id=None):
     ''' Pause user's playback.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.pause_playback(device_id=device))
+    return get_spotify().playback_pause(device_id=device_id)
 
 
 @argh.aliases('next')
@@ -65,8 +64,7 @@ def shuffle(state, device=None):
 
 def devices():
     ''' Get a list of user's available devices.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.devices())
+    return get_spotify().playback_devices()
 
 
 def current_playback(market=None):
