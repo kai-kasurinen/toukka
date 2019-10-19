@@ -51,7 +51,7 @@ def generate_playlist_from_search(query_type: str, query: str,
 @argh.arg('--seed-track-uris', nargs='*')
 @argh.arg('--seed-genres', nargs='*')
 @argh.arg('--recommendation-attributes-list', nargs='*')
-def generate_playlist_from_recommendation(seed_artist_uris: list = None,
+def generate_playlist_from_recommendations(seed_artist_uris: list = None,
                                           seed_track_uris: list = None,
                                           seed_genres: list = None,
                                           dry_run: bool = False,
@@ -67,7 +67,6 @@ def generate_playlist_from_recommendation(seed_artist_uris: list = None,
     recommendation_attributes_dict = {}
     if recommendation_attributes_list is not None:
         recommendation_attributes_dict = {k: v for k, v in (x.split(':') for x in recommendation_attributes_list)}
-        print(recommendation_attributes_dict)
         spotipy.client.browse.validate.validate_attributes(recommendation_attributes_dict)
     generator = PlaylistGenerator()
     generator.generate_playlist_from_recommendations(**args, recommendation_attributes=recommendation_attributes_dict)
@@ -101,7 +100,7 @@ def generate_playlist_from_genre(genre_name: str,
 COMMANDS = [
     generate_playlist_from_uris,
     generate_playlist_from_search,
-    generate_playlist_from_recommendation,
+    generate_playlist_from_recommendations,
     generate_playlist_from_genre
 ]
 
