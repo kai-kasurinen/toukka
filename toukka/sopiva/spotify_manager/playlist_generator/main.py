@@ -342,11 +342,12 @@ class PlaylistGenerator:
         # FIXME: call_times is hack
         # NOTE: calling n times is not usefull cos recommendatios is always pretty same on same seed
         for n in range(call_times):
+            # NOTE: market=None gives many unplayeble tracks
             recommendations = self.spotify.recommendations(
                                                     artist_ids=seed_artist_ids,
                                                     track_ids=seed_track_ids,
                                                     genres=seed_genres,
-                                                    market=self._market,
+                                                    market=self._market_country_code,
                                                     limit=100,
                                                     **recommendation_attributes)
 
