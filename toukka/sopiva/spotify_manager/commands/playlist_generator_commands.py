@@ -46,21 +46,25 @@ def generate_playlist_from_search(query_type: str, query: str,
     generator.generate_playlist_from_search(**args)
 
 
-# FIXME: update
 @argh.arg('--seed-artist-uris', nargs='*')
 @argh.arg('--seed-track-uris', nargs='*')
 @argh.arg('--seed-genres', nargs='*')
 @argh.arg('--recommendation-attributes-list', nargs='*')
 def generate_playlist_from_recommendations(seed_artist_uris: list = None,
-                                          seed_track_uris: list = None,
-                                          seed_genres: list = None,
-                                          dry_run: bool = False,
-                                          call_times: int = 1,
-                                          recommendation_attributes_list: list = None,
-                                          expand_track_to_album: bool = False,
-                                          expand_track_to_artist: bool = False,
-                                          expand_generator_to_items: bool = False,
-                                          **kwargs):
+                                           seed_track_uris: list = None,
+                                           seed_genres: list = None,
+                                           dry_run: bool = False,
+                                           call_times: int = 1,
+                                           recommendation_attributes_list: list = None,
+                                           expand_track_to_album: bool = False,
+                                           expand_track_to_artist: bool = False,
+                                           expand_artist_to_albums: bool = False,
+                                           expand_artist_to_top_tracks: bool = False,
+                                           expand_artist_to_related_artists: bool = False,
+                                           expand_album_to_tracks: bool = False,
+                                           expand_playlist_to_tracks: bool = False,
+                                           expand_generator_to_items: bool = False,
+                                           **kwargs):
     '''generate playlist from recommendation'''
     args = locals()
     print(args)
