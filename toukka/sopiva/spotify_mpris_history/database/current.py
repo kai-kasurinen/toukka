@@ -1,5 +1,7 @@
 #
 
+from contextlib import contextmanager
+
 from sqlalchemy import Column, DateTime, Float, Integer, Text, text, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -34,9 +36,21 @@ class SpotifyMprisHistory(Base):
 class SpotifyMprisHistoryDB:
     def __init__(self, database_uri):
         self.engine = create_engine(database_uri, echo=False)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
+        self.Session = sessionmaker(bind=self.engine)
         Base.metadata.create_all(self.engine)
+
+    @contextmanager
+    def session_scope(self):
+        """Provide a transactional scope around a series of operations."""
+        session = self.Session()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     def last_saved_mpris_track_id(self):
         # FIXME: update to orm

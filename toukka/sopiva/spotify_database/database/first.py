@@ -1,5 +1,7 @@
 #
 
+from contextlib import contextmanager
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy import create_engine
@@ -20,7 +22,20 @@ class SpotifyDB:
     def __init__(self, database_uri):
         self.engine = create_engine(database_uri, echo=False)
         self.Session = sessionmaker(bind=self.engine)
-        self.session = self.Session()
+        #self.session = self.Session()
+
+    @contextmanager
+    def session_scope(self):
+        """Provide a transactional scope around a series of operations."""
+        session = self.Session()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     def _create(self):
         Base.metadata.create_all(self.engine)

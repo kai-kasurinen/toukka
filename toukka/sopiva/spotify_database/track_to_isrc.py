@@ -25,11 +25,12 @@ def update():
     db._create()
 
     # all unique mpris_track_ids not in spotify_track_isrc using subquery
-    track_isrc_query = db.session.query(SpotifyTrackISRC.track_uri)
-    history_query = db.session.query(SpotifyMprisHistory.mpris_track_id).\
-        filter(SpotifyMprisHistory.mpris_track_id.like('spotify:track:%')).\
-        filter(SpotifyMprisHistory.mpris_track_id.notin_(track_isrc_query)).\
-        distinct().all()
+    with db.session_scope() as session:
+        track_isrc_query = session.query(SpotifyTrackISRC.track_uri)
+        history_query = session.query(SpotifyMprisHistory.mpris_track_id).\
+            filter(SpotifyMprisHistory.mpris_track_id.like('spotify:track:%')).\
+            filter(SpotifyMprisHistory.mpris_track_id.notin_(track_isrc_query)).\
+            distinct().all()
 
     logger.debug('%s mpris_track_ids without isrc', len(history_query))
 
@@ -48,7 +49,8 @@ def update():
         isrc = track.external_ids.get('isrc')
 
         track_to_isrc_entry = SpotifyTrackISRC(track_uri=track_uri, track_isrc=isrc)
-        db.session.add(track_to_isrc_entry)
-        db.session.commit()
+        with db.session_scope() as session:
+            session.add(track_to_isrc_entry)
+            session.commit()
 
 # END

@@ -10,6 +10,7 @@ from toukka.sopiva.spotify_mpris_history.database.current import SpotifyMprisHis
 
 Session = sessionmaker()
 
+
 class SpotifyHistory:
     def __init__(self):
         database_uri = get_database_uri_from_config()
