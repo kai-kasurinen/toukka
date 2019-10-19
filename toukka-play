@@ -23,7 +23,7 @@ from toukka.sopiva.spotify_manager.genres import genres_completer
 
 __version__ = 0
 __program_name__ = 'toukka-play'
-__program_description__ = ''
+__program_description__ = 'some personal shortcuts'
 
 
 ##
