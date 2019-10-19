@@ -3,10 +3,12 @@
 
 import logging
 import pprint
+import dataclasses
 
 import argh
 import spotipy.convert
 
+import toukka.sopiva.spotify_manager.genres
 from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
 
 
@@ -59,10 +61,35 @@ def generate_playlist_from_recommendation(seed_artist_uris: list = None,
     generator.generate_playlist_from_recommendations(**locals())
 
 
+@argh.arg('genre_name', completer=toukka.sopiva.spotify_manager.genres.genres_completer)
+def generate_playlist_from_genre(genre_name: str,
+                                 dry_run: bool = False,
+                                 expand_track_to_album: bool = False,
+                                 expand_track_to_artist: bool = False,
+                                 expand_artist_to_albums: bool = False,
+                                 expand_artist_to_top_tracks: bool = False,
+                                 expand_artist_to_related_artists: bool = False,
+                                 expand_album_to_tracks: bool = False,
+                                 expand_playlist_to_tracks: bool = False,
+                                 expand_generator_to_items: bool = False
+                                 ):
+    print(locals())
+    genres = toukka.sopiva.spotify_manager.genres.genres()
+    genre = genres.get(genre_name)
+    if genre is None:
+        raise argh.exceptions.CommandError(f'genre "{genre_name}" not found')
+    print(genre)
+    playlists = dataclasses.asdict(genre.playlists)
+    uris = [uri for uri in playlists.values() if uri is not None]
+    generator = PlaylistGenerator()
+    generator.generate_playlist_from_uris(**locals())
+
+
 COMMANDS = [
     generate_playlist_from_uris,
     generate_playlist_from_search,
     generate_playlist_from_recommendation,
+    generate_playlist_from_genre
 ]
 
 
