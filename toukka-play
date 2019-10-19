@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 
-'''main, main, main'''
 
 import sys
 import logging
@@ -17,11 +16,14 @@ from toukka.sopiva.spotify_manager.commands.playlist_generator_commands import (
     generate_playlist_from_recommendation
 )
 
-from toukka.sopiva.spotify_manager.commands.genres import _genres_completer
+from toukka.sopiva.spotify_manager.genres import genres_completer
+
+#
 
 __version__ = 0
 __program_name__ = 'toukka-play'
 __program_description__ = ''
+
 
 ##
 

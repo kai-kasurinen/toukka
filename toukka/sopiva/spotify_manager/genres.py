@@ -27,6 +27,7 @@ class GenrePlaylists:
     year_2018: str = None
     year_2019: str = None
 
+
 @dataclass(frozen=True)
 class Genre:
     name: str
@@ -214,6 +215,11 @@ def genres():
 
 def genres_refresh():
     return genres.refresh()
+
+
+def genres_completer(prefix, **kwargs):
+    genres = toukka.sopiva.spotify_manager.genres.genres().keys()
+    return (genre for genre in genres if genre.startswith(prefix))
 
 
 # END
