@@ -6,6 +6,7 @@ import pprint
 import itertools
 import types
 import collections
+import random
 
 import spotipy.convert
 import spotipy.serialise
@@ -62,6 +63,8 @@ class PlaylistGenerator:
         self.playlist_description = '<empty>'
         # for debugging
         self.dry_run = False
+        #
+        self.randomize = False
 
         self.looper_target_count = 500
         self.looper_max_tries = 5000
@@ -139,8 +142,13 @@ class PlaylistGenerator:
                                     uris: list,
                                     **kwargs):
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
+        # FIXME: maybe we should use Options
         self.dry_run = kwargs.get('dry_run', True)
+        self.randomize = kwargs.get('randomize', False)
         items = self.expand_uris(uris)
+        if self.randomize:
+            logger.debug('randomize is True, so shuffling uris')
+            random.shuffle(items)
         for item in items:
             self.add_source(self.expander(item, **expander_params))
         self.playlist_description = f'source: {uris}'

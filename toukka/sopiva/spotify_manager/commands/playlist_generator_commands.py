@@ -13,8 +13,9 @@ import toukka.sopiva.spotify_manager.genres
 from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
 
 
-def generate_playlist_from_uris(*uris: list,
+def generate_playlist_from_uris(*uris: tuple,
                                 dry_run: bool = False,
+                                randomize: bool = False,
                                 expand_track_to_album: bool = False,
                                 expand_track_to_artist: bool = False,
                                 expand_artist_to_albums: bool = False,
@@ -24,6 +25,7 @@ def generate_playlist_from_uris(*uris: list,
                                 expand_playlist_to_tracks: bool = False,
                                 expand_generator_to_items: bool = False):
     args = locals()
+    print(type(uris))
     print(args)
     generator = PlaylistGenerator()
     generator.generate_playlist_from_uris(**args)
@@ -32,6 +34,7 @@ def generate_playlist_from_uris(*uris: list,
 @argh.arg('query_type', choices=['artist', 'album', 'track', 'playlist'])
 def generate_playlist_from_search(query_type: str, query: str,
                                   dry_run: bool = False,
+                                  randomize: bool = False,
                                   expand_track_to_album: bool = False,
                                   expand_track_to_artist: bool = False,
                                   expand_artist_to_albums: bool = False,
@@ -55,6 +58,7 @@ def generate_playlist_from_recommendations(seed_artist_uris: list = None,
                                            seed_genres: list = None,
                                            dry_run: bool = False,
                                            call_times: int = 1,
+                                           randomize: bool = False,
                                            recommendation_attributes_list: list = None,
                                            expand_track_to_album: bool = False,
                                            expand_track_to_artist: bool = False,
@@ -79,6 +83,7 @@ def generate_playlist_from_recommendations(seed_artist_uris: list = None,
 @argh.arg('genre_name', completer=toukka.sopiva.spotify_manager.genres.genres_completer)
 def generate_playlist_from_genre(genre_name: str,
                                  dry_run: bool = False,
+                                 randomize: bool = False,
                                  expand_track_to_album: bool = False,
                                  expand_track_to_artist: bool = False,
                                  expand_artist_to_albums: bool = False,
