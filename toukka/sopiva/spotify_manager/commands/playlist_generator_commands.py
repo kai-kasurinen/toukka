@@ -13,7 +13,8 @@ import toukka.sopiva.spotify_manager.genres
 from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
 
 
-def generate_playlist_from_uris(*uris: tuple,
+@argh.arg('uris', nargs='*')
+def generate_playlist_from_uris(uris: list,
                                 dry_run: bool = False,
                                 randomize: bool = False,
                                 expand_track_to_album: bool = False,
@@ -25,7 +26,6 @@ def generate_playlist_from_uris(*uris: tuple,
                                 expand_playlist_to_tracks: bool = False,
                                 expand_generator_to_items: bool = False):
     args = locals()
-    print(type(uris))
     print(args)
     generator = PlaylistGenerator()
     generator.generate_playlist_from_uris(**args)

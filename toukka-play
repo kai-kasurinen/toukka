@@ -69,28 +69,28 @@ def nordic_post_rock():
         'spotify:playlist:0KTT7vvBohnpfzXUcdkz8F',
         'spotify:playlist:0my3JQPuWJX7rHnX2Hvp2U'
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def instrumental_post_rock():
     uris = [
         'spotify:playlist:7m4SvnJOObW34xVsLdXx30',
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def atmospheric_post_rock():
     uris = [
         'spotify:playlist:2sTxdHJ1Nf5vve4zmir510',
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def jazz_piano():
     uris = [
         'spotify:playlist:5KudWqpwRKdH5CY6yQ1nwA'
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def new_age_piano():
@@ -99,14 +99,14 @@ def new_age_piano():
         'spotify:playlist:06ErX6daanvbqhBp7LXPc7',
         'spotify:playlist:6AUtSj2kOPTITWGMo02bkU'
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def sleep():
     uris = [
         'spotify:playlist:0cuaFpexE9V0zr3s7l6yjR'
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def female_fronted_metal():
@@ -114,14 +114,14 @@ def female_fronted_metal():
         'spotify:playlist:6VLyqry0Zrr5EdTbKT7SVa'
     ]
 
-    generate_playlist_from_uris(*uris, **kwargs_for_playlist)
+    generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
 def from_deuter():
     uris = [
         'spotify:artist:3AGvwnXbUo9LoAU2P5qYHB'
     ]
-    generate_playlist_from_uris(*uris, **kwargs_for_related_artists)
+    generate_playlist_from_uris(uris, **kwargs_for_related_artists)
 
 
 def post_rock():
@@ -129,13 +129,12 @@ def post_rock():
                                   'sound of post-rock',
                                   **kwargs_for_playlist)
 
-
-def uri(*uris: tuple,
+@argh.arg('uris', nargs='*')
+def uri(uris: list,
         dry_run: bool = False,
         randomize: bool = False
         ):
-    # FIXME: dry_run and randomize not passed, cos uris so stupid on from_uris
-    generate_playlist_from_uris(*uris, **kwargs_for_uris)
+    generate_playlist_from_uris(**locals(), **kwargs_for_uris)
 
 
 @argh.arg('genre_name', completer=genres_completer)

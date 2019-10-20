@@ -44,14 +44,15 @@ def recommendation_genre_seeds():
 @argh.arg('--seed-artist-uris', nargs='*')
 @argh.arg('--seed-track-uris', nargs='*')
 @argh.arg('--seed-genres', nargs='*')
-@argh.arg('--recommendation-attributes-list', nargs='*')
+@argh.arg('--attributes', nargs='*')
 def recommendations(seed_artist_uris: list = None,
                     seed_track_uris: list = None,
                     seed_genres: list = None,
-                    recommendation_attributes_list: list = None,
+                    attributes: list = None,
                     market: str = None,
                     limit: int = 100):
     '''get a list of recommended tracks for seeds'''
+    print(locals())
 
     def uris_to_ids(uris: list):
         ids = list()
@@ -65,8 +66,9 @@ def recommendations(seed_artist_uris: list = None,
     if seed_artist_uris is not None:
         seed_artist_ids = uris_to_ids(seed_artist_uris)
     if seed_track_uris is not None:
-        seed_track_ids = uris_to_ids(seed_artist_uris)
+        seed_track_ids = uris_to_ids(seed_track_uris)
 
+    recommendation_attributes_list = attributes
     recommendation_attributes_dict = {}
     if recommendation_attributes_list is not None:
         recommendation_attributes_dict = {k: v for k, v in (x.split(':') for x in recommendation_attributes_list)}
