@@ -8,6 +8,8 @@ import types
 import collections
 import random
 
+from options import Options
+
 import spotipy.convert
 import spotipy.serialise
 import spotipy.model.track
@@ -32,14 +34,24 @@ def _get_playlist_uri_from_config():
 class PlaylistGenerator:
     '''generates playlist'''
 
+    options = Options(
+        dry_run=False,
+        randomize=False,
+        looper_target_count=500,
+        looper_max_tries=5000
+    )
+
     def __init__(self,
                  playlist_uri=None,
                  **kwargs
                  ):
+        self.options = PlaylistGenerator.options.push(kwargs)
+
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
 
         # NOTE: bug with market='from_token' fails on unplayeble track -> TypeError
+        # NOTE: bug is fixed, so clear this mess
         self._market = None
         self._market_country_code = 'FI'
 
@@ -61,13 +73,6 @@ class PlaylistGenerator:
         self.playlist_name = '< g e n e r a t e d >'
         # NOTE: not None -> get updated. '' -> fails
         self.playlist_description = '<empty>'
-        # for debugging
-        self.dry_run = False
-        #
-        self.randomize = False
-
-        self.looper_target_count = 500
-        self.looper_max_tries = 5000
 
         # FIXME: move to Sources class
         # TODO: use PriorityQueue or something
@@ -113,12 +118,12 @@ class PlaylistGenerator:
                 track_ids_to_playlist.append(track.id)
                 logger.debug('%s: added', track.id)
 
-            if len(track_ids_to_playlist) >= self.looper_target_count:
+            if len(track_ids_to_playlist) >= self.options.looper_target_count:
                 logger.info('we have enough tracks to add')
                 break
 
             # safety
-            if counter > self.looper_max_tries:
+            if counter > self.options.looper_max_tries:
                 logger.info('we have tried too many tracks, breaking loop')
                 break
 
@@ -127,7 +132,7 @@ class PlaylistGenerator:
 
     def commit(self):
         track_ids_to_playlist = self.track_ids_to_playlist
-        if not self.dry_run:
+        if not self.options.dry_run:
             if len(track_ids_to_playlist) > 0:
                 self.playlist_clear()
                 self.playlist_tracks_add(track_ids_to_playlist)
@@ -141,12 +146,11 @@ class PlaylistGenerator:
     def generate_playlist_from_uris(self,
                                     uris: list,
                                     **kwargs):
+        self.options.update(kwargs)
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
-        # FIXME: maybe we should use Options
-        self.dry_run = kwargs.get('dry_run', True)
-        self.randomize = kwargs.get('randomize', False)
+
         items = self.expand_uris(uris)
-        if self.randomize:
+        if self.options.randomize:
             logger.debug('randomize is True, so shuffling uris')
             random.shuffle(items)
         for item in items:
@@ -158,8 +162,8 @@ class PlaylistGenerator:
                                       query_type: str,
                                       query: str,
                                       **kwargs):
+        self.options.update(kwargs)
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
-        self.dry_run = kwargs.get('dry_run', True)
         s = self.iterate_search(query_type=query_type, query=query)
         e = self.expander(s, **expander_params)
         self.add_source(e)
@@ -174,8 +178,7 @@ class PlaylistGenerator:
                                                recommendation_attributes: dict = None,
                                                **kwargs):
         '''generate playlist from recommendations'''
-
-        self.dry_run = kwargs.get('dry_run', True)
+        self.options.update(kwargs)
 
         seed_artist_ids = list()
         if seed_artist_uris is not None:
