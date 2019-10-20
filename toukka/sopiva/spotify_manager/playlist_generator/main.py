@@ -107,7 +107,7 @@ class PlaylistGenerator:
                          counter,
                          len(track_ids_to_playlist),
                          len(self.sources_queue))
-            #logger.debug(type(track))
+            # logger.debug(type(track))
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
@@ -396,6 +396,13 @@ class PlaylistGenerator:
         for playlist_track in playlist_tracks:
             yield playlist_track.track
 
+    def randomizer(self, generator):
+        if self.options.randomize:
+            logger.debug('randomizing %s', generator)
+            yield from shuffle_generator(generator, 100)
+        else:
+            yield from generator
+
     # FIXME: not used, remove
     def track_expand(self, track,
                      expand_album: bool = False,
@@ -526,8 +533,11 @@ class PlaylistGenerator:
             if self.is_uri_already_seen(item.uri):
                 return
             if expand_playlist_to_tracks:
-                yield from self.expander(self.iterate_playlist_all_tracks(item.id),
-                                         **expander_params)
+                # NOTE: ranomizer testing
+                yield from self.expander(
+                    self.randomizer(
+                        self.iterate_playlist_all_tracks(item.id)),
+                    **expander_params)
             else:
                 logger.warning('did not do anything with artist: %s', item.id)
         else:
@@ -551,5 +561,22 @@ class PlaylistGenerator:
             else:
                 logger.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
         return items
+
+# END OF CLASS
+
+# util functions
+
+
+# source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
+# modified
+def shuffle_generator(generator, buffer_size):
+    while True:
+        buffer = list(itertools.islice(generator, buffer_size))
+        if len(buffer) == 0:
+            break
+        random.shuffle(buffer)
+        for item in buffer:
+            yield item
+
 
 # END
