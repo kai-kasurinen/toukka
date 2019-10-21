@@ -356,12 +356,12 @@ class PlaylistGenerator:
         for n in range(call_times):
             # NOTE: market=None gives many unplayeble tracks
             recommendations = self.spotify.recommendations(
-                                                    artist_ids=seed_artist_ids,
-                                                    track_ids=seed_track_ids,
-                                                    genres=seed_genres,
-                                                    market=self._market_country_code,
-                                                    limit=100,
-                                                    **recommendation_attributes)
+                artist_ids=seed_artist_ids,
+                track_ids=seed_track_ids,
+                genres=seed_genres,
+                market=self._market_country_code,
+                limit=100,
+                **recommendation_attributes)
 
             for seed in recommendations.seeds:
                 logger.debug(seed)
