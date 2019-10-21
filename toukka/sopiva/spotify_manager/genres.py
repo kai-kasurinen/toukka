@@ -208,6 +208,7 @@ def genres_make():
     return genres
 
 
+# TODO: use pickle?
 @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=-1)
 def genres():
     return genres_make()

@@ -15,6 +15,7 @@ autologging = "*"
 sqlalchemy = "*"
 argh = "*"
 argcomplete = "*"
+options = "*"
 
 [packages.spotipy]
 git = "https://github.com/felix-hilden/spotipy.git"

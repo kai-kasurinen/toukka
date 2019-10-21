@@ -6,7 +6,7 @@ import functools
 import pprint
 import logging
 
-import autologging
+# import autologging
 import deprecated
 
 import spotipy.model
@@ -19,13 +19,13 @@ from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
 @functools.singledispatch
-@autologging.traced
+#@autologging.traced
 def printer(arg):
     print(arg)
 
 
 @printer.register
-@autologging.traced
+#@autologging.traced
 def print_item(item: spotipy.model.base.Item):
     print(f'{item.type}, {item.id}, {item.uri}')
 
