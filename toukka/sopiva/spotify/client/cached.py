@@ -7,6 +7,9 @@ from spotipy.model import FullTrack, FullArtist, FullAlbum, AudioFeatures
 import toukka.cache.dogpile
 from .extented import SpotifyExtended
 
+# TODO: rename cached methods
+# TODO: do something when pickling fails?
+# TODO: handle from_token
 
 class SpotifyCached(SpotifyExtended):
 

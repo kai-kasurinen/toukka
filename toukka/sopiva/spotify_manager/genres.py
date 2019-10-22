@@ -3,9 +3,13 @@
 import logging
 import re
 import itertools
+import pickle
+import os
 
 from dataclasses import dataclass
 from typing import List
+
+from xdg.BaseDirectory import save_cache_path
 
 import spotipy.convert
 
@@ -58,6 +62,7 @@ def genres_make():
     def playlist_cached(playlist_id: str):
         return spotify.playlist(playlist_id, market=None)
 
+    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def process_sound_of_spotify():
         user_id = sound_of_spotify_id
         playlists = playlists_cached(user_id)
@@ -94,6 +99,7 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return sounds
 
+    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def process_particle_detector():
         user_id = particle_detector_id
         playlists = playlists_cached(user_id)
@@ -125,6 +131,7 @@ def genres_make():
 
         return intros, pulses, edges
 
+    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def process_particle_filter():
         user_id = particle_filter_id
         playlists = playlists_cached(user_id)
@@ -143,6 +150,7 @@ def genres_make():
         return females
 
     # TODO: make generic for years
+    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def process_particle_detector_2018():
         user_id = particle_detector_2018_id
         playlists = playlists_cached(user_id)
@@ -160,6 +168,7 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return year_2018
 
+    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
     def process_particle_detector_2019():
         user_id = particle_detector_2019_id
         playlists = playlists_cached(user_id)
@@ -208,18 +217,36 @@ def genres_make():
     return genres
 
 
-# TODO: use pickle?
-@toukka.cache.dogpile.region.cache_on_arguments(expiration_time=-1)
 def genres():
-    return genres_make()
+    try:
+        return genres_load()
+    except FileNotFoundError:
+        logger.warning('pickled genres not found, returning empty')
+        return {}
 
 
 def genres_refresh():
-    return genres.refresh()
+    genres_save()
 
 
+def genres_save():
+    genres = genres_make()
+
+    _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
+
+    with open(_file, 'wb') as file:
+        pickle.dump(genres, file)
+
+
+def genres_load():
+    _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
+    with open(_file, 'rb') as file:
+        return pickle.load(file)
+
+
+# for argcomplete
 def genres_completer(prefix, **kwargs):
-    genres = toukka.sopiva.spotify_manager.genres.genres().keys()
+    genres = genres().keys()
     return (genre for genre in genres if genre.startswith(prefix))
 
 
