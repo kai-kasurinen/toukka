@@ -22,7 +22,9 @@ def search(type: str,
                             market=None,
                             limit=50)
     paging = search[0]
-    # NOTE: next() not compatible with search results
+    print(f'results total: {paging.total}')
+    print()
+
     for count, item in enumerate(spotify.iterate_items_from_paging(paging), start=1):
         printer.printer(item)
 
