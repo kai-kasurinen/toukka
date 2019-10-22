@@ -178,6 +178,7 @@ def main():
 
     parser.add_commands(COMMANDS)
     args = parser.parse_args()
+    toukka.logger.simple.set_logging_level(args.loglevel)
     parser.dispatch()
 
 

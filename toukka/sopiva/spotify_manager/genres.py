@@ -51,18 +51,18 @@ def genres_make():
     particle_detector_2018_id = 'particledetector2018'
     particle_detector_2019_id = 'particledetector2019'
 
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def playlists_cached(user_id: str):
         paging = spotify.playlists(user_id, limit=50)
         logger.debug('playlists total: %i', paging.total)
         playlists = list(spotify.items_from_paging(paging))
         return playlists
 
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def playlist_cached(playlist_id: str):
         return spotify.playlist(playlist_id, market=None)
 
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def process_sound_of_spotify():
         user_id = sound_of_spotify_id
         playlists = playlists_cached(user_id)
@@ -99,7 +99,7 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return sounds
 
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def process_particle_detector():
         user_id = particle_detector_id
         playlists = playlists_cached(user_id)
@@ -131,7 +131,7 @@ def genres_make():
 
         return intros, pulses, edges
 
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def process_particle_filter():
         user_id = particle_filter_id
         playlists = playlists_cached(user_id)
@@ -150,7 +150,7 @@ def genres_make():
         return females
 
     # TODO: make generic for years
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def process_particle_detector_2018():
         user_id = particle_detector_2018_id
         playlists = playlists_cached(user_id)
@@ -168,7 +168,7 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return year_2018
 
-    @toukka.cache.dogpile.region.cache_on_arguments(expiration_time=604800)
+    @toukka.cache.dogpile.region.cache_on_arguments()
     def process_particle_detector_2019():
         user_id = particle_detector_2019_id
         playlists = playlists_cached(user_id)

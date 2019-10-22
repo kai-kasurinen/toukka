@@ -7,9 +7,11 @@ import spotipy
 import spotipy.util
 
 import toukka.config
+import toukka.hub.requests
 
 import toukka.sopiva.spotify.client.cached
 import toukka.sopiva.spotify.state
+
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
@@ -63,8 +65,10 @@ def get_user_token():
 
 def get_spotify_with_user_credentials():
     token = get_user_token()
-    #sender = spotipy.sender.PersistentSender()
-    sender = spotipy.sender.RetryingSender(retries=2, sender=spotipy.sender.PersistentSender())
+    sender = spotipy.sender.PersistentSender()
+    sender.session = toukka.hub.requests.get_session_cached()
+    # NOTE: our session handless retrying, so this not neededs
+    # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
     client = toukka.sopiva.spotify.client.cached.SpotifyCached(
         token=token,
         sender=sender)
