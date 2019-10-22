@@ -217,6 +217,7 @@ def genres_make():
     return genres
 
 
+# FIXME: rename
 def genres():
     try:
         return genres_load()
@@ -231,9 +232,7 @@ def genres_refresh():
 
 def genres_save():
     genres = genres_make()
-
     _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
-
     with open(_file, 'wb') as file:
         pickle.dump(genres, file)
 
@@ -246,8 +245,8 @@ def genres_load():
 
 # for argcomplete
 def genres_completer(prefix, **kwargs):
-    genres = genres().keys()
-    return (genre for genre in genres if genre.startswith(prefix))
+    _genres = genres().keys()
+    return (genre for genre in _genres if genre.startswith(prefix))
 
 
 # END
