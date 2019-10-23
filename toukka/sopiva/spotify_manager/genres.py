@@ -42,6 +42,8 @@ class Genres(dict):
     pass
 
 
+# TODO: fix caching, currently it caches ~1.7GiB
+
 def genres_make():
     spotify = get_spotify()
 
