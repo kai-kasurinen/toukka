@@ -99,10 +99,12 @@ def genre_re(genre_name_re: str,
              dry_run: bool = False,
              randomize: bool = False
              ):
+    args = locals()
+    args.pop('genre_name_re')
     regex = re.compile(genre_name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genre_names_match = filter(regex.fullmatch, genres.keys())
-    generate_playlist_from_genres(genre_name=genre_names_match, **kwargs_for_playlist)
+    generate_playlist_from_genres(genre_name=genre_names_match, **args, **kwargs_for_playlist)
 
 ##
 

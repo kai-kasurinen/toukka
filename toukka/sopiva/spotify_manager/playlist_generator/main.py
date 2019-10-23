@@ -7,6 +7,7 @@ import itertools
 import types
 import collections
 import random
+import textwrap
 
 from options import Options
 
@@ -301,6 +302,10 @@ class PlaylistGenerator:
     def playlist_details_update(self):
         if self.playlist_description is None:
             logger.warning('playlist description is None')
+        # spotify api silently fails if description is too long
+        self.playlist_description = textwrap.shorten(self.playlist_description, width=300)
+        logger.debug('playlist details update: name: %s, desc: %s',
+                     self.playlist_name, self.playlist_description)
         self.spotify.playlist_change_details(
             self.playlist.id,
             name=self.playlist_name,
