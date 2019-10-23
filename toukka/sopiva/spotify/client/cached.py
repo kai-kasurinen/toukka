@@ -11,6 +11,7 @@ from .extented import SpotifyExtended
 # TODO: do something when pickling fails?
 # TODO: handle from_token
 
+
 class SpotifyCached(SpotifyExtended):
 
     @toukka.cache.dogpile.region.cache_on_arguments()
