@@ -59,7 +59,7 @@ def get_spotify_with_user_credentials():
     # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
     #
     # https://github.com/psf/requests/issues/3070
-    requests_kwargs = {'timeout': 60.0}
+    requests_kwargs = {'timeout': 10.0}
     client = toukka.sopiva.spotify.client.cached.SpotifyCached(
         token=token,
         sender=sender,
