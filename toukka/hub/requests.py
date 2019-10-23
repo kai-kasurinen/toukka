@@ -8,9 +8,15 @@ import cachecontrol.caches
 import redis
 
 
+
+
+
 def get_session():
     session = requests.Session()
-    retry = urllib3.util.retry.Retry(total=3)
+    retry = urllib3.util.retry.Retry(
+        total=3,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 503))
     adapter = requests.adapters.HTTPAdapter(max_retries=retry)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
@@ -21,7 +27,10 @@ def get_cached_session():
     # TODO: add file_cache support
     redis_ = redis.Redis.from_url('redis://')
     session = requests.Session()
-    retry = urllib3.util.retry.Retry(total=3)
+    retry = urllib3.util.retry.Retry(
+        total=3,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 503))
     cache = cachecontrol.caches.RedisCache(redis_)
     adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retry)
     session.mount('http://', adapter)
