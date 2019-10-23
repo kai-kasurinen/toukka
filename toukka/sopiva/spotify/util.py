@@ -9,7 +9,7 @@ import spotipy.util
 import toukka.config
 import toukka.hub.requests
 
-import toukka.sopiva.spotify.client.cached
+import toukka.sopiva.spotify.client.current
 import toukka.sopiva.spotify.state
 
 
@@ -60,7 +60,7 @@ def get_spotify_with_user_credentials():
     #
     # https://github.com/psf/requests/issues/3070
     requests_kwargs = {'timeout': 10.0}
-    client = toukka.sopiva.spotify.client.cached.SpotifyCached(
+    client = toukka.sopiva.spotify.client.current.Spotify(
         token=token,
         sender=sender,
         requests_kwargs=requests_kwargs)
@@ -74,7 +74,7 @@ def get_spotify_with_client_credentials():
     credentials = spotipy.auth.Credentials(client_id, client_secret, redirect_uri)
     token = credentials.request_client_token()
     # FIXME: current RefreshingToken does not work with client credentials
-    client = toukka.sopiva.spotify.client.cached.SpotifyCached(
+    client = toukka.sopiva.spotify.client.current.Spotify(
         token=token,
         sender=spotipy.sender.PersistentSender())
     return client

@@ -1,15 +1,11 @@
 #
 
 from typing import Generator
-import logging
 
-import deprecated
 import spotipy.client
+
 from spotipy.model.paging import Paging
 from spotipy.model.base import Item
-
-logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
 
 
 class SpotifyExtended(spotipy.client.Spotify):
@@ -17,7 +13,7 @@ class SpotifyExtended(spotipy.client.Spotify):
     def pages_from_paging(self,
                           paging: Paging
                           ) -> Generator[Paging, None, None]:
-        '''pages from Paging generator'''
+        '''all pages from Paging generator'''
         yield paging
         while paging.next:
             paging = self.next(paging)

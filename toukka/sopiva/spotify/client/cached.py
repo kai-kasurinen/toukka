@@ -2,17 +2,19 @@
 
 from typing import Union
 
+import spotipy.client
 from spotipy.model import FullTrack, FullArtist, FullAlbum, AudioFeatures
 
 import toukka.cache.dogpile
-from .extented import SpotifyExtended
+
 
 # TODO: rename cached methods
 # TODO: do something when pickling fails?
 # TODO: handle from_token
+# TODO: or not use at all?
 
 
-class SpotifyCached(SpotifyExtended):
+class SpotifyCached(spotipy.client.Spotify):
 
     @toukka.cache.dogpile.region.cache_on_arguments()
     def track(self,
@@ -34,6 +36,7 @@ class SpotifyCached(SpotifyExtended):
               ) -> FullAlbum:
         return super().album(album_id, market=market)
 
+    # NOTE: not cached by cachecontrol at all
     @toukka.cache.dogpile.region.cache_on_arguments()
     def track_audio_features(self, track_id: str) -> AudioFeatures:
         return super().track_audio_features(track_id)
