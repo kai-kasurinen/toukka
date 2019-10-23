@@ -6,16 +6,21 @@ from dogpile.cache import make_region
 from xdg.BaseDirectory import save_cache_path
 
 
-# FIXME: rename
-region = make_region()
+null = make_region()
+memory = make_region()
+local = make_region()
+redis = make_region()
 
 
 def configure():
 
-    _cache_path = save_cache_path('toukka', 'dogpile')
-    _cache_file = os.path.join(_cache_path, 'cache.dbm')
+    _cache_file = os.path.join(save_cache_path('toukka', 'dogpile'), 'local.dbm')
 
     config = {
+        # null
+        'cache.null.backend': 'dogpile.cache.null',
+        # memory
+        'cache.memory.backend': 'dogpile.cache.memory_pickle',
         # local file
         'cache.local.backend': 'dogpile.cache.dbm',
         'cache.local.arguments.filename': _cache_file,
@@ -26,8 +31,10 @@ def configure():
         'cache.redis.expiration_time': 60*60*24
     }
 
-    # region.configure_from_config(config, 'cache.local.')
-    region.configure_from_config(config, 'cache.redis.')
+    null.configure_from_config(config, 'cache.null.')
+    memory.configure_from_config(config, 'cache.memory.')
+    local.configure_from_config(config, 'cache.local.')
+    redis.configure_from_config(config, 'cache.redis.')
 
 
 # FIXME: removes

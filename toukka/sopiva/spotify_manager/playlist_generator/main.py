@@ -550,6 +550,9 @@ class PlaylistGenerator:
             raise Exception()
 
     # FIXME: better name?
+    # TODO: add Uri class
+    # TODO: yield things
+    # NOTE: this is currrently very slow for large number uris
     def expand_uris(self, uris: list):
         items = list()
         for uri in uris:

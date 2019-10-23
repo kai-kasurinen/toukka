@@ -168,3 +168,7 @@ logging:
     https://pythonhosted.org/Autologging/index.html
 
 
+dataclasses:
+    https://github.com/lidatong/dataclasses-json
+    https://github.com/konradhalas/dacite
+    https://github.com/Fatal1ty/mashumaro

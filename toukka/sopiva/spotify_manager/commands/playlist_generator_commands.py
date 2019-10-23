@@ -97,10 +97,6 @@ def generate_playlist_from_genres(genre_name: list,
     print(args)
     genres = toukka.sopiva.spotify_manager.genres.genres()
 
-    # support single str
-    if isinstance(genre_name, str):
-        genre_name = [genre_name]
-
     uris_all = list()
     for name in genre_name:
         genre = genres.get(name)
