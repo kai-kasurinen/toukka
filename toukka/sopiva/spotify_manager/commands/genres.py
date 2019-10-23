@@ -29,7 +29,13 @@ def genre(name: str):
 def genre_re(name_re: str):
     regex = re.compile(name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
-    genre_names_match = filter(regex.search, genres.keys())
+    # NOTE:
+    # If the whole string matches this regular expression,
+    # return a corresponding match object.
+    # Return None if the string does not match the pattern
+    #
+    # match object is True and None is False
+    genre_names_match = filter(regex.fullmatch, genres.keys())
 
     for g in genre_names_match:
         genre = genres.get(g)
