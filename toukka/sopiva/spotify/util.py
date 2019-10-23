@@ -57,9 +57,13 @@ def get_spotify_with_user_credentials():
     sender.session = toukka.hub.requests.get_cached_session()
     # NOTE: our session handless retrying, so this not neededs
     # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
+    #
+    # https://github.com/psf/requests/issues/3070
+    requests_kwargs = {'timeout': 60.0}
     client = toukka.sopiva.spotify.client.cached.SpotifyCached(
         token=token,
-        sender=sender)
+        sender=sender,
+        requests_kwargs=requests_kwargs)
     return client
 
 
