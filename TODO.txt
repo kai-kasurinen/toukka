@@ -38,7 +38,7 @@ https://github.com/Hexxeh/spotify-websocket-api
 https://github.com/plamere/OrganizeYourMusic
 https://github.com/plamere/OrganizeYourMusic/blob/master/web/index.html sadness, happiness, anger
 https://github.com/plamere/NowPlayingOnSpotify
-
+https://github.com/plamere/pbl  Playlist Builder Library (PBL)
 
 https://towardsdatascience.com/is-my-spotify-music-boring-an-analysis-involving-music-data-and-machine-learning-47550ae931de
 https://github.com/juandes/spotify-audio-features-data-experiment
@@ -166,3 +166,5 @@ oauth:
 
 logging:
     https://pythonhosted.org/Autologging/index.html
+
+
