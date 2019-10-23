@@ -1,6 +1,7 @@
 #
 
 import pprint
+import re
 import argh
 
 import toukka.sopiva.spotify_manager.genres
@@ -25,8 +26,19 @@ def genre(name: str):
     pprint.pprint(genre)
 
 
+def genre_re(name_re: str):
+    regex = re.compile(name_re)
+    genres = toukka.sopiva.spotify_manager.genres.genres()
+    genre_names_match = filter(regex.search, genres.keys())
+
+    for g in genre_names_match:
+        genre = genres.get(g)
+        pprint.pprint(genre)
+
+
 COMMANDS = [
     genres,
     genres_refresh,
-    genre
+    genre,
+    genre_re
 ]
