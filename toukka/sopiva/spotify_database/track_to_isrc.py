@@ -36,7 +36,7 @@ def update():
     logger.debug('%s mpris_track_ids without isrc', len(query))
 
     for track_uri, in query:
-        logger.debug(f'{track_uri}')
+        logger.debug('%s', track_uri)
 
         track_uri_type, track_uri_id = spotipy.convert.from_uri(track_uri)
 
