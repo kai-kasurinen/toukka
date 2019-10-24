@@ -25,7 +25,7 @@ def update():
     db._create()
 
     with db.session_scope() as session:
-        history_query = session.query(SpotifyMprisHistory.mpris_track_id).\
+        query = session.query(SpotifyMprisHistory.mpris_track_id).\
             join(SpotifyTrackISRC,
                  SpotifyMprisHistory.mpris_track_id == SpotifyTrackISRC.track_uri,
                  isouter=True).\
@@ -33,16 +33,10 @@ def update():
             filter(SpotifyTrackISRC.track_uri.is_(None)).\
             distinct().all()
 
-    logger.debug('%s mpris_track_ids without isrc', len(history_query))
+    logger.debug('%s mpris_track_ids without isrc', len(query))
 
-    for track_uri, in history_query:
+    for track_uri, in query:
         logger.debug(f'{track_uri}')
-
-        # FIXME: remove, not needed
-        # 'cos convert.from_uri does not handle podcasts and other
-        if 'spotify:track:' not in track_uri:
-            logger.debug(f'{track_uri}: unsupported type')
-            continue
 
         track_uri_type, track_uri_id = spotipy.convert.from_uri(track_uri)
 
