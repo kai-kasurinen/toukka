@@ -15,7 +15,7 @@ class SpotifyExtended(spotipy.client.Spotify):
                               ) -> Generator[Paging, None, None]:
         '''all pages from Paging generator'''
         yield paging
-        while paging.next:
+        while paging.next is not None:
             paging = self.next(paging)
             yield paging
 
@@ -27,8 +27,8 @@ class SpotifyExtended(spotipy.client.Spotify):
             yield from page.items
 
     # FIXME: remove
-    iterate_pages_from_paging = pages_from_paging
-    iterate_items_from_paging = items_from_paging
+    iterate_pages_from_paging = all_pages_from_paging
+    iterate_items_from_paging = all_items_from_paging
     items_from_paging = all_items_from_paging
     pages_from_paging = all_pages_from_paging
 
