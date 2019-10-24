@@ -24,12 +24,13 @@ def update():
     db = SpotifyDB(database_uri)
     db._create()
 
-    # all unique mpris_track_ids not in spotify_track_isrc using subquery
     with db.session_scope() as session:
-        track_isrc_query = session.query(SpotifyTrackISRC.track_uri)
         history_query = session.query(SpotifyMprisHistory.mpris_track_id).\
+            join(SpotifyTrackISRC,
+                 SpotifyMprisHistory.mpris_track_id == SpotifyTrackISRC.track_uri,
+                 isouter=True).\
             filter(SpotifyMprisHistory.mpris_track_id.like('spotify:track:%')).\
-            filter(SpotifyMprisHistory.mpris_track_id.notin_(track_isrc_query)).\
+            filter(SpotifyTrackISRC.track_uri.is_(None)).\
             distinct().all()
 
     logger.debug('%s mpris_track_ids without isrc', len(history_query))
