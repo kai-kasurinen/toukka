@@ -64,11 +64,13 @@ kwargs_for_uris = {
 }
 
 
-def female_fronted_metal():
-    uris = [
-        'spotify:playlist:6VLyqry0Zrr5EdTbKT7SVa'
-    ]
+def hotel_costes():
+    uris = ['spotify:artist:0sKvyHIsuZMjaLWyHFX4RV']
+    generate_playlist_from_uris(uris, **kwargs_for_uris)
 
+
+def female_fronted_metal():
+    uris = ['spotify:playlist:6VLyqry0Zrr5EdTbKT7SVa']
     generate_playlist_from_uris(uris, **kwargs_for_playlist)
 
 
@@ -110,6 +112,7 @@ def genre_re(genre_name_re: str,
 
 
 COMMANDS = [
+    hotel_costes,
     female_fronted_metal,
     from_deuter,
     uri,
