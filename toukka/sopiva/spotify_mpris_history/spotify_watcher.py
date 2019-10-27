@@ -23,7 +23,7 @@ class SpotifyWatcher(PlayerCtlManager, GObject.GObject):
         self.last_seen = None
         self.last_ok = None
         self.check_player_timeout_source = None
-        super().__init__(watch_only='spotify')
+        super().__init__(watch_only=['spotify'])
 
     def check_player_timeout_remove(self):
         if self.check_player_timeout_source is None:
@@ -38,6 +38,7 @@ class SpotifyWatcher(PlayerCtlManager, GObject.GObject):
         if self.check_player_timeout_source is not None:
             logger.debug('check player timeout already added')
         else:
+            # NOTE: 10 seconds delay for checking
             self.check_player_timeout_source = GLib.timeout_add_seconds(10, self.check_player)
             logger.debug('check player timeout added')
 
@@ -86,12 +87,13 @@ class SpotifyWatcher(PlayerCtlManager, GObject.GObject):
 
         # hopefully this fixes crash
         if self.player is None:
-            logger.debug('player disappeared?')
+            logger.debug('player disappeared? removing check')
             self.check_player_timeout_source = None
             return False
 
         # when not playing, stop watching
         if self.player.props.status != 'Playing':
+            logger.debug('player not playing? removing check')
             self.check_player_timeout_source = None
             return False
 
@@ -100,15 +102,23 @@ class SpotifyWatcher(PlayerCtlManager, GObject.GObject):
 
         # we already send it
         if track_id == self.last_ok:
-            logger.debug('track_id is same as last_ok')
+            logger.debug('track_id is same as last_ok. removing check')
             self.check_player_timeout_source = None
             return False
 
         # NOTE: position in the current track of the player in microseconds
         position = self.player.props.position
-        # NOTE: position_wanted should be mpris:length/2, but length may be 0 or something
-        # so 30 seconds is should be ok
+        # NOTE: defaults to 30 seconds
         position_wanted = 30000000
+
+        track_length = metadata['mpris:length']
+        # logger.debug('track length: %i', track_length)
+
+        # NOTE: if length is defined, new position wanted is half of length
+        if track_length > 0:
+            position_wanted = track_length/2
+
+        logger.debug('position is %i, position wanted is %i', position, position_wanted)
 
         if position <= position_wanted:
             logger.debug('track position not ok')

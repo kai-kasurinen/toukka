@@ -10,7 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class SpotifySaver:
-    def __init__(self):
+    def __init__(self,
+                 dry_run: bool = False,
+                 ):
+        self.dry_run = dry_run
         self.last_seen = None
         database_uri = lazy_config['database_uri'].get()
         logger.debug('database_uri is %s', database_uri)
@@ -47,7 +50,7 @@ class SpotifySaver:
     def saver(self, metadata):
         # NOTE: metadata is now python dict
         track_id = metadata.get('mpris:trackid')
-
+        logger.debug('saver %s', track_id)
         # convert metadata to columns
         columns = {
             'mpris_track_id':     metadata.get('mpris:trackid'),
@@ -66,8 +69,12 @@ class SpotifySaver:
         history_entry = SpotifyMprisHistory(**columns)
         # session_scope handles commit, rollback, close session
         with self.db.session_scope() as session:
-            session.add(history_entry)
-            session.commit()
+            if self.dry_run:
+                logger.warning('not commit, dry_run is %s', self.dry_run)
+            else:
+                logger.debug('commit track to database')
+                session.add(history_entry)
+                session.commit()
 
         self.last_saved = track_id
         logger.debug('saved %s', track_id)

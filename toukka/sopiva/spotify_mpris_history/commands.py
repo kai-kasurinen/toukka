@@ -4,6 +4,7 @@ from .playerctl_manager import PlayerCtlManager
 from .spotify_saver import SpotifySaver
 from .glib_mainloop import MainLoop
 
+
 # FIXME: move
 def watch_all_players():
     '''for debugging only'''
@@ -12,9 +13,10 @@ def watch_all_players():
     mainloop.run()
 
 
-def saver():
+def saver(dry_run: bool = False):
     '''saves spotify mpris metadata to database'''
-    spotify_saver = SpotifySaver()
+    args = locals()
+    spotify_saver = SpotifySaver(**args)
     mainloop = MainLoop()
     mainloop.run()
 #
