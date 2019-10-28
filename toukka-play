@@ -10,6 +10,8 @@ import re
 
 import click
 import click_log
+import click_completion
+click_completion.init()
 
 import toukka.logger.simple
 
@@ -66,6 +68,16 @@ kwargs_for_uris = {
 }
 
 
+# FIXME: not work?
+#
+# ctx - The current click context.
+# args - The list of arguments passed in.
+# incomplete - The partial word that is being completed, as a string.
+#              May be an empty string '' if no characters have been entered yet.
+def click_genre_completer(ctx, args, incomplete):
+    return genres_completer(incomplete)
+
+
 @click.group()
 @click.version_option(version=__version__)
 @click_log.simple_verbosity_option(None, '--loglevel')
@@ -86,7 +98,7 @@ def uri(uris: tuple,
 
 # TODO: add support genre_completer
 @cli.command()
-@click.argument('genre_name', nargs=-1)
+@click.argument('genre_name', nargs=-1, autocompletion=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
 def genre(genre_name: tuple,
