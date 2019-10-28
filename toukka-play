@@ -5,9 +5,11 @@
 import sys
 import logging
 import pprint
-import argh
 import dataclasses
 import re
+
+import click
+import click_log
 
 import toukka.logger.simple
 
@@ -64,7 +66,17 @@ kwargs_for_uris = {
 }
 
 
-@argh.arg('uris', nargs='*')
+@click.group()
+@click.version_option(version=__version__)
+@click_log.simple_verbosity_option(None, '--loglevel')
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument('uris', required=True, nargs=-1)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def uri(uris: list,
         dry_run: bool = False,
         randomize: bool = False
@@ -72,7 +84,11 @@ def uri(uris: list,
     generate_playlist_from_uris(**locals(), **kwargs_for_uris)
 
 
-@argh.arg('genre_name', nargs='*', completer=genres_completer)
+# TODO: add support genre_completer
+@cli.command()
+@click.argument('genre_name', nargs=-1)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def genre(genre_name: list,
           dry_run: bool = False,
           randomize: bool = False
@@ -80,6 +96,9 @@ def genre(genre_name: list,
     generate_playlist_from_genres(**locals(), **kwargs_for_playlist)
 
 
+@cli.command()
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def genre_re(genre_name_re: str,
              dry_run: bool = False,
              randomize: bool = False
@@ -94,31 +113,12 @@ def genre_re(genre_name_re: str,
 ##
 
 
-COMMANDS = [
-    uri,
-    genre,
-    genre_re
-]
-
-
 def main():
     '''main'''
     toukka.logger.simple.init_logging()
-
-    parser = argh.ArghParser(prog=__program_name__, description=__program_description__)
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s {version}'.format(version=__version__))
-    parser.add_argument('--debug',
-                        help='Print lots of debugging statements',
-                        action='store_const',
-                        dest='loglevel',
-                        const=logging.DEBUG,
-                        default=logging.INFO)
-
-    parser.add_commands(COMMANDS)
-    args = parser.parse_args()
-    toukka.logger.simple.set_logging_level(args.loglevel)
-    parser.dispatch()
+    # FIXME: format?
+    click_log.basic_config()
+    cli()
 
 
 if __name__ == "__main__":
