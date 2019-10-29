@@ -84,7 +84,6 @@ class PlaylistGenerator:
     def generate(self):
         self.looper()
         self.commit()
-        # FIXME: continue
 
     def looper(self):
 
