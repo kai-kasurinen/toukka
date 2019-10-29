@@ -27,6 +27,25 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+class SourceQueue:
+    def __init__(self):
+        self.sources_queue = collections.deque()
+
+    # FIXME: move to Sources class
+    def add(self, source):
+        self.sources_queue.append(source)
+
+    # FIXME: move to Sources class
+    def generator(self):
+        while True:
+            try:
+                yield from self.sources_queue.popleft()
+            except IndexError:
+                break
+
+    def __len__(self):
+        return len(self.sources_queue)
+
 
 class PlaylistGenerator:
     '''generates playlist'''
@@ -60,22 +79,7 @@ class PlaylistGenerator:
         self._uris_seen = set()
 
         self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
-
-        # FIXME: move to Sources class
-        # TODO: use PriorityQueue or something
-        self.sources_queue = collections.deque()
-
-    # FIXME: move to Sources class
-    def add_source(self, source):
-        self.sources_queue.append(source)
-
-    # FIXME: move to Sources class
-    def sources_queue_generator(self):
-        while True:
-            try:
-                yield from self.sources_queue.popleft()
-            except IndexError:
-                break
+        self.sources = SourceQueue()
 
     def generate(self):
         self.looper()
@@ -85,15 +89,12 @@ class PlaylistGenerator:
     def looper(self):
 
         track_ids_to_playlist = list()
-        # logger.debug('sources: %s', self._sources)
-        # sources = itertools.chain.from_iterable(self.sources_queue)
-        sources = self.sources_queue_generator()
 
-        for counter, track in enumerate(sources):
+        for counter, track in enumerate(self.sources.generator()):
             logger.debug('counter: %i, tracks: %i, sources: %i',
                          counter,
                          len(track_ids_to_playlist),
-                         len(self.sources_queue))
+                         len(self.sources))
             # logger.debug(type(track))
             assert isinstance(track, spotipy.model.track.FullTrack)
 
@@ -117,7 +118,7 @@ class PlaylistGenerator:
         self.track_ids_to_playlist = track_ids_to_playlist
         logger.info(f'{len(track_ids_to_playlist)} tracks to add')
 
-    # FIXME: move to Playlist
+    # TODO: split and move to Playlist
     def commit(self):
         track_ids_to_playlist = self.track_ids_to_playlist
         if not self.options.dry_run:
@@ -142,8 +143,8 @@ class PlaylistGenerator:
             logger.debug('randomize is True, so shuffling uris')
             random.shuffle(items)
         for item in items:
-            self.add_source(self.expander(item, **expander_params))
-        self.playlist.description = f'source: {uris}'
+            self.sources.add(self.expander(item, **expander_params))
+        self.playlist.description = f'source: {", ".join(uris)}'
         self.generate()
 
     def generate_playlist_from_search(self,
@@ -154,7 +155,7 @@ class PlaylistGenerator:
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
         s = self.iterate_search(query_type=query_type, query=query)
         e = self.expander(s, **expander_params)
-        self.add_source(e)
+        self.sources.add(e)
         self.playlist.description = f'source: search {query_type} "{query}"'
         self.generate()
 
@@ -186,7 +187,7 @@ class PlaylistGenerator:
             recommendation_attributes=recommendation_attributes)
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
         e = self.expander(s, **expander_params)
-        self.add_source(e)
+        self.sources.add(e)
         self.playlist.description = ', '.join((
             f'source: recommendations',
             f'{seed_artist_uris}',
@@ -433,7 +434,7 @@ class PlaylistGenerator:
                 _expander_params = expander_params.copy()
                 _expander_params['expand_track_to_artist'] = False
                 for artist in item.artists:
-                    self.add_source(
+                    self.sources.add(
                         self.expander(
                             self.spotify.artist(artist.id),
                             **_expander_params))
@@ -456,7 +457,7 @@ class PlaylistGenerator:
 
             if expand_artist_to_related_artists:
                 # add artists as new source
-                self.add_source(
+                self.sources.add(
                     self.expander(
                         self.iterate_related_artists(item.id),
                         **expander_params))
