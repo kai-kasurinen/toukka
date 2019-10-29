@@ -7,7 +7,6 @@ import itertools
 import types
 import collections
 import random
-import textwrap
 
 from options import Options
 
@@ -18,18 +17,15 @@ import spotipy.model.artist
 import spotipy.model.playlist
 import spotipy.model.album
 
-import toukka.config
-
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 from toukka.sopiva.spotify.printer import first as printer
 
+from .playlist import Playlist
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-
-def _get_playlist_uri_from_config():
-    return toukka.config.lazy_config['spotify_manager']['playlist_generator']['playlist_uri'].get()
 
 
 class PlaylistGenerator:
@@ -63,17 +59,7 @@ class PlaylistGenerator:
         self._isrc_seen = set()
         self._uris_seen = set()
 
-        # get playlist
-        if playlist_uri is None:
-            playlist_uri = _get_playlist_uri_from_config()
-        playlist_uri_type, playlist_uri_id = spotipy.convert.from_uri(playlist_uri)
-        self.playlist = self.spotify.playlist(playlist_uri_id, market=self._market)
-        self.playlist_snapshot_id = self.playlist.snapshot_id
-
-        # defaults
-        self.playlist_name = '< g e n e r a t e d >'
-        # NOTE: not None -> get updated. '' -> fails
-        self.playlist_description = '<empty>'
+        self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
 
         # FIXME: move to Sources class
         # TODO: use PriorityQueue or something
@@ -131,13 +117,14 @@ class PlaylistGenerator:
         self.track_ids_to_playlist = track_ids_to_playlist
         logger.info(f'{len(track_ids_to_playlist)} tracks to add')
 
+    # FIXME: move to Playlist
     def commit(self):
         track_ids_to_playlist = self.track_ids_to_playlist
         if not self.options.dry_run:
             if len(track_ids_to_playlist) > 0:
-                self.playlist_clear()
-                self.playlist_tracks_add(track_ids_to_playlist)
-                self.playlist_details_update()
+                self.playlist.clear()
+                self.playlist.tracks_add(track_ids_to_playlist)
+                self.playlist.details_update()
             else:
                 logger.info('try something else?')
         else:
@@ -156,7 +143,7 @@ class PlaylistGenerator:
             random.shuffle(items)
         for item in items:
             self.add_source(self.expander(item, **expander_params))
-        self.playlist_description = f'source: {uris}'
+        self.playlist.description = f'source: {uris}'
         self.generate()
 
     def generate_playlist_from_search(self,
@@ -168,7 +155,7 @@ class PlaylistGenerator:
         s = self.iterate_search(query_type=query_type, query=query)
         e = self.expander(s, **expander_params)
         self.add_source(e)
-        self.playlist_description = f'source: search {query_type} "{query}"'
+        self.playlist.description = f'source: search {query_type} "{query}"'
         self.generate()
 
     def generate_playlist_from_recommendations(self,
@@ -200,12 +187,12 @@ class PlaylistGenerator:
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
         e = self.expander(s, **expander_params)
         self.add_source(e)
-        self.playlist_description = ', '.join((
+        self.playlist.description = ', '.join((
             f'source: recommendations',
             f'{seed_artist_uris}',
             f'{seed_track_uris}',
             f'{seed_genres}'))
-        print(self.playlist_description)
+        print(self.playlist.description)
         self.generate()
 
     def is_track_ok_to_add(self, track):
@@ -285,37 +272,6 @@ class PlaylistGenerator:
         else:
             self._uris_seen.add(uri)
             return False
-
-    # playlist modify methods
-
-    def playlist_clear(self):
-        self.spotify.playlist_tracks_replace(self.playlist.id, [])
-
-    def playlist_reload(self):
-        self.playlist = self.spotify.playlist(self.playlist.id)
-
-    def playlist_tracks_add(self, track_ids):
-        chunks = self.list_to_chunks(track_ids, 100)
-        for chunk in chunks:
-            self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, chunk)
-
-    def playlist_details_update(self):
-        if self.playlist_description is None:
-            logger.warning('playlist description is None')
-        # spotify api silently fails if description is too long
-        self.playlist_description = textwrap.shorten(self.playlist_description, width=300)
-        logger.debug('playlist details update: name: %s, desc: %s',
-                     self.playlist_name, self.playlist_description)
-        self.spotify.playlist_change_details(
-            self.playlist.id,
-            name=self.playlist_name,
-            description=self.playlist_description)
-
-    # util functions
-    def list_to_chunks(self, l: list, n: int):
-        """Yield successive n-sized chunks from l."""
-        for i in range(0, len(l), n):
-            yield l[i:i + n]
 
     # generators
 
