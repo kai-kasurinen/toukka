@@ -202,7 +202,7 @@ class PlaylistGenerator:
             self.__log.debug(f'{track.id}: not playeable')
             return False
         elif not self.is_track_on_market(track, self._market_country_code):
-            self.__log.debug(f'{track.id}: is not available on {self._market_country_code}')
+            self.__log.debug(f'{track.id}: not available on {self._market_country_code}')
             return False
         elif not self.is_track_album_name_good(track):
             self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
