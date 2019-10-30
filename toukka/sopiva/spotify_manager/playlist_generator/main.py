@@ -32,11 +32,9 @@ class SourcesQueue:
     def __init__(self):
         self.sources_queue = collections.deque()
 
-    # FIXME: move to Sources class
     def add(self, source):
         self.sources_queue.append(source)
 
-    # FIXME: move to Sources class
     def generator(self):
         while True:
             try:
@@ -407,7 +405,7 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
-    # FIXME: where this is used?
+    # FIXME: is used?
     def expand_modellist(self,
                          item: spotipy.serialise.ModelList,
                          **kwargs):
