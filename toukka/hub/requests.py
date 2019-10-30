@@ -16,7 +16,7 @@ def get_session():
     retry = urllib3.util.retry.Retry(
         total=3,
         backoff_factor=0.3,
-        status_forcelist=(500, 502, 503))
+        status_forcelist=(429, 500, 502, 503))
     adapter = requests.adapters.HTTPAdapter(max_retries=retry)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
