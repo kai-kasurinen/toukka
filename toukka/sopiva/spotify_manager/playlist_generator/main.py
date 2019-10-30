@@ -5,9 +5,7 @@ from typing import Generator
 
 import logging
 import pprint
-import itertools
 import types
-import collections
 import random
 
 import autologging
@@ -26,24 +24,8 @@ from toukka.sopiva.spotify_history.util import get_spotify_history
 from toukka.sopiva.spotify.printer import first as printer
 
 from .playlist import Playlist
-
-
-class SourcesQueue:
-    def __init__(self):
-        self.sources_queue = collections.deque()
-
-    def add(self, source):
-        self.sources_queue.append(source)
-
-    def generator(self):
-        while True:
-            try:
-                yield from self.sources_queue.popleft()
-            except IndexError:
-                break
-
-    def __len__(self):
-        return len(self.sources_queue)
+from .sources_queue import SourcesQueue
+from .util import scramble_generator
 
 
 @autologging.traced
@@ -374,31 +356,31 @@ class PlaylistGenerator:
         else:
             yield from generator
 
-    # FIXME: rename and use single dispatch method
+    # TODO: use single dispatch method
     def expander(self, item, **kwargs):
         opts = self.options.push(kwargs)
         self.__log.debug('%s', type(item))
         if isinstance(item, types.GeneratorType):
-            yield from self.expand_generator(item, **opts)
+            yield from self.expander_generator(item, **opts)
         elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
-            yield from self.expand_generator(item, **opts)
+            yield from self.expander_generator(item, **opts)
         elif isinstance(item, spotipy.serialise.ModelList):
-            yield from self.expand_modellist(item, **opts)
+            yield from self.expander_modellist(item, **opts)
         elif isinstance(item, spotipy.model.track.FullTrack):
-            yield from self.expand_track(item, **opts)
+            yield from self.expander_track(item, **opts)
         elif isinstance(item, spotipy.model.artist.Artist):
-            yield from self.expand_artist(item, **opts)
+            yield from self.expander_artist(item, **opts)
         elif isinstance(item, spotipy.model.album.Album):
-            yield from self.expand_album(item, **opts)
+            yield from self.expander_album(item, **opts)
         elif isinstance(item, spotipy.model.playlist.Playlist):
-            yield from self.expand_playlist(item, **opts)
+            yield from self.expander_playlist(item, **opts)
         else:
             self.__log.warning('not yet supported: %s', type(item))
             raise Exception()
 
-    def expand_generator(self,
-                         item: types.GeneratorType,
-                         **kwargs):
+    def expander_generator(self,
+                           item: types.GeneratorType,
+                           **kwargs):
         opts = self.options.push(kwargs)
         if opts.expand_generator_to_items:
             for item_ in item:
@@ -407,9 +389,9 @@ class PlaylistGenerator:
             self.__log.warning('did not do anything with: %s', item)
 
     # FIXME: is used?
-    def expand_modellist(self,
-                         item: spotipy.serialise.ModelList,
-                         **kwargs):
+    def expander_modellist(self,
+                           item: spotipy.serialise.ModelList,
+                           **kwargs):
         opts = self.options.push(kwargs)
         if opts.expand_modellist_to_items:
             for item_ in item:
@@ -417,9 +399,9 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
-    def expand_track(self,
-                     item: spotipy.model.track.FullTrack,
-                     **kwargs):
+    def expander_track(self,
+                       item: spotipy.model.track.FullTrack,
+                       **kwargs):
         opts = self.options.push(kwargs)
 
         # add as new source
@@ -452,9 +434,9 @@ class PlaylistGenerator:
             if not self.is_uri_already_seen(item.uri):
                 yield item
 
-    def expand_artist(self,
-                      item: spotipy.model.artist.FullArtist,
-                      **kwargs):
+    def expander_artist(self,
+                        item: spotipy.model.artist.FullArtist,
+                        **kwargs):
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(item.uri):
             return
@@ -465,6 +447,14 @@ class PlaylistGenerator:
                 self.expander(
                     self.related_artists_generator(item.id),
                     **opts))
+
+        # add as new source
+        if opts.expand_artist_to_recommendations and not self.is_uri_already_seen(item.uri + '#recommendations'):
+            self.sources.add(
+                self.expander(
+                    self.recommendations_generator(seed_artist_ids=[item.id]),
+                    **opts))
+
         # FIXME: if elif else? order?
         if opts.expand_artist_to_albums:
             yield from self.expander(
@@ -478,9 +468,9 @@ class PlaylistGenerator:
             # FIXME: can be false alarm
             self.__log.warning('did not do anything with: %s', item)
 
-    def expand_album(self,
-                     item: spotipy.model.album.full.FullAlbum,
-                     **kwargs):
+    def expander_album(self,
+                       item: spotipy.model.album.full.FullAlbum,
+                       **kwargs):
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(item.uri):
             return
@@ -492,9 +482,9 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
-    def expand_playlist(self,
-                        item: spotipy.model.playlist.Playlist,
-                        **kwargs):
+    def expander_playlist(self,
+                          item: spotipy.model.playlist.Playlist,
+                          **kwargs):
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(item.uri):
             return
@@ -507,6 +497,7 @@ class PlaylistGenerator:
             self.__log.warning('did not do anything with: %s', item)
 
     # TODO: add uri model class
+    # NOTE: not used by expander
     def expand_uri(self,
                    item: str,
                    **kwargs):
@@ -540,40 +531,5 @@ class PlaylistGenerator:
             else:
                 self.__log.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
         return items
-
-# END OF CLASS
-
-# util functions
-
-
-# source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
-# modified
-def shuffle_generator(generator, buffer_size):
-    while True:
-        buffer = list(itertools.islice(generator, buffer_size))
-        if len(buffer) == 0:
-            break
-        random.shuffle(buffer)
-        for item in buffer:
-            yield item
-
-
-# source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
-# modified
-def scramble_generator(generator, buffer_size):
-    buf = []
-    i = iter(generator)
-    while True:
-        try:
-            e = next(i)
-            buf.append(e)
-            if len(buf) >= buffer_size:
-                choice = random.randint(0, len(buf)-1)
-                buf[-1], buf[choice] = buf[choice], buf[-1]
-                yield buf.pop()
-        except StopIteration:
-            random.shuffle(buf)
-            yield from buf
-            return
 
 # END
