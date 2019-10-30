@@ -58,9 +58,11 @@ class PlaylistGenerator:
         looper_max_tries=5000,
         expand_track_to_album=False,
         expand_track_to_artist=False,
+        expand_track_to_recommendations=False,
         expand_artist_to_albums=False,
         expand_artist_to_top_tracks=False,
         expand_artist_to_related_artists=False,
+        expand_artist_to_recommendations=False,
         expand_album_to_tracks=False,
         expand_playlist_to_tracks=False,
         expand_generator_to_items=False
@@ -145,9 +147,9 @@ class PlaylistGenerator:
             self.__log.info('dry_run is True, not committing')
         self.__log.info('done')
 
-    def generate_playlist_from_uris(self,
-                                    uris: list,
-                                    **kwargs):
+    def generate_from_uris(self,
+                           uris: list,
+                           **kwargs):
         self.options.update(kwargs)
         self.__log.debug(self.options)
         if self.options.randomize:
@@ -158,10 +160,10 @@ class PlaylistGenerator:
         self.playlist.description = f'source: {", ".join(uris)}'
         self.generate()
 
-    def generate_playlist_from_search(self,
-                                      query_type: str,
-                                      query: str,
-                                      **kwargs):
+    def generate_from_search(self,
+                             query_type: str,
+                             query: str,
+                             **kwargs):
         self.options.update(kwargs)
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(s)
@@ -169,12 +171,12 @@ class PlaylistGenerator:
         self.playlist.description = f'source: search {query_type} "{query}"'
         self.generate()
 
-    def generate_playlist_from_recommendations(self,
-                                               seed_artist_uris: list = None,
-                                               seed_track_uris: list = None,
-                                               seed_genres: list = None,
-                                               recommendation_attributes: dict = None,
-                                               **kwargs):
+    def generate_from_recommendations(self,
+                                      seed_artist_uris: list = None,
+                                      seed_track_uris: list = None,
+                                      seed_genres: list = None,
+                                      recommendation_attributes: dict = None,
+                                      **kwargs):
         '''generate playlist from recommendations'''
         self.options.update(kwargs)
 
@@ -187,7 +189,6 @@ class PlaylistGenerator:
             for artist in self.uris_to_items(seed_track_uris):
                 seed_artist_ids.append(artist.id)
 
-        # TODO: add support attributes
         s = self.recommendations_generator(
             seed_artist_ids=seed_artist_ids,
             seed_track_ids=seed_track_ids,
@@ -421,12 +422,9 @@ class PlaylistGenerator:
                      **kwargs):
         opts = self.options.push(kwargs)
 
-        # FIXME: move?
-        if opts.expand_track_to_artist and opts.expand_track_to_album:
-            self.__log.warning('expand_track_to_artist AND expand_track_to_album')
-
-        # FIXME: if elif else
+        # add as new source
         if opts.expand_track_to_artist and not self.is_uri_already_seen(item.uri + '#artists'):
+            # set expand_track_to_artist option to False, so we dont hit again
             opts.set(expand_track_to_artist=False)
             for artist in item.artists:
                 self.sources.add(
@@ -434,13 +432,23 @@ class PlaylistGenerator:
                         self.spotify.artist(artist.id),
                         **opts))
 
-        elif opts.expand_track_to_album and not self.is_uri_already_seen(item.uri + '#album'):
+        # add as new source
+        if opts.expand_track_to_recommendations and not self.is_uri_already_seen(item.uri + '#recommendations'):
+            # no need set expand_track_to_recommendations option to False
+            self.sources.add(
+                self.expander(
+                    self.recommendations_generator(seed_track_ids=[item.id]),
+                    **opts))
+
+        # yields tracks
+        if opts.expand_track_to_album and not self.is_uri_already_seen(item.uri + '#album'):
+            # set expand_track_to_album option False, so we dont hit again
             opts.set(expand_track_to_album=False)
             yield from self.expander(
                 self.spotify.album(item.album.id, market=self._market),
                 **opts)
+        # and finally use track if not expanded to album
         else:
-            # FIXME: if we first expand and later try again, we never yield track
             if not self.is_uri_already_seen(item.uri):
                 yield item
 

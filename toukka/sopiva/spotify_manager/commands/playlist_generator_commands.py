@@ -19,16 +19,18 @@ def generate_playlist_from_uris(uris: list,
                                 randomize: bool = False,
                                 expand_track_to_album: bool = False,
                                 expand_track_to_artist: bool = False,
+                                expand_track_to_recommendations: bool = False,
                                 expand_artist_to_albums: bool = False,
                                 expand_artist_to_top_tracks: bool = False,
                                 expand_artist_to_related_artists: bool = False,
+                                expand_artist_to_recommendations: bool = False,
                                 expand_album_to_tracks: bool = False,
                                 expand_playlist_to_tracks: bool = False,
                                 expand_generator_to_items: bool = False):
     args = locals()
     print(args)
     generator = PlaylistGenerator()
-    generator.generate_playlist_from_uris(**args)
+    generator.generate_from_uris(**args)
 
 
 @argh.arg('query_type', choices=['artist', 'album', 'track', 'playlist'])
@@ -37,16 +39,18 @@ def generate_playlist_from_search(query_type: str, query: str,
                                   randomize: bool = False,
                                   expand_track_to_album: bool = False,
                                   expand_track_to_artist: bool = False,
+                                  expand_track_to_recommendations: bool = False,
                                   expand_artist_to_albums: bool = False,
                                   expand_artist_to_top_tracks: bool = False,
                                   expand_artist_to_related_artists: bool = False,
+                                  expand_artist_to_recommendations: bool = False,
                                   expand_album_to_tracks: bool = False,
                                   expand_playlist_to_tracks: bool = False,
                                   expand_generator_to_items: bool = False):
     args = locals()
     print(args)
     generator = PlaylistGenerator()
-    generator.generate_playlist_from_search(**args)
+    generator.generate_from_search(**args)
 
 
 @argh.arg('--seed-artist-uris', nargs='*')
@@ -61,9 +65,11 @@ def generate_playlist_from_recommendations(seed_artist_uris: list = None,
                                            recommendation_attributes_list: list = None,
                                            expand_track_to_album: bool = False,
                                            expand_track_to_artist: bool = False,
+                                           expand_track_to_recommendations: bool = False,
                                            expand_artist_to_albums: bool = False,
                                            expand_artist_to_top_tracks: bool = False,
                                            expand_artist_to_related_artists: bool = False,
+                                           expand_artist_to_recommendations: bool = False,
                                            expand_album_to_tracks: bool = False,
                                            expand_playlist_to_tracks: bool = False,
                                            expand_generator_to_items: bool = False,
@@ -76,7 +82,7 @@ def generate_playlist_from_recommendations(seed_artist_uris: list = None,
         recommendation_attributes_dict = {k: v for k, v in (x.split(':') for x in recommendation_attributes_list)}
         spotipy.client.browse.validate.validate_attributes(recommendation_attributes_dict)
     generator = PlaylistGenerator()
-    generator.generate_playlist_from_recommendations(**args, recommendation_attributes=recommendation_attributes_dict)
+    generator.generate_from_recommendations(**args, recommendation_attributes=recommendation_attributes_dict)
 
 
 @argh.arg('genre_name', nargs='*', completer=toukka.sopiva.spotify_manager.genres.genres_completer)
@@ -88,6 +94,7 @@ def generate_playlist_from_genres(genre_name: list,
                                   expand_artist_to_albums: bool = False,
                                   expand_artist_to_top_tracks: bool = False,
                                   expand_artist_to_related_artists: bool = False,
+                                  expand_artist_to_recommendations: bool = False,
                                   expand_album_to_tracks: bool = False,
                                   expand_playlist_to_tracks: bool = False,
                                   expand_generator_to_items: bool = False
@@ -107,7 +114,7 @@ def generate_playlist_from_genres(genre_name: list,
         uris_all.extend(uris)
 
     generator = PlaylistGenerator()
-    generator.generate_playlist_from_uris(uris=uris_all, **args)
+    generator.generate_from_uris(uris=uris_all, **args)
 
 
 COMMANDS = [
