@@ -308,7 +308,7 @@ class PlaylistGenerator:
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         for album in self.artist_albums(artist_id):
-            yield from self.iterate_album_tracks(album.id)
+            yield from self.album_tracks_generator(album.id)
 
     def album_tracks_generator(self,
                                album_id
@@ -429,13 +429,13 @@ class PlaylistGenerator:
 
         # FIXME: if elif else
         if opts.expand_track_to_artist and not self.is_uri_already_seen(item.uri + '#artists'):
+            opts.set(expand_track_to_artist=False)
             for artist in item.artists:
                 self.sources.add(
                     self.expander(
                         self.spotify.artist(artist.id),
                         **opts))
 
-        # FIXME: expand_track_to_album and expand_album_to_tracks causes infinite loop?
         elif opts.expand_track_to_album and not self.is_uri_already_seen(item.uri + '#album'):
             opts.set(expand_track_to_album=False)
             yield from self.expander(
@@ -461,7 +461,7 @@ class PlaylistGenerator:
 
         # FIXME: if elif else? order?
         if opts.expand_artist_to_albums:
-            yield from self.expander(self.artist_albums(item.id))
+            yield from self.expander(self.artist_albums_generator(item.id))
         elif opts.expand_artist_to_top_tracks:
             # FIXME: use expander
             # FIXME: move to method? and add support different countries
