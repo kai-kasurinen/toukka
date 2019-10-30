@@ -26,7 +26,7 @@ from toukka.sopiva.spotify.printer import first as printer
 from .playlist import Playlist
 
 
-class SourceQueue:
+class SourcesQueue:
     def __init__(self):
         self.sources_queue = collections.deque()
 
@@ -80,7 +80,7 @@ class PlaylistGenerator:
         self._uris_seen = set()
 
         self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
-        self.sources = SourceQueue()
+        self.sources = SourcesQueue()
 
     def generate(self):
         self.looper()
