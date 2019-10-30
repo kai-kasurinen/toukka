@@ -461,7 +461,6 @@ class PlaylistGenerator:
                 self.expander(
                     self.related_artists_generator(item.id),
                     **opts))
-
         # FIXME: if elif else? order?
         if opts.expand_artist_to_albums:
             yield from self.expander(
