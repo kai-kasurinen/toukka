@@ -306,7 +306,7 @@ class PlaylistGenerator:
     def artist_top_tracks_generator(self,
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        yield from self.spotify.artist_top_tracks(item.id,
+        yield from self.spotify.artist_top_tracks(artist_id,
                                                   country=self._market_country_code)
 
     def album_tracks_generator(self,
