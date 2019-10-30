@@ -3,14 +3,12 @@
 import logging
 import textwrap
 
+import autologging
+
 import spotipy.convert
 import toukka.config
 
 from toukka.sopiva.spotify.util import get_spotify
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 def _get_playlist_uri_from_config():
@@ -25,6 +23,8 @@ def list_to_chunks(l: list, n: int):
 #
 
 
+@autologging.traced
+@autologging.logged
 class Playlist:
 
     def __init__(self,
@@ -67,11 +67,12 @@ class Playlist:
 
     def details_update(self):
         if self.playlist_description is None:
-            logger.warning('playlist description is None')
+            self.__log.warning('playlist description is None')
         # spotify api silently fails if description is too long
         self.playlist_description = textwrap.shorten(self.playlist_description, width=300)
-        logger.debug('playlist details update: name: %s, desc: %s',
-                     self.playlist_name, self.playlist_description)
+        self.__log.debug(
+            'playlist details update: name: %s, desc: %s',
+            self.playlist_name, self.playlist_description)
         self.spotify.playlist_change_details(
             self.playlist.id,
             name=self.playlist_name,

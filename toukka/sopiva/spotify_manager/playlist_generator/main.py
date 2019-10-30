@@ -8,6 +8,8 @@ import types
 import collections
 import random
 
+import autologging
+
 from options import Options
 
 import spotipy.convert
@@ -22,9 +24,6 @@ from toukka.sopiva.spotify_history.util import get_spotify_history
 from toukka.sopiva.spotify.printer import first as printer
 
 from .playlist import Playlist
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class SourceQueue:
@@ -47,6 +46,8 @@ class SourceQueue:
         return len(self.sources_queue)
 
 
+@autologging.traced
+@autologging.logged
 class PlaylistGenerator:
     '''generates playlist'''
 
@@ -90,32 +91,34 @@ class PlaylistGenerator:
         track_ids_to_playlist = list()
 
         for counter, track in enumerate(self.sources.generator()):
-            logger.debug('counter: %i, tracks: %i, sources: %i',
-                         counter,
-                         len(track_ids_to_playlist),
-                         len(self.sources))
-            # logger.debug(type(track))
+
+            self.__log.debug(
+                'counter: %i, tracks: %i, sources: %i',
+                counter,
+                len(track_ids_to_playlist),
+                len(self.sources))
+
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
-                logger.debug('%s: already added', track.id)
+                self.__log.debug('%s: already added', track.id)
 
             if self.is_track_ok_to_add(track):
                 # printer.print_track(track)
                 track_ids_to_playlist.append(track.id)
-                logger.debug('%s: added', track.id)
+                self.__log.debug('%s: added', track.id)
 
             if len(track_ids_to_playlist) >= self.options.looper_target_count:
-                logger.info('we have enough tracks to add')
+                self.__log.info('we have enough tracks to add')
                 break
 
             # safety
             if counter > self.options.looper_max_tries:
-                logger.info('we have tried too many tracks, breaking loop')
+                self.__log.info('we have tried too many tracks, breaking loop')
                 break
 
         self.track_ids_to_playlist = track_ids_to_playlist
-        logger.info(f'{len(track_ids_to_playlist)} tracks to add')
+        self.__log.info(f'{len(track_ids_to_playlist)} tracks to add')
 
     # TODO: split and move to Playlist
     def commit(self):
@@ -126,10 +129,10 @@ class PlaylistGenerator:
                 self.playlist.tracks_add(track_ids_to_playlist)
                 self.playlist.details_update()
             else:
-                logger.info('try something else?')
+                self.__log.info('try something else?')
         else:
-            logger.info('dry_run is True, not committing')
-        logger.info('done')
+            self.__log.info('dry_run is True, not committing')
+        self.__log.info('done')
 
     def generate_playlist_from_uris(self,
                                     uris: list,
@@ -197,22 +200,22 @@ class PlaylistGenerator:
 
     def is_track_ok_to_add(self, track):
         if self.is_track_isrc_already_added(track):
-            logger.debug(f'{track.id}: isrc already added')
+            self.__log.debug(f'{track.id}: isrc already added')
             return False
         elif self.is_track_already_played(track):
-            logger.debug(f'{track.id}: already played')
+            self.__log.debug(f'{track.id}: already played')
             return False
         elif self.is_track_isrc_already_played(track):
-            logger.debug(f'{track.id}: isrc already played')
+            self.__log.debug(f'{track.id}: isrc already played')
             return False
         elif not self.is_track_playeable(track):
-            logger.debug(f'{track.id}: not playeable')
+            self.__log.debug(f'{track.id}: not playeable')
             return False
         elif not self.is_track_on_market(track, self._market_country_code):
-            logger.debug(f'{track.id}: is not available on {self._market_country_code}')
+            self.__log.debug(f'{track.id}: is not available on {self._market_country_code}')
             return False
         elif not self.is_track_album_name_good(track):
-            logger.debug(f'{track.id}: album name "{track.album.name}" not good')
+            self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
             return False
         else:
             return True
@@ -267,7 +270,7 @@ class PlaylistGenerator:
 
     def is_uri_already_seen(self, uri):
         if uri in self._uris_seen:
-            logger.debug('%s is already seen', uri)
+            self.__log.debug('%s is already seen', uri)
             return True
         else:
             self._uris_seen.add(uri)
@@ -286,7 +289,7 @@ class PlaylistGenerator:
             include_groups=include_album_groups,
             market=self._market)
 
-        yield from self.spotify.items_from_paging(paging)
+        yield from self.spotify.all_items_from_paging(paging)
 
     # FIXME: rename
     def iterate_artist_all_tracks(self, artist_id: str):
@@ -325,7 +328,7 @@ class PlaylistGenerator:
                 **recommendation_attributes)
 
             for seed in recommendations.seeds:
-                logger.debug(seed)
+                self.__log.debug(seed)
             yield from recommendations.tracks
 
     # FIXME: not used?
@@ -359,7 +362,7 @@ class PlaylistGenerator:
 
     def randomizer(self, generator):
         if self.options.randomize:
-            logger.debug('randomizing %s', generator)
+            self.__log.debug('randomizing %s', generator)
             yield from scramble_generator(generator, 100)
         else:
             yield from generator
@@ -404,16 +407,16 @@ class PlaylistGenerator:
                  expand_playlist_to_tracks: bool = False,
                  expand_generator_to_items: bool = False
                  ):
-        logger.debug('%s', type(item))
+        self.__log.debug('%s', type(item))
         expander_params = {key: value for key, value in locals().items() if key.startswith('expand')}
 
         # generators
-        if isinstance(item, types.GeneratorType):
+        if isinstance(item, types.GeneratorType) or isinstance(item, autologging._GeneratorIteratorTracingProxy):
             if expand_generator_to_items:
                 for item_ in item:
                     yield from self.expander(item_, **expander_params)
             else:
-                logger.warning('did not do anything with generator: %s', item)
+                self.__log.warning('did not do anything with generator: %s', item)
 
         # modellist
         elif isinstance(item, spotipy.serialise.ModelList):
@@ -425,7 +428,7 @@ class PlaylistGenerator:
         elif isinstance(item, spotipy.model.track.FullTrack):
 
             if expand_track_to_artist and expand_track_to_album:
-                logger.warning('expand_track_to_artist AND expand_track_to_album')
+                self.__log.warning('expand_track_to_artist AND expand_track_to_album')
 
             # FIXME: if elif else
             if expand_track_to_artist and not self.is_uri_already_seen(item.uri + '#artists'):
@@ -474,7 +477,7 @@ class PlaylistGenerator:
                     **expander_params)
             else:
                 # FIXME: can be sfalse alarm
-                logger.warning('did not do anything with artist: %s', item.id)
+                self.__log.warning('did not do anything with artist: %s', item.id)
 
         # album
         elif isinstance(item, spotipy.model.album.Album):
@@ -487,7 +490,7 @@ class PlaylistGenerator:
                 _expander_params['expand_track_to_album'] = False
                 yield from self.expander(self.iterate_album_tracks(item.id), **_expander_params)
             else:
-                logger.warning('did not do anything with album: %s', item.id)
+                self.__log.warning('did not do anything with album: %s', item.id)
 
         # playlist
         elif isinstance(item, spotipy.model.playlist.Playlist):
@@ -500,9 +503,9 @@ class PlaylistGenerator:
                         self.iterate_playlist_all_tracks(item.id)),
                     **expander_params)
             else:
-                logger.warning('did not do anything with artist: %s', item.id)
+                self.__log.warning('did not do anything with artist: %s', item.id)
         else:
-            logger.warning('not yet supported: %s', type(item))
+            self.__log.warning('not yet supported: %s', type(item))
             raise Exception()
 
     # FIXME: better name?
@@ -513,7 +516,7 @@ class PlaylistGenerator:
         items = list()
         for uri in uris:
             uri_type, uri_id = spotipy.convert.from_uri(uri)
-            logger.debug('%s: %s', uri_type, uri_id)
+            self.__log.debug('%s: %s', uri_type, uri_id)
             if uri_type == 'artist':
                 items.append(self.spotify.artist(uri_id))
             elif uri_type == 'album':
@@ -523,7 +526,7 @@ class PlaylistGenerator:
             elif uri_type == 'playlist':
                 items.append(self.spotify.playlist(uri_id, market=self._market))
             else:
-                logger.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
+                self.__log.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
         return items
 
 # END OF CLASS
