@@ -152,17 +152,12 @@ class PlaylistGenerator:
                                     **kwargs):
         self.options.update(kwargs)
         self.__log.debug(self.options)
-        # FIXME: remove
-        expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
-        self.__log.debug(expander_params)
-
         items = self.expand_uris(uris)
         if self.options.randomize:
             self.__log.debug('randomize is True, so shuffling uris')
             random.shuffle(items)
         for item in items:
-            # FIXME: remove options
-            self.sources.add(self.expander(item, **self.options))
+            self.sources.add(self.expander(item))
         self.playlist.description = f'source: {", ".join(uris)}'
         self.generate()
 
@@ -171,9 +166,8 @@ class PlaylistGenerator:
                                       query: str,
                                       **kwargs):
         self.options.update(kwargs)
-        expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
         s = self.search_generator(query_type=query_type, query=query)
-        e = self.expander(s, **expander_params)
+        e = self.expander(s)
         self.sources.add(e)
         self.playlist.description = f'source: search {query_type} "{query}"'
         self.generate()
@@ -182,7 +176,6 @@ class PlaylistGenerator:
                                                seed_artist_uris: list = None,
                                                seed_track_uris: list = None,
                                                seed_genres: list = None,
-                                               call_times: int = 1,
                                                recommendation_attributes: dict = None,
                                                **kwargs):
         '''generate playlist from recommendations'''
@@ -202,10 +195,8 @@ class PlaylistGenerator:
             seed_artist_ids=seed_artist_ids,
             seed_track_ids=seed_track_ids,
             seed_genres=seed_genres,
-            call_times=call_times,
             recommendation_attributes=recommendation_attributes)
-        expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
-        e = self.expander(s, **expander_params)
+        e = self.expander(s)
         self.sources.add(e)
         self.playlist.description = ', '.join((
             f'source: recommendations',
@@ -295,7 +286,9 @@ class PlaylistGenerator:
 
     # generators
 
-    def artist_albums_generator(self, artist_id: str):
+    def artist_albums_generator(self,
+                                artist_id: str
+                                ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
         # NOTE: 'album', 'single', 'appears_on', 'compilation'
         include_album_groups = ['album', 'single', 'compilation']
         paging = self.spotify.artist_albums(
@@ -307,7 +300,7 @@ class PlaylistGenerator:
     def artist_all_tracks_generator(self,
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        for album in self.artist_albums(artist_id):
+        for album in self.artist_albums_generator(artist_id):
             yield from self.album_tracks_generator(album.id)
 
     def album_tracks_generator(self,
@@ -362,7 +355,9 @@ class PlaylistGenerator:
             # NOTE: item can me track, album, artist, playlist ...
             yield item
 
-    def playlist_all_tracks_generator(self, playlist_id: str):
+    def playlist_all_tracks_generator(self,
+                                      playlist_id: str
+                                      ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
         playlist_tracks = self.spotify.all_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
@@ -375,6 +370,7 @@ class PlaylistGenerator:
         else:
             yield from generator
 
+    # FIXME: rename and use single dispatch method
     def expander(self, item, **kwargs):
         opts = self.options.push(kwargs)
         self.__log.debug('%s', type(item))
