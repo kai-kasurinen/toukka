@@ -152,12 +152,11 @@ class PlaylistGenerator:
                                     **kwargs):
         self.options.update(kwargs)
         self.__log.debug(self.options)
-        items = self.uris_to_items(uris)
         if self.options.randomize:
             self.__log.debug('shuffling uris')
-            random.shuffle(items)
-        for item in items:
-            self.sources.add(self.expander(item))
+            random.shuffle(uris)
+        for uri in uris:
+            self.sources.add(self.expand_uri(uri))
         self.playlist.description = f'source: {", ".join(uris)}'
         self.generate()
 
@@ -380,7 +379,6 @@ class PlaylistGenerator:
     def expander(self, item, **kwargs):
         opts = self.options.push(kwargs)
         self.__log.debug('%s', type(item))
-
         if isinstance(item, types.GeneratorType):
             yield from self.expand_generator(item, **opts)
         elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
@@ -499,6 +497,24 @@ class PlaylistGenerator:
                 self.randomizer(
                     self.playlist_all_tracks_generator(item.id)),
                 **opts)
+        else:
+            self.__log.warning('did not do anything with: %s', item)
+
+    # TODO: add uri model class
+    def expand_uri(self,
+                   item: str,
+                   **kwargs):
+        opts = self.options.push(kwargs)
+        item_type, item_id = spotipy.convert.from_uri(item)
+        self.__log.debug('%s: %s', item_type, item_id)
+        if item_type == 'artist':
+            yield from self.expander(self.spotify.artist(item_id), **opts)
+        elif item_type == 'album':
+            yield from self.expander(self.spotify.album(item_id, market=self._market), **opts)
+        elif item_type == 'track':
+            yield from self.expander(self.spotify.track(item_id, market=self._market), **opts)
+        elif item_type == 'playlist':
+            yield from self.expander(self.spotify.playlist(item_id, market=self._market), **opts)
         else:
             self.__log.warning('did not do anything with: %s', item)
 
