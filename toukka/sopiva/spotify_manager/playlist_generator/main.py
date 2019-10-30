@@ -132,6 +132,7 @@ class PlaylistGenerator:
     def generate_from_uris(self,
                            uris: list,
                            **kwargs):
+        # TODO: use method opts and pass them..
         self.options.update(kwargs)
         self.__log.debug(self.options)
         if self.options.randomize:
@@ -146,6 +147,7 @@ class PlaylistGenerator:
                              query_type: str,
                              query: str,
                              **kwargs):
+        # TODO: use method opts and pass them..
         self.options.update(kwargs)
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(s)
@@ -159,7 +161,7 @@ class PlaylistGenerator:
                                       seed_genres: list = None,
                                       recommendation_attributes: dict = None,
                                       **kwargs):
-        '''generate playlist from recommendations'''
+        # TODO: use method opts and pass them..
         self.options.update(kwargs)
 
         seed_artist_ids = list()
@@ -349,8 +351,9 @@ class PlaylistGenerator:
         for playlist_track in playlist_tracks:
             yield playlist_track.track
 
-    def randomizer(self, generator):
-        if self.options.randomize:
+    def randomizer(self, generator, **kwargs):
+        opts = self.options.push(kwargs)
+        if opts.randomize:
             self.__log.debug('randomizing %s', generator)
             yield from scramble_generator(generator, 100)
         else:
