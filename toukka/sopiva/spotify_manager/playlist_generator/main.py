@@ -152,9 +152,9 @@ class PlaylistGenerator:
                                     **kwargs):
         self.options.update(kwargs)
         self.__log.debug(self.options)
-        items = self.expand_uris(uris)
+        items = self.uris_to_items(uris)
         if self.options.randomize:
-            self.__log.debug('randomize is True, so shuffling uris')
+            self.__log.debug('shuffling uris')
             random.shuffle(items)
         for item in items:
             self.sources.add(self.expander(item))
@@ -183,11 +183,11 @@ class PlaylistGenerator:
 
         seed_artist_ids = list()
         if seed_artist_uris is not None:
-            for artist in self.expand_uris(seed_artist_uris):
+            for artist in self.uris_to_items(seed_artist_uris):
                 seed_artist_ids.append(artist.id)
         seed_track_ids = list()
         if seed_track_uris is not None:
-            for artist in self.expand_uris(seed_track_uris):
+            for artist in self.uris_to_items(seed_track_uris):
                 seed_artist_ids.append(artist.id)
 
         # TODO: add support attributes
@@ -302,6 +302,12 @@ class PlaylistGenerator:
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         for album in self.artist_albums_generator(artist_id):
             yield from self.album_tracks_generator(album.id)
+
+    def artist_top_tracks_generator(self,
+                                    artist_id: str
+                                    ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+        yield from self.spotify.artist_top_tracks(item.id,
+                                                  country=self._market_country_code)
 
     def album_tracks_generator(self,
                                album_id
@@ -448,6 +454,7 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(item.uri):
             return
+
         if opts.expand_artist_to_related_artists:
             # add artists as new source
             self.sources.add(
@@ -457,13 +464,12 @@ class PlaylistGenerator:
 
         # FIXME: if elif else? order?
         if opts.expand_artist_to_albums:
-            yield from self.expander(self.artist_albums_generator(item.id))
-        elif opts.expand_artist_to_top_tracks:
-            # FIXME: use expander
-            # FIXME: move to method? and add support different countries
             yield from self.expander(
-                self.spotify.artist_top_tracks(item.id,
-                                               country=self._market_country_code),
+                self.artist_albums_generator(item.id),
+                **opts)
+        elif opts.expand_artist_to_top_tracks:
+            yield from self.expander(
+                self.artist_top_tracks_generator(item.id),
                 **opts)
         else:
             # FIXME: can be false alarm
@@ -497,11 +503,7 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
-    # FIXME: better name?
-    # TODO: add Uri class
-    # TODO: yield things
-    # NOTE: this is currrently very slow for large number uris
-    def expand_uris(self, uris: list):
+    def uris_to_items(self, uris: list):
         items = list()
         for uri in uris:
             uri_type, uri_id = spotipy.convert.from_uri(uri)
