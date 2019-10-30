@@ -1,6 +1,8 @@
 #
 #
 
+from typing import Generator
+
 import logging
 import pprint
 import itertools
@@ -82,6 +84,9 @@ class PlaylistGenerator:
         self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
 
+        # FIXME: remove
+        self.__log.setLevel(logging.DEBUG)
+
     def generate(self):
         self.looper()
         self.commit()
@@ -142,7 +147,7 @@ class PlaylistGenerator:
 
         items = self.expand_uris(uris)
         if self.options.randomize:
-            logger.debug('randomize is True, so shuffling uris')
+            self.__log.debug('randomize is True, so shuffling uris')
             random.shuffle(items)
         for item in items:
             self.sources.add(self.expander(item, **expander_params))
@@ -155,7 +160,7 @@ class PlaylistGenerator:
                                       **kwargs):
         self.options.update(kwargs)
         expander_params = {key: value for key, value in kwargs.items() if key.startswith('expand')}
-        s = self.iterate_search(query_type=query_type, query=query)
+        s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(s, **expander_params)
         self.sources.add(e)
         self.playlist.description = f'source: search {query_type} "{query}"'
@@ -181,7 +186,7 @@ class PlaylistGenerator:
                 seed_artist_ids.append(artist.id)
 
         # TODO: add support attributes
-        s = self.iterate_recommendations(
+        s = self.recommendations_generator(
             seed_artist_ids=seed_artist_ids,
             seed_track_ids=seed_track_ids,
             seed_genres=seed_genres,
@@ -278,85 +283,76 @@ class PlaylistGenerator:
 
     # generators
 
-    def artist_albums(self, artist_id: str):
-        '''artist all albumns'''
-
+    def artist_albums_generator(self, artist_id: str):
         # NOTE: 'album', 'single', 'appears_on', 'compilation'
         include_album_groups = ['album', 'single', 'compilation']
-
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_album_groups,
             market=self._market)
-
         yield from self.spotify.all_items_from_paging(paging)
 
-    # FIXME: rename
-    def iterate_artist_all_tracks(self, artist_id: str):
-        '''artist all tracks'''
+    def artist_all_tracks_generator(self,
+                                    artist_id: str
+                                    ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         for album in self.artist_albums(artist_id):
             yield from self.iterate_album_tracks(album.id)
 
-    # FIXME: rename
-    def iterate_album_tracks(self, album_id):
-        paging = self.spotify.album_tracks(album_id,
-                                           market=self._market,
-                                           limit=50)
-        for simple_track in self.spotify.items_from_paging(paging):
+    def album_tracks_generator(self,
+                               album_id
+                               ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+        paging = self.spotify.album_tracks(
+            album_id,
+            market=self._market,
+            limit=50)
+        for simple_track in self.spotify.all_items_from_paging(paging):
             yield self.spotify.track(simple_track.id, market=self._market)
 
-    def iterate_recommendations(self,
-                                seed_artist_ids: list = None,
-                                seed_track_ids: list = None,
-                                seed_genres: list = None,
-                                call_times: int = 1,
-                                recommendation_attributes: dict = None
-                                ):
+    def recommendations_generator(self,
+                                  seed_artist_ids: list = None,
+                                  seed_track_ids: list = None,
+                                  seed_genres: list = None,
+                                  recommendation_attributes: dict = None
+                                  ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+
         if recommendation_attributes is None:
             recommendation_attributes = {}
 
-        # FIXME: call_times is hack
-        # NOTE: calling n times is not usefull cos recommendatios is always pretty same on same seed
-        for n in range(call_times):
-            # NOTE: market=None gives many unplayeble tracks
-            recommendations = self.spotify.recommendations(
-                artist_ids=seed_artist_ids,
-                track_ids=seed_track_ids,
-                genres=seed_genres,
-                market=self._market_country_code,
-                limit=100,
-                **recommendation_attributes)
+        # NOTE: market=None gives many unplayeble tracks
+        recommendations = self.spotify.recommendations(
+            artist_ids=seed_artist_ids,
+            track_ids=seed_track_ids,
+            genres=seed_genres,
+            market=self._market_country_code,
+            limit=100,
+            **recommendation_attributes)
 
-            for seed in recommendations.seeds:
-                self.__log.debug(seed)
-            yield from recommendations.tracks
+        for seed in recommendations.seeds:
+            self.__log.debug(seed)
+        yield from recommendations.tracks
 
     # FIXME: not used?
-    def iterate_related_artists_all_tracks(self, artist_id):
+    def related_artists_all_tracks_generator(self, artist_id
+                                             ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         for artist in self.spotify.artist_related_artists(artist_id):
-            yield from self.iterate_artist_all_tracks(artist.id)
+            yield from self.artist_all_tracks_generator(artist.id)
 
-    # FIXME: rename
-    def iterate_related_artists(self, artist_id):
+    def related_artists_generator(self, artist_id):
         yield from self.spotify.artist_related_artists(artist_id)
 
-    # FIXME: rename
-    def iterate_search(self, query_type: str, query: str):
-        '''search'''
+    def search_generator(self, query_type: str, query: str):
         search = self.spotify.search(query=query,
                                      types=[query_type],
                                      limit=50,
                                      market=self._market)
         paging = search[0]
-        for count, item in enumerate(self.spotify.items_from_paging(paging), start=1):
+        for item in self.spotify.all_items_from_paging(paging):
             # NOTE: item can me track, album, artist, playlist ...
             yield item
 
-    # FIXME: rename
-    def iterate_playlist_all_tracks(self,
-                                    playlist_id: str):
+    def playlist_all_tracks_generator(self, playlist_id: str):
         playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
-        playlist_tracks = self.spotify.iterate_items_from_paging(playlist.tracks)
+        playlist_tracks = self.spotify.all_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
             yield playlist_track.track
 
@@ -366,35 +362,6 @@ class PlaylistGenerator:
             yield from scramble_generator(generator, 100)
         else:
             yield from generator
-
-    # FIXME: not used, remove
-    def track_expand(self, track,
-                     expand_album: bool = False,
-                     expand_artist: bool = False):
-        if expand_album:
-            for track in self.iterate_album_tracks(track.album.id):
-                yield track
-        elif expand_artist:
-            for artist in track.artists:
-                for track in self.iterate_artist_all_tracks(artist.id):
-                    yield track
-        else:
-            yield track
-
-    # FIXME: not used, remove
-    def artist_expand(self, artist,
-                      expand_albums: bool = False,
-                      expand_top_tracks: bool = False):
-        if expand_albums:
-            # FIXME: yield albumns?
-            for track in self.iterate_artist_all_tracks(artist.id):
-                yield track
-        elif expand_top_tracks:
-            # FIXME: move to method? and add support different countries
-            yield from self.spotify.artist_top_tracks(artist.id,
-                                                      country=self._market_country_code)
-        else:
-            return
 
     # FIXME: this was very stupid idea
     def expander(self, item,
@@ -461,7 +428,7 @@ class PlaylistGenerator:
                 # add artists as new source
                 self.sources.add(
                     self.expander(
-                        self.iterate_related_artists(item.id),
+                        self.related_artists_generator(item.id),
                         **expander_params))
 
             # FIXME: if elif else? order?
@@ -488,7 +455,7 @@ class PlaylistGenerator:
                 # if both expand_album_to_tracks and expand_track_to_album is True
                 _expander_params = expander_params.copy()
                 _expander_params['expand_track_to_album'] = False
-                yield from self.expander(self.iterate_album_tracks(item.id), **_expander_params)
+                yield from self.expander(self.album_tracks_generator(item.id), **_expander_params)
             else:
                 self.__log.warning('did not do anything with album: %s', item.id)
 
@@ -500,13 +467,19 @@ class PlaylistGenerator:
                 # NOTE: ranomizer testing
                 yield from self.expander(
                     self.randomizer(
-                        self.iterate_playlist_all_tracks(item.id)),
+                        self.playlist_all_tracks_generator(item.id)),
                     **expander_params)
             else:
                 self.__log.warning('did not do anything with artist: %s', item.id)
         else:
             self.__log.warning('not yet supported: %s', type(item))
             raise Exception()
+
+    # TODO: write and use :)
+    def expand_playlist(self,
+                        item: spotipy.model.playlist.Playlist,
+                        **kwargs):
+        pass
 
     # FIXME: better name?
     # TODO: add Uri class
