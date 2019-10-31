@@ -108,7 +108,7 @@ class PlaylistGenerator:
                 break
 
             # safety
-            if counter > self.options.looper_max_tries:
+            if counter >= self.options.looper_max_tries:
                 self.__log.info('we have tried too many tracks, breaking loop')
                 break
 
