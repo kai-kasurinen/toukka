@@ -3,7 +3,7 @@
 from typing import Union
 import logging
 import spotipy.client
-from spotipy.model import FullTrack, FullArtist, FullAlbum, AudioFeatures
+from spotipy.model import FullTrack, FullArtist, FullAlbum, AudioFeatures, AudioAnalysis
 
 import toukka.cache.dogpile
 
