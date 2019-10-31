@@ -408,17 +408,19 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
 
         # add as new source
-        if opts.expand_track_to_artist and not self.is_uri_already_seen(item.uri + '#artists'):
+        if (opts.expand_track_to_artist and
+                not self.is_uri_already_seen(item.uri + '#artists')):
             # set expand_track_to_artist option to False, so we dont hit again
             opts.set(expand_track_to_artist=False)
             for artist in item.artists:
-                self.sources.add(
-                    self.expander(
+                if not self.is_uri_already_seen(artist.uri + '#as-source'):
+                    self.sources.add(self.expander(
                         self.spotify.artist(artist.id),
                         **opts))
 
         # add as new source
-        if opts.expand_track_to_recommendations and not self.is_uri_already_seen(item.uri + '#recommendations'):
+        if (opts.expand_track_to_recommendations and
+                not self.is_uri_already_seen(item.uri + '#recommendations')):
             # no need set expand_track_to_recommendations option to False
             self.sources.add(
                 self.expander(
@@ -426,7 +428,8 @@ class PlaylistGenerator:
                     **opts))
 
         # yields tracks
-        if opts.expand_track_to_album and not self.is_uri_already_seen(item.uri + '#album'):
+        if (opts.expand_track_to_album and
+                not self.is_uri_already_seen(item.uri + '#album')):
             # set expand_track_to_album option False, so we dont hit again
             opts.set(expand_track_to_album=False)
             yield from self.expander(
@@ -444,15 +447,17 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(item.uri):
             return
 
-        if opts.expand_artist_to_related_artists:
-            # add artists as new source
+        # add as new source
+        if (opts.expand_artist_to_related_artists and
+                not self.is_uri_already_seen(item.uri + '#related')):
             self.sources.add(
                 self.expander(
                     self.related_artists_generator(item.id),
                     **opts))
 
         # add as new source
-        if opts.expand_artist_to_recommendations and not self.is_uri_already_seen(item.uri + '#recommendations'):
+        if (opts.expand_artist_to_recommendations and
+                not self.is_uri_already_seen(item.uri + '#recommendations')):
             self.sources.add(
                 self.expander(
                     self.recommendations_generator(seed_artist_ids=[item.id]),
