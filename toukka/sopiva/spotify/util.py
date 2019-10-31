@@ -40,14 +40,22 @@ def get_user_token():
     client_id, client_secret, redirect_uri = _read_from_config()
     # client_id, client_secret, client_redirect = read_environment()
     refresh_token = get_user_refresh_token()
+    token = None
+
     if refresh_token:
         logger.debug('refresh token found, using it')
-        token = spotipy.util.token_from_refresh_token(client_id, client_secret, redirect_uri, refresh_token)
-    else:
+        # TODO: catch spotipy.auth.OAuthError
+        try:
+            token = spotipy.util.token_from_refresh_token(client_id, client_secret, redirect_uri, refresh_token)
+        except spotipy.auth.OAuthError as e:
+            logger.warning(e)
+
+    if token is None:
         logger.debug('referesh token not found, prompt user input')
         scope = spotipy.Scope(spotipy.scope.every)
         token = spotipy.util.prompt_for_user_token(client_id, client_secret, redirect_uri, scope)
         set_user_refresh_token(token.refresh_token)
+
     return token
 
 
