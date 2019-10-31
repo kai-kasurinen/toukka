@@ -46,7 +46,9 @@ kwargs_for_playlist = {
     'expand_generator_to_items': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
-    'expand_album_to_tracks': True
+    'expand_album_to_tracks': True,
+    'expand_track_to_artist': False,
+    'expand_artist_to_albums': False
 }
 
 kwargs_for_related_artists = {
