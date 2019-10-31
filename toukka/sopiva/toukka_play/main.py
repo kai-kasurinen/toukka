@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-# PYTHON_ARGCOMPLETE_OK
-
+#
 
 import sys
 import logging
@@ -80,7 +78,7 @@ def click_genre_completer(ctx, args, incomplete):
 
 @click.group()
 @click.version_option(version=__version__)
-#@click_log.simple_verbosity_option(None, '--loglevel')
+@click_log.simple_verbosity_option(None, '--loglevel')
 def cli():
     pass
 
@@ -127,13 +125,11 @@ def genre_re(genre_name_re: str,
 
 
 def main():
-    '''main'''
     toukka.logger.simple.init_logging()
     #toukka.logger.simple.set_logging_level_to_trace()
     # FIXME: format?
-    #click_log.basic_config()
+    click_log.basic_config()
     cli()
-
 
 
 # END
