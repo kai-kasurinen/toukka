@@ -131,7 +131,7 @@ def main():
     #toukka.logger.simple.set_logging_level_to_trace()
     # FIXME: format?
     click_log.basic_config()
-    cli()
+    cli.main()
 
 
 # END
