@@ -18,6 +18,8 @@ from toukka.sopiva.spotify_manager.cli import cli_root
 logger = logging.getLogger(__name__)
 
 
+# TODO: add genetator options group and remove cxt.obj usage
+
 @cli_root.group()
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
@@ -111,21 +113,18 @@ def from_genres(generator,
 
 @generate_playlist.command()
 @click.argument('genre_name_re', required=True)
-@click.pass_context
-def from_genres_re(ctx,
-                   genre_name_re: str,
+def from_genres_re(genre_name_re: str,
                    **kwargs):
     regex = re.compile(genre_name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genre_names_match = filter(regex.fullmatch, genres.keys())
-    ctx.invoke(from_genres, genre_name=genre_names_match, **kwargs)
+    context = click.get_current_context()
+    context.invoke(from_genres, genre_name=genre_names_match, **kwargs)
 
 
 @generate_playlist.command()
 @click.argument('uris', required=True, nargs=-1)
-@click.pass_context
-def easy_uris(ctx,
-              uris: tuple):
+def easy_uris(uris: tuple):
     '''easy shortcut to from-uris'''
     kwargs_for_uris = {
         'expand_playlist_to_tracks': True,
@@ -134,15 +133,14 @@ def easy_uris(ctx,
         'expand_artist_to_albums': True,
         'expand_artist_to_related_artists': True
     }
-    ctx.invoke(from_uris, uris=uris, **kwargs_for_uris)
+    context = click.get_current_context()
+    context.invoke(from_uris, uris=uris, **kwargs_for_uris)
 
 
 @generate_playlist.command()
 @click.argument('genre_name', required=True, nargs=-1,
                 autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
-@click.pass_context
-def easy_genres(ctx,
-                genre_name: tuple):
+def easy_genres(genre_name: tuple):
     '''easy shortcut to from-genres'''
     kwargs_for_playlist = {
         'expand_playlist_to_tracks': True,
@@ -151,7 +149,8 @@ def easy_genres(ctx,
         'expand_track_to_artists': False,
         'expand_artist_to_albums': False
     }
-    ctx.invoke(from_genres, genre_name=genre_name, **kwargs_for_playlist)
+    context = click.get_current_context()
+    context.invoke(from_genres, genre_name=genre_name, **kwargs_for_playlist)
 
 
 # END
