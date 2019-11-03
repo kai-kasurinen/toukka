@@ -1,8 +1,14 @@
 #
 
-import argh
+import click
 
 from toukka.sopiva.spotify.util import get_spotify
+from ..cli import cli_root
+
+
+@cli_root.group()
+def personalization():
+    pass
 
 
 _RANGES_DESCRIPTION = {
@@ -12,10 +18,11 @@ _RANGES_DESCRIPTION = {
 }
 
 
-@argh.aliases('top-tracks')
-@argh.arg('--time-range', choices=['short', 'medium', 'long'])
+# FIXME: update
+@personalization.command('top-tracks')
+@click.argument('ime-range', type=click.Choice(['short', 'medium', 'long']))
 def current_user_top_tracks(time_range='long'):
-    toukka = Toukka()
+    spotify = get_spotify()
 
     if time_range not in ('short', 'medium', 'long'):
         raise Exception()
@@ -25,7 +32,7 @@ def current_user_top_tracks(time_range='long'):
     print('{}: {}'.format(time_range, _RANGES_DESCRIPTION.get(time_range)))
     print()
 
-    results = toukka.sp.current_user_top_tracks(time_range=time_range, limit=50)
+    results = spotify.current_user_top_tracks(time_range=time_range, limit=50)
 
     for i, item in enumerate(results['items']):
         artists_string = _get_string_from_artists(item['artists'])
@@ -33,8 +40,8 @@ def current_user_top_tracks(time_range='long'):
               format(**item, pos=i+1, artists_string=artists_string))
 
 
-@argh.aliases('top-artists')
-@argh.arg('--time-range', choices=['short', 'medium', 'long'])
+@personalization.command('top-artists')
+@click.argument('time-range', type=click.Choice(['short', 'medium', 'long']))
 def current_user_top_artists(time_range='long'):
     spotify = get_spotify()
 
@@ -52,11 +59,5 @@ def current_user_top_artists(time_range='long'):
         print(f'{i:2} {item.name:50} {list_to_string(item.genres)}')
 
 
-#
-
-COMMANDS = [
-    current_user_top_tracks,
-    current_user_top_artists
-    ]
 
 # END

@@ -11,14 +11,19 @@ import argh
 
 import spotipy.convert
 
-#from toukka.hub import Toukka
 from toukka.util import _get_flags, _list_to_string
-
 from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify.printer import first as printer
+from toukka.sopiva.spotify.printer.first import printer
+from toukka.sopiva.spotify.cli import cli_root
+
+
+@cli_root.group()
+def playlist():
+    pass
 
 
 # FIXME: should be same as user_playlists?
+@playlist.command()
 def current_user_playlists():
     '''get current user playlists'''
 
@@ -34,6 +39,7 @@ def current_user_playlists():
               f', id: {p.id}')
 
 
+@playlist.command()
 def user_playlists_info(user):
     '''gets playlists of a user'''
 
@@ -51,6 +57,7 @@ def user_playlists_info(user):
     print(f'total collaborative playlists: {len(collaborative)}')
 
 
+@playlist.command()
 def user_playlists(user,
                    filter_own=False,
                    filter_public=False,
@@ -93,6 +100,7 @@ def _print_playlists(playlists, one_line=True):
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
+@playlist.command()
 def playlist_info(uri: str,
                   print_tracks: bool = False):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
@@ -108,6 +116,7 @@ def playlist_info(uri: str,
             printer.printer(track)
 
 
+@playlist.command()
 def playlist_tracks(uri: str):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
@@ -116,8 +125,6 @@ def playlist_tracks(uri: str):
     for playlist_track in playlist_tracks:
         track = playlist_track.track
         printer.print_track(track)
-
-
 
 
 # FIXME: move
@@ -131,14 +138,5 @@ def _print_playlist_info(playlist):
     print('\tflags: {}'.format(_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
-
-
-
-#
-COMMANDS = [playlist_info,
-            playlist_tracks,
-            current_user_playlists,
-            user_playlists,
-            user_playlists_info]
 
 # END

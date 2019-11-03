@@ -1,13 +1,21 @@
 #
 
-import argh
+import click
 import spotipy.convert
 import spotipy.client.browse.validate
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
 
+from ..cli import cli_root
 
+
+@cli_root.group()
+def browse():
+    pass
+
+
+@browse.command()
 def categories(country: str = None,
                locale: str = None):
     '''list categories'''
@@ -19,6 +27,7 @@ def categories(country: str = None,
         print(f'{category.id:20}: {category.name}')
 
 
+@browse.command()
 def featured_playlists(country: str = None,
                        locale: str = None,
                        timestamp: str = None):
@@ -36,15 +45,17 @@ def featured_playlists(country: str = None,
         print(f'{playlist.id}: {playlist.name}')
 
 
+@browse.command()
 def recommendation_genre_seeds():
     '''get list of available genre seeds'''
     return get_spotify().recommendation_genre_seeds()
 
 
-@argh.arg('--seed-artist-uris', nargs='*')
-@argh.arg('--seed-track-uris', nargs='*')
-@argh.arg('--seed-genres', nargs='*')
-@argh.arg('--attributes', nargs='*')
+@browse.command()
+@click.option('--seed-artist-uris', multiple=True)
+@click.option('--seed-track-uris', multiple=True)
+@click.option('--seed-genres', multiple=True)
+@click.option('--attributes', multiple=True)
 def recommendations(seed_artist_uris: list = None,
                     seed_track_uris: list = None,
                     seed_genres: list = None,
@@ -91,13 +102,5 @@ def recommendations(seed_artist_uris: list = None,
     for track in recommendations.tracks:
         printer.printer(track)
 
-#
-
-COMMANDS = [
-    categories,
-    featured_playlists,
-    recommendation_genre_seeds,
-    recommendations
-]
 
 # END

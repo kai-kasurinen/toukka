@@ -1,13 +1,16 @@
 #
 
-import pprint
-import argh
+import click
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
 
+from ..cli import cli_root
 
-@argh.arg('type', choices=['artist', 'album', 'track', 'playlist'])
+
+@cli_root.command()
+@click.argument('type', type=click.Choice(['artist', 'album', 'track', 'playlist']))
+@click.argument('query')
 def search(type: str,
            query: str,
            limit: int = None):
@@ -31,11 +34,5 @@ def search(type: str,
         if limit is not None and count >= limit:
             break
 
-#
-
-
-COMMANDS = [
-    search
-]
 
 # END

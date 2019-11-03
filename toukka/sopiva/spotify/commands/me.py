@@ -11,29 +11,30 @@ import tabulate
 import argh
 
 from toukka.sopiva.spotify.util import get_spotify
-
-
-# FIXME: remove
-#from toukka.hub import Toukka
-#from toukka.spotify.models.track_features import TrackFeaturesDelivered
 from toukka.util import json_dump, json_dump_print, format_as_table
 from toukka.util import _get_flags, _list_to_string
+from ..cli import cli_root
 
 
+@cli_root.group()
+def me():
+    pass
+
+
+@me.command('info')
 def current_user():
     '''get current user information'''
     # FIXME: TypeError: __init__() got an unexpected keyword argument 'birthdate'
     return get_spotify().current_user().pprint()
 
 
-@argh.named('followed-artists')
+@me.command('followed-artists')
 def current_user_followed_artists():
     toukka = Toukka()
     return json_dump(toukka.sp.current_user_followed_artists())
 
 
-
-@argh.named('recently-played')
+@me.command('recently-played')
 def current_user_recently_played():
     toukka = Toukka()
 
