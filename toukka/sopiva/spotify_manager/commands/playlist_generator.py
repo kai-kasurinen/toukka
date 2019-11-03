@@ -114,23 +114,19 @@ def from_genres(generator,
 @click.pass_context
 def from_genres_re(ctx,
                    genre_name_re: str,
-                   *kwargs):
+                   **kwargs):
     regex = re.compile(genre_name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genre_names_match = filter(regex.fullmatch, genres.keys())
     ctx.invoke(from_genres, genre_name=genre_names_match, **kwargs)
 
 
-@generate_playlist.group()
-def easy():
-    pass
-
-
-@easy.command()
+@generate_playlist.command()
 @click.argument('uris', required=True, nargs=-1)
 @click.pass_context
-def uris(ctx,
-         uris: tuple):
+def easy_uris(ctx,
+              uris: tuple):
+    '''easy shortcut to from-uris'''
     kwargs_for_uris = {
         'expand_playlist_to_tracks': True,
         'expand_track_to_album': True,
@@ -141,12 +137,13 @@ def uris(ctx,
     ctx.invoke(from_uris, uris=uris, **kwargs_for_uris)
 
 
-@easy.command()
+@generate_playlist.command()
 @click.argument('genre_name', required=True, nargs=-1,
                 autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
 @click.pass_context
-def genres(ctx,
-           genre_name: tuple):
+def easy_genres(ctx,
+                genre_name: tuple):
+    '''easy shortcut to from-genres'''
     kwargs_for_playlist = {
         'expand_playlist_to_tracks': True,
         'expand_track_to_album': True,

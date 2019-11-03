@@ -13,12 +13,15 @@ import click_log
 
 import toukka.logger.simple
 
-from toukka.sopiva.spotify_manager.playlist_generator_commands import (
-    generate_playlist_from_uris,
-    generate_playlist_from_search,
-    generate_playlist_from_recommendations,
-    generate_playlist_from_genres
+
+from toukka.sopiva.spotify_manager.commands.playlist_generator import (
+    from_uris,
+    from_genres,
+    from_genres_re,
+    from_search,
+    from_recommendations
 )
+
 
 from toukka.sopiva.spotify_manager.genres import click_genre_completer
 
@@ -80,10 +83,11 @@ def cli():
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
 def uri(uris: tuple,
-        dry_run: bool = False,
-        randomize: bool = False
+        **kwargs
         ):
-    generate_playlist_from_uris(**locals(), **kwargs_for_uris)
+    args = locals()
+    context = click.get_current_context()
+    context.invoke(from_uris, **args, **kwargs, **kwargs_for_uris)
 
 
 # FIXME: autocompletion
@@ -92,26 +96,23 @@ def uri(uris: tuple,
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
 def genre(genre_name: tuple,
-          dry_run: bool = False,
-          randomize: bool = False
+          **kwargs
           ):
-    generate_playlist_from_genres(**locals(), **kwargs_for_playlist)
+    args = locals()
+    context = click.get_current_context()
+    context.invoke(from_genres, **args, **kwargs, **kwargs_for_playlist)
 
 
 @cli.command()
-@click.argument('genre_name_re')
+@click.argument('genre_name_re', required=True)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
 def genre_re(genre_name_re: str,
-             dry_run: bool = False,
-             randomize: bool = False
+             **kwargs
              ):
     args = locals()
-    args.pop('genre_name_re')
-    regex = re.compile(genre_name_re)
-    genres = toukka.sopiva.spotify_manager.genres.genres()
-    genre_names_match = filter(regex.fullmatch, genres.keys())
-    generate_playlist_from_genres(genre_name=genre_names_match, **args, **kwargs_for_playlist)
+    context = click.get_current_context()
+    context.invoke(from_genres_re, **args, **kwargs, **kwargs_for_playlist)
 
 ##
 
