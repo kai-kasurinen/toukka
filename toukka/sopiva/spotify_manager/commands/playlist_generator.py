@@ -4,6 +4,7 @@
 import logging
 import pprint
 import dataclasses
+import re
 
 import click
 import spotipy.convert
@@ -33,6 +34,9 @@ logger = logging.getLogger(__name__)
 @click.option('--looper-max-tries', default=5000)
 @click.pass_context
 def generate_playlist(ctx, **kwargs):
+    # FIXME: subcommand --help calls this
+    # https://github.com/pallets/click/issues/295
+    # https://github.com/pallets/click/issues/814
     ctx.obj = PlaylistGenerator(**kwargs)
 
 
@@ -43,8 +47,9 @@ pass_generator = click.make_pass_decorator(PlaylistGenerator, ensure=True)
 @pass_generator
 @click.argument('uris', required=True, nargs=-1)
 def from_uris(generator,
-              uris: list):
-    generator.generate_from_uris(uris)
+              uris: tuple,
+              **kwargs):
+    generator.generate_from_uris(uris, **kwargs)
 
 
 @generate_playlist.command()
@@ -53,8 +58,9 @@ def from_uris(generator,
 @pass_generator
 def from_search(generator,
                 query_type: str,
-                query: str):
-    generator.generate_from_search(query_type=query_type, query=query)
+                query: str,
+                **kwargs):
+    generator.generate_from_search(query_type=query_type, query=query, **kwargs)
 
 
 @generate_playlist.command()
@@ -64,10 +70,11 @@ def from_search(generator,
 @click.option('--attributes', 'attributes_list', multiple=True)
 @pass_generator
 def from_recommendations(generator,
-                         seed_artist_uris: list = None,
-                         seed_track_uris: list = None,
-                         seed_genres: list = None,
-                         attributes_list: list = None):
+                         seed_artist_uris: tuple = None,
+                         seed_track_uris: tuple = None,
+                         seed_genres: tuple = None,
+                         attributes_list: tuple = None,
+                         **kwargs):
 
     '''generate playlist from recommendation'''
     attributes_dict = {}
@@ -78,7 +85,8 @@ def from_recommendations(generator,
         seed_artist_uris=seed_artist_uris,
         seed_track_uris=seed_track_uris,
         seed_genres=seed_genres,
-        seed_attributes=attributes_dict)
+        seed_attributes=attributes_dict,
+        **kwargs)
 
 
 @generate_playlist.command()
@@ -86,20 +94,67 @@ def from_recommendations(generator,
                 autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
 @pass_generator
 def from_genres(generator,
-                genre_name: list):
+                genre_name: tuple,
+                **kwargs):
     genres = toukka.sopiva.spotify_manager.genres.genres()
-
     uris_all = list()
     for name in genre_name:
         genre = genres.get(name)
         if genre is None:
-            raise Exception(f'genre "{name}" not found')
-        print(genre)
+            raise click.ClickException(f'genre "{name}" not found')
+        logger.debug(genre)
         playlists = dataclasses.asdict(genre.playlists)
         uris = [uri for uri in playlists.values() if uri is not None]
         uris_all.extend(uris)
+    generator.generate_from_uris(uris=uris_all, **kwargs)
 
-    generator.generate_from_uris(uris=uris_all)
+
+@generate_playlist.command()
+@click.argument('genre_name_re', required=True)
+@click.pass_context
+def from_genres_re(ctx,
+                   genre_name_re: str,
+                   *kwargs):
+    regex = re.compile(genre_name_re)
+    genres = toukka.sopiva.spotify_manager.genres.genres()
+    genre_names_match = filter(regex.fullmatch, genres.keys())
+    ctx.invoke(from_genres, genre_name=genre_names_match, **kwargs)
+
+
+@generate_playlist.group()
+def easy():
+    pass
+
+
+@easy.command()
+@click.argument('uris', required=True, nargs=-1)
+@click.pass_context
+def uris(ctx,
+         uris: tuple):
+    kwargs_for_uris = {
+        'expand_playlist_to_tracks': True,
+        'expand_track_to_album': True,
+        'expand_album_to_tracks': True,
+        'expand_artist_to_albums': True,
+        'expand_artist_to_related_artists': True
+    }
+    ctx.invoke(from_uris, uris=uris, **kwargs_for_uris)
+
+
+@easy.command()
+@click.argument('genre_name', required=True, nargs=-1,
+                autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
+@click.pass_context
+def genres(ctx,
+           genre_name: tuple):
+    kwargs_for_playlist = {
+        'expand_playlist_to_tracks': True,
+        'expand_track_to_album': True,
+        'expand_album_to_tracks': True,
+        'expand_track_to_artists': False,
+        'expand_artist_to_albums': False
+    }
+    ctx.invoke(from_genres, genre_name=genre_name, **kwargs_for_playlist)
 
 
 # END

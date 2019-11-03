@@ -73,7 +73,7 @@ class PlaylistGenerator:
         # FIXME: remove
         self.__log.setLevel(logging.DEBUG)
         self.__log.debug('initialized %s', self)
-        self.__log.debug('options %s', self.options)
+        self.__log.debug('self options %s', self.options)
 
     def generate(self, **kwargs):
         opts = self.options.push(kwargs)
@@ -135,7 +135,7 @@ class PlaylistGenerator:
                            uris: list,
                            **kwargs):
         opts = self.options.push(kwargs)
-        self.__log.debug(self.options)
+        self.__log.debug('method options: %s', opts)
         if opts.randomize:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
@@ -149,6 +149,7 @@ class PlaylistGenerator:
                              query: str,
                              **kwargs):
         opts = self.options.push(kwargs)
+        self.__log.debug('method options: %s', opts)
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(s, **opts)
         self.sources.add(e)
@@ -162,6 +163,7 @@ class PlaylistGenerator:
                                       seed_attributes: dict = None,
                                       **kwargs):
         opts = self.options.push(kwargs)
+        self.__log.debug('method options: %s', opts)
 
         seed_artist_ids = list()
         if seed_artist_uris is not None:
