@@ -407,6 +407,7 @@ class PlaylistGenerator:
                        item: spotipy.model.track.FullTrack,
                        **kwargs):
         opts = self.options.push(kwargs)
+        did = False
 
         # add as new source
         if (opts.expand_track_to_artists and
@@ -418,6 +419,7 @@ class PlaylistGenerator:
                     self.sources.add(self.expander(
                         self.spotify.artist(artist.id),
                         **opts))
+            did = True
 
         # add as new source
         if (opts.expand_track_to_recommendations and
@@ -427,6 +429,7 @@ class PlaylistGenerator:
                 self.expander(
                     self.recommendations_generator(seed_track_ids=[item.id]),
                     **opts))
+            did = True
 
         # yields tracks
         if (opts.expand_track_to_album and
@@ -436,6 +439,7 @@ class PlaylistGenerator:
             yield from self.expander(
                 self.spotify.album(item.album.id, market=self.market),
                 **opts)
+            did = True
         # and finally use track if not expanded to album
         else:
             if not self.is_uri_already_seen(item.uri):
