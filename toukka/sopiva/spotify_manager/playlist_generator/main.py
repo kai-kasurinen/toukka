@@ -58,11 +58,7 @@ class PlaylistGenerator:
 
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
-
-        # NOTE: bug with market='from_token' fails on unplayeble track -> TypeError
-        # NOTE: bug is fixed, so clear this mess
-        self._market = None
-        self._market_country_code = 'FI'
+        self.market = self.spotify.current_user().country
 
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas']
@@ -81,8 +77,8 @@ class PlaylistGenerator:
 
     def generate(self, **kwargs):
         opts = self.options.push(kwargs)
-        self.looper()
-        self.commit()
+        self.looper(**opts)
+        self.commit(**opts)
 
     def looper(self, **kwargs):
         opts = self.options.push(kwargs)
@@ -120,9 +116,11 @@ class PlaylistGenerator:
         self.__log.info(f'{len(track_ids_to_playlist)} tracks to add')
 
     # TODO: split and move to Playlist
-    def commit(self):
+    def commit(self, **kwargs):
+        opts = self.options.push(kwargs)
+
         track_ids_to_playlist = self.track_ids_to_playlist
-        if not self.options.dry_run:
+        if not opts.dry_run:
             if len(track_ids_to_playlist) > 0:
                 self.playlist.clear()
                 self.playlist.tracks_add(track_ids_to_playlist)
@@ -142,9 +140,9 @@ class PlaylistGenerator:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
         for uri in uris:
-            self.sources.add(self.expand_uri(uri))
+            self.sources.add(self.expand_uri(uri, **opts))
         self.playlist.description = f'source: {", ".join(uris)}'
-        self.generate()
+        self.generate(**opts)
 
     def generate_from_search(self,
                              query_type: str,
@@ -152,10 +150,10 @@ class PlaylistGenerator:
                              **kwargs):
         opts = self.options.push(kwargs)
         s = self.search_generator(query_type=query_type, query=query)
-        e = self.expander(s)
+        e = self.expander(s, **opts)
         self.sources.add(e)
         self.playlist.description = f'source: search {query_type} "{query}"'
-        self.generate()
+        self.generate(**opts)
 
     def generate_from_recommendations(self,
                                       seed_artist_uris: list = None,
@@ -181,7 +179,7 @@ class PlaylistGenerator:
             seed_track_ids=seed_track_ids,
             seed_genres=seed_genres,
             seed_attributes=seed_attributes)
-        e = self.expander(s)
+        e = self.expander(s, **opts)
         self.sources.add(e)
         self.playlist.description = ', '.join((
             f'source: recommendations',
@@ -189,7 +187,7 @@ class PlaylistGenerator:
             f'{seed_track_uris}',
             f'{seed_genres}'))
         print(self.playlist.description)
-        self.generate()
+        self.generate(**opts)
 
     def is_track_ok_to_add(self, track):
         if self.is_track_isrc_already_added(track):
@@ -203,9 +201,6 @@ class PlaylistGenerator:
             return False
         elif not self.is_track_playeable(track):
             self.__log.debug(f'{track.id}: not playeable')
-            return False
-        elif not self.is_track_on_market(track, self._market_country_code):
-            self.__log.debug(f'{track.id}: not available on {self._market_country_code}')
             return False
         elif not self.is_track_album_name_good(track):
             self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
@@ -240,15 +235,16 @@ class PlaylistGenerator:
 
     def is_track_playeable(self, track):
         if track.is_playable is None:
-            # should log warning or something
-            return True
+            self.__log.warning('%s: is_playable is None', track.id)
+            return self.is_track_on_market(track, self.market)
         else:
             return track.is_playable
 
+    # NOTE: this called from is_track_playeable when relinking is off
     def is_track_on_market(self, track, market):
         markets = track.available_markets
         if markets is None:
-            # hjum?
+            self.__log.warning('%s: markets is None', track.id)
             return True
         elif market in markets:
             return True
@@ -279,7 +275,7 @@ class PlaylistGenerator:
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_album_groups,
-            market=self._market)
+            market=self.market)
         yield from self.spotify.all_items_from_paging(paging)
 
     def artist_all_tracks_generator(self,
@@ -292,17 +288,17 @@ class PlaylistGenerator:
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         yield from self.spotify.artist_top_tracks(artist_id,
-                                                  country=self._market_country_code)
+                                                  country=self.market)
 
     def album_tracks_generator(self,
                                album_id
                                ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         paging = self.spotify.album_tracks(
             album_id,
-            market=self._market,
+            market=self.market,
             limit=50)
         for simple_track in self.spotify.all_items_from_paging(paging):
-            yield self.spotify.track(simple_track.id, market=self._market)
+            yield self.spotify.track(simple_track.id, market=self.market)
 
     def recommendations_generator(self,
                                   seed_artist_ids: list = None,
@@ -321,7 +317,7 @@ class PlaylistGenerator:
             artist_ids=seed_artist_ids,
             track_ids=seed_track_ids,
             genres=seed_genres,
-            market=self._market_country_code,
+            market=self.market,
             limit=100,
             **seed_attributes)
 
@@ -342,7 +338,7 @@ class PlaylistGenerator:
         search = self.spotify.search(query=query,
                                      types=[query_type],
                                      limit=50,
-                                     market=self._market)
+                                     market=self.market)
         paging = search[0]
         for item in self.spotify.all_items_from_paging(paging):
             # NOTE: item can me track, album, artist, playlist ...
@@ -438,7 +434,7 @@ class PlaylistGenerator:
             # set expand_track_to_album option False, so we dont hit again
             opts.set(expand_track_to_album=False)
             yield from self.expander(
-                self.spotify.album(item.album.id, market=self._market),
+                self.spotify.album(item.album.id, market=self.market),
                 **opts)
         # and finally use track if not expanded to album
         else:
@@ -449,6 +445,7 @@ class PlaylistGenerator:
                         item: spotipy.model.artist.FullArtist,
                         **kwargs):
         opts = self.options.push(kwargs)
+        did = False
         if self.is_uri_already_seen(item.uri):
             return
 
@@ -459,6 +456,7 @@ class PlaylistGenerator:
                 self.expander(
                     self.related_artists_generator(item.id),
                     **opts))
+            did = True
 
         # add as new source
         if (opts.expand_artist_to_recommendations and
@@ -467,18 +465,21 @@ class PlaylistGenerator:
                 self.expander(
                     self.recommendations_generator(seed_artist_ids=[item.id]),
                     **opts))
+            did = True
 
         # FIXME: if elif else? order?
         if opts.expand_artist_to_albums:
             yield from self.expander(
                 self.artist_albums_generator(item.id),
                 **opts)
+            did = True
         elif opts.expand_artist_to_top_tracks:
             yield from self.expander(
                 self.artist_top_tracks_generator(item.id),
                 **opts)
-        else:
-            # FIXME: can be false alarm
+            did = True
+        # nice hack
+        if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
 
     def expander_album(self,
@@ -520,11 +521,11 @@ class PlaylistGenerator:
         if item_type == 'artist':
             yield from self.expander(self.spotify.artist(item_id), **opts)
         elif item_type == 'album':
-            yield from self.expander(self.spotify.album(item_id, market=self._market), **opts)
+            yield from self.expander(self.spotify.album(item_id, market=self.market), **opts)
         elif item_type == 'track':
-            yield from self.expander(self.spotify.track(item_id, market=self._market), **opts)
+            yield from self.expander(self.spotify.track(item_id, market=self.market), **opts)
         elif item_type == 'playlist':
-            yield from self.expander(self.spotify.playlist(item_id, market=self._market), **opts)
+            yield from self.expander(self.spotify.playlist(item_id, market=self.market), **opts)
         else:
             self.__log.warning('did not do anything with: %s', item)
 
@@ -536,11 +537,11 @@ class PlaylistGenerator:
             if uri_type == 'artist':
                 items.append(self.spotify.artist(uri_id))
             elif uri_type == 'album':
-                items.append(self.spotify.album(uri_id, market=self._market))
+                items.append(self.spotify.album(uri_id, market=self.market))
             elif uri_type == 'track':
-                items.append(self.spotify.track(uri_id, market=self._market))
+                items.append(self.spotify.track(uri_id, market=self.market))
             elif uri_type == 'playlist':
-                items.append(self.spotify.playlist(uri_id, market=self._market))
+                items.append(self.spotify.playlist(uri_id, market=self.market))
             else:
                 self.__log.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
         return items
