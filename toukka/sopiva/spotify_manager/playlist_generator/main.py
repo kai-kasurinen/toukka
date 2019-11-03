@@ -47,7 +47,7 @@ class PlaylistGenerator:
         expand_artist_to_recommendations=False,
         expand_album_to_tracks=False,
         expand_playlist_to_tracks=False,
-        expand_generator_to_items=False
+        expand_generator_to_items=True
     )
 
     def __init__(self,
@@ -76,12 +76,16 @@ class PlaylistGenerator:
 
         # FIXME: remove
         self.__log.setLevel(logging.DEBUG)
+        self.__log.debug('initialized %s', self)
+        self.__log.debug('options %s', self.options)
 
-    def generate(self):
+    def generate(self, **kwargs):
+        opts = self.options.push(kwargs)
         self.looper()
         self.commit()
 
-    def looper(self):
+    def looper(self, **kwargs):
+        opts = self.options.push(kwargs)
 
         track_ids_to_playlist = list()
 
@@ -103,12 +107,12 @@ class PlaylistGenerator:
                 track_ids_to_playlist.append(track.id)
                 self.__log.debug('%s: added', track.id)
 
-            if len(track_ids_to_playlist) >= self.options.looper_target_count:
+            if len(track_ids_to_playlist) >= opts.looper_target_count:
                 self.__log.info('we have enough tracks to add')
                 break
 
             # safety
-            if counter >= self.options.looper_max_tries:
+            if counter >= opts.looper_max_tries:
                 self.__log.info('we have tried too many tracks, breaking loop')
                 break
 
@@ -132,10 +136,9 @@ class PlaylistGenerator:
     def generate_from_uris(self,
                            uris: list,
                            **kwargs):
-        # TODO: use method opts and pass them..
-        self.options.update(kwargs)
+        opts = self.options.push(kwargs)
         self.__log.debug(self.options)
-        if self.options.randomize:
+        if opts.randomize:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
         for uri in uris:
@@ -147,8 +150,7 @@ class PlaylistGenerator:
                              query_type: str,
                              query: str,
                              **kwargs):
-        # TODO: use method opts and pass them..
-        self.options.update(kwargs)
+        opts = self.options.push(kwargs)
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(s)
         self.sources.add(e)
@@ -159,10 +161,9 @@ class PlaylistGenerator:
                                       seed_artist_uris: list = None,
                                       seed_track_uris: list = None,
                                       seed_genres: list = None,
-                                      recommendation_attributes: dict = None,
+                                      seed_attributes: dict = None,
                                       **kwargs):
-        # TODO: use method opts and pass them..
-        self.options.update(kwargs)
+        opts = self.options.push(kwargs)
 
         seed_artist_ids = list()
         if seed_artist_uris is not None:
@@ -173,11 +174,13 @@ class PlaylistGenerator:
             for artist in self.uris_to_items(seed_track_uris):
                 seed_artist_ids.append(artist.id)
 
+        # TODO: move seed_attributes validation here?
+
         s = self.recommendations_generator(
             seed_artist_ids=seed_artist_ids,
             seed_track_ids=seed_track_ids,
             seed_genres=seed_genres,
-            recommendation_attributes=recommendation_attributes)
+            seed_attributes=seed_attributes)
         e = self.expander(s)
         self.sources.add(e)
         self.playlist.description = ', '.join((
@@ -305,11 +308,13 @@ class PlaylistGenerator:
                                   seed_artist_ids: list = None,
                                   seed_track_ids: list = None,
                                   seed_genres: list = None,
-                                  recommendation_attributes: dict = None
+                                  seed_attributes: dict = None
                                   ) -> Generator[spotipy.model.track.FullTrack, None, None]:
 
-        if recommendation_attributes is None:
-            recommendation_attributes = {}
+        if seed_attributes is None:
+            seed_attributes = {}
+
+        self.__log.debug(locals())
 
         # NOTE: market=None gives many unplayeble tracks
         recommendations = self.spotify.recommendations(
@@ -318,7 +323,7 @@ class PlaylistGenerator:
             genres=seed_genres,
             market=self._market_country_code,
             limit=100,
-            **recommendation_attributes)
+            **seed_attributes)
 
         for seed in recommendations.seeds:
             self.__log.debug(seed)

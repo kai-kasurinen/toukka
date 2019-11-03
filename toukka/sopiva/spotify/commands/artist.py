@@ -27,6 +27,7 @@ def info(uri):
 
 @artist.command()
 @click.argument('uri')
+@click.option('--market')
 def albums(uri,
            market='from_token'):
     '''get artist albums'''

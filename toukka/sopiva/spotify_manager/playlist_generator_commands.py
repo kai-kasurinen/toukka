@@ -99,7 +99,7 @@ def generate_playlist_from_genres(genre_name: list,
     for name in genre_name:
         genre = genres.get(name)
         if genre is None:
-            raise argh.exceptions.CommandError(f'genre "{name}" not found')
+            raise Exception(f'genre "{name}" not found')
         print(genre)
         playlists = dataclasses.asdict(genre.playlists)
         uris = [uri for uri in playlists.values() if uri is not None]
