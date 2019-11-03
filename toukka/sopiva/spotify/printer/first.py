@@ -13,6 +13,8 @@ import spotipy.model
 import spotipy.model.base
 import spotipy.model.playlist
 import spotipy.model.album
+import spotipy.model.category
+import spotipy.model.recommendations
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
@@ -172,6 +174,15 @@ def print_playlist(playlisttrack: spotipy.model.playlist.PlaylistTrack):
     if flags:
         print(f'\tflags: {flags}')
 
+
+@printer.register
+def print_category(category: spotipy.model.category.Category):
+    print(f'category: {category.name} ({category.id})')
+
+
+@printer.register
+def print_recommendationseed(seed: spotipy.model.recommendations.RecommendationSeed):
+    print(f'recommendation seed: {seed}')
 
 
 # OLD

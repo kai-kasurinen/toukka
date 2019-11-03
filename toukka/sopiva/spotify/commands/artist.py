@@ -7,8 +7,7 @@ import spotipy
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
-
-from ..cli import cli_root
+from toukka.sopiva.spotify.cli import cli_root
 
 
 @cli_root.group()

@@ -6,8 +6,8 @@ import spotipy.client.browse.validate
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
-
-from ..cli import cli_root
+from toukka.sopiva.spotify.printer.first import printer
+from toukka.sopiva.spotify.cli import cli_root
 
 
 @cli_root.group()
@@ -16,22 +16,12 @@ def browse():
 
 
 @browse.command()
-def categories(country: str = None,
-               locale: str = None):
-    '''list categories'''
-    spotify = get_spotify()
-    paging = spotify.categories(country=country, locale=locale, limit=50)
-    print(f'found {paging.total} categories')
-    categories = spotify.items_from_paging(paging)
-    for category in categories:
-        print(f'{category.id:20}: {category.name}')
-
-
-@browse.command()
+@click.option('--country')
+@click.option('--locale')
 def featured_playlists(country: str = None,
                        locale: str = None,
                        timestamp: str = None):
-    '''list categories'''
+    '''Get a list of Spotify featured playlists'''
     spotify = get_spotify()
     message, paging = spotify.featured_playlists(
         country=country,
@@ -42,13 +32,61 @@ def featured_playlists(country: str = None,
     print(f'found {paging.total} featured playlists')
     playlists = spotify.all_items_from_paging(paging)
     for playlist in playlists:
-        print(f'{playlist.id}: {playlist.name}')
+        printer(playlist)
 
 
 @browse.command()
-def recommendation_genre_seeds():
-    '''get list of available genre seeds'''
-    return get_spotify().recommendation_genre_seeds()
+@click.option('--country')
+def new_releases(country: str = None):
+    '''Get a list of new album releases featured in Spotify'''
+    spotify = get_spotify()
+    paging = spotify.new_releases(country=country, limit=50)
+    print(f'found {paging.total} releases')
+    for album in spotify.all_items_from_paging(paging):
+        printer(album)
+
+
+@browse.command()
+@click.option('--country')
+@click.option('--locale')
+def categories(country: str = None,
+               locale: str = None):
+    '''Get a list of categories used to tag items in Spotify'''
+    spotify = get_spotify()
+    paging = spotify.categories(country=country, locale=locale, limit=50)
+    print(f'found {paging.total} categories')
+    for category in spotify.all_items_from_paging(paging):
+        printer(category)
+
+
+@browse.command()
+@click.argument('category_id')
+@click.option('--country')
+@click.option('--locale')
+def category(category_id: str,
+             country: str = None,
+             locale: str = None):
+    '''Get a single category used to tag items in Spotify'''
+    spotify = get_spotify()
+    category = spotify.category(category_id, country=country, locale=locale)
+    printer(category)
+
+
+@browse.command()
+@click.argument('category_id')
+@click.option('--country')
+def category_playlists(category_id: str,
+                       country: str = None):
+    '''Get a list of Spotify playlists tagged with a particular category'''
+    spotify = get_spotify()
+    paging = spotify.category_playlists(
+        category_id,
+        country=country,
+        limit=50)
+    print(f'found {paging.total} playlists')
+    playlists = spotify.all_items_from_paging(paging)
+    for playlist in playlists:
+        printer(playlist)
 
 
 @browse.command()
@@ -56,6 +94,8 @@ def recommendation_genre_seeds():
 @click.option('--seed-track-uris', multiple=True)
 @click.option('--seed-genres', multiple=True)
 @click.option('--attributes', multiple=True)
+@click.option('--market')
+@click.option('--limit', default=100)
 def recommendations(seed_artist_uris: list = None,
                     seed_track_uris: list = None,
                     seed_genres: list = None,
@@ -79,12 +119,13 @@ def recommendations(seed_artist_uris: list = None,
     if seed_track_uris is not None:
         seed_track_ids = uris_to_ids(seed_track_uris)
 
-    recommendation_attributes_list = attributes
-    recommendation_attributes_dict = {}
-    if recommendation_attributes_list is not None:
-        recommendation_attributes_dict = {k: v for k, v in (x.split(':') for x in recommendation_attributes_list)}
-        print(recommendation_attributes_dict)
-        spotipy.client.browse.validate.validate_attributes(recommendation_attributes_dict)
+    # FIXME: remove this hack
+    attributes_list = attributes
+    attributes_dict = {}
+    if attributes_list is not None:
+        attributes_dict = {k: v for k, v in (x.split(':') for x in attributes_list)}
+        print(attributes_dict)
+        spotipy.client.browse.validate.validate_attributes(attributes_dict)
 
     spotify = get_spotify()
     recommendations = spotify.recommendations(
@@ -93,14 +134,20 @@ def recommendations(seed_artist_uris: list = None,
         genres=seed_genres,
         market=market,
         limit=limit,
-        **recommendation_attributes_dict)
+        **attributes_dict)
 
     for seed in recommendations.seeds:
-        printer.printer(seed)
+        printer(seed)
 
-    print(type(recommendations.tracks))
     for track in recommendations.tracks:
-        printer.printer(track)
+        printer(track)
+
+
+@browse.command()
+def recommendation_genre_seeds():
+    '''get list of available genre seeds'''
+    for genre in get_spotify().recommendation_genre_seeds():
+        print(genre)
 
 
 # END
