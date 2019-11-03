@@ -63,7 +63,8 @@ kwargs_for_uris = {
     'expand_track_to_album': True,
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': True,
-    'expand_artist_to_related_artists': True
+    'expand_artist_to_related_artists': True,
+    'expand_artist_to_recommendations': True
 }
 
 
