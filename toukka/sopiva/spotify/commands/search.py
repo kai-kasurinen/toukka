@@ -3,9 +3,8 @@
 import click
 
 from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify.printer import first as printer
-
-from ..cli import cli_root
+from toukka.sopiva.spotify.printer.first import printer
+from toukka.sopiva.spotify.cli import cli_root
 
 
 @cli_root.command()
@@ -15,6 +14,7 @@ def search(type: str,
            query: str,
            limit: int = None):
 
+    # FIXME: remove
     # NOTE: cos default is None, argh (or some else) set it as str
     if limit is not None:
         limit = int(limit)
@@ -29,7 +29,7 @@ def search(type: str,
     print()
 
     for count, item in enumerate(spotify.iterate_items_from_paging(paging), start=1):
-        printer.printer(item)
+        printer(item)
 
         if limit is not None and count >= limit:
             break
