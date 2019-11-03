@@ -4,7 +4,7 @@
 
 import logging
 import argh
-
+import click_log
 import toukka.logger.simple
 import toukka.config
 import toukka.version
@@ -16,7 +16,7 @@ __program_name__ = 'toukka-spotify-manager'
 __program_description__ = 'manage spotify'
 
 
-def main():
+def main_():
     '''main, main, main'''
     toukka.logger.simple.init_logging()
 
@@ -37,6 +37,13 @@ def main():
     toukka.logger.simple.set_logging_level(args.loglevel)
 
     parser.dispatch()
+
+
+def main():
+    toukka.logger.simple.init_logging()
+    # FIXME: format?
+    click_log.basic_config()
+    toukka.sopiva.spotify_manager.cli.cli_root.main()
 
 
 # END

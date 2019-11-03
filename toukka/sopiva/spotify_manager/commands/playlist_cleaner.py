@@ -1,12 +1,21 @@
 #
 
-import argh
+import click
 import spotipy.convert
 
 import toukka.sopiva.spotify.util
 import toukka.sopiva.spotify_history.util
 
+from toukka.sopiva.spotify_manager.cli import cli_root
 
+
+@cli_root.command()
+@click.argument('uri')
+@click.option('--filter-played-tracks', is_flag=True, default=False)
+@click.option('--filter-played-isrc', is_flag=True, default=False)
+@click.option('--filter-duplicate-isrc', is_flag=True, default=False)
+@click.option('--filter-non-playable', is_flag=True, default=False)
+@click.option('--remove-tracks', is_flag=True, default=False)
 def playlist_cleaner(uri: str,
                      remove_tracks: bool = False,
                      filter_played_tracks: bool = False,
@@ -107,11 +116,5 @@ def _playlist_current():
     else:
         return False
 
-
-#
-
-COMMANDS = [
-    playlist_cleaner,
-    ]
 
 # END

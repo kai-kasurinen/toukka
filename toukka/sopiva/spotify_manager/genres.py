@@ -256,10 +256,20 @@ def genres_load():
         return pickle.load(file)
 
 
-# for argcomplete
-def genres_completer(prefix, **kwargs):
+# NOTE: for argcomplete
+def argcomplete_genres_completer(prefix, **kwargs):
     _genres = genres().keys()
     return (genre for genre in _genres if genre.startswith(prefix))
 
+
+# NOTE: for click
+# FIXME: not work?
+#
+# ctx - The current click context.
+# args - The list of arguments passed in.
+# incomplete - The partial word that is being completed, as a string.
+#              May be an empty string '' if no characters have been entered yet.
+def click_genre_completer(ctx, args, incomplete):
+    return argcomplete_genres_completer(incomplete)
 
 # END

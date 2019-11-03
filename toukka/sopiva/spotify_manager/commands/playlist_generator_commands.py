@@ -5,15 +5,25 @@ import logging
 import pprint
 import dataclasses
 
-import argh
+import click
 import spotipy.convert
 import spotipy.client.browse.validate
 
 import toukka.sopiva.spotify_manager.genres
+
 from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
+from toukka.sopiva.spotify_manager.cli import cli_root
 
 
-@argh.arg('uris', nargs='*')
+@cli_root.group()
+def generate_playlist():
+    pass
+
+
+@generate_playlist.command('from-uris')
+@click.argument('uris', required=True, nargs=-1)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def generate_playlist_from_uris(uris: list,
                                 dry_run: bool = False,
                                 randomize: bool = False,
@@ -33,7 +43,11 @@ def generate_playlist_from_uris(uris: list,
     generator.generate_from_uris(**args)
 
 
-@argh.arg('query_type', choices=['artist', 'album', 'track', 'playlist'])
+@generate_playlist.command('from-search')
+@click.argument('query_type', type=click.Choice(['artist', 'album', 'track', 'playlist']))
+@click.argument('query')
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def generate_playlist_from_search(query_type: str, query: str,
                                   dry_run: bool = False,
                                   randomize: bool = False,
@@ -53,10 +67,13 @@ def generate_playlist_from_search(query_type: str, query: str,
     generator.generate_from_search(**args)
 
 
-@argh.arg('--seed-artist-uris', nargs='*')
-@argh.arg('--seed-track-uris', nargs='*')
-@argh.arg('--seed-genres', nargs='*')
-@argh.arg('--recommendation-attributes-list', nargs='*')
+@generate_playlist.command('from-recomendations')
+@click.option('--seed-artist-uris', multiple=True)
+@click.option('--seed-track-uris', multiple=True)
+@click.option('--seed-genres', multiple=True)
+@click.option('--attributes', multiple=True)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def generate_playlist_from_recommendations(seed_artist_uris: list = None,
                                            seed_track_uris: list = None,
                                            seed_genres: list = None,
@@ -85,7 +102,11 @@ def generate_playlist_from_recommendations(seed_artist_uris: list = None,
     generator.generate_from_recommendations(**args, recommendation_attributes=recommendation_attributes_dict)
 
 
-@argh.arg('genre_name', nargs='*', completer=toukka.sopiva.spotify_manager.genres.genres_completer)
+@generate_playlist.command('from-genres')
+@click.argument('genre_name', required=True, nargs=-1,
+                autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
 def generate_playlist_from_genres(genre_name: list,
                                   dry_run: bool = False,
                                   randomize: bool = False,
@@ -115,14 +136,6 @@ def generate_playlist_from_genres(genre_name: list,
 
     generator = PlaylistGenerator()
     generator.generate_from_uris(uris=uris_all, **args)
-
-
-COMMANDS = [
-    generate_playlist_from_uris,
-    generate_playlist_from_search,
-    generate_playlist_from_recommendations,
-    generate_playlist_from_genres
-]
 
 
 # END

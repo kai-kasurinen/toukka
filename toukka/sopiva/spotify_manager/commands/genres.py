@@ -2,22 +2,27 @@
 
 import pprint
 import re
-import argh
+import click
 
 import toukka.sopiva.spotify_manager.genres
 
+from toukka.sopiva.spotify_manager.cli import cli_root
 
+
+@cli_root.command()
 def genres():
     genres = toukka.sopiva.spotify_manager.genres.genres()
     for genre in genres.values():
         pprint.pprint(genre)
 
 
+@cli_root.command()
 def genres_refresh():
     toukka.sopiva.spotify_manager.genres.genres_refresh()
 
 
-@argh.arg('name', completer=toukka.sopiva.spotify_manager.genres.genres_completer)
+@cli_root.command()
+@click.argument('name')
 def genre(name: str):
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genre = genres.get(name)
@@ -26,6 +31,8 @@ def genre(name: str):
     pprint.pprint(genre)
 
 
+@cli_root.command()
+@click.argument('name_re')
 def genre_re(name_re: str):
     regex = re.compile(name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
@@ -42,9 +49,4 @@ def genre_re(name_re: str):
         pprint.pprint(genre)
 
 
-COMMANDS = [
-    genres,
-    genres_refresh,
-    genre,
-    genre_re
-]
+# END
