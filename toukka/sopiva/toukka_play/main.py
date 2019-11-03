@@ -33,7 +33,7 @@ __program_description__ = 'some personal shortcuts'
 
 kwargs_default = {
     'expand_track_to_album': False,
-    'expand_track_to_artist': False,
+    'expand_track_to_artists': False,
     'expand_artist_to_albums': False,
     'expand_artist_to_top_tracks': False,
     'expand_artist_to_related_artists': False,
@@ -47,7 +47,7 @@ kwargs_for_playlist = {
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_album_to_tracks': True,
-    'expand_track_to_artist': False,
+    'expand_track_to_artists': False,
     'expand_artist_to_albums': False
 }
 

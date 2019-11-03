@@ -39,7 +39,7 @@ class PlaylistGenerator:
         looper_target_count=500,
         looper_max_tries=5000,
         expand_track_to_album=False,
-        expand_track_to_artist=False,
+        expand_track_to_artists=False,
         expand_track_to_recommendations=False,
         expand_artist_to_albums=False,
         expand_artist_to_top_tracks=False,
@@ -408,10 +408,10 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
 
         # add as new source
-        if (opts.expand_track_to_artist and
+        if (opts.expand_track_to_artists and
                 not self.is_uri_already_seen(item.uri + '#artists')):
-            # set expand_track_to_artist option to False, so we dont hit again
-            opts.set(expand_track_to_artist=False)
+            # set expand_track_to_artists option to False, so we dont hit again
+            opts.set(expand_track_to_artists=False)
             for artist in item.artists:
                 if not self.is_uri_already_seen(artist.uri + '#as-source'):
                     self.sources.add(self.expander(
@@ -474,7 +474,7 @@ class PlaylistGenerator:
                 **opts)
         else:
             # FIXME: can be false alarm
-            self.__log.warning('did not do anything with: %s', item)
+            self.__log.warning('did not do anything with: %s', item.uri)
 
     def expander_album(self,
                        item: spotipy.model.album.full.FullAlbum,
@@ -488,7 +488,7 @@ class PlaylistGenerator:
                 self.album_tracks_generator(item.id),
                 **opts)
         else:
-            self.__log.warning('did not do anything with: %s', item)
+            self.__log.warning('did not do anything with: %s', item.uri)
 
     def expander_playlist(self,
                           item: spotipy.model.playlist.Playlist,
@@ -502,7 +502,7 @@ class PlaylistGenerator:
                     self.playlist_all_tracks_generator(item.id)),
                 **opts)
         else:
-            self.__log.warning('did not do anything with: %s', item)
+            self.__log.warning('did not do anything with: %s', item.uri)
 
     # TODO: add uri model class
     # NOTE: not used by expander
