@@ -11,6 +11,7 @@ import toukka.sopiva.spotify_manager.genres
 
 from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
 
+# FIXME: remove
 
 def generate_playlist_from_uris(uris: list,
                                 dry_run: bool = False,
