@@ -13,14 +13,14 @@ import click_log
 
 import toukka.logger.simple
 
-from toukka.sopiva.spotify_manager.commands.playlist_generator_commands import (
+from toukka.sopiva.spotify_manager.playlist_generator_commands import (
     generate_playlist_from_uris,
     generate_playlist_from_search,
     generate_playlist_from_recommendations,
     generate_playlist_from_genres
 )
 
-from toukka.sopiva.spotify_manager.genres import genres_completer
+from toukka.sopiva.spotify_manager.genres import click_genre_completer
 
 #
 
@@ -66,16 +66,6 @@ kwargs_for_uris = {
     'expand_artist_to_albums': True,
     'expand_artist_to_related_artists': True
 }
-
-
-# FIXME: not work?
-#
-# ctx - The current click context.
-# args - The list of arguments passed in.
-# incomplete - The partial word that is being completed, as a string.
-#              May be an empty string '' if no characters have been entered yet.
-def click_genre_completer(ctx, args, incomplete):
-    return genres_completer(incomplete)
 
 
 @click.group()

@@ -257,7 +257,7 @@ def genres_load():
 
 
 # NOTE: for argcomplete
-def argcomplete_genres_completer(prefix, **kwargs):
+def argcomplete_genre_completer(prefix, **kwargs):
     _genres = genres().keys()
     return (genre for genre in _genres if genre.startswith(prefix))
 
@@ -270,6 +270,6 @@ def argcomplete_genres_completer(prefix, **kwargs):
 # incomplete - The partial word that is being completed, as a string.
 #              May be an empty string '' if no characters have been entered yet.
 def click_genre_completer(ctx, args, incomplete):
-    return argcomplete_genres_completer(incomplete)
+    return argcomplete_genre_completer(incomplete)
 
 # END
