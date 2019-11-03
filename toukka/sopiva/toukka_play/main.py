@@ -42,11 +42,9 @@ kwargs_default = {
     'expand_artist_to_related_artists': False,
     'expand_album_to_tracks': False,
     'expand_playlist_to_tracks': False,
-    'expand_generator_to_items': False
 }
 
 kwargs_for_playlist = {
-    'expand_generator_to_items': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_album_to_tracks': True,
@@ -55,14 +53,12 @@ kwargs_for_playlist = {
 }
 
 kwargs_for_related_artists = {
-    'expand_generator_to_items': True,
     'expand_album_to_tracks': True,
     'expand_artist_to_related_artists': True,
     'expand_artist_to_albums': True
 }
 
 kwargs_for_uris = {
-    'expand_generator_to_items': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_album_to_tracks': True,
