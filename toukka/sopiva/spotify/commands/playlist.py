@@ -7,7 +7,7 @@ import humanize
 import iso8601
 import statistics
 import pprint
-import argh
+import click
 
 import spotipy.convert
 
@@ -39,6 +39,7 @@ def current_user_playlists():
               f', id: {p.id}')
 
 
+# FIXME: move
 @playlist.command()
 def user_playlists_info(user):
     '''gets playlists of a user'''
@@ -57,6 +58,7 @@ def user_playlists_info(user):
     print(f'total collaborative playlists: {len(collaborative)}')
 
 
+# FIXME: fix and move
 @playlist.command()
 def user_playlists(user,
                    filter_own=False,
@@ -100,43 +102,37 @@ def _print_playlists(playlists, one_line=True):
             flags=_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
 
 
-@playlist.command()
+@playlist.command(name='info')
+@click.argument('uri')
+@click.option('--market')
 def playlist_info(uri: str,
+                  market: str = None,
                   print_tracks: bool = False):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
-    playlist = spotify.playlist(playlist_id=uri_id, market=None)
-    printer.printer(playlist)
+    playlist = spotify.playlist(playlist_id=uri_id, market=market)
+    printer(playlist)
 
     if print_tracks:
         playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
-            printer.printer(playlist_track)
+            printer(playlist_track)
             track = playlist_track.track
-            printer.printer(track)
+            printer(track)
 
 
-@playlist.command()
-def playlist_tracks(uri: str):
+@playlist.command(name='tracks')
+@click.argument('uri')
+@click.option('--market')
+def playlist_tracks(uri: str,
+                    market: str = None):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
-    playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=None)
+    playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market)
     playlist_tracks = spotify.all_items_from_paging(playlist_tracks_paging)
     for playlist_track in playlist_tracks:
         track = playlist_track.track
-        printer.print_track(track)
-
-
-# FIXME: move
-def _print_playlist_info(playlist):
-    print('playlist: {name} ({uri}) (followers: {followers[total]}, tracks: {tracks[total]}'.format(**playlist))
-    print('\tdescription: {description}'.format(**playlist))
-    print('\towner: {owner[display_name]} ({owner[id]}) ({owner[uri]})'.format(**playlist))
-    print('\tsnapshot: {snapshot_id}'.format(**playlist))
-    if playlist.get('external_urls'):
-            print('\texternal urls: {external_urls}'.format(**playlist))
-    print('\tflags: {}'.format(_list_to_string(_get_flags(playlist, ['public', 'collaborative']))))
-
+        printer(track)
 
 
 # END

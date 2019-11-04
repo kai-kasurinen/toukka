@@ -5,6 +5,8 @@
 import click
 import spotipy
 
+from click_params import StringListParamType
+
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.cli import cli_root
@@ -28,19 +30,24 @@ def info(uri):
 @artist.command()
 @click.argument('uri')
 @click.option('--market')
+@click.option('--include-groups',
+              type=StringListParamType(','),
+              help='album,appears_on,compilation,single',
+              default='album,single,compilation')
 def albums(uri,
-           market='from_token'):
+           market: str = None,
+           include_groups: list = None):
     '''get artist albums'''
     spotify = get_spotify()
     uri_type, uri_id = spotipy.convert.from_uri(uri)
-    # FIXME: got type error with default market
-    paging = spotify.artist_albums(uri_id, market=market)
+    paging = spotify.artist_albums(uri_id, market=market, include_groups=include_groups)
     for album in spotify.all_items_from_paging(paging):
         printer(album)
 
 
 @artist.command()
 @click.argument('uri')
+@click.option('--country', default='from_token')
 def top_tracks(uri,
                country='from_token'):
     '''get artist top tracks'''
