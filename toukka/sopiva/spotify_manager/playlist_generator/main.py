@@ -88,6 +88,7 @@ class PlaylistGenerator:
         if opts.looper_progress_bar:
             self.stop_looper_progress_bar()
 
+    # FIXME: move to own class
     def start_looper_progress_bar(self):
         self.enlighten_manager = enlighten.get_manager()
         self.progress_tracks = self.enlighten_manager.counter(
