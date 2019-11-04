@@ -366,7 +366,7 @@ class PlaylistGenerator:
     # TODO: use single dispatch method
     def expander(self, item, **kwargs):
         opts = self.options.push(kwargs)
-        self.__log.debug('%s', type(item))
+        #self.__log.debug('%s', type(item))
         if isinstance(item, types.GeneratorType):
             yield from self.expander_generator(item, **opts)
         elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
@@ -410,6 +410,7 @@ class PlaylistGenerator:
                        item: spotipy.model.track.FullTrack,
                        **kwargs):
         opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         # add as new source
@@ -452,6 +453,7 @@ class PlaylistGenerator:
                         item: spotipy.model.artist.FullArtist,
                         **kwargs):
         opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if self.is_uri_already_seen(item.uri):
             return
@@ -493,6 +495,7 @@ class PlaylistGenerator:
                        item: spotipy.model.album.full.FullAlbum,
                        **kwargs):
         opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
             return
         if opts.expand_album_to_tracks and not self.is_uri_already_seen(item.uri + '#tracks'):
@@ -507,6 +510,7 @@ class PlaylistGenerator:
                           item: spotipy.model.playlist.Playlist,
                           **kwargs):
         opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
             return
         elif opts.expand_playlist_to_tracks:
