@@ -34,29 +34,31 @@ from .util import scramble_generator
 class PlaylistGenerator:
     '''generates playlist'''
 
-    options = Options(
-        dry_run=False,
-        randomize=False,
-        looper_target_count=500,
-        looper_max_tries=5000,
-        looper_progress_bar=False,
-        expand_track_to_album=False,
-        expand_track_to_artists=False,
-        expand_track_to_recommendations=False,
-        expand_artist_to_albums=False,
-        expand_artist_to_top_tracks=False,
-        expand_artist_to_related_artists=False,
-        expand_artist_to_recommendations=False,
-        expand_album_to_tracks=False,
-        expand_playlist_to_tracks=False,
-        expand_generator_to_items=True
-    )
-
     def __init__(self,
                  playlist_uri=None,
                  **kwargs
                  ):
-        self.options = PlaylistGenerator.options.push(kwargs)
+
+        # TODO: move
+        options = Options(
+            dry_run=False,
+            randomize=False,
+            looper_target_count=500,
+            looper_max_tries=5000,
+            looper_progress_bar=False,
+            expand_track_to_album=False,
+            expand_track_to_artists=False,
+            expand_track_to_recommendations=False,
+            expand_artist_to_albums=False,
+            expand_artist_to_top_tracks=False,
+            expand_artist_to_related_artists=False,
+            expand_artist_to_recommendations=False,
+            expand_album_to_tracks=False,
+            expand_playlist_to_tracks=False,
+            expand_generator_to_items=True
+        )
+
+        self.options = options.push(kwargs)
 
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
