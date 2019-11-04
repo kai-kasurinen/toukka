@@ -1,6 +1,5 @@
 #
 
-'''main, main, main'''
 
 import click_log
 import toukka.logger.simple
