@@ -18,6 +18,7 @@ import spotipy.model.album
 import spotipy.model.category
 import spotipy.model.recommendations
 import spotipy.model.currently_playing
+import spotipy.model.local
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
@@ -199,6 +200,28 @@ def print_currently_playing_track(cpt: spotipy.model.currently_playing.Currently
     print(f'\tactions disallows: {disallows}')
     print()
     printer(cpt.item)
+
+
+@printer.register
+def print_track_local(track: spotipy.model.local.LocalTrack):
+    print(f'local track: {track.name} ({track.uri})')
+
+    print(f'\talbum: {track.album.name} ({track.album.uri})')
+    print(f'\tartists: {_artists_to_string(track.artists)})')
+    print(f'\tduration: {datetime.timedelta(milliseconds=track.duration_ms)}')
+    print(f'\ttrack number: {track.track_number},',
+          f'disc number: {track.disc_number}')
+
+    if track.external_ids:
+        print(f'\texternal ids: {track.external_ids}')
+    if track.external_urls:
+        print(f'\texternal urls: {track.external_urls}')
+    if track.available_markets:
+        print(f'\tmarkets: {len(track.available_markets)}')
+
+    flags = _get_flags(track.asdict(), ['explicit', 'is_playable', 'is_local'])
+    if flags:
+        print(f'\tflags: {flags}')
 
 
 # UTILS

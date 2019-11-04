@@ -131,6 +131,7 @@ def playlist_tracks(uri: str,
     playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market)
     playlist_tracks = spotify.all_items_from_paging(playlist_tracks_paging)
     for playlist_track in playlist_tracks:
+        printer(playlist_track)
         track = playlist_track.track
         printer(track)
 
