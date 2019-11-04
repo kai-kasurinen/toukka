@@ -72,17 +72,17 @@ def print_track(track: spotipy.model.FullTrack,
 @printer.register
 def print_track_audio_features(features: spotipy.model.AudioFeatures):
     print(f'track features: ({features.uri})')
-    print(f'\tacousticness: {features.acousticness},',
-          f'danceability: {features.danceability},',
-          f'energy: {features.energy}')
-    print(f'\tinstrumentalness: {features.instrumentalness},',
-          f'liveness: {features.liveness},',
-          f'speechiness: {features.speechiness},',
-          f'valence: {features.valence}')
+    print(f'\tacousticness: {features.acousticness:f},',
+          f'danceability: {features.danceability:f},',
+          f'energy: {features.energy:f}')
+    print(f'\tinstrumentalness: {features.instrumentalness:f},',
+          f'liveness: {features.liveness:f},',
+          f'speechiness: {features.speechiness:f},',
+          f'valence: {features.valence:f}')
     print(f'\tkey: {features.key}',
           f'mode: {features.mode}',
-          f'tempo: {features.tempo},',
-          f'loudness: {features.loudness}')
+          f'tempo: {features.tempo:f},',
+          f'loudness: {features.loudness:f}')
 
 
 @printer.register

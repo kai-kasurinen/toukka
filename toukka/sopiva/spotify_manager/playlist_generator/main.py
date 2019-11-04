@@ -61,7 +61,7 @@ class PlaylistGenerator:
         self.market = self.spotify.current_user().country
 
         # FIXME: from config?
-        self.bad_words_in_album_names = ['christmas']
+        self.bad_words_in_album_names = ['christmas', 'joulu']
 
         # init empty
         self._isrc_seen = set()

@@ -47,9 +47,10 @@ kwargs_default = {
 kwargs_for_playlist = {
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
+    'expand_track_to_artists': True,
     'expand_album_to_tracks': True,
-    'expand_track_to_artists': False,
-    'expand_artist_to_albums': False
+    'expand_artist_to_albums': False,
+    'expand_artist_to_recommendations': True
 }
 
 kwargs_for_related_artists = {
@@ -61,6 +62,7 @@ kwargs_for_related_artists = {
 kwargs_for_uris = {
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
+    'expand_track_to_artists': True,
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': True,
     'expand_artist_to_related_artists': True,
