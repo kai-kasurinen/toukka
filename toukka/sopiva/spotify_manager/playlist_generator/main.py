@@ -418,7 +418,7 @@ class PlaylistGenerator:
             # set expand_track_to_artists option to False, so we dont hit again
             opts.set(expand_track_to_artists=False)
             for artist in item.artists:
-                if not self.is_uri_already_seen(artist.uri + '#as-source'):
+                if not self.is_uri_already_seen(artist.uri + '#source'):
                     self.sources.add(self.expander(
                         self.spotify.artist(artist.id),
                         **opts))
