@@ -2,8 +2,6 @@
 
 '''main, main, main'''
 
-import logging
-import argh
 import click_log
 import toukka.logger.simple
 import toukka.config

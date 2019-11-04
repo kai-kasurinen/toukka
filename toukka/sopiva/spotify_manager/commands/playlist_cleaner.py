@@ -1,27 +1,34 @@
 #
 
+import logging
 import click
 import spotipy.convert
+import enlighten
 
 import toukka.sopiva.spotify.util
 import toukka.sopiva.spotify_history.util
 
+from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.cli import cli_root
+
+logger = logging.getLogger(__name__)
 
 
 @cli_root.command()
 @click.argument('uri')
 @click.option('--filter-played-tracks', is_flag=True, default=False)
-@click.option('--filter-played-isrc', is_flag=True, default=False)
+@click.option('--filter-played-isrcs', is_flag=True, default=False)
 @click.option('--filter-duplicate-isrc', is_flag=True, default=False)
-@click.option('--filter-non-playable', is_flag=True, default=False)
+@click.option('--filter-not-playable', is_flag=True, default=False)
 @click.option('--remove-tracks', is_flag=True, default=False)
+@click.option('--progress-bar', is_flag=True, default=False)
 def playlist_cleaner(uri: str,
                      remove_tracks: bool = False,
                      filter_played_tracks: bool = False,
                      filter_played_isrcs: bool = False,
                      filter_duplicate_isrc: bool = False,
-                     filter_not_playable: bool = False
+                     filter_not_playable: bool = False,
+                     progress_bar: bool = False
                      ):
     '''clean playlist'''
 
@@ -30,39 +37,40 @@ def playlist_cleaner(uri: str,
         if uri_current:
             uri = uri_current
         else:
-            raise argh.exceptions.CommandError('not currently playing playlist?')
+            raise click.ClickException('not currently playing playlist?')
 
     uri_type, uri_id = spotipy.convert.from_uri(uri)
 
     spotify = toukka.sopiva.spotify.util.get_spotify()
     spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
-
-    # NOTE: not setting market, we should get market from token and relinking information
-    #       but it fails with TypeError
-    playlist = spotify.playlist(playlist_id=uri_id, market=None)
-    playlist.pprint(depth=2)
-
-    # NOTE: returns iterator
-    playlist_tracks = spotify.iterate_items_from_paging(playlist.tracks)
-
-    # prepare for main loop
+    market = spotify.current_user().country
     tracks_to_remove = set()
     isrcs = set()
+
+    playlist = spotify.playlist(playlist_id=uri_id, market=market)
+    printer(playlist)
+
+    playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
+
+    enlighten_manager = enlighten.get_manager(enabled=progress_bar)
+    progress_tracks = enlighten_manager.counter(
+        desc='Playlist Tracks', unit='tracks',
+        total=playlist.tracks.total,
+        color='green')
 
     # main loop for doing things
     for playlist_track in playlist_tracks:
         track = playlist_track.track
         isrc = track.external_ids.get('isrc')
 
-        # NOTE: not work when market is None
         if filter_not_playable:
             if track.is_playable is False:
-                print(f'{track.uri}: not playable')
+                logger.info(f'{track.uri}: not playable')
                 tracks_to_remove.add(track.id)
 
         if filter_duplicate_isrc and isrc is not None:
             if isrc in isrcs:
-                print(f'{track.uri}: isrc {isrc} is already seen')
+                logger.info(f'{track.uri}: isrc {isrc} is already seen')
                 tracks_to_remove.add(track.id)
             else:
                 isrcs.add(isrc)
@@ -70,17 +78,18 @@ def playlist_cleaner(uri: str,
         if filter_played_tracks:
             played_count = spotify_history.count_by_track_id(track.uri)
             if played_count > 0:
-                print(f'{track.uri}: played {played_count} times')
+                logger.info(f'{track.uri}: played {played_count} times')
                 tracks_to_remove.add(track.id)
 
         if filter_played_isrcs and isrc is not None:
             played_count_isrc = spotify_history.count_by_track_isrc(isrc)
             if played_count_isrc > 0:
-                print(f'{track.uri}: {isrc} played {played_count_isrc} times')
+                logger.info(f'{track.uri}: {isrc} played {played_count_isrc} times')
                 tracks_to_remove.add(track.id)
+        progress_tracks.update()
 
-    print(f'{playlist.tracks.total} total tracks')
-    print(f'{len(tracks_to_remove)} tracks remove')
+    logger.info(f'{playlist.tracks.total} total tracks')
+    logger.info(f'{len(tracks_to_remove)} tracks remove')
 
     def chunks(l, n):
         """Yield successive n-sized chunks from l."""
@@ -88,16 +97,25 @@ def playlist_cleaner(uri: str,
             yield l[i:i + n]
 
     if remove_tracks:
+        progress_remove = enlighten_manager.counter(
+            desc='Remove Tracks', unit='tracks',
+            total=playlist.tracks.total,
+            color='red')
         tracks_to_remove_list = list(tracks_to_remove)
         snapshot_id = playlist.snapshot_id
 
         for chunk in chunks(tracks_to_remove_list, 100):
-            print(f'removing {len(chunk)} tracks')
+            logger.info(f'removing {len(chunk)} tracks')
             snapshot_id = spotify.playlist_tracks_remove(
                 playlist_id=playlist.id,
                 track_ids=chunk,
                 snapshot_id=snapshot_id)
-            print(f'new snapshot id: {snapshot_id}')
+            logger.info(f'new snapshot id: {snapshot_id}')
+            progress_remove.update()
+    else:
+        logger.info(f'remove-tracks not enabled')
+    # grii
+    enlighten_manager.stop()
 
 
 def _playlist_current():

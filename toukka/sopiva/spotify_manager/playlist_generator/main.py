@@ -22,7 +22,7 @@ import spotipy.model.album
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
-from toukka.sopiva.spotify.printer import first as printer
+from toukka.sopiva.spotify.printer.first import printer
 
 from .playlist import Playlist
 from .sources_queue import SourcesQueue
