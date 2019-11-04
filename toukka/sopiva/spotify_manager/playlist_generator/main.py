@@ -29,7 +29,7 @@ from .sources_queue import SourcesQueue
 from .util import scramble_generator
 
 
-@autologging.traced
+# @autologging.traced
 @autologging.logged
 class PlaylistGenerator:
     '''generates playlist'''
@@ -93,10 +93,12 @@ class PlaylistGenerator:
         self.enlighten_manager = enlighten.get_manager()
         self.progress_tracks = self.enlighten_manager.counter(
             desc='Tracks', unit='tracks',
-            total=self.options.looper_target_count)
+            total=self.options.looper_target_count,
+            color='green')
         self.progress_looper = self.enlighten_manager.counter(
             desc='Loops', unit='tracks',
-            total=self.options.looper_max_tries)
+            total=self.options.looper_max_tries,
+            color='blue')
 
     def stop_looper_progress_bar(self):
         self.enlighten_manager.stop()
