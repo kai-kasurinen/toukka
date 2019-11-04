@@ -492,7 +492,7 @@ class PlaylistGenerator:
                 not self.is_uri_already_seen(item.uri + '#related')):
             self.sources.add(
                 self.expander(
-                    self.related_artists_generator(item.id),
+                    self.randomizer(self.related_artists_generator(item.id), **opts),
                     **opts))
             did = True
 
@@ -508,7 +508,7 @@ class PlaylistGenerator:
         # FIXME: if elif else? order?
         if opts.expand_artist_to_albums:
             yield from self.expander(
-                self.artist_albums_generator(item.id),
+                self.randomizer(self.artist_albums_generator(item.id), **opts),
                 **opts)
             did = True
         elif opts.expand_artist_to_top_tracks:
@@ -544,8 +544,7 @@ class PlaylistGenerator:
             return
         elif opts.expand_playlist_to_tracks:
             yield from self.expander(
-                self.randomizer(
-                    self.playlist_all_tracks_generator(item.id)),
+                self.randomizer(self.playlist_all_tracks_generator(item.id), **opts),
                 **opts)
         else:
             self.__log.warning('did not do anything with: %s', item.uri)
