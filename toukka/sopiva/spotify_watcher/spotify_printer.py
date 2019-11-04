@@ -37,7 +37,7 @@ class SpotifyPrinter:
         artists.update(_get_all_artist_ids_from_item(track))
         artists.update(_get_all_artist_ids_from_item(album))
 
-        print()
+        print(''.ljust(80, '='))
         for artist_id in artists:
             artist = self.spotify.artist(artist_id)
             printer(artist)
@@ -49,6 +49,7 @@ class SpotifyPrinter:
         self.check_and_print_relink(track_id)
         print()
         printer(self.spotify.track_audio_features(track_id))
+        print(''.ljust(80, '='))
 
 
 def _get_all_artist_ids_from_item(item):
