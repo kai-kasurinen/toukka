@@ -127,7 +127,7 @@ def _playlist_current():
 
     if playing.context and playing.context.type.name == 'playlist':
         uri = playing.context.uri
-        username = uri.split(':')[2]
+        # username = uri.split(':')[2]
         playlist_id = uri.split(':')[4]
         new_uri = spotipy.convert.to_uri('playlist', playlist_id)
         return new_uri
