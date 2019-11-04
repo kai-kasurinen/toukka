@@ -4,6 +4,7 @@ import logging
 import click
 import spotipy.convert
 import enlighten
+import more_itertools
 
 import toukka.sopiva.spotify.util
 import toukka.sopiva.spotify_history.util
@@ -91,20 +92,16 @@ def playlist_cleaner(uri: str,
     logger.info(f'{playlist.tracks.total} total tracks')
     logger.info(f'{len(tracks_to_remove)} tracks remove')
 
-    def chunks(l, n):
-        """Yield successive n-sized chunks from l."""
-        for i in range(0, len(l), n):
-            yield l[i:i + n]
-
     if remove_tracks:
         progress_remove = enlighten_manager.counter(
             desc='Remove Tracks', unit='tracks',
             total=playlist.tracks.total,
             color='red')
-        tracks_to_remove_list = list(tracks_to_remove)
-        snapshot_id = playlist.snapshot_id
 
-        for chunk in chunks(tracks_to_remove_list, 100):
+        snapshot_id = playlist.snapshot_id
+        chunks = more_itertools.chunked(tracks_to_remove, 100)
+
+        for chunk in chunks:
             logger.info(f'removing {len(chunk)} tracks')
             snapshot_id = spotify.playlist_tracks_remove(
                 playlist_id=playlist.id,
