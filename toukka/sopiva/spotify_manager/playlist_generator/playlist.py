@@ -4,6 +4,7 @@ import logging
 import textwrap
 
 import autologging
+import more_itertools
 
 import spotipy.convert
 import toukka.config
@@ -11,19 +12,7 @@ import toukka.config
 from toukka.sopiva.spotify.util import get_spotify
 
 
-def _get_playlist_uri_from_config():
-    return toukka.config.lazy_config['spotify_manager']['playlist_generator']['playlist_uri'].get()
-
-
-def list_to_chunks(l: list, n: int):
-    """Yield successive n-sized chunks from l."""
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
-
-#
-
-
-@autologging.traced
+# @autologging.traced
 @autologging.logged
 class Playlist:
 
@@ -61,7 +50,7 @@ class Playlist:
         self.playlist = self.spotify.playlist(self.playlist.id)
 
     def tracks_add(self, track_ids):
-        chunks = list_to_chunks(track_ids, 100)
+        chunks = more_itertools.chunked(track_ids, 100)
         for chunk in chunks:
             self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, chunk)
 
@@ -77,6 +66,12 @@ class Playlist:
             self.playlist.id,
             name=self.playlist_name,
             description=self.playlist_description)
+
+
+#
+
+def _get_playlist_uri_from_config():
+    return toukka.config.lazy_config['spotify_manager']['playlist_generator']['playlist_uri'].get()
 
 
 # END
