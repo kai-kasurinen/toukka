@@ -5,8 +5,8 @@
 import click
 
 from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.cli import cli_root
-
 
 # NOTE: most of current player commands needs premium account
 # FIXME: update all commands use new spotipy
@@ -90,7 +90,9 @@ def current_playback(market=None):
 @playback.command()
 def currently_playing(market=None):
     ''' Get user's currently playing track.'''
-    return get_spotify().playback_currently_playing(market=None).pprint(depth=2)
+    spotify = get_spotify()
+    playing = spotify.playback_currently_playing(market=market)
+    printer(playing)
 
 
 @playback.command()

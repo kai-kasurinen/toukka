@@ -5,8 +5,10 @@ import dataclasses
 import functools
 import pprint
 import logging
+import datetime
 
-# import autologging
+import humanize
+
 import deprecated
 
 import spotipy.model
@@ -15,19 +17,18 @@ import spotipy.model.playlist
 import spotipy.model.album
 import spotipy.model.category
 import spotipy.model.recommendations
+import spotipy.model.currently_playing
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 
 @functools.singledispatch
-#@autologging.traced
 def printer(arg):
     print(arg)
 
 
 @printer.register
-#@autologging.traced
 def print_item(item: spotipy.model.base.Item):
     print(f'{item.type}, {item.id}, {item.uri}')
 
@@ -35,7 +36,6 @@ def print_item(item: spotipy.model.base.Item):
 @printer.register
 def print_track(track: spotipy.model.FullTrack,
                 use_play_count=True):
-    '''print track'''
     print(f'track: {track.name} ({track.uri})',
           f'(popularity: {track.popularity})')
 
@@ -84,15 +84,13 @@ def print_track_audio_features(features: spotipy.model.AudioFeatures):
           f'loudness: {features.loudness}')
 
 
-# TODO: compine Album and FullAlbum prints
 @printer.register
-def print_album_(album: spotipy.model.album.Album):
+def print_album_simple(album: spotipy.model.album.SimpleAlbum):
     # NOTE: popularity is only on FullAlbum
     print(f'album: {album.name} ({album.album_type.name}) ({album.uri})',
           f'({album.release_date} {album.release_date_precision.name})',
           f'(tracks: {album.total_tracks})')
     print('\tartists: %s' % _artists_to_string(album.artists))
-    # FIXME: not on Album, but on SimpleAlbum
     if album.album_group:
         print(f'\talbum group: {album.album_group}')
     if album.available_markets:
@@ -102,7 +100,7 @@ def print_album_(album: spotipy.model.album.Album):
 
 
 @printer.register
-def print_album(album: spotipy.model.FullAlbum):
+def print_album_full(album: spotipy.model.FullAlbum):
     '''print album'''
     print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
           '({album.release_date} {album.release_date_precision.name})'.format(album=album),
@@ -158,7 +156,9 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
         print(f'\tflags: {flags}')
 
     # only on FullPlaylist
-    #print(f'\tdesc: {playlist.description}')
+    if isinstance(playlist, spotipy.model.playlist.FullPlaylist):
+        print(f'\tdesc: {playlist.description}')
+        print(f'\tfollowers: {playlist.followers.total}')
 
 
 @printer.register
@@ -185,32 +185,24 @@ def print_recommendationseed(seed: spotipy.model.recommendations.RecommendationS
     print(f'recommendation seed: {seed}')
 
 
-# OLD
+@printer.register
+def print_currently_playing_track(cpt: spotipy.model.currently_playing.CurrentlyPlayingTrack):
+    print(f'currently playing: {cpt.is_playing}')
 
-@deprecated.deprecated
-def print_tracks(tracks):
-    '''print tracks'''
+    cpt_timestamp = datetime.datetime.fromtimestamp(cpt.timestamp/1000.0)
+    print('\ttimestamp: %s (%s)' % (
+            humanize.naturaldate(cpt_timestamp),
+            humanize.naturaltime(datetime.datetime.now() - cpt_timestamp)))
+    print('\tprogress: %s' % datetime.timedelta(milliseconds=cpt.progress_ms))
+    print(f'\tcontext: {cpt.context.type} ({cpt.context.uri})')
+    print(f'\ttype: {cpt.currently_playing_type}')
+    disallows = _get_flags(cpt.actions.disallows.asdict(), cpt.actions.disallows.asdict().keys())
+    print(f'\tactions disallows: {disallows}')
     print()
-    for track in tracks:
-        print_track(track)
-        print()
+    printer(cpt.item)
 
 
-@deprecated.deprecated
-def print_albums(albums):
-    print()
-    for album in albums:
-        print_album(album)
-        print()
-
-
-@deprecated.deprecated
-def print_artists(artists):
-    print()
-    for artist in artists:
-        print_artist(artist)
-        print()
-
+# UTILS
 
 def _artists_to_string(artists):
     return ", ".join("%s (%s)" % (artist.name, artist.uri) for artist in artists)
@@ -220,3 +212,5 @@ def _artists_to_string(artists):
 # modified
 def _get_flags(_dict, _needed, _value_is=True):
     return [key for key, value in _dict.items() if key in _needed and value is _value_is]
+
+# END
