@@ -513,7 +513,7 @@ class PlaylistGenerator:
             did = True
         elif opts.expand_artist_to_top_tracks:
             yield from self.expander(
-                self.artist_top_tracks_generator(item.id),
+                self.randomizer(self.artist_top_tracks_generator(item.id), **opts),
                 **opts)
             did = True
         # nice hack
