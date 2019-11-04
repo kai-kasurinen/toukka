@@ -73,6 +73,10 @@ class PlaylistGenerator:
         self.sources = SourcesQueue()
 
         # FIXME: remove
+        self.progress_looper = None
+        self.progress_tracks = None
+
+        # FIXME: remove
         self.__log.setLevel(logging.DEBUG)
         self.__log.debug('initialized %s', self)
         self.__log.debug('self options %s', self.options)
