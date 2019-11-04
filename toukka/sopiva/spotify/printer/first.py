@@ -188,7 +188,6 @@ def print_recommendationseed(seed: spotipy.model.recommendations.RecommendationS
 @printer.register
 def print_currently_playing_track(cpt: spotipy.model.currently_playing.CurrentlyPlayingTrack):
     print(f'currently playing: {cpt.is_playing}')
-
     cpt_timestamp = datetime.datetime.fromtimestamp(cpt.timestamp/1000.0)
     print('\ttimestamp: %s (%s)' % (
             humanize.naturaldate(cpt_timestamp),
