@@ -18,45 +18,30 @@ _RANGES_DESCRIPTION = {
 }
 
 
-# FIXME: update
 @personalization.command('top-tracks')
-@click.argument('ime-range', type=click.Choice(['short', 'medium', 'long']))
-def current_user_top_tracks(time_range='long'):
+@click.argument('time-range', type=click.Choice(['short', 'medium', 'long']))
+def current_user_top_tracks(time_range):
     spotify = get_spotify()
-
-    if time_range not in ('short', 'medium', 'long'):
-        raise Exception()
-
-    time_range = '{}_term'.format(time_range)
-
-    print('{}: {}'.format(time_range, _RANGES_DESCRIPTION.get(time_range)))
+    time_range = f'{time_range}_term'
+    print(f'{time_range}: {_RANGES_DESCRIPTION.get(time_range)}')
     print()
-
-    results = spotify.current_user_top_tracks(time_range=time_range, limit=50)
-
-    for i, item in enumerate(results['items']):
-        artists_string = _get_string_from_artists(item['artists'])
-        print('{pos:2} {name:40} {artists_string}'.
-              format(**item, pos=i+1, artists_string=artists_string))
+    paging = spotify.current_user_top_tracks(time_range=time_range, limit=50)
+    for i, item in enumerate(spotify.all_items_from_paging(paging), start=1):
+        artists = ', '.join(artist.name for artist in item.artists)
+        print(f'{i:2} {item.name:50} {artists}')
 
 
 @personalization.command('top-artists')
 @click.argument('time-range', type=click.Choice(['short', 'medium', 'long']))
-def current_user_top_artists(time_range='long'):
+def current_user_top_artists(time_range):
     spotify = get_spotify()
-
     time_range = f'{time_range}_term'
-
-    results = spotify.current_user_top_artists(time_range=time_range, limit=50)
-
-    def list_to_string(s):
-        return ', '.join(map(str, s))
-
     print(f'{time_range}: {_RANGES_DESCRIPTION.get(time_range)}')
     print()
-
-    for i, item in enumerate(results.items, start=1):
-        print(f'{i:2} {item.name:50} {list_to_string(item.genres)}')
+    paging = spotify.current_user_top_artists(time_range=time_range, limit=50)
+    for i, item in enumerate(spotify.all_items_from_paging(paging), start=1):
+        genres = ', '.join(item.genres)
+        print(f'{i:2} {item.name:50} {genres}')
 
 
 
