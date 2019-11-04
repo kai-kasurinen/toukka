@@ -34,17 +34,8 @@ __program_description__ = 'some personal shortcuts'
 
 ##
 
-kwargs_default = {
-    'expand_track_to_album': False,
-    'expand_track_to_artists': False,
-    'expand_artist_to_albums': False,
-    'expand_artist_to_top_tracks': False,
-    'expand_artist_to_related_artists': False,
-    'expand_album_to_tracks': False,
-    'expand_playlist_to_tracks': False,
-}
-
 kwargs_for_playlist = {
+    'looper_progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,
@@ -53,13 +44,8 @@ kwargs_for_playlist = {
     'expand_artist_to_recommendations': True
 }
 
-kwargs_for_related_artists = {
-    'expand_album_to_tracks': True,
-    'expand_artist_to_related_artists': True,
-    'expand_artist_to_albums': True
-}
-
 kwargs_for_uris = {
+    'looper_progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,

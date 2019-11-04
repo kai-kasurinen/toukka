@@ -9,6 +9,7 @@ import types
 import random
 
 import autologging
+import enlighten
 
 from options import Options
 
@@ -38,6 +39,7 @@ class PlaylistGenerator:
         randomize=False,
         looper_target_count=500,
         looper_max_tries=5000,
+        looper_progress_bar=False,
         expand_track_to_album=False,
         expand_track_to_artists=False,
         expand_track_to_recommendations=False,
@@ -77,8 +79,26 @@ class PlaylistGenerator:
 
     def generate(self, **kwargs):
         opts = self.options.push(kwargs)
+        # FIXME: grr
+        if opts.looper_progress_bar:
+            self.start_looper_progress_bar()
         self.looper(**opts)
         self.commit(**opts)
+        # FIXME: grr
+        if opts.looper_progress_bar:
+            self.stop_looper_progress_bar()
+
+    def start_looper_progress_bar(self):
+        self.enlighten_manager = enlighten.get_manager()
+        self.progress_tracks = self.enlighten_manager.counter(
+            desc='Tracks', unit='tracks',
+            total=self.options.looper_target_count)
+        self.progress_looper = self.enlighten_manager.counter(
+            desc='Loops', unit='tracks',
+            total=self.options.looper_max_tries)
+
+    def stop_looper_progress_bar(self):
+        self.enlighten_manager.stop()
 
     def looper(self, **kwargs):
         opts = self.options.push(kwargs)
@@ -93,6 +113,10 @@ class PlaylistGenerator:
                 len(track_ids_to_playlist),
                 len(self.sources))
 
+            # FIXME: just test
+            if self.progress_looper is not None:
+                self.progress_looper.update()
+
             assert isinstance(track, spotipy.model.track.FullTrack)
 
             if track.id in track_ids_to_playlist:
@@ -102,6 +126,8 @@ class PlaylistGenerator:
                 # printer.print_track(track)
                 track_ids_to_playlist.append(track.id)
                 self.__log.debug('%s: added', track.id)
+                if self.progress_tracks is not None:
+                    self.progress_tracks.update()
 
             if len(track_ids_to_playlist) >= opts.looper_target_count:
                 self.__log.info('we have enough tracks to add')

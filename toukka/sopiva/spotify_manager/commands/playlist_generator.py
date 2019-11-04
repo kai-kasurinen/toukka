@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-playlist-to-tracks', is_flag=True)
 @click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=5000)
+@click.option('--looper-progress-bar', is_flag=True)
 @click.pass_context
 def generate_playlist(ctx, **kwargs):
     # FIXME: subcommand --help calls this
@@ -50,6 +51,7 @@ pass_generator = click.make_pass_decorator(PlaylistGenerator, ensure=True)
 @click.argument('uris', required=True, nargs=-1)
 def from_uris(generator,
               uris: tuple,
+              progress: bool = False,
               **kwargs):
     generator.generate_from_uris(uris, **kwargs)
 
