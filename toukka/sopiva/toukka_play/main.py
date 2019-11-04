@@ -8,8 +8,8 @@ import re
 
 import click
 import click_log
-#import click_completion
-#click_completion.init()
+# import click_completion
+# click_completion.init()
 
 import toukka.logger.simple
 
@@ -44,7 +44,7 @@ kwargs_for_playlist = {
     'expand_artist_to_recommendations': True
 }
 
-kwargs_for_uris = {
+kwargs_for_uri = {
     'looper_progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
@@ -52,6 +52,17 @@ kwargs_for_uris = {
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': True,
     'expand_artist_to_related_artists': True,
+    'expand_artist_to_recommendations': True
+}
+
+kwargs_for_uri_second = {
+    'looper_progress_bar': True,
+    'expand_playlist_to_tracks': True,
+    'expand_track_to_album': True,
+    'expand_track_to_artists': True,
+    'expand_album_to_tracks': True,
+    'expand_artist_to_albums': False,
+    'expand_artist_to_related_artists': False,
     'expand_artist_to_recommendations': True
 }
 
@@ -68,11 +79,21 @@ def cli():
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
 def uri(uris: tuple,
-        **kwargs
-        ):
+        **kwargs):
     args = locals()
     context = click.get_current_context()
-    context.invoke(from_uris, **args, **kwargs, **kwargs_for_uris)
+    context.invoke(from_uris, **args, **kwargs, **kwargs_for_uri)
+
+
+@cli.command()
+@click.argument('uris', required=True, nargs=-1)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--randomize', is_flag=True, default=False)
+def uri2(uris: tuple,
+         **kwargs):
+    args = locals()
+    context = click.get_current_context()
+    context.invoke(from_uris, **args, **kwargs, **kwargs_for_uri_second)
 
 
 # FIXME: autocompletion
@@ -104,7 +125,7 @@ def genre_re(genre_name_re: str,
 
 def main():
     toukka.logger.simple.init_logging()
-    #toukka.logger.simple.set_logging_level_to_trace()
+    # toukka.logger.simple.set_logging_level_to_trace()
     # FIXME: format?
     click_log.basic_config()
     cli.main()
