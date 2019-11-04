@@ -314,7 +314,6 @@ class PlaylistGenerator:
 
         self.__log.debug(locals())
 
-        # NOTE: market=None gives many unplayeble tracks
         recommendations = self.spotify.recommendations(
             artist_ids=seed_artist_ids,
             track_ids=seed_track_ids,
@@ -349,7 +348,7 @@ class PlaylistGenerator:
     def playlist_all_tracks_generator(self,
                                       playlist_id: str
                                       ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        playlist = self.spotify.playlist(playlist_id=playlist_id, market=None)
+        playlist = self.spotify.playlist(playlist_id=playlist_id, market=self.market)
         playlist_tracks = self.spotify.all_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
             yield playlist_track.track
