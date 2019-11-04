@@ -340,6 +340,7 @@ class PlaylistGenerator:
                                      types=[query_type],
                                      limit=50,
                                      market=self.market)
+        # FIXME: handle all types not just one
         paging = search[0]
         for item in self.spotify.all_items_from_paging(paging):
             # NOTE: item can me track, album, artist, playlist ...
@@ -351,7 +352,8 @@ class PlaylistGenerator:
         playlist = self.spotify.playlist(playlist_id=playlist_id, market=self.market)
         playlist_tracks = self.spotify.all_items_from_paging(playlist.tracks)
         for playlist_track in playlist_tracks:
-            yield playlist_track.track
+            if not playlist_track.is_local:
+                yield playlist_track.track
 
     def randomizer(self, generator, **kwargs):
         opts = self.options.push(kwargs)
