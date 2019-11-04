@@ -41,7 +41,7 @@ def print_track(track: spotipy.model.FullTrack,
           f'(popularity: {track.popularity})')
 
     print(f'\talbum: {track.album.name} ({track.album.uri})')
-    print(f'\tartists: {_artists_to_string(track.artists)})')
+    print(f'\tartists: {_artists_to_string(track.artists)}')
     print(f'\tduration: {datetime.timedelta(milliseconds=track.duration_ms)}')
     print(f'\ttrack number: {track.track_number},',
           f'disc number: {track.disc_number}')
@@ -207,7 +207,7 @@ def print_track_local(track: spotipy.model.local.LocalTrack):
     print(f'local track: {track.name} ({track.uri})')
 
     print(f'\talbum: {track.album.name} ({track.album.uri})')
-    print(f'\tartists: {_artists_to_string(track.artists)})')
+    print(f'\tartists: {_artists_to_string(track.artists)}')
     print(f'\tduration: {datetime.timedelta(milliseconds=track.duration_ms)}')
     print(f'\ttrack number: {track.track_number},',
           f'disc number: {track.disc_number}')
