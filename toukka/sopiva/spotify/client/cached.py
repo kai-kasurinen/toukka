@@ -1,34 +1,44 @@
 #
 
 import functools
-import spotipy.client
-import toukka.cache.dogpile
+from spotipy.client import Spotify
 
+from toukka.cache.dogpile import redis
+
+# TODO: handle from_token better
 # TODO: do something when pickling fails?
 
 
 def check_from_token(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
-        if kwargs.get('market') != 'from_token':
-            return f(*args, **kwargs)
-        else:
+        if kwargs.get('market') == 'from_token':
             raise Exception('market is from_token')
+        # artist_top_tracks
+        elif kwargs.get('country') == 'from_token':
+            raise Exception('country is from_token')
+        else:
+            return f(*args, **kwargs)
     return wrapper
 
 
-class SpotifyCached(spotipy.client.Spotify):
+class SpotifyCached(Spotify):
 
-    track = toukka.cache.dogpile.redis.cache_on_arguments()(spotipy.client.Spotify.track)
-    track = check_from_token(track)
+    # cache-control: public
+    track = check_from_token(
+        redis.cache_on_arguments()(Spotify.track))
+    artist = redis.cache_on_arguments()(Spotify.artist)
+    artist_albums = check_from_token(
+        redis.cache_on_arguments()(Spotify.artist_albums))
+    artist_related_artists = check_from_token(
+        redis.cache_on_arguments()(Spotify.artist_related_artists))
+    artist_top_tracks = check_from_token(
+        redis.cache_on_arguments()(Spotify.artist_top_tracks))
+    album = check_from_token(redis.cache_on_arguments()(Spotify.album))
 
-    artist = toukka.cache.dogpile.redis.cache_on_arguments()(spotipy.client.Spotify.artist)
-
-    album = toukka.cache.dogpile.redis.cache_on_arguments()(spotipy.client.Spotify.album)
-    album = check_from_token(track)
-
-    track_audio_features = toukka.cache.dogpile.redis.cache_on_arguments()(spotipy.client.Spotify.track_audio_features)
-    track_audio_analysis = toukka.cache.dogpile.redis.cache_on_arguments()(spotipy.client.Spotify.track_audio_analysis)
+    # cache-control: private, max-age=0
+    track_audio_features = redis.cache_on_arguments()(Spotify.track_audio_features)
+    track_audio_analysis = redis.cache_on_arguments()(Spotify.track_audio_analysis)
 
 
 # END
