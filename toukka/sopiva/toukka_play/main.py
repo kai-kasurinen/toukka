@@ -38,10 +38,10 @@ kwargs_for_playlist = {
     'looper_progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
-    'expand_track_to_artists': True,
+    'expand_track_to_artists': False,
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': False,
-    'expand_artist_to_recommendations': True
+    'expand_artist_to_recommendations': False
 }
 
 kwargs_for_uri = {
