@@ -137,7 +137,7 @@ class PlaylistGenerator:
                 self.__log.debug('%s: already added', track.id)
 
             # NOTE: we need correct relinking information
-            track = self.track(track.id, market=self.user_country)
+            track = self.spotify.track(track.id, market=self.user_country)
 
             if self.is_track_ok_to_add(track):
                 # printer(track)
