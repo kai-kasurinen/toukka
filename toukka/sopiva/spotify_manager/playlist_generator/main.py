@@ -291,8 +291,8 @@ class PlaylistGenerator:
         markets = track.available_markets
         if markets is None:
             # TODO: raise exception
-            self.__log.warning('%s: markets is None', track.id)
-            return True
+            self.__log.warning('%s: available_markets is None', track.id)
+            return False
         elif market in markets:
             return True
         else:
