@@ -130,7 +130,7 @@ class PlaylistGenerator:
                 self.progress_looper.update()
 
             # actually we do not care as long track.id is usable
-            if not isinstance(track, spotipy.model.track.FullTrack):
+            if not isinstance(track, spotipy.model.track.Track):
                 self.__log.warning('wrong type received: %s', type(track))
 
             if track.id in track_ids_to_playlist:
@@ -345,7 +345,9 @@ class PlaylistGenerator:
             market=self.market,
             limit=50)
         for simple_track in self.spotify.all_items_from_paging(paging):
-            yield self.spotify.track(simple_track.id, market=self.market)
+            # NOTE: try yielding simple_tracks
+            # yield self.spotify.track(simple_track.id, market=self.market)
+            yield simple_track
 
     def recommendations_generator(self,
                                   seed_artist_ids: list = None,
@@ -420,6 +422,8 @@ class PlaylistGenerator:
             yield from self.expander_modellist(item, **opts)
         elif isinstance(item, spotipy.model.track.FullTrack):
             yield from self.expander_track(item, **opts)
+        elif isinstance(item, spotipy.model.track.SimpleTrack):
+            yield from self.expander_track(item, **opts)
         elif isinstance(item, spotipy.model.artist.Artist):
             yield from self.expander_artist(item, **opts)
         elif isinstance(item, spotipy.model.album.Album):
@@ -427,8 +431,7 @@ class PlaylistGenerator:
         elif isinstance(item, spotipy.model.playlist.Playlist):
             yield from self.expander_playlist(item, **opts)
         else:
-            self.__log.warning('not yet supported: %s', type(item))
-            raise Exception()
+            raise Exception('not yet supported: %s', type(item))
 
     def expander_generator(self,
                            item: types.GeneratorType,
