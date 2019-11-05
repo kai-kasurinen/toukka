@@ -1,15 +1,8 @@
 #
 
-from typing import Union
-import logging
 import functools
-
 import spotipy.client
-from spotipy.model import FullTrack, FullArtist, FullAlbum, AudioFeatures, AudioAnalysis
-
 import toukka.cache.dogpile
-
-logger = logging.getLogger(__name__)
 
 # TODO: do something when pickling fails?
 
