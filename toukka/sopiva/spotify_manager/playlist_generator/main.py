@@ -339,15 +339,13 @@ class PlaylistGenerator:
 
     def album_tracks_generator(self,
                                album_id
-                               ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+                               ) -> Generator[spotipy.model.track.SimpleTrack, None, None]:
         paging = self.spotify.album_tracks(
             album_id,
             market=self.market,
             limit=50)
-        for simple_track in self.spotify.all_items_from_paging(paging):
-            # NOTE: try yielding simple_tracks
-            # yield self.spotify.track(simple_track.id, market=self.market)
-            yield simple_track
+        # NOTE: yield SimpleTracks
+        yield from self.spotify.all_items_from_paging(paging)
 
     def recommendations_generator(self,
                                   seed_artist_ids: list = None,
@@ -361,6 +359,7 @@ class PlaylistGenerator:
 
         self.__log.debug(locals())
 
+        # NOTE: market=None may return lot of unplayable tracks
         recommendations = self.spotify.recommendations(
             artist_ids=seed_artist_ids,
             track_ids=seed_track_ids,
