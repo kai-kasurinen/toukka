@@ -19,4 +19,13 @@ def track(uri: str,
     printer(track)
 
 
+@cli_root.command()
+@click.argument('uri')
+def track_audio_features(uri: str):
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    spotify = get_spotify()
+    track_features = spotify.track_audio_features(uri_id)
+    printer(track_features)
+
+
 # END
