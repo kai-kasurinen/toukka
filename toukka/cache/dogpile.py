@@ -27,8 +27,9 @@ def configure():
         'cache.local.expiration_time': 60*60*24,
         # local redis
         'cache.redis.backend': 'dogpile.cache.redis',
-        'cache.redis.redis_expiration_time': 60*60*24*2,
-        'cache.redis.expiration_time': 60*60*24
+        'cache.redis.expiration_time': 60*60*24,
+        # NOTE: documentation says: This should be larger than dogpile’s cache expiration.
+        'cache.redis.redis_expiration_time': 60*60*24
     }
 
     null.configure_from_config(config, 'cache.null.')

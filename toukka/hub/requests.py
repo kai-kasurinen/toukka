@@ -25,7 +25,7 @@ def get_session():
 
 def get_cached_session():
     # TODO: add file_cache support
-    redis_ = redis.Redis.from_url('redis://')
+    redis_ = redis.Redis.from_url('redis://?db=15')
     session = requests.Session()
     retry = urllib3.util.retry.Retry(
         total=3,
