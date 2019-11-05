@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: add genetator options group and remove cxt.obj usage
+# TODO: https://github.com/pallets/click/issues/108
 
 @cli_root.group()
 @click.option('--dry-run', is_flag=True, default=False)
