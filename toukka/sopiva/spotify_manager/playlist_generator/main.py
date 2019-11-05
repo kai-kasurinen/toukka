@@ -116,6 +116,7 @@ class PlaylistGenerator:
 
         track_ids_to_playlist = list()
 
+        # TODO: rename track to item
         for counter, track in enumerate(self.sources.generator()):
 
             self.__log.debug(
@@ -128,13 +129,18 @@ class PlaylistGenerator:
             if self.progress_looper is not None:
                 self.progress_looper.update()
 
-            assert isinstance(track, spotipy.model.track.FullTrack)
+            # actually we do not care as long track.id is usable
+            if not isinstance(track, spotipy.model.track.FullTrack):
+                self.__log.warning('wrong type received: %s', type(track))
 
             if track.id in track_ids_to_playlist:
                 self.__log.debug('%s: already added', track.id)
 
+            # NOTE: we need correct relinking information
+            track = self.track(track.id, market=self.user_country)
+
             if self.is_track_ok_to_add(track):
-                # printer.print_track(track)
+                # printer(track)
                 track_ids_to_playlist.append(track.id)
                 self.__log.debug('%s: added', track.id)
                 if self.progress_tracks is not None:
@@ -229,7 +235,13 @@ class PlaylistGenerator:
         self.generate(**opts)
 
     def is_track_ok_to_add(self, track):
-        if self.is_track_isrc_already_added(track):
+        if not self.is_track_playable(track):
+            self.__log.debug(f'{track.id}: not playable')
+            return False
+        elif not self.is_track_album_name_good(track):
+            self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
+            return False
+        elif self.is_track_isrc_already_added(track):
             self.__log.debug(f'{track.id}: isrc already added')
             return False
         elif self.is_track_already_played(track):
@@ -237,12 +249,6 @@ class PlaylistGenerator:
             return False
         elif self.is_track_isrc_already_played(track):
             self.__log.debug(f'{track.id}: isrc already played')
-            return False
-        #elif not self.is_track_playeable(track):
-        #    self.__log.debug(f'{track.id}: not playeable')
-        #    return False
-        elif not self.is_track_album_name_good(track):
-            self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
             return False
         else:
             return True
@@ -272,18 +278,19 @@ class PlaylistGenerator:
             self._isrc_seen.add(isrc)
             return False
 
-    def is_track_playeable(self, track):
+    # TODO: combine this and _on_market
+    def is_track_playable(self, track):
         if track.is_playable is None:
-            # self.__log.warning('%s: is_playable is None', track.id)
-            # use self.user_country not self.market
-            return self.is_track_on_market(track, self.user_country)
+            # TODO: raise exception
+            self.__log.warning('%s: is_playable is None', track.id)
+            return False
         else:
             return track.is_playable
 
-    # NOTE: this called from is_track_playeable when relinking is off
     def is_track_on_market(self, track, market):
         markets = track.available_markets
         if markets is None:
+            # TODO: raise exception
             self.__log.warning('%s: markets is None', track.id)
             return True
         elif market in markets:
@@ -404,7 +411,7 @@ class PlaylistGenerator:
     # TODO: use single dispatch method
     def expander(self, item, **kwargs):
         opts = self.options.push(kwargs)
-        #self.__log.debug('%s', type(item))
+        # self.__log.debug('%s', type(item))
         if isinstance(item, types.GeneratorType):
             yield from self.expander_generator(item, **opts)
         elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
