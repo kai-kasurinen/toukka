@@ -62,7 +62,9 @@ class PlaylistGenerator:
 
         self.spotify = get_spotify()
         self.spotify_history = get_spotify_history()
-        self.market = self.spotify.current_user().country
+        self.user_country = self.spotify.current_user().country
+        # disabling track relinking
+        self.market = None
 
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas', 'joulu']
@@ -236,9 +238,9 @@ class PlaylistGenerator:
         elif self.is_track_isrc_already_played(track):
             self.__log.debug(f'{track.id}: isrc already played')
             return False
-        elif not self.is_track_playeable(track):
-            self.__log.debug(f'{track.id}: not playeable')
-            return False
+        #elif not self.is_track_playeable(track):
+        #    self.__log.debug(f'{track.id}: not playeable')
+        #    return False
         elif not self.is_track_album_name_good(track):
             self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
             return False
@@ -272,8 +274,9 @@ class PlaylistGenerator:
 
     def is_track_playeable(self, track):
         if track.is_playable is None:
-            self.__log.warning('%s: is_playable is None', track.id)
-            return self.is_track_on_market(track, self.market)
+            # self.__log.warning('%s: is_playable is None', track.id)
+            # use self.user_country not self.market
+            return self.is_track_on_market(track, self.user_country)
         else:
             return track.is_playable
 
@@ -325,7 +328,7 @@ class PlaylistGenerator:
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         yield from self.spotify.artist_top_tracks(artist_id,
-                                                  country=self.market)
+                                                  country=self.user_country)
 
     def album_tracks_generator(self,
                                album_id
