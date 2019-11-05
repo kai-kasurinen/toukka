@@ -27,9 +27,12 @@ def configure():
         'cache.local.expiration_time': 60*60*24,
         # local redis
         'cache.redis.backend': 'dogpile.cache.redis',
+        'cache.redis.url': 'redis://',
         'cache.redis.expiration_time': 60*60*24,
-        # NOTE: documentation says: This should be larger than dogpile’s cache expiration.
-        'cache.redis.redis_expiration_time': 60*60*24
+        # NOTE: This should be larger than dogpile’s cache expiration.
+        'cache.redis.redis_expiration_time': 60*60*24,
+        # NOTE: Use this when multiple processes will be talking to the same redis instance
+        'cache.redis.distributed_lock': True
     }
 
     null.configure_from_config(config, 'cache.null.')

@@ -322,6 +322,7 @@ class PlaylistGenerator:
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_album_groups,
+            limit=50,
             market=self.market)
         yield from self.spotify.all_items_from_paging(paging)
 

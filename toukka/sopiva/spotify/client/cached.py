@@ -27,6 +27,8 @@ class SpotifyCached(Spotify):
     # cache-control: public
     track = check_from_token(
         redis.cache_on_arguments()(Spotify.track))
+    tracks = check_from_token(
+        redis.cache_on_arguments()(Spotify.tracks))
     artist = redis.cache_on_arguments()(Spotify.artist)
     artist_albums = check_from_token(
         redis.cache_on_arguments()(Spotify.artist_albums))
@@ -34,7 +36,12 @@ class SpotifyCached(Spotify):
         redis.cache_on_arguments()(Spotify.artist_related_artists))
     artist_top_tracks = check_from_token(
         redis.cache_on_arguments()(Spotify.artist_top_tracks))
-    album = check_from_token(redis.cache_on_arguments()(Spotify.album))
+    album = check_from_token(
+        redis.cache_on_arguments()(Spotify.album))
+    albums = check_from_token(
+        redis.cache_on_arguments()(Spotify.albums))
+    album_tracks = check_from_token(
+        redis.cache_on_arguments()(Spotify.album_tracks))
 
     # cache-control: private, max-age=0
     track_audio_features = redis.cache_on_arguments()(Spotify.track_audio_features)
