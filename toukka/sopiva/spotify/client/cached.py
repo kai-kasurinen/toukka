@@ -24,7 +24,7 @@ def check_from_token(f):
 
 class SpotifyCached(Spotify):
 
-    # cache-control: public
+    # cache-control: public, max-age>0
     track = check_from_token(
         redis.cache_on_arguments()(Spotify.track))
     tracks = check_from_token(

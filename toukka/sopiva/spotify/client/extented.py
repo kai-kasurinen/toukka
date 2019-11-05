@@ -2,13 +2,12 @@
 
 from typing import Generator
 
-import spotipy.client
-
+from spotipy.client import Spotify
 from spotipy.model.paging import Paging
 from spotipy.model.base import Item
 
 
-class SpotifyExtended(spotipy.client.Spotify):
+class SpotifyExtended(Spotify):
 
     def all_pages_from_paging(self,
                               paging: Paging
@@ -26,10 +25,5 @@ class SpotifyExtended(spotipy.client.Spotify):
         for page in self.all_pages_from_paging(paging):
             yield from page.items
 
-    # FIXME: remove
-    iterate_pages_from_paging = all_pages_from_paging
-    iterate_items_from_paging = all_items_from_paging
-    items_from_paging = all_items_from_paging
-    pages_from_paging = all_pages_from_paging
 
 # END
