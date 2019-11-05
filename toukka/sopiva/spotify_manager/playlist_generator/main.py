@@ -396,9 +396,10 @@ class PlaylistGenerator:
     def playlist_all_tracks_generator(self,
                                       playlist_id: str
                                       ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        playlist = self.spotify.playlist(playlist_id=playlist_id, market=self.market)
-        playlist_tracks = self.spotify.all_items_from_paging(playlist.tracks)
-        for playlist_track in playlist_tracks:
+        paging = self.spotify.playlist_tracks(playlist_id=playlist_id,
+                                              limit=100,
+                                              market=self.market)
+        for playlist_track in self.spotify.all_items_from_paging(paging):
             if not playlist_track.is_local:
                 yield playlist_track.track
 
