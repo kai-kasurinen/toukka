@@ -153,8 +153,8 @@ class PlaylistGenerator:
             if len(track_ids_to_playlist) >= opts.looper_target_count:
                 self.__log.info('we have enough tracks to add (target count)')
                 break
-            # playlist can contains only ~10000 tracks
-            # (11000 when tried and then silently fail)
+            # playlist can contains only ~10000 tracks 
+            # (actually 11000 and then 500 ISE)
             if len(track_ids_to_playlist) >= 10000:
                 self.__log.info('we have enough tracks to add (playlist max)')
                 break
