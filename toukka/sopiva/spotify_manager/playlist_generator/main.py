@@ -134,7 +134,12 @@ class PlaylistGenerator:
                 self.__log.warning('wrong type received: %s', type(track))
 
             if track.id in track_ids_to_playlist:
-                self.__log.debug('%s: already added', track.id)
+                self.__log.debug('track:%s: already added', track.id)
+
+            # NOTE: shortcut, try speed up things
+            if self.is_track_already_played(track):
+                self.__log.debug('track:%s: already played', track.id)
+                continue
 
             # NOTE: we need correct relinking information
             track = self.spotify.track(track.id, market=self.user_country)
@@ -142,7 +147,7 @@ class PlaylistGenerator:
             if self.is_track_ok_to_add(track):
                 # printer(track)
                 track_ids_to_playlist.append(track.id)
-                self.__log.debug('%s: added', track.id)
+                self.__log.debug('track:%s: added', track.id)
                 if self.progress_tracks is not None:
                     self.progress_tracks.update()
 
@@ -236,19 +241,19 @@ class PlaylistGenerator:
 
     def is_track_ok_to_add(self, track):
         if not self.is_track_playable(track):
-            self.__log.debug(f'{track.id}: not playable')
+            self.__log.debug('track:%s: not playable', track.id)
             return False
         elif not self.is_track_album_name_good(track):
-            self.__log.debug(f'{track.id}: album name "{track.album.name}" not good')
+            self.__log.debug('track:%s: album name "%s" not good', track.id, track.album.name)
             return False
         elif self.is_track_isrc_already_added(track):
-            self.__log.debug(f'{track.id}: isrc already added')
+            self.__log.debug('track:%s: isrc already added', track.id)
             return False
         elif self.is_track_already_played(track):
-            self.__log.debug(f'{track.id}: already played')
+            self.__log.debug('track:%s: already played', track.id)
             return False
         elif self.is_track_isrc_already_played(track):
-            self.__log.debug(f'{track.id}: isrc already played')
+            self.__log.debug('track:%s: isrc already played', track.id)
             return False
         else:
             return True
@@ -324,7 +329,13 @@ class PlaylistGenerator:
             include_groups=include_album_groups,
             limit=50,
             market=self.market)
-        yield from self.spotify.all_items_from_paging(paging)
+
+        for album in self.spotify.all_items_from_paging(paging):
+            # NOTE: try speed up things
+            if self.user_country not in album.available_markets:
+                self.__log.debug('album:%s: not available on %s', album.id, self.user_country)
+                continue
+            yield album
 
     def artist_all_tracks_generator(self,
                                     artist_id: str
