@@ -145,20 +145,26 @@ class PlaylistGenerator:
             track = self.spotify.track(track.id, market=self.user_country)
 
             if self.is_track_ok_to_add(track):
-                # printer(track)
                 track_ids_to_playlist.append(track.id)
                 self.__log.debug('track:%s: added', track.id)
                 if self.progress_tracks is not None:
                     self.progress_tracks.update()
 
             if len(track_ids_to_playlist) >= opts.looper_target_count:
-                self.__log.info('we have enough tracks to add')
+                self.__log.info('we have enough tracks to add (target count)')
+                break
+            # playlist can contains only ~10000 tracks
+            # (11000 when tried and then silently fail)
+            if len(track_ids_to_playlist) >= 10000:
+                self.__log.info('we have enough tracks to add (playlist max)')
                 break
 
             # safety
             if counter >= opts.looper_max_tries:
-                self.__log.info('we have tried too many tracks, breaking loop')
+                self.__log.info('we have tried too many tracks')
                 break
+
+
 
         self.track_ids_to_playlist = track_ids_to_playlist
         self.__log.info(f'{len(track_ids_to_playlist)} tracks to add')
@@ -324,18 +330,13 @@ class PlaylistGenerator:
                                 ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
         # NOTE: 'album', 'single', 'appears_on', 'compilation'
         include_album_groups = ['album', 'single', 'compilation']
+        # NOTE: use self.user_country for market
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_album_groups,
             limit=50,
-            market=self.market)
-
-        for album in self.spotify.all_items_from_paging(paging):
-            # NOTE: try speed up things
-            if self.user_country not in album.available_markets:
-                self.__log.debug('album:%s: not available on %s', album.id, self.user_country)
-                continue
-            yield album
+            market=self.user_country)
+        yield from self.spotify.all_items_from_paging(paging)
 
     def artist_all_tracks_generator(self,
                                     artist_id: str
