@@ -72,6 +72,8 @@ class PlaylistGenerator:
         # init empty
         self._isrc_seen = set()
         self._uris_seen = set()
+        # FIXME: use orderedset
+        self.track_ids_to_playlist = list()
 
         self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
@@ -114,15 +116,13 @@ class PlaylistGenerator:
     def looper(self, **kwargs):
         opts = self.options.push(kwargs)
 
-        track_ids_to_playlist = list()
-
         # TODO: rename track to item
         for counter, track in enumerate(self.sources.generator()):
 
             self.__log.debug(
                 'counter: %i, tracks: %i, sources: %i',
                 counter,
-                len(track_ids_to_playlist),
+                len(self.track_ids_to_playlist),
                 len(self.sources))
 
             # FIXME: just test
@@ -133,29 +133,25 @@ class PlaylistGenerator:
             if not isinstance(track, spotipy.model.track.Track):
                 self.__log.warning('wrong type received: %s', type(track))
 
-            # TODO: move this to is_track_ok_to_add and check also relinked track
-            if track.id in track_ids_to_playlist:
-                self.__log.debug('track:%s: already added', track.id)
-
-            # NOTE: shortcut, try speed up things
+            # shortcut, for speedup things
             if self.is_track_already_played(track):
                 self.__log.debug('track:%s: already played', track.id)
                 continue
 
-            # NOTE: we pass track.id not whole track
+            # NOTE: we use track.id not whole track object
             if self.is_track_ok_to_add(track.id):
-                # NOTE: add original track, not relinked track
-                track_ids_to_playlist.append(track.id)
+                self.track_ids_to_playlist.append(track.id)
                 self.__log.debug('track:%s: added', track.id)
                 if self.progress_tracks is not None:
                     self.progress_tracks.update()
 
-            if len(track_ids_to_playlist) >= opts.looper_target_count:
+            if len(self.track_ids_to_playlist) >= opts.looper_target_count:
                 self.__log.info('we have enough tracks to add (target count)')
                 break
-            # playlist can contains only ~10000 tracks 
+
+            # playlist can contains only ~10000 tracks
             # (actually 11000 and then 500 ISE)
-            if len(track_ids_to_playlist) >= 10000:
+            if len(self.track_ids_to_playlist) >= 10000:
                 self.__log.info('we have enough tracks to add (playlist max)')
                 break
 
@@ -164,8 +160,7 @@ class PlaylistGenerator:
                 self.__log.info('we have tried too many tracks')
                 break
 
-        self.track_ids_to_playlist = track_ids_to_playlist
-        self.__log.info(f'{len(track_ids_to_playlist)} tracks to add')
+        self.__log.info(f'{len(self.track_ids_to_playlist)} tracks to add')
 
     # TODO: split and move to Playlist
     def commit(self, **kwargs):
@@ -254,23 +249,33 @@ class PlaylistGenerator:
         # NOTE: we need correct relinking information
         track_relinked = self.spotify.track(track_id, market=self.user_country)
 
+        # just warning
         if track.id != track_relinked.id:
             self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
 
+        # and long list checks
+        if track.id in self.track_ids_to_playlist:
+            self.__log.debug('track:%s: already added', track.id)
+            return False
+        elif track_relinked.id in self.track_ids_to_playlist:
+            self.__log.debug('track:%s: already added (relinked)', track.id)
+            return False
         # NOTE: check playable on relinked track
-        if not self.is_track_playable(track_relinked):
+        elif not self.is_track_playable(track_relinked):
             self.__log.debug('track:%s: not playable', track.id)
             return False
         elif not self.is_track_album_name_good(track):
             self.__log.debug('track:%s: album name "%s" not good', track.id, track.album.name)
             return False
-        elif self.is_track_isrc_already_added(track):
-            self.__log.debug('track:%s: isrc already added', track.id)
+        elif self.is_track_isrc_already_seen(track):
+            self.__log.debug('track:%s: isrc already seen', track.id)
             return False
-        # FIXME: this checks and ADDS isrc, so we fail most of time
-        #elif self.is_track_isrc_already_added(track_relinked):
-        #    self.__log.debug('track:%s: isrc already added (relinked)', track.id)
-        #    return False
+        elif (
+            not self.has_tracks_same_isrc(track, track_relinked)
+            and self.is_track_isrc_already_seen(track_relinked)
+        ):
+            self.__log.debug('track:%s: isrc already seen (relinked)', track.id)
+            return False
         elif self.is_track_already_played(track):
             self.__log.debug('track:%s: already played', track.id)
             return False
@@ -281,7 +286,7 @@ class PlaylistGenerator:
             self.__log.debug('track:%s: isrc already played', track.id)
             return False
         elif self.is_track_isrc_already_played(track_relinked):
-            self.__log.debug('track:%s: isrc already played (relinked', track.id)
+            self.__log.debug('track:%s: isrc already played (relinked)', track.id)
             return False
         else:
             return True
@@ -305,7 +310,7 @@ class PlaylistGenerator:
 
     # TODO: isrc is only on FullTrack?
     # FIXME: split check and add
-    def is_track_isrc_already_added(self, track):
+    def is_track_isrc_already_seen(self, track):
         isrc = track.external_ids.get('isrc')
         if isrc is None:
             self.__log.warning('track:%s: isrc is %s', track.id, isrc)
@@ -314,6 +319,13 @@ class PlaylistGenerator:
             return True
         else:
             self._isrc_seen.add(isrc)
+            return False
+
+    def has_tracks_same_isrc(self, track1, track2):
+        if track1.external_ids.get('isrc') == track2.external_ids.get('isrc'):
+            return True
+        else:
+            self.__log.warning('track:%s and track:%s has different ISRC', track1.id, track2.id)
             return False
 
     def is_track_playable(self, track):
@@ -341,6 +353,7 @@ class PlaylistGenerator:
         else:
             return True
 
+    # TODO: split check and add
     def is_uri_already_seen(self, uri):
         if uri in self._uris_seen:
             self.__log.debug('%s is already seen', uri)
