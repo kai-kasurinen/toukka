@@ -133,6 +133,7 @@ class PlaylistGenerator:
             if not isinstance(track, spotipy.model.track.Track):
                 self.__log.warning('wrong type received: %s', type(track))
 
+            # TODO: move this to is_track_ok_to_add and check also relinked track
             if track.id in track_ids_to_playlist:
                 self.__log.debug('track:%s: already added', track.id)
 
@@ -141,7 +142,7 @@ class PlaylistGenerator:
                 self.__log.debug('track:%s: already played', track.id)
                 continue
 
-
+            # NOTE: we pass track.id not whole track
             if self.is_track_ok_to_add(track.id):
                 # NOTE: add original track, not relinked track
                 track_ids_to_playlist.append(track.id)
@@ -162,8 +163,6 @@ class PlaylistGenerator:
             if counter >= opts.looper_max_tries:
                 self.__log.info('we have tried too many tracks')
                 break
-
-
 
         self.track_ids_to_playlist = track_ids_to_playlist
         self.__log.info(f'{len(track_ids_to_playlist)} tracks to add')
@@ -248,9 +247,12 @@ class PlaylistGenerator:
 
         # TODO: cleanup this mess and move to new class
 
-        track = self.spotify.track(track.id, market=None)
+        # track and track_relinked may be totally different
+        # isrc can be different, album can be different ...
+
+        track = self.spotify.track(track_id, market=None)
         # NOTE: we need correct relinking information
-        track_relinked = self.spotify.track(track.id, market=self.user_country)
+        track_relinked = self.spotify.track(track_id, market=self.user_country)
 
         if track.id != track_relinked.id:
             self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
@@ -265,17 +267,18 @@ class PlaylistGenerator:
         elif self.is_track_isrc_already_added(track):
             self.__log.debug('track:%s: isrc already added', track.id)
             return False
-        elif self.is_track_isrc_already_added(track_relinked):
-            self.__log.debug('track:%s: isrc already added (relinked)', track.id)
-            return False
+        # FIXME: this checks and ADDS isrc, so we fail most of time
+        #elif self.is_track_isrc_already_added(track_relinked):
+        #    self.__log.debug('track:%s: isrc already added (relinked)', track.id)
+        #    return False
         elif self.is_track_already_played(track):
             self.__log.debug('track:%s: already played', track.id)
             return False
-        elif self.is_track_isrc_already_played(track):
-            self.__log.debug('track:%s: isrc already played', track.id)
-            return False
         elif self.is_track_already_played(track_relinked):
             self.__log.debug('track:%s: already played (relinked)', track.id)
+            return False
+        elif self.is_track_isrc_already_played(track):
+            self.__log.debug('track:%s: isrc already played', track.id)
             return False
         elif self.is_track_isrc_already_played(track_relinked):
             self.__log.debug('track:%s: isrc already played (relinked', track.id)
@@ -301,6 +304,7 @@ class PlaylistGenerator:
             return False
 
     # TODO: isrc is only on FullTrack?
+    # FIXME: split check and add
     def is_track_isrc_already_added(self, track):
         isrc = track.external_ids.get('isrc')
         if isrc is None:
