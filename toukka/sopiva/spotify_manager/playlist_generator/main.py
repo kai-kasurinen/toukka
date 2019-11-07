@@ -142,9 +142,10 @@ class PlaylistGenerator:
                 continue
 
             # NOTE: we need correct relinking information
-            track = self.spotify.track(track.id, market=self.user_country)
+            track_relinked = self.spotify.track(track.id, market=self.user_country)
 
-            if self.is_track_ok_to_add(track):
+            if self.is_track_ok_to_add(track_relinked):
+                # NOTE: add original track, not relinked track
                 track_ids_to_playlist.append(track.id)
                 self.__log.debug('track:%s: added', track.id)
                 if self.progress_tracks is not None:
