@@ -369,13 +369,17 @@ class PlaylistGenerator:
                                 ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
         # NOTE: 'album', 'single', 'appears_on', 'compilation'
         include_album_groups = ['album', 'single', 'compilation']
-        # NOTE: use self.user_country for market
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_album_groups,
             limit=50,
-            market=self.user_country)
-        yield from self.spotify.all_items_from_paging(paging)
+            market=self.market)
+        for album in self.spotify.all_items_from_paging(paging):
+            # speed up things
+            if self.user_country not in album.available_markets:
+                self.__log.debug('album:%s: is not available %s', album.id, self.user_country)
+                continue
+            yield album
 
     def artist_all_tracks_generator(self,
                                     artist_id: str
