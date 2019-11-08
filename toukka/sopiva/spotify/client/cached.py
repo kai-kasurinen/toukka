@@ -35,8 +35,7 @@ class SpotifyCached(Spotify):
     artist = redis.cache_on_arguments()(Spotify.artist)
     artist_albums = check_from_token(
         redis.cache_on_arguments()(Spotify.artist_albums))
-    artist_related_artists = check_from_token(
-        redis.cache_on_arguments()(Spotify.artist_related_artists))
+    artist_related_artists = redis.cache_on_arguments()(Spotify.artist_related_artists)
     artist_top_tracks = check_from_token(
         redis.cache_on_arguments()(Spotify.artist_top_tracks))
     album = check_from_token(

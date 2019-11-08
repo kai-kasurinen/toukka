@@ -422,7 +422,8 @@ class PlaylistGenerator:
             self.__log.debug(seed)
         yield from recommendations.tracks
 
-    def related_artists_generator(self, artist_id):
+    def related_artists_generator(self, artist_id
+                                  ) -> Generator[spotipy.model.artist.FullArtist, None, None]:
         yield from self.spotify.artist_related_artists(artist_id)
 
     def search_generator(self,
@@ -464,7 +465,8 @@ class PlaylistGenerator:
             yield from generator
 
     # TODO: use single dispatch method
-    def expander(self, item, **kwargs):
+    def expander(self, item, **kwargs
+                 ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         opts = self.options.push(kwargs)
         # self.__log.debug('%s', type(item))
         if isinstance(item, types.GeneratorType):
@@ -507,39 +509,29 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
-    # TODO: support also SimpleTracks, so mypy is happy
     def expander_track(self,
                        item: spotipy.model.track.FullTrack,
-                       **kwargs):
+                       **kwargs
+                       ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         # add as new source
-        if (opts.expand_track_to_artists and
-                not self.is_uri_already_seen(item.uri + '#artists')):
-            # set expand_track_to_artists option to False, so we dont hit again
-            opts.set(expand_track_to_artists=False)
-            for artist in item.artists:
-                if not self.is_uri_already_seen(artist.uri + '#source'):
-                    self.sources.add(self.expander(
-                        self.spotify.artist(artist.id),
-                        **opts))
+        if opts.expand_track_to_artists:
+            self.add_track_artists_as_source(item, **opts)
             did = True
 
         # add as new source
-        if (opts.expand_track_to_recommendations and
-                not self.is_uri_already_seen(item.uri + '#recommendations')):
-            # no need set expand_track_to_recommendations option to False
-            self.sources.add(
-                self.expander(
-                    self.recommendations_generator(seed_track_ids=[item.id]),
-                    **opts))
+        if opts.expand_track_to_recommendations:
+            self.add_track_recommendations_as_source(item, **opts)
             did = True
 
         # yields tracks
-        if (opts.expand_track_to_album and
-                not self.is_uri_already_seen(item.uri + '#album')):
+        if (
+            opts.expand_track_to_album and
+            not self.is_uri_already_seen(item.uri + '#album')
+        ):
             # set expand_track_to_album option False, so we dont hit again
             opts.set(expand_track_to_album=False)
             yield from self.expander(
@@ -551,16 +543,41 @@ class PlaylistGenerator:
             if not self.is_uri_already_seen(item.uri):
                 yield item
 
+    def add_artist_as_source(self, artist, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(artist.uri + '#source'):
+            return
+        e = self.expander(self.spotify.artist(artist.id), **opts)
+        self.sources.add(e)
+
+    def add_track_recommendations_as_source(self, track, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(track.uri + '#recommendations'):
+            return
+        e = self.expander(self.recommendations_generator(seed_track_ids=[track.id]), **opts)
+        self.sources.add(e)
+
+    def add_track_artists_as_source(self, track, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(track.uri + '#artists'):
+            return
+        # set expand_track_to_artists option to False, so we dont hit again
+        opts.set(expand_track_to_artists=False)
+        for artist in track.artists:
+            self.add_artist_as_source(artist, **opts)
+
     # NOTE: simpletrack do not have album informations
     def expander_simple_track(self,
                               item: spotipy.model.track.SimpleTrack,
-                              **kwargs):
+                              **kwargs
+                              ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         opts = self.options.push(kwargs)
         yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
 
     def expander_artist(self,
                         item: spotipy.model.artist.FullArtist,
-                        **kwargs):
+                        **kwargs
+                        ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
@@ -602,7 +619,8 @@ class PlaylistGenerator:
 
     def expander_album(self,
                        item: spotipy.model.album.full.FullAlbum,
-                       **kwargs):
+                       **kwargs
+                       ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
@@ -617,7 +635,8 @@ class PlaylistGenerator:
 
     def expander_playlist(self,
                           item: spotipy.model.playlist.Playlist,
-                          **kwargs):
+                          **kwargs
+                          ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
