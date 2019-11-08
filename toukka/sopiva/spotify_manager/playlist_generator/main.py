@@ -1,7 +1,7 @@
 #
 #
 
-from typing import Generator
+from typing import List, Set, Generator, Union
 
 import logging
 import pprint
@@ -70,10 +70,10 @@ class PlaylistGenerator:
         self.bad_words_in_album_names = ['christmas', 'joulu']
 
         # init empty
-        self._isrc_seen = set()
-        self._uris_seen = set()
+        self._isrc_seen: Set[str] = set()
+        self._uris_seen: Set[str] = set()
         # FIXME: use orderedset
-        self.track_ids_to_playlist = list()
+        self.track_ids_to_playlist: List[str] = list()
 
         self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
@@ -212,11 +212,11 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
 
-        seed_artist_ids = list()
+        seed_artist_ids: List[str] = list()
         if seed_artist_uris is not None:
             for artist in self.uris_to_items(seed_artist_uris):
                 seed_artist_ids.append(artist.id)
-        seed_track_ids = list()
+        seed_track_ids: List[str] = list()
         if seed_track_uris is not None:
             for artist in self.uris_to_items(seed_track_uris):
                 seed_artist_ids.append(artist.id)
@@ -381,12 +381,6 @@ class PlaylistGenerator:
                 continue
             yield album
 
-    def artist_all_tracks_generator(self,
-                                    artist_id: str
-                                    ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        for album in self.artist_albums_generator(artist_id):
-            yield from self.album_tracks_generator(album.id)
-
     def artist_top_tracks_generator(self,
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
@@ -427,12 +421,6 @@ class PlaylistGenerator:
         for seed in recommendations.seeds:
             self.__log.debug(seed)
         yield from recommendations.tracks
-
-    # FIXME: not used?
-    def related_artists_all_tracks_generator(self, artist_id
-                                             ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        for artist in self.spotify.artist_related_artists(artist_id):
-            yield from self.artist_all_tracks_generator(artist.id)
 
     def related_artists_generator(self, artist_id):
         yield from self.spotify.artist_related_artists(artist_id)
@@ -479,7 +467,7 @@ class PlaylistGenerator:
         elif isinstance(item, spotipy.model.track.FullTrack):
             yield from self.expander_track(item, **opts)
         elif isinstance(item, spotipy.model.track.SimpleTrack):
-            yield from self.expander_track(item, **opts)
+            yield from self.expander_simple_track(item, **opts)
         elif isinstance(item, spotipy.model.artist.Artist):
             yield from self.expander_artist(item, **opts)
         elif isinstance(item, spotipy.model.album.Album):
@@ -510,6 +498,7 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
+    # TODO: support also SimpleTracks, so mypy is happy
     def expander_track(self,
                        item: spotipy.model.track.FullTrack,
                        **kwargs):
@@ -552,6 +541,13 @@ class PlaylistGenerator:
         else:
             if not self.is_uri_already_seen(item.uri):
                 yield item
+
+    # NOTE: simpletrack do not have album informations
+    def expander_simple_track(self,
+                              item: spotipy.model.track.SimpleTrack,
+                              **kwargs):
+        opts = self.options.push(kwargs)
+        yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
 
     def expander_artist(self,
                         item: spotipy.model.artist.FullArtist,

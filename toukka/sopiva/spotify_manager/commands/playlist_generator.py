@@ -1,6 +1,8 @@
 #
 #
 
+from typing import Dict, Union
+
 import logging
 import pprint
 import dataclasses
@@ -82,7 +84,7 @@ def from_recommendations(generator,
                          **kwargs):
 
     '''generate playlist from recommendation'''
-    attributes_dict = {}
+    attributes_dict: Dict[str, Union[float, int]] = {}
     if attributes_list is not None:
         attributes_dict = {k: v for k, v in (x.split(':') for x in attributes_list)}
         spotipy.client.browse.validate.validate_attributes(attributes_dict)

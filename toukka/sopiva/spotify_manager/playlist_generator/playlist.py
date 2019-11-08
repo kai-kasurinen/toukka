@@ -1,5 +1,7 @@
 #
 
+from typing import Union
+
 import logging
 import textwrap
 
@@ -18,7 +20,7 @@ class Playlist:
 
     def __init__(self,
                  uri: str = None,
-                 spotify: object = None,
+                 spotify: spotipy.Spotify = None,
                  market: str = None
                  ):
 

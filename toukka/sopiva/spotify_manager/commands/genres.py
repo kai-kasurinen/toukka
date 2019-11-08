@@ -27,7 +27,7 @@ def genre(name: str):
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genre = genres.get(name)
     if genre is None:
-        raise argh.exceptions.CommandError(f'{name} genre not found')
+        raise click.ClickException(f'genre "{name}" not found')
     pprint.pprint(genre)
 
 
