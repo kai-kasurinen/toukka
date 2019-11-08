@@ -521,30 +521,31 @@ class PlaylistGenerator:
         if opts.expand_track_to_artists:
             self.add_track_artists_as_source(item, **opts)
             did = True
-
         # add as new source
         if opts.expand_track_to_recommendations:
             self.add_track_recommendations_as_source(item, **opts)
             did = True
-
         # yields tracks
-        if (
-            opts.expand_track_to_album and
-            not self.is_uri_already_seen(item.uri + '#album')
-        ):
-            # set expand_track_to_album option False, so we dont hit again
-            opts.set(expand_track_to_album=False)
-            yield from self.expander(
-                self.spotify.album(item.album.id, market=self.market),
-                **opts)
+        if opts.expand_track_to_album:
+            yield from self.expand_track_to_album(item, **opts)
             did = True
         # and finally use track if not expanded to album
         else:
             if not self.is_uri_already_seen(item.uri):
                 yield item
+                did = True
         # nice hack
         if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
+
+    def expand_track_to_album(self, track, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(track.uri + '#album'):
+            return
+        # set expand_track_to_album option False, so we dont hit again
+        opts.set(expand_track_to_album=False)
+        e = self.expander(self.spotify.album(track.album.id, market=self.market), **opts)
+        yield from e
 
     def add_artist_as_source(self, artist, **kwargs):
         opts = self.options.push(kwargs)
@@ -611,26 +612,38 @@ class PlaylistGenerator:
         if opts.expand_artist_to_related_artists:
             self.add_artist_related_artists_as_source(item, **opts)
             did = True
-
         # add as new source
         if opts.expand_artist_to_recommendations:
             self.add_artist_recommendations_as_source(item, **opts)
             did = True
-
-        # FIXME: if elif else? order?
+        # yield tracks
         if opts.expand_artist_to_albums:
-            yield from self.expander(
-                self.randomizer(self.artist_albums_generator(item.id), **opts),
-                **opts)
+            yield from self.expand_artist_to_albums(item, **opts)
             did = True
         elif opts.expand_artist_to_top_tracks:
-            yield from self.expander(
-                self.randomizer(self.artist_top_tracks_generator(item.id), **opts),
-                **opts)
+            yield from self.expand_artist_to_top_tracks(item, **opts)
             did = True
         # nice hack
         if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
+
+    def expand_artist_to_albums(self, artist, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(artist.uri + '#albums'):
+            return
+        e = self.expander(self.randomizer(
+                self.artist_albums_generator(artist.id),
+                **opts), **opts)
+        yield from e
+
+    def expand_artist_to_top_tracks(self, artist, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(artist.uri + '#top-tracks'):
+            return
+        e = self.expander(self.randomizer(
+                self.artist_top_tracks_generator(artist.id),
+                **opts), **opts)
+        yield from e
 
     def expander_album(self,
                        item: spotipy.model.album.full.FullAlbum,
@@ -640,13 +653,18 @@ class PlaylistGenerator:
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
             return
-        if opts.expand_album_to_tracks and not self.is_uri_already_seen(item.uri + '#tracks'):
-            opts.set(expand_track_to_album=False)
-            yield from self.expander(
-                self.album_tracks_generator(item.id),
-                **opts)
+        if opts.expand_album_to_tracks:
+            yield from self.expand_album_to_tracks(item, **opts)
         else:
             self.__log.warning('did not do anything with: %s', item.uri)
+
+    def expand_album_to_tracks(self, album, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(album.uri + '#tracks'):
+            return
+        opts.set(expand_track_to_album=False)
+        e = self.expander(self.album_tracks_generator(album.id), **opts)
+        yield from e
 
     def expander_playlist(self,
                           item: spotipy.model.playlist.Playlist,
@@ -657,11 +675,18 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(item.uri):
             return
         elif opts.expand_playlist_to_tracks:
-            yield from self.expander(
-                self.randomizer(self.playlist_all_tracks_generator(item.id), **opts),
-                **opts)
+            yield from self.expand_playlist_to_tracks(item, **opts)
         else:
             self.__log.warning('did not do anything with: %s', item.uri)
+
+    def expand_playlist_to_tracks(self, playlist, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(playlist.uri + '#tracks'):
+            return
+        e = self.expander(self.randomizer(
+                self.playlist_all_tracks_generator(playlist.id),
+                **opts), **opts)
+        yield from e
 
     # TODO: add uri model class
     # NOTE: not used by expander
