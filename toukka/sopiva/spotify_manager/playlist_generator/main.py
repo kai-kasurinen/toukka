@@ -425,7 +425,16 @@ class PlaylistGenerator:
     def related_artists_generator(self, artist_id):
         yield from self.spotify.artist_related_artists(artist_id)
 
-    def search_generator(self, query_type: str, query: str):
+    def search_generator(self,
+                         query_type: str,
+                         query: str
+                         ) -> Generator[
+                             Union[spotipy.model.track.FullTrack,
+                                   spotipy.model.album.SimpleAlbum,
+                                   spotipy.model.artist.FullArtist,
+                                   spotipy.model.playlist.SimplePlaylist],
+                             None, None]:
+
         search = self.spotify.search(query=query,
                                      types=[query_type],
                                      limit=50,
