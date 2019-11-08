@@ -245,6 +245,7 @@ class PlaylistGenerator:
         # track and track_relinked may be totally different
         # isrc can be different, album can be different ...
 
+        # TODO: to speed up things, use relinked track as track if id matches
         track = self.spotify.track(track_id, market=None)
         # NOTE: we need correct relinking information
         track_relinked = self.spotify.track(track_id, market=self.user_country)
@@ -529,7 +530,7 @@ class PlaylistGenerator:
         if opts.expand_track_to_album:
             yield from self.expand_track_to_album(item, **opts)
             did = True
-        # and finally use track if not expanded to album
+        # and finally use track if not seen
         if not self.is_uri_already_seen(item.uri):
             yield item
             did = True
