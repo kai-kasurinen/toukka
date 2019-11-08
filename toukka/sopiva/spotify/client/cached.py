@@ -12,7 +12,10 @@ from toukka.cache.dogpile import redis
 def check_from_token(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
-        if kwargs.get('market') == 'from_token':
+        # TODO: remove
+        if 'market' not in kwargs.keys():
+            raise Exception('market is not defined')
+        elif kwargs.get('market') == 'from_token':
             raise Exception('market is from_token')
         # artist_top_tracks
         elif kwargs.get('country') == 'from_token':
