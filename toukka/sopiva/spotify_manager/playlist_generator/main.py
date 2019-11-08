@@ -241,24 +241,26 @@ class PlaylistGenerator:
     def is_track_ok_to_add(self, track_id: str):
 
         # TODO: cleanup this mess and move to new class
-
         # track and track_relinked may be totally different
         # isrc can be different, album can be different ...
 
-        # TODO: to speed up things, use relinked track as track if id matches
-        track = self.spotify.track(track_id, market=None)
         # NOTE: we need correct relinking information
         track_relinked = self.spotify.track(track_id, market=self.user_country)
 
-        # just warning
-        if track.id != track_relinked.id:
-            self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
+        # NOTE: to speed up things, use relinked track as track if id matches
+        if track_relinked.id == track_id:
+            track = track_relinked
+            relinked = False
+        else:
+            self.__log.warning('track:%s: relinked to track:%s', track_id, track_relinked.id)
+            track = self.spotify.track(track_id, market=None)
+            relinked = True
 
         # and long list checks
         if track.id in self.track_ids_to_playlist:
             self.__log.debug('track:%s: already added', track.id)
             return False
-        elif track_relinked.id in self.track_ids_to_playlist:
+        elif relinked and track_relinked.id in self.track_ids_to_playlist:
             self.__log.debug('track:%s: already added (relinked)', track.id)
             return False
         # NOTE: check playable on relinked track
@@ -272,7 +274,8 @@ class PlaylistGenerator:
             self.__log.debug('track:%s: isrc already seen', track.id)
             return False
         elif (
-            not self.has_tracks_same_isrc(track, track_relinked)
+            relinked
+            and not self.has_tracks_same_isrc(track, track_relinked)
             and self.is_track_isrc_already_seen(track_relinked)
         ):
             self.__log.debug('track:%s: isrc already seen (relinked)', track.id)
@@ -280,13 +283,13 @@ class PlaylistGenerator:
         elif self.is_track_already_played(track):
             self.__log.debug('track:%s: already played', track.id)
             return False
-        elif self.is_track_already_played(track_relinked):
+        elif relinked and self.is_track_already_played(track_relinked):
             self.__log.debug('track:%s: already played (relinked)', track.id)
             return False
         elif self.is_track_isrc_already_played(track):
             self.__log.debug('track:%s: isrc already played', track.id)
             return False
-        elif self.is_track_isrc_already_played(track_relinked):
+        elif relinked and self.is_track_isrc_already_played(track_relinked):
             self.__log.debug('track:%s: isrc already played (relinked)', track.id)
             return False
         else:
