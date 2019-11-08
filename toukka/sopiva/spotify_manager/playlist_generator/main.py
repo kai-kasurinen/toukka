@@ -542,6 +542,9 @@ class PlaylistGenerator:
         else:
             if not self.is_uri_already_seen(item.uri):
                 yield item
+        # nice hack
+        if not did:
+            self.__log.warning('did not do anything with: %s', item.uri)
 
     def add_artist_as_source(self, artist, **kwargs):
         opts = self.options.push(kwargs)
@@ -554,7 +557,9 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(track.uri + '#recommendations'):
             return
-        e = self.expander(self.recommendations_generator(seed_track_ids=[track.id]), **opts)
+        e = self.expander(self.randomizer(
+                self.recommendations_generator(seed_track_ids=[track.id]),
+                **opts), **opts)
         self.sources.add(e)
 
     def add_track_artists_as_source(self, track, **kwargs):
@@ -565,6 +570,24 @@ class PlaylistGenerator:
         opts.set(expand_track_to_artists=False)
         for artist in track.artists:
             self.add_artist_as_source(artist, **opts)
+
+    def add_artist_related_artists_as_source(self, artist, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(artist.uri + '#related'):
+            return
+        e = self.expander(self.randomizer(
+                self.related_artists_generator(artist.id),
+                **opts), **opts)
+        self.sources.add(e)
+
+    def add_artist_recommendations_as_source(self, artist, **kwargs):
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(artist.uri + '#recommendations'):
+            return
+        e = self.expander(self.randomizer(
+                self.recommendations_generator(seed_artist_ids=[artist.id]),
+                **opts), **opts)
+        self.sources.add(e)
 
     # NOTE: simpletrack do not have album informations
     def expander_simple_track(self,
@@ -585,21 +608,13 @@ class PlaylistGenerator:
             return
 
         # add as new source
-        if (opts.expand_artist_to_related_artists and
-                not self.is_uri_already_seen(item.uri + '#related')):
-            self.sources.add(
-                self.expander(
-                    self.randomizer(self.related_artists_generator(item.id), **opts),
-                    **opts))
+        if opts.expand_artist_to_related_artists:
+            self.add_artist_related_artists_as_source(item, **opts)
             did = True
 
         # add as new source
-        if (opts.expand_artist_to_recommendations and
-                not self.is_uri_already_seen(item.uri + '#recommendations')):
-            self.sources.add(
-                self.expander(
-                    self.recommendations_generator(seed_artist_ids=[item.id]),
-                    **opts))
+        if opts.expand_artist_to_recommendations:
+            self.add_artist_recommendations_as_source(item, **opts)
             did = True
 
         # FIXME: if elif else? order?
