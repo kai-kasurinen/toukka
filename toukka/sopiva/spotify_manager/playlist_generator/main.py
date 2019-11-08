@@ -530,10 +530,9 @@ class PlaylistGenerator:
             yield from self.expand_track_to_album(item, **opts)
             did = True
         # and finally use track if not expanded to album
-        else:
-            if not self.is_uri_already_seen(item.uri):
-                yield item
-                did = True
+        if not self.is_uri_already_seen(item.uri):
+            yield item
+            did = True
         # nice hack
         if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
@@ -568,7 +567,7 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(track.uri + '#artists'):
             return
         # set expand_track_to_artists option to False, so we dont hit again
-        opts.set(expand_track_to_artists=False)
+        # opts.set(expand_track_to_artists=False)
         for artist in track.artists:
             self.add_artist_as_source(artist, **opts)
 
