@@ -8,6 +8,7 @@ import textwrap
 import autologging
 import more_itertools
 
+import spotipy
 import spotipy.convert
 import toukka.config
 
