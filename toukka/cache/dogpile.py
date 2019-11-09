@@ -23,16 +23,16 @@ def configure():
         'cache.memory.backend': 'dogpile.cache.memory_pickle',
         # local file
         'cache.local.backend': 'dogpile.cache.dbm',
-        'cache.local.arguments.filename': _cache_file,
         'cache.local.expiration_time': 60*60*24,
+        'cache.local.arguments.filename': _cache_file,
         # local redis
         'cache.redis.backend': 'dogpile.cache.redis',
-        'cache.redis.url': 'redis://',
         'cache.redis.expiration_time': 60*60*24,
+        'cache.redis.arguments.url': 'redis://?db=10',
         # NOTE: This should be larger than dogpile’s cache expiration.
-        'cache.redis.redis_expiration_time': 60*60*24,
+        'cache.redis.arguments.redis_expiration_time': 60*60*24,
         # NOTE: Use this when multiple processes will be talking to the same redis instance
-        'cache.redis.distributed_lock': True
+        'cache.redis.arguments.distributed_lock': True
     }
 
     null.configure_from_config(config, 'cache.null.')
