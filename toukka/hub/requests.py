@@ -6,6 +6,7 @@ import urllib3.util.retry
 import cachecontrol
 import cachecontrol.caches
 import redis
+import xdg.BaseDirectory
 
 
 def get_retry():
@@ -25,12 +26,22 @@ def get_session():
     return session
 
 
-def get_cached_session():
-    # TODO: add file_cache support
+def get_rediscache():
     redis_ = redis.Redis.from_url('redis://?db=15')
+    cache = cachecontrol.caches.RedisCache(redis_)
+    return cache
+
+
+def get_filecache():
+    path = xdg.BaseDirectory.save_cache_path('toukka', 'cachecontrol')
+    cache = cachecontrol.caches.FileCache(path)
+    return cache
+
+
+def get_cached_session():
     session = requests.Session()
     retry = get_retry()
-    cache = cachecontrol.caches.RedisCache(redis_)
+    cache = get_rediscache()
     adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retry)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
