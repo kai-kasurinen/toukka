@@ -292,8 +292,6 @@ class PlaylistGenerator:
         if seed_attributes is None:
             seed_attributes = {}
 
-        self.__log.debug(locals())
-
         # NOTE: market=None may return lot of unplayable tracks
         recommendations = self.spotify.recommendations(
             artist_ids=seed_artist_ids,
