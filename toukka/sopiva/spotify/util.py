@@ -14,7 +14,7 @@ import toukka.sopiva.spotify.state
 
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 
 def _read_from_config():
@@ -89,6 +89,7 @@ def get_spotify_with_client_credentials():
 
 
 def get_spotify():
+    logger.debug('get spotify')
     return get_spotify_with_user_credentials()
 
 

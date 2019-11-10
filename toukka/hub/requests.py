@@ -1,5 +1,6 @@
 #
 
+import logging
 import requests
 import requests.adapters
 import urllib3.util.retry
@@ -9,11 +10,16 @@ import redis
 import xdg.BaseDirectory
 
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
 def get_retry():
+    logging.getLogger('urllib3.util.retry').setLevel(logging.DEBUG)
     retry = urllib3.util.retry.Retry(
         total=3,
         backoff_factor=0.3,
-        status_forcelist=(429, 500, 502, 503))
+        status_forcelist=[413, 429, 500, 502, 503])
     return retry
 
 
