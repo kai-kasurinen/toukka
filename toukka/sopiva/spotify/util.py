@@ -14,7 +14,7 @@ import toukka.sopiva.spotify.state
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 
 def _read_from_config():
