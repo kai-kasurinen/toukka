@@ -12,4 +12,5 @@ from . import search
 from . import track
 from . import user
 from . import follow
+from . import shell
 
