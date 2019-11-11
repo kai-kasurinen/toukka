@@ -11,4 +11,5 @@ from . import playlist
 from . import search
 from . import track
 from . import user
+from . import follow
 
