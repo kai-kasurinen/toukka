@@ -13,7 +13,7 @@ from toukka.sopiva.spotify_manager.cli import cli_root
 def genres():
     genres = toukka.sopiva.spotify_manager.genres.genres()
     for genre in genres.values():
-        pprint.pprint(genre)
+        print(genre)
 
 
 @cli_root.command()
@@ -28,7 +28,7 @@ def genre(name: str):
     genre = genres.get(name)
     if genre is None:
         raise click.ClickException(f'genre "{name}" not found')
-    pprint.pprint(genre)
+    print(genre)
 
 
 @cli_root.command()
@@ -46,7 +46,7 @@ def genre_re(name_re: str):
 
     for g in genre_names_match:
         genre = genres.get(g)
-        pprint.pprint(genre)
+        print(genre)
 
 
 # END
