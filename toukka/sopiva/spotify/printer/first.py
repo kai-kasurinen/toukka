@@ -19,6 +19,7 @@ import spotipy.model.category
 import spotipy.model.recommendations
 import spotipy.model.currently_playing
 import spotipy.model.local
+import spotipy.model.play_history
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
@@ -223,6 +224,13 @@ def print_track_local(track: spotipy.model.local.LocalTrack):
     if flags:
         print(f'\tflags: {flags}')
 
+
+@printer.register
+def print_playhistory(playhistory: spotipy.model.play_history.PlayHistory):
+    print(f'played at: {playhistory.played_at}')
+    if playhistory.context:
+        print(f'context: {playhistory.context}')
+    printer(playhistory.track)
 
 # UTILS
 

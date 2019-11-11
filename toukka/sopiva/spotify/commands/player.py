@@ -102,4 +102,10 @@ def transfer_playback(device, force_play=True):
     return json_dump(toukka.sp.transfer_playback(device, force_play=force_play))
 
 
+@playback.command()
+def recently_played():
+    spotify = get_spotify()
+    paging = spotify.playback_recently_played()
+    for played in spotify.all_items_from_paging(paging):
+        printer(played)
 # END
