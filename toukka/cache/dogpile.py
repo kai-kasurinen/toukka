@@ -10,6 +10,7 @@ null = make_region()
 memory = make_region()
 local = make_region()
 redis = make_region()
+mongo = make_region()
 
 
 def configure():
@@ -32,13 +33,20 @@ def configure():
         # NOTE: This should be larger than dogpile’s cache expiration.
         'cache.redis.arguments.redis_expiration_time': 60*60*24,
         # NOTE: Use this when multiple processes will be talking to the same redis instance
-        'cache.redis.arguments.distributed_lock': True
+        'cache.redis.arguments.distributed_lock': True,
+        # mongo
+        'cache.mongo.backend': 'mongo',
+        'cache.mongo.expiration_time': 60*60*24,
+        'cache.mongo.arguments.db': False,
+        'cache.mongo.arguments.uri': 'localhost',
+        'cache.mongo.arguments.db_name': 'toukka',
     }
 
     null.configure_from_config(config, 'cache.null.')
     memory.configure_from_config(config, 'cache.memory.')
     local.configure_from_config(config, 'cache.local.')
     redis.configure_from_config(config, 'cache.redis.')
+    # mongo.configure_from_config(config, 'cache.mongo.')
 
 
 # FIXME: removes
