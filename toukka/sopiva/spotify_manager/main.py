@@ -12,7 +12,7 @@ import toukka.sopiva.spotify_manager.cli
 
 def main():
     toukka.logger.simple.init_logging()
-    click_log.basic_config()
+    #click_log.basic_config()
     toukka.sopiva.spotify_manager.cli.cli_root.main()
 
 

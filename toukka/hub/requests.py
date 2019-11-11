@@ -44,10 +44,15 @@ def get_filecache():
     return cache
 
 
-def get_cached_session():
+def get_cached_session(cache_type='redis'):
     session = requests.Session()
     retry = get_retry()
-    cache = get_rediscache()
+    if cache_type == 'redis':
+        cache = get_rediscache()
+    elif cache_type == 'file':
+        cache = get_filecache()
+    else:
+        raise Exception(f'not supported cache_type: {cache_type}')
     adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retry)
     session.mount('http://', adapter)
     session.mount('https://', adapter)

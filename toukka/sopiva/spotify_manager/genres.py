@@ -38,6 +38,7 @@ class Genre:
     playlists: Optional[GenrePlaylists] = None
 
 
+# TODO: make somehow frozen
 class Genres(dict):
     pass
 
@@ -53,18 +54,19 @@ def genres_make():
     particle_detector_2018_id = 'particledetector2018'
     particle_detector_2019_id = 'particledetector2019'
 
+    # TODO: move to Spotify
     @toukka.cache.dogpile.local.cache_on_arguments()
     def playlists_cached(user_id: str):
         paging = spotify.playlists(user_id, limit=50)
         logger.debug('playlists total: %i', paging.total)
-        playlists = list(spotify.items_from_paging(paging))
+        playlists = list(spotify.all_items_from_paging(paging))
         return playlists
 
     @toukka.cache.dogpile.local.cache_on_arguments()
     def playlist_cached(playlist_id: str):
         return spotify.playlist(playlist_id, market=None)
 
-    @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
+    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_sound_of_spotify():
         user_id = sound_of_spotify_id
         logger.info('processing user: %s', user_id)
@@ -104,7 +106,7 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return sounds, places
 
-    @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
+    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_particle_detector():
         user_id = particle_detector_id
         logger.info('processing user: %s', user_id)
@@ -137,7 +139,7 @@ def genres_make():
 
         return intros, pulses, edges
 
-    @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
+    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_particle_filter():
         user_id = particle_filter_id
         logger.info('processing user: %s', user_id)
@@ -156,52 +158,32 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return females
 
-    # TODO: make generic for years
-    @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
-    def process_particle_detector_2018():
-        user_id = particle_detector_2018_id
-        logger.info('processing user: %s', user_id)
+    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
+    def process_particle_detector_year(user_id: str, year: int):
+        logger.info('processing user: %s, year: %i', user_id, year)
         playlists = playlists_cached(user_id)
         logger.info('%s playlists count: %i', user_id, len(playlists))
-        year_2018 = dict()
+        ret = dict()
         for playlist in playlists:
             if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
                 continue
-            if playlist.name.startswith('2018 in'):
-                thing = playlist.name.split('2018 in ')[1]
+            if playlist.name.startswith('%i in' % year):
+                thing = playlist.name.split('%i in ' % year)[1]
                 genre_name = thing.lower()
-                year_2018[genre_name] = playlist.uri
+                ret[genre_name] = playlist.uri
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
-        return year_2018
+        return ret
 
-    @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
-    def process_particle_detector_2019():
-        user_id = particle_detector_2019_id
-        logger.info('processing user: %s', user_id)
-        playlists = playlists_cached(user_id)
-        logger.info('%s playlists count: %i', user_id, len(playlists))
-        year_2019 = dict()
-        for playlist in playlists:
-            if playlist.owner.id != user_id:
-                logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
-                continue
-            if playlist.name.startswith('2019 in'):
-                thing = playlist.name.split('2019 in ')[1]
-                genre_name = thing.lower()
-                year_2019[genre_name] = playlist.uri
-            else:
-                logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
-        return year_2019
-
+    #
     logger.info('generating genres, this may take some time')
 
     sounds, places = process_sound_of_spotify()
     intros, pulses, edges = process_particle_detector()
     females = process_particle_filter()
-    year_2018 = process_particle_detector_2018()
-    year_2019 = process_particle_detector_2019()
+    year_2018 = process_particle_detector_year(particle_detector_2018_id, 2018)
+    year_2019 = process_particle_detector_year(particle_detector_2019_id, 2019)
     genres = dict()
 
     for genre_name in sounds.keys():
@@ -225,7 +207,6 @@ def genres_make():
 
     # TODO: do something with places
     logger.info('places total: %i', len(places))
-
     logger.info('genres total: %i', len(genres))
     return genres
 
