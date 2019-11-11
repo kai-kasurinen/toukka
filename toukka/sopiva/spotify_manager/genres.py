@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 
 
+"""
 @dataclass(frozen=True)
 class GenrePlaylists:
     intro: Optional[str] = None
@@ -30,6 +31,11 @@ class GenrePlaylists:
     female: Optional[str] = None
     year_2018: Optional[str] = None
     year_2019: Optional[str] = None
+"""
+
+
+class GenrePlaylists(dict):
+    pass
 
 
 @dataclass(frozen=True)

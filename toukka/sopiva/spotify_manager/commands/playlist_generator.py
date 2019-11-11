@@ -4,11 +4,10 @@
 from typing import Dict, Union
 
 import logging
-import pprint
-import dataclasses
 import re
 
 import click
+import click_params
 import spotipy.convert
 import spotipy.client.browse.validate
 
@@ -99,10 +98,17 @@ def from_recommendations(generator,
 @generate_playlist.command()
 @click.argument('genre_name', required=True, nargs=-1,
                 autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
+@click.option('--playlists', type=click_params.StringListParamType())
 @pass_generator
 def from_genres(generator,
                 genre_name: tuple,
+                playlists: list = None,
                 **kwargs):
+
+    # TODO: get all keys from somewhere
+    if playlists is None:
+        # playlists = ['intro', 'sound', 'pulse', 'edge', 'female', 'year_2018', 'year_2019']
+        playlists = ['intro', 'sound', 'female', 'year_2018', 'year_2019', 'pulse', 'edge']
     genres = toukka.sopiva.spotify_manager.genres.genres()
     uris_all = list()
     for name in genre_name:
@@ -110,14 +116,19 @@ def from_genres(generator,
         if genre is None:
             raise click.ClickException(f'genre "{name}" not found')
         logger.debug(genre)
-        playlists = dataclasses.asdict(genre.playlists)
-        uris = [uri for uri in playlists.values() if uri is not None]
+        uris = []
+        try:
+            uris = [genre.playlists[k] for k in playlists]
+        except KeyError as e:
+            raise click.ClickException(f'unknown playlist name: {e}')
+        uris = list(filter(None, uris))
         uris_all.extend(uris)
     generator.generate_from_uris(uris=uris_all, **kwargs)
 
 
 @generate_playlist.command()
 @click.argument('genre_name_re', required=True)
+@click.option('--playlists', type=click_params.StringListParamType())
 def from_genres_re(genre_name_re: str,
                    **kwargs):
     regex = re.compile(genre_name_re)
