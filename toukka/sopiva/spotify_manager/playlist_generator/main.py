@@ -95,8 +95,9 @@ class PlaylistGenerator:
 
         # FIXME: move?
         progress_bars = ProgressBars(enabled=opts.progress_bar)
-        progress_looper = progress_bars.progress_bar_for_loops(opts.looper_max_tries)
+        # NOTE: order means something
         progress_tracks = progress_bars.progress_bar_for_tracks(opts.looper_target_count)
+        progress_looper = progress_bars.progress_bar_for_loops(opts.looper_max_tries)
 
         # TODO: rename track to item
         for counter, track in enumerate(self.sources.generator()):
