@@ -35,7 +35,7 @@ __program_description__ = 'some personal shortcuts'
 ##
 
 kwargs_for_playlist = {
-    'looper_progress_bar': True,
+    'progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': False,
@@ -45,7 +45,7 @@ kwargs_for_playlist = {
 }
 
 kwargs_for_uri = {
-    'looper_progress_bar': True,
+    'progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,
@@ -56,7 +56,7 @@ kwargs_for_uri = {
 }
 
 kwargs_for_uri_second = {
-    'looper_progress_bar': True,
+    'progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,
@@ -67,7 +67,7 @@ kwargs_for_uri_second = {
 }
 
 kwargs_for_uri_third = {
-    'looper_progress_bar': True,
+    'progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,

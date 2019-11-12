@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 @cli_root.group()
 @click.option('--dry-run', is_flag=True, default=False)
+@click.option('--progress-bar/--no-progress-bar', default=False)
 @click.option('--randomize', is_flag=True, default=False)
 @click.option('--expand-track-to-album', is_flag=True)
 @click.option('--expand-track-to-artists', is_flag=True)
@@ -36,7 +37,6 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-playlist-to-tracks', is_flag=True)
 @click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=5000)
-@click.option('--looper-progress-bar', is_flag=True)
 @click.pass_context
 def generate_playlist(ctx, **kwargs):
     # FIXME: subcommand --help calls this

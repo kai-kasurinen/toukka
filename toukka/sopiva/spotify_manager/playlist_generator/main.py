@@ -27,7 +27,7 @@ from .playlist import Playlist
 from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter
 from .util import scramble_generator
-
+from .progress_bar import ProgressBars
 
 # @autologging.traced
 @autologging.logged
@@ -42,10 +42,10 @@ class PlaylistGenerator:
         # TODO: move
         options = Options(
             dry_run=False,
+            progress_bar=False,
             randomize=False,
             looper_target_count=500,
             looper_max_tries=5000,
-            looper_progress_bar=False,
             expand_track_to_album=False,
             expand_track_to_artists=False,
             expand_track_to_recommendations=False,
@@ -78,42 +78,25 @@ class PlaylistGenerator:
             user_country=self.user_country)
 
         # FIXME: remove
-        self.progress_looper = None
-        self.progress_tracks = None
-
-        # FIXME: remove
         self.__log.setLevel(logging.DEBUG)
         self.__log.debug('initialized %s', self)
-        self.__log.debug('self options %s', self.options)
+        self.__log.debug('options %s', self.options)
 
     def generate(self, **kwargs):
         opts = self.options.push(kwargs)
-        # FIXME: grr
-        if opts.looper_progress_bar:
-            self.start_looper_progress_bar()
         self.looper(**opts)
         self.commit(**opts)
-        # FIXME: grr
-        if opts.looper_progress_bar:
-            self.stop_looper_progress_bar()
-
-    # FIXME: move to own class
-    def start_looper_progress_bar(self):
-        self.enlighten_manager = enlighten.get_manager()
-        self.progress_tracks = self.enlighten_manager.counter(
-            desc='Tracks', unit='tracks',
-            total=self.options.looper_target_count,
-            color='green')
-        self.progress_looper = self.enlighten_manager.counter(
-            desc='Loops', unit='tracks',
-            total=self.options.looper_max_tries,
-            color='blue')
 
     def stop_looper_progress_bar(self):
         self.enlighten_manager.stop()
 
     def looper(self, **kwargs):
         opts = self.options.push(kwargs)
+
+        # FIXME: move?
+        progress_bars = ProgressBars(enabled=opts.progress_bar)
+        progress_looper = progress_bars.progress_bar_for_loops(opts.looper_max_tries)
+        progress_tracks = progress_bars.progress_bar_for_tracks(opts.looper_target_count)
 
         # TODO: rename track to item
         for counter, track in enumerate(self.sources.generator()):
@@ -124,9 +107,7 @@ class PlaylistGenerator:
                 len(self.track_ids_to_playlist),
                 len(self.sources))
 
-            # FIXME: just test
-            if self.progress_looper is not None:
-                self.progress_looper.update()
+            progress_looper.update()
 
             # actually we do not care as long track.id is usable
             if not isinstance(track, spotipy.model.track.Track):
@@ -141,8 +122,7 @@ class PlaylistGenerator:
             if self.track_filter.is_track_ok_to_add(track.id):
                 self.track_ids_to_playlist.append(track.id)
                 self.__log.debug('track:%s: added', track.id)
-                if self.progress_tracks is not None:
-                    self.progress_tracks.update()
+                progress_tracks.update()
 
             if len(self.track_ids_to_playlist) >= opts.looper_target_count:
                 self.__log.info('we have enough tracks to add (target count)')
@@ -158,6 +138,8 @@ class PlaylistGenerator:
             if counter >= opts.looper_max_tries:
                 self.__log.info('we have tried too many tracks')
                 break
+
+        progress_bars.stop()
 
         self.__log.info(f'{len(self.track_ids_to_playlist)} tracks to add')
 
@@ -182,6 +164,7 @@ class PlaylistGenerator:
                            **kwargs):
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
+
         if opts.randomize:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
@@ -196,6 +179,7 @@ class PlaylistGenerator:
                              **kwargs):
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
+
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(s, **opts)
         self.sources.add(e)
