@@ -16,10 +16,19 @@ logger.setLevel(logging.DEBUG)
 
 def get_retry():
     logging.getLogger('urllib3.util.retry').setLevel(logging.DEBUG)
+    #
+    # RETRY_AFTER_STATUS_CODES = frozenset([413, 429, 503]
+    # By default, we only retry on methods which are considered to be idempotent
+    # (multiple requests with the same parameters end with the same state)
+    # DEFAULT_METHOD_WHITELIST = frozenset(['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'])
+    #
+    #
     retry = urllib3.util.retry.Retry(
         total=3,
         backoff_factor=0.3,
-        status_forcelist=[413, 429, 500, 502, 503])
+        status_forcelist=[500, 502],
+        # added 'POST'
+        method_whitelist=['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'POST'])
     return retry
 
 

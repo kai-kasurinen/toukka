@@ -87,7 +87,7 @@ def devices():
 
 @playback.command()
 def current_playback(market=None):
-    printer(get_spotify().playback())
+    printer(get_spotify().playback(**locals()))
 
 
 @playback.command()
