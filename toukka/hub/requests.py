@@ -23,12 +23,12 @@ def get_retry():
     # DEFAULT_METHOD_WHITELIST = frozenset(['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'])
     #
     #
+    default_method_whitelist = list(urllib3.util.retry.Retry.DEFAULT_METHOD_WHITELIST)
     retry = urllib3.util.retry.Retry(
         total=3,
         backoff_factor=0.3,
         status_forcelist=[500, 502],
-        # added 'POST'
-        method_whitelist=['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'POST'])
+        method_whitelist=default_method_whitelist+['POST'])
     return retry
 
 
