@@ -4,6 +4,8 @@
 
 import click
 
+from typing import Union
+
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.cli import cli_root
@@ -16,75 +18,60 @@ from toukka.sopiva.spotify.cli import cli_root
 def playback():
     pass
 
-@playback.command()
-def play(uri=None, offset=None, uris=None, device=None):
-    ''' Start or resume user's playback.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.start_playback(context_uri=uri,
-                                              uris=uris,
-                                              offset=offset,
-                                              device_id=device))
-
 
 @playback.command()
-def pause(device_id=None):
-    ''' Pause user's playback.'''
+def start(context_uri: str = None,
+          track_ids: list = None,
+          offset: Union[int, str] = None,
+          position_ms: int = None,
+          device_id: str = None
+          ):
     return get_spotify().playback_pause(device_id=device_id)
 
 
 @playback.command()
-def next_track(device=None):
-    ''' Skip user's playback to next track.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.next_track(device_id=device))
+def pause(device_id=None):
+    return get_spotify().playback_pause(device_id=device_id)
 
 
 @playback.command()
-def previous_track(device=None):
-    ''' Skip user's playback to previous track.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.previous_track(device_id=device))
+def next(device_id=None):
+    return get_spotify().playback_next(device_id=device_id)
 
 
 @playback.command()
-def seek(position: 'position in milliseconds to seek to', device=None):
-    ''' Seek to position in current track.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.seek_track(position, device_id=device))
+def previous(device_id=None):
+    return get_spotify().playback_next(device_id=device_id)
 
 
 @playback.command()
-def repeat(state: '`track`, `context`, or `off`', device=None):
-    ''' Set repeat mode for playback.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.repeat(state, device_id=device))
+def seek(position_ms: int, device_id=None):
+    return get_spotify().playback_seek(position_ms, device_id=device_id)
 
 
 @playback.command()
-def volume(percent: 'volume between 0 and 100', device=None):
-    ''' Set playback volume.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.volume(int(percent), device_id=device))
+def repeat(state: str, device_id=None):
+    return get_spotify().playback_repeat(state, device_id=device_id)
 
 
 @playback.command()
-def shuffle(state, device=None):
-    ''' Toggle playback shuffling.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.shuffle(state, device_id=device))
+def volume(percent: int, device_id=None):
+    return get_spotify().playback_volume(percent, device_id=device_id)
+
+
+@playback.command()
+def shuffle(state: bool, device_id=None):
+    return get_spotify().playback_shuffle(state, device_id=device_id)
 
 
 @playback.command()
 def devices():
-    ''' Get a list of user's available devices.'''
-    return get_spotify().playback_devices()
+    printer(get_spotify().playback_devices())
 
 
 @playback.command()
 def current_playback(market=None):
-    ''' Get information about user's current playback.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.current_playback(market))
+    printer(get_spotify().playback())
 
 
 @playback.command()
@@ -96,10 +83,8 @@ def currently_playing(market=None):
 
 
 @playback.command()
-def transfer_playback(device, force_play=True):
-    ''' Transfer playback to another device.'''
-    toukka = Toukka()
-    return json_dump(toukka.sp.transfer_playback(device, force_play=force_play))
+def transfer_playback(device_id, force_play: bool = False):
+    return get_spotify().playback_transfer(device_id, force_play=force_play)
 
 
 @playback.command()

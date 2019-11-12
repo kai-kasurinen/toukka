@@ -38,10 +38,10 @@ def print_item(item: spotipy.model.base.Item):
 @printer.register
 def print_track(track: spotipy.model.track.Track,
                 use_play_count=True):
-    print(f'track: {track.name} ({track.uri})', end=None)
+    print(f'track: {track.name} ({track.uri})', end='')
 
     if hasattr(track, 'popularity'):
-        print(f'(popularity: {track.popularity})')
+        print(f' (popularity: {track.popularity})')
     else:
         print()
 
@@ -210,20 +210,32 @@ def print_recommendationseed(seed: spotipy.model.recommendations.RecommendationS
     print(f'recommendation seed: {seed}')
 
 
+# TODO: combine cpt and cpc
 @printer.register
 def print_currently_playing_track(cpt: spotipy.model.currently_playing.CurrentlyPlayingTrack):
-    print(f'currently playing: {cpt.is_playing}')
+    print(f'currently playing: playing {cpt.is_playing}')
     cpt_timestamp = datetime.datetime.fromtimestamp(cpt.timestamp/1000.0)
     print('\ttimestamp: %s (%s)' % (
             humanize.naturaldate(cpt_timestamp),
             humanize.naturaltime(datetime.datetime.now() - cpt_timestamp)))
     print('\tprogress: %s' % datetime.timedelta(milliseconds=cpt.progress_ms))
-    print(f'\tcontext: {cpt.context.type} ({cpt.context.uri})')
+    print(f'\tcontext: {cpt.context.type.name} ({cpt.context.uri})')
     print(f'\ttype: {cpt.currently_playing_type}')
     disallows = _get_flags(cpt.actions.disallows.asdict(), cpt.actions.disallows.asdict().keys())
     print(f'\tactions disallows: {disallows}')
     print()
     printer(cpt.item)
+
+
+@printer.register
+def print_currently_playing_context(cpc: spotipy.model.currently_playing.CurrentlyPlayingContext):
+    print(f'currently playing context: playing {cpc.is_playing}')
+    print(f'\tdevice: {cpc.device}')
+    print(f'\tstate: repeat: {cpc.repeat_state}, shuffle: {cpc.shuffle_state}')
+    print(f'\tcontext: {cpc.context.type.name} ({cpc.context.uri})')
+    print(f'\ttype: {cpc.currently_playing_type.name}')
+    print()
+    printer(cpc.item)
 
 
 @printer.register
