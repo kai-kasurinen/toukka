@@ -32,22 +32,28 @@ def printer(arg):
 
 @printer.register
 def print_item(item: spotipy.model.base.Item):
-    print(f'{item.type}, {item.id}, {item.uri}')
+    print(f'{type(item)}, {item.type}, {item.id}, {item.uri}')
 
 
 @printer.register
-def print_track(track: spotipy.model.FullTrack,
+def print_track(track: spotipy.model.track.Track,
                 use_play_count=True):
-    print(f'track: {track.name} ({track.uri})',
-          f'(popularity: {track.popularity})')
+    print(f'track: {track.name} ({track.uri})', end=None)
 
-    print(f'\talbum: {track.album.name} ({track.album.uri})')
+    if hasattr(track, 'popularity'):
+        print(f'(popularity: {track.popularity})')
+    else:
+        print()
+
+    if hasattr(track, 'album'):
+        print(f'\talbum: {track.album.name} ({track.album.uri})')
+
     print(f'\tartists: {_artists_to_string(track.artists)}')
     print(f'\tduration: {datetime.timedelta(milliseconds=track.duration_ms)}')
     print(f'\ttrack number: {track.track_number},',
           f'disc number: {track.disc_number}')
 
-    if track.external_ids:
+    if hasattr(track, 'external_ids') and track.external_ids:
         print(f'\texternal ids: {track.external_ids}')
     if track.external_urls:
         print(f'\texternal urls: {track.external_urls}')
@@ -62,12 +68,22 @@ def print_track(track: spotipy.model.FullTrack,
     if flags:
         print(f'\tflags: {flags}')
 
+    # FIXME: move
     if use_play_count:
-        spotify_history = get_spotify_history()
-        played_count_track = spotify_history.count_by_track_id(track.uri)
+        _print_track_played_count(track)
+
+
+def _print_track_played_count(track):
+    spotify_history = get_spotify_history()
+    played_count_track = spotify_history.count_by_track_id(track.uri)
+
+    played_count_isrc = None
+    if hasattr(track, 'external_ids'):
         isrc = track.external_ids.get('isrc')
-        played_count_isrc = spotify_history.count_by_track_isrc(isrc)
-        print(f'\tplayed: {played_count_track} track, {played_count_isrc} isrc')
+        if isrc:
+            played_count_isrc = spotify_history.count_by_track_isrc(isrc)
+
+    print(f'\tplayed: {played_count_track} track, {played_count_isrc} isrc')
 
 
 @printer.register
@@ -86,6 +102,7 @@ def print_track_audio_features(features: spotipy.model.AudioFeatures):
           f'loudness: {features.loudness:f}')
 
 
+# FIXME: compine album_simple and album_full
 @printer.register
 def print_album_simple(album: spotipy.model.album.SimpleAlbum):
     # NOTE: popularity is only on FullAlbum
@@ -131,6 +148,7 @@ def print_album_full(album: spotipy.model.FullAlbum):
         print('\tflags: %s' % flags)
 
 
+# FIXME: use Artist
 @printer.register
 def print_artist(artist: spotipy.model.FullArtist,
                  use_play_count=True):
@@ -143,9 +161,14 @@ def print_artist(artist: spotipy.model.FullArtist,
     if artist.external_urls:
         print('\texternal urls: {artist.external_urls}'.format(artist=artist))
 
+    # FIXME: move
     if use_play_count:
-        spotify_history = get_spotify_history()
-        print('\tplayed: %s' % spotify_history.count_by_artist_name(artist.name))
+        _print_artist_played_count(artist)
+
+
+def _print_artist_played_count(artist):
+    spotify_history = get_spotify_history()
+    print('\tplayed: %s' % spotify_history.count_by_artist_name(artist.name))
 
 
 @printer.register
@@ -233,6 +256,7 @@ def print_playhistory(playhistory: spotipy.model.play_history.PlayHistory):
     printer(playhistory.track)
 
 # UTILS
+
 
 def _artists_to_string(artists):
     return ", ".join("%s (%s)" % (artist.name, artist.uri) for artist in artists)

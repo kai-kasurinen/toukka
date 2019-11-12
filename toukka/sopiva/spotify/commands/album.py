@@ -11,16 +11,17 @@ from toukka.sopiva.spotify.cli import cli_root
 @cli_root.command()
 @click.argument('uri')
 @click.option('--market')
+@click.option('--tracks', is_flag=True)
 def album(uri,
-          market='from_token'):
+          market: str = None,
+          tracks: bool = False
+          ):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
-    album = spotify.album(uri_id)
+    album = spotify.album(uri_id, market=None)
     printer(album)
-
-#
-
-
-COMMANDS = [album]
+    if tracks:
+        for track in spotify.all_items_from_paging(album.tracks):
+            printer(track)
 
 # END
