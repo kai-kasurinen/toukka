@@ -289,6 +289,9 @@ def print_episode(episode: Episode):
     if flags:
         print(f'\tflags: {flags}')
 
+    # FIXME: move
+    _print_track_played_count(episode)
+
     if episode.show:
         print()
         printer(episode.show)
