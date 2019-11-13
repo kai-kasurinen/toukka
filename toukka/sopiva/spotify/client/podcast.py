@@ -57,6 +57,7 @@ class Episode(Item):
     def __post_init__(self):
         if self.show is not None:
             self.show = Show(**self.show)
+        self.release_date_precision = ReleaseDatePrecision[self.release_date_precision]
 
 
 class SpotifyPodcast(SpotifyBase):

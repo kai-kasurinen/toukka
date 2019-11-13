@@ -23,6 +23,7 @@ import spotipy.model.play_history
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
+from toukka.sopiva.spotify.client.podcast import Episode, Show
 
 
 @functools.singledispatch
@@ -270,6 +271,39 @@ def print_playhistory(playhistory: spotipy.model.play_history.PlayHistory):
     if playhistory.context:
         print(f'context: {playhistory.context}')
     printer(playhistory.track)
+
+
+@printer.register
+def print_episode(episode: Episode):
+    print(f'episode: {episode.name} ({episode.uri})')
+    print(f'\treleased: {episode.release_date} {episode.release_date_precision.name}')
+    print(f'\tdesc: {episode.description}')
+    print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
+    print(f'\tlanguages: {episode.languages}')
+
+
+    if episode.external_urls:
+        print(f'\texternal urls: {episode.external_urls}')
+
+    flags = _get_flags(episode.asdict(), ['explicit', 'is_playable', 'is_externally_hosted'])
+    if flags:
+        print(f'\tflags: {flags}')
+
+    if episode.show:
+        print()
+        printer(episode.show)
+
+
+@printer.register
+def print_show(show: Show):
+    print(f'show: {show.name} ({show.uri}) ({show.media_type})')
+    print(f'\tdesc: {show.description}')
+    print(f'\tpublisher: {show.publisher}')
+    print(f'\tlanguages: {show.languages}')
+
+    if show.available_markets:
+        print(f'\tmarkets: {len(show.available_markets)}')
+
 
 # UTILS
 

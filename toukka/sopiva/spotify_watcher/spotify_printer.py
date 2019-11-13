@@ -16,6 +16,11 @@ class SpotifyPrinter:
         self.market = self.spotify.current_user().country
 
     def print_all_from_track_uri(self, track_uri):
+        # FIXME: remove when from_uri supports episodes
+        if 'spotify:episode:' in track_uri:
+            self.print_episode(track_uri)
+            return
+
         uri_type, uri_id = spotipy.convert.from_uri(track_uri)
         track_id = uri_id
         self.print_all_from_track_id(track_id)
@@ -49,6 +54,13 @@ class SpotifyPrinter:
         self.check_and_print_relink(track_id)
         print()
         printer(self.spotify.track_audio_features(track_id))
+        print(''.ljust(80, '='))
+
+    def print_episode(self, uri):
+        spotify, type_, id_ = uri.split(':')
+        episode = self.spotify.episode(id_, market=None)
+        print(''.ljust(80, '='))
+        printer(episode)
         print(''.ljust(80, '='))
 
 

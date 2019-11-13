@@ -40,6 +40,10 @@ class SpotifyWatcher(PlayerCtlManager):
             GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
             self.last_seen = track_id
             return
+        elif 'spotify:episode:' in track_id:
+            GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
+            self.last_seen = track_id
+            return
         else:
             logger.debug('unsupported track id: %s', track_id)
             return
