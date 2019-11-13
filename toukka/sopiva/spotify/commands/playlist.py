@@ -28,7 +28,7 @@ def current_user_playlists():
     '''get current user playlists'''
 
     spotify = get_spotify()
-    paging = spotify.current_user_playlists()
+    paging = spotify.current_user_playlists(limit=50)
     print(f'user has {paging.total} playlists')
 
     for playlist in spotify.all_items_from_paging(paging):
@@ -42,7 +42,7 @@ def user_playlists_info(user):
     '''gets playlists of a user'''
 
     spotify = get_spotify()
-    paging = spotify.playlists(user)
+    paging = spotify.playlists(user, limit=50)
     print(f'user has {paging.total} playlists')
     playlists = spotify.all_items_from_paging(paging)
 
@@ -59,7 +59,7 @@ def user_playlists_info(user):
 @click.argument('user')
 def user_playlists(user):
     spotify = get_spotify()
-    paging = spotify.playlists(user)
+    paging = spotify.playlists(user, limit=50)
     print(f'user has {paging.total} playlists')
     for playlist in spotify.all_items_from_paging(paging):
         printer(playlist)
