@@ -33,6 +33,8 @@ class Show(Item):
     episodes: EpisodePaging = None
 
     def __post_init__(self):
+        self.copyrights = [Copyright(**c) for c in self.copyrights]
+        self.images = [Image(**i) for i in self.images]
         if self.episodes is not None:
             self.episodes = EpisodePaging(**self.episodes)
 
