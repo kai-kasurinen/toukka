@@ -3,10 +3,10 @@
 
 from .extented import SpotifyExtended
 from .cached import SpotifyCached
-from .episode import SpotifyEpisode
+from .podcast import SpotifyPodcast
 
 
-class Spotify(SpotifyExtended, SpotifyEpisode, SpotifyCached):
+class Spotify(SpotifyExtended, SpotifyPodcast, SpotifyCached):
     pass
 
 

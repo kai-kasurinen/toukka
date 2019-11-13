@@ -219,12 +219,14 @@ def print_currently_playing_track(cpt: spotipy.model.currently_playing.Currently
             humanize.naturaldate(cpt_timestamp),
             humanize.naturaltime(datetime.datetime.now() - cpt_timestamp)))
     print('\tprogress: %s' % datetime.timedelta(milliseconds=cpt.progress_ms))
-    print(f'\tcontext: {cpt.context.type.name} ({cpt.context.uri})')
+    if cpt.context:
+        print(f'\tcontext: {cpt.context.type.name} ({cpt.context.uri})')
     print(f'\ttype: {cpt.currently_playing_type}')
     disallows = _get_flags(cpt.actions.disallows.asdict(), cpt.actions.disallows.asdict().keys())
     print(f'\tactions disallows: {disallows}')
     print()
-    printer(cpt.item)
+    if cpt.item:
+        printer(cpt.item)
 
 
 @printer.register
@@ -232,10 +234,12 @@ def print_currently_playing_context(cpc: spotipy.model.currently_playing.Current
     print(f'currently playing context: playing {cpc.is_playing}')
     print(f'\tdevice: {cpc.device}')
     print(f'\tstate: repeat: {cpc.repeat_state}, shuffle: {cpc.shuffle_state}')
-    print(f'\tcontext: {cpc.context.type.name} ({cpc.context.uri})')
+    if cpc.context:
+        print(f'\tcontext: {cpc.context.type.name} ({cpc.context.uri})')
     print(f'\ttype: {cpc.currently_playing_type.name}')
     print()
-    printer(cpc.item)
+    if cpc.item:
+        printer(cpc.item)
 
 
 @printer.register
