@@ -6,19 +6,16 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.cli import cli_root
 
+# TODO: support multiple types
+
 
 @cli_root.command()
 @click.argument('type', type=click.Choice(['artist', 'album', 'track', 'playlist']))
 @click.argument('query')
+@click.option('--limit', type=int)
 def search(type: str,
            query: str,
            limit: int = None):
-
-    # FIXME: remove
-    # NOTE: cos default is None, argh (or some else) set it as str
-    if limit is not None:
-        limit = int(limit)
-
     spotify = get_spotify()
     search = spotify.search(query=query,
                             types=[type],
