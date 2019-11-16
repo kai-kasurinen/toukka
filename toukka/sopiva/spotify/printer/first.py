@@ -20,10 +20,10 @@ import spotipy.model.recommendations
 import spotipy.model.currently_playing
 import spotipy.model.local
 import spotipy.model.play_history
+import spotipy.model.podcast
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
-from toukka.sopiva.spotify.client.podcast import Episode, Show
 
 
 @functools.singledispatch
@@ -274,7 +274,7 @@ def print_playhistory(playhistory: spotipy.model.play_history.PlayHistory):
 
 
 @printer.register
-def print_episode(episode: Episode):
+def print_episode(episode: spotipy.model.podcast.Episode):
     print(f'episode: {episode.name} ({episode.uri})')
     print(f'\treleased: {episode.release_date} {episode.release_date_precision.name}')
     print(f'\tdesc: {episode.description}')
@@ -298,7 +298,7 @@ def print_episode(episode: Episode):
 
 
 @printer.register
-def print_show(show: Show):
+def print_show(show: spotipy.model.podcast.Show):
     print(f'show: {show.name} ({show.uri}) ({show.media_type})')
     print(f'\tdesc: {show.description}')
     print(f'\tpublisher: {show.publisher}')

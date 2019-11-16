@@ -10,7 +10,7 @@ from toukka.sopiva.spotify.cli import cli_root
 
 
 @cli_root.command()
-@click.argument('type', type=click.Choice(['artist', 'album', 'track', 'playlist']))
+@click.argument('type', type=click.Choice(['artist', 'album', 'track', 'playlist', 'show', 'episode']))
 @click.argument('query')
 @click.option('--limit', type=int)
 def search(type: str,
