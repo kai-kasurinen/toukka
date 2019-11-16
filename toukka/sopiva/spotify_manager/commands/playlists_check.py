@@ -25,10 +25,12 @@ def playlists_check():
     for playlist in playlists:
         logger.info(playlist.name)
         paging = spotify.playlist_tracks(playlist.id)
-        tracks = list(spotify.all_items_from_paging(paging))
+        ptracks = list(spotify.all_items_from_paging(paging))
 
-        if paging.total != len(tracks):
-            logger.warning('paging total %s and len(tracks) %s', paging.total, len(tracks))
+        for ptrack in ptracks:
+            if ptrack.track is None:
+                printer(ptrack)
+                logger.warning('track is None')
 
 
 @cli_root.command()
@@ -42,10 +44,13 @@ def playlist_check(uri):
     paging = playlist.tracks
 
     logger.info(playlist.name)
-    tracks = list(spotify.all_items_from_paging(paging))
+    ptracks = spotify.all_items_from_paging(paging)
 
-    if paging.total != len(tracks):
-        logger.warning('paging total %s and len(tracks) %s', paging.total, len(tracks))
+    for ptrack in ptracks:
+        if ptrack.track is None:
+            printer(ptrack)
+            logger.warning('track is None')
+
 
 
 # END
