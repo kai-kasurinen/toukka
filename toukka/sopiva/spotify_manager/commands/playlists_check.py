@@ -31,5 +31,21 @@ def playlists_check():
             logger.warning('paging total %s and len(tracks) %s', paging.total, len(tracks))
 
 
+@cli_root.command()
+@click.argument('uri')
+def playlist_check(uri):
+
+    uri_type, uri_id = spotipy.convert.from_uri(uri)
+
+    spotify = toukka.sopiva.spotify.util.get_spotify()
+    playlist = spotify.playlist(uri_id)
+    paging = playlist.tracks
+
+    logger.info(playlist.name)
+    tracks = list(spotify.all_items_from_paging(paging))
+
+    if paging.total != len(tracks):
+        logger.warning('paging total %s and len(tracks) %s', paging.total, len(tracks))
+
 
 # END
