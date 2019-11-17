@@ -7,6 +7,9 @@ from spotipy.model.paging import Paging
 from spotipy.model.base import Item
 
 
+# TODO: clean (methods added to spotipy
+
+
 class SpotifyExtended(Spotify):
 
     def all_pages_from_paging(self,
