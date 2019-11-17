@@ -16,20 +16,25 @@ def podcast():
 @podcast.command()
 @click.argument('uri')
 @click.option('--market')
+@click.option('--episodes', is_flag=True)
 def show(uri,
-         market: str = 'from_token'
+         market: str = None,
+         episodes: bool = False
          ):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
     show = spotify.show(uri_id, market=market)
     printer(show)
+    if episodes:
+        for episode in spotify.all_items_from_paging(show.episodes):
+            printer(episode)
 
 
 @podcast.command()
 @click.argument('uri')
 @click.option('--market')
 def episode(uri,
-            market: str = 'from_token'
+            market: str = None
             ):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
