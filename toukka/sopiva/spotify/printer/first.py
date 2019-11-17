@@ -213,21 +213,21 @@ def print_recommendationseed(seed: spotipy.model.recommendations.RecommendationS
 
 # TODO: combine cpt and cpc
 @printer.register
-def print_currently_playing_track(cpt: spotipy.model.currently_playing.CurrentlyPlayingTrack):
-    print(f'currently playing: playing {cpt.is_playing}')
-    cpt_timestamp = datetime.datetime.fromtimestamp(cpt.timestamp/1000.0)
+def print_currently_playing(cp: spotipy.model.currently_playing.CurrentlyPlaying):
+    print(f'currently playing: playing {cp.is_playing}')
+    cpt_timestamp = datetime.datetime.fromtimestamp(cp.timestamp/1000.0)
     print('\ttimestamp: %s (%s)' % (
             humanize.naturaldate(cpt_timestamp),
             humanize.naturaltime(datetime.datetime.now() - cpt_timestamp)))
-    print('\tprogress: %s' % datetime.timedelta(milliseconds=cpt.progress_ms))
-    if cpt.context:
-        print(f'\tcontext: {cpt.context.type.name} ({cpt.context.uri})')
-    print(f'\ttype: {cpt.currently_playing_type}')
-    disallows = _get_flags(cpt.actions.disallows.asdict(), cpt.actions.disallows.asdict().keys())
+    print('\tprogress: %s' % datetime.timedelta(milliseconds=cp.progress_ms))
+    if cp.context:
+        print(f'\tcontext: {cp.context.type.name} ({cp.context.uri})')
+    print(f'\ttype: {cp.currently_playing_type}')
+    disallows = _get_flags(cp.actions.disallows.asdict(), cp.actions.disallows.asdict().keys())
     print(f'\tactions disallows: {disallows}')
     print()
-    if cpt.item:
-        printer(cpt.item)
+    if cp.item:
+        printer(cp.item)
 
 
 @printer.register
@@ -280,7 +280,6 @@ def print_episode(episode: spotipy.model.podcast.Episode):
     print(f'\tdesc: {episode.description}')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {episode.languages}')
-
 
     if episode.external_urls:
         print(f'\texternal urls: {episode.external_urls}')
