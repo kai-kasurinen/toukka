@@ -1,6 +1,7 @@
 #
 
 import click
+import spotipy
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -10,7 +11,7 @@ from toukka.sopiva.spotify.cli import cli_root
 
 
 @cli_root.command()
-@click.argument('type', type=click.Choice(['artist', 'album', 'track', 'playlist', 'show', 'episode']))
+@click.argument('type', type=click.Choice(spotipy.client.paging_type.keys()))
 @click.argument('query')
 @click.option('--market')
 @click.option('--limit', type=int)
