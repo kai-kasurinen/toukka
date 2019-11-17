@@ -25,7 +25,7 @@ def get_retry():
     #
     default_method_whitelist = list(urllib3.util.retry.Retry.DEFAULT_METHOD_WHITELIST)
     retry = urllib3.util.retry.Retry(
-        total=3,
+        total=4,
         backoff_factor=1,
         status_forcelist=[500, 502],
         method_whitelist=default_method_whitelist+['POST'])
