@@ -18,7 +18,7 @@ def album(uri,
           ):
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
-    album = spotify.album(uri_id, market=None)
+    album = spotify.album(uri_id, market=market)
     printer(album)
     if tracks:
         for track in spotify.all_items_from_paging(album.tracks):

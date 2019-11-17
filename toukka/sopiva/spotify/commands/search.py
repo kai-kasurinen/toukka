@@ -12,15 +12,16 @@ from toukka.sopiva.spotify.cli import cli_root
 @cli_root.command()
 @click.argument('type', type=click.Choice(['artist', 'album', 'track', 'playlist', 'show', 'episode']))
 @click.argument('query')
+@click.option('--market')
 @click.option('--limit', type=int)
 def search(type: str,
            query: str,
-           limit: int = None):
+           limit: int = None,
+           market: str = None):
     spotify = get_spotify()
     search = spotify.search(query=query,
                             types=[type],
-                            market=None,
-                            limit=50)
+                            market=market)
     paging = search[0]
     print(f'results total: {paging.total}')
     print()
