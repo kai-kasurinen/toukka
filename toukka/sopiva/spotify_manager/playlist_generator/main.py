@@ -1,7 +1,7 @@
 #
 #
 
-from typing import List, Set, Generator, Union, Any
+from typing import List, Set, Generator, Union, Any, Dict
 
 import logging
 import pprint
@@ -36,7 +36,7 @@ class PlaylistGenerator:
     '''generates playlist'''
 
     def __init__(self,
-                 playlist_uri=None,
+                 playlist_uri: str = None,
                  **kwargs
                  ) -> None:
 
@@ -166,7 +166,7 @@ class PlaylistGenerator:
         self.__log.info('done')
 
     def generate_from_uris(self,
-                           uris: list,
+                           uris: List,
                            **kwargs) -> None:
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
@@ -193,10 +193,10 @@ class PlaylistGenerator:
         self.generate(**opts)
 
     def generate_from_recommendations(self,
-                                      seed_artist_uris: list = None,
-                                      seed_track_uris: list = None,
-                                      seed_genres: list = None,
-                                      seed_attributes: dict = None,
+                                      seed_artist_uris: List = None,
+                                      seed_track_uris: List = None,
+                                      seed_genres: List = None,
+                                      seed_attributes: Dict = None,
                                       **kwargs) -> None:
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
@@ -273,10 +273,10 @@ class PlaylistGenerator:
         yield from self.spotify.all_items_from_paging(paging)
 
     def recommendations_generator(self,
-                                  seed_artist_ids: list = None,
-                                  seed_track_ids: list = None,
-                                  seed_genres: list = None,
-                                  seed_attributes: dict = None
+                                  seed_artist_ids: List = None,
+                                  seed_track_ids: List = None,
+                                  seed_genres: List = None,
+                                  seed_attributes: Dict = None
                                   ) -> Generator[spotipy.model.track.FullTrack, None, None]:
 
         if seed_attributes is None:
@@ -410,7 +410,10 @@ class PlaylistGenerator:
         if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
 
-    def expand_track_to_album(self, track, **kwargs) -> Generator[Any, None, None]:
+    def expand_track_to_album(self,
+                              track: spotipy.model.track.FullTrack,
+                              **kwargs) -> Generator[Any, None, None]:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(track.uri + '#album'):
             return
@@ -419,14 +422,20 @@ class PlaylistGenerator:
         e = self.expander(self.spotify.album(track.album.id, market=self.market), **opts)
         yield from e
 
-    def add_artist_as_source(self, artist, **kwargs) -> None:
+    def add_artist_as_source(self,
+                             artist: spotipy.model.artist.Artist,
+                             **kwargs) -> None:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#source'):
             return
         e = self.expander(self.spotify.artist(artist.id), **opts)
         self.sources.add(e)
 
-    def add_track_recommendations_as_source(self, track, **kwargs) -> None:
+    def add_track_recommendations_as_source(self,
+                                            track: spotipy.model.track.Track,
+                                            **kwargs) -> None:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(track.uri + '#recommendations'):
             return
@@ -435,7 +444,10 @@ class PlaylistGenerator:
                 **opts), **opts)
         self.sources.add(e)
 
-    def add_track_artists_as_source(self, track, **kwargs) -> None:
+    def add_track_artists_as_source(self,
+                                    track: spotipy.model.track.Track,
+                                    **kwargs) -> None:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(track.uri + '#artists'):
             return
@@ -444,7 +456,10 @@ class PlaylistGenerator:
         for artist in track.artists:
             self.add_artist_as_source(artist, **opts)
 
-    def add_artist_related_artists_as_source(self, artist, **kwargs) -> None:
+    def add_artist_related_artists_as_source(self,
+                                             artist: spotipy.model.artist.Artist,
+                                             **kwargs) -> None:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#related'):
             return
@@ -453,7 +468,10 @@ class PlaylistGenerator:
                 **opts), **opts)
         self.sources.add(e)
 
-    def add_artist_recommendations_as_source(self, artist, **kwargs) -> None:
+    def add_artist_recommendations_as_source(self,
+                                             artist: spotipy.model.artist.Artist,
+                                             **kwargs) -> None:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#recommendations'):
             return
@@ -467,6 +485,7 @@ class PlaylistGenerator:
                               item: spotipy.model.track.SimpleTrack,
                               **kwargs
                               ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+
         opts = self.options.push(kwargs)
         yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
 
@@ -474,6 +493,7 @@ class PlaylistGenerator:
                         item: spotipy.model.artist.Artist,
                         **kwargs
                         ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
@@ -499,7 +519,10 @@ class PlaylistGenerator:
         if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
 
-    def expand_artist_to_albums(self, artist, **kwargs) -> Generator[Any, None, None]:
+    def expand_artist_to_albums(self,
+                                artist: spotipy.model.artist.Artist,
+                                **kwargs) -> Generator[Any, None, None]:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#albums'):
             return
@@ -508,7 +531,10 @@ class PlaylistGenerator:
                 **opts), **opts)
         yield from e
 
-    def expand_artist_to_top_tracks(self, artist, **kwargs) -> Generator[Any, None, None]:
+    def expand_artist_to_top_tracks(self,
+                                    artist: spotipy.model.artist.Artist,
+                                    **kwargs) -> Generator[Any, None, None]:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#top-tracks'):
             return
@@ -521,6 +547,7 @@ class PlaylistGenerator:
                        item: spotipy.model.album.Album,
                        **kwargs
                        ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
@@ -530,7 +557,10 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item.uri)
 
-    def expand_album_to_tracks(self, album, **kwargs) -> Generator[Any, None, None]:
+    def expand_album_to_tracks(self,
+                               album: spotipy.model.album.Album,
+                               **kwargs) -> Generator[Any, None, None]:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(album.uri + '#tracks'):
             return
@@ -542,6 +572,7 @@ class PlaylistGenerator:
                           item: spotipy.model.playlist.Playlist,
                           **kwargs
                           ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.is_uri_already_seen(item.uri):
@@ -551,7 +582,10 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item.uri)
 
-    def expand_playlist_to_tracks(self, playlist, **kwargs) -> Generator[Any, None, None]:
+    def expand_playlist_to_tracks(self,
+                                  playlist: spotipy.model.playlist.Playlist,
+                                  **kwargs) -> Generator[Any, None, None]:
+
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(playlist.uri + '#tracks'):
             return
@@ -565,6 +599,7 @@ class PlaylistGenerator:
     def expand_uri(self,
                    item: str,
                    **kwargs) -> Generator[Any, None, None]:
+
         opts = self.options.push(kwargs)
         item_type, item_id = spotipy.convert.from_uri(item)
         self.__log.debug('%s: %s', item_type, item_id)
@@ -579,7 +614,8 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
-    def uris_to_items(self, uris: list) -> List:
+    def uris_to_items(self, uris: List) -> List:
+
         items = list()
         for uri in uris:
             uri_type, uri_id = spotipy.convert.from_uri(uri)

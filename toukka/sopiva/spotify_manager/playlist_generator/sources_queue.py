@@ -9,7 +9,7 @@ class SourcesQueue:
     def __init__(self) -> None:
         self.sources_queue: Deque = collections.deque()
 
-    def add(self, source) -> None:
+    def add(self, source: Any) -> None:
         self.sources_queue.append(source)
 
     def generator(self) -> Generator[Any, None, None]:
@@ -19,7 +19,7 @@ class SourcesQueue:
             except IndexError:
                 break
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.sources_queue)
 
 
