@@ -218,12 +218,12 @@ def genres_make():
 
 
 # FIXME: rename
-def genres():
+def genres() -> Genres:
     try:
         return genres_load()
     except FileNotFoundError:
         logger.warning('pickled genres not found, returning empty')
-        return {}
+        return Genres()
 
 
 def genres_refresh():
