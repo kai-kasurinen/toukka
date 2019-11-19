@@ -228,7 +228,7 @@ class PlaylistGenerator:
         self.generate(**opts)
 
     # TODO: split check and add
-    def is_uri_already_seen(self, uri, debug=False) -> bool:
+    def is_uri_already_seen(self, uri: str, debug=False) -> bool:
         if uri in self._uris_seen:
             if debug:
                 self.__log.debug('%s is already seen', uri)
@@ -263,7 +263,7 @@ class PlaylistGenerator:
                                                   country=self.user_country)
 
     def album_tracks_generator(self,
-                               album_id
+                               album_id: str
                                ) -> Generator[spotipy.model.track.SimpleTrack, None, None]:
         paging = self.spotify.album_tracks(
             album_id,
@@ -295,7 +295,7 @@ class PlaylistGenerator:
             self.__log.debug(seed)
         yield from recommendations.tracks
 
-    def related_artists_generator(self, artist_id
+    def related_artists_generator(self, artist_id: str
                                   ) -> Generator[spotipy.model.artist.FullArtist, None, None]:
         yield from self.spotify.artist_related_artists(artist_id)
 
