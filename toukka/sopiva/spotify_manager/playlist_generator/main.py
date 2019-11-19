@@ -324,7 +324,7 @@ class PlaylistGenerator:
                                               limit=100,
                                               market=self.market)
         for playlist_track in self.spotify.all_items_from_paging(paging):
-            if not playlist_track.is_local:
+            if playlist_track.track is not None and not playlist_track.is_local:
                 yield playlist_track.track
 
     def randomizer(self, generator, **kwargs):
