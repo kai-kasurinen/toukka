@@ -8,7 +8,7 @@ import pprint
 import types
 import random
 
-import autologging
+# import autologging
 import enlighten
 
 from options import Options
@@ -29,8 +29,9 @@ from .track_filter import TrackFilter
 from .util import scramble_generator
 from .progress_bar import ProgressBars
 
+
 # @autologging.traced
-@autologging.logged
+# @autologging.logged
 class PlaylistGenerator:
     '''generates playlist'''
 
@@ -77,6 +78,8 @@ class PlaylistGenerator:
             track_ids_to_playlist=self.track_ids_to_playlist,
             user_country=self.user_country)
 
+        # FIXME: do something (emulates what autologging provides
+        self.__log = logging.getLogger(__name__)
         # FIXME: remove
         self.__log.setLevel(logging.DEBUG)
         self.__log.debug('initialized %s', self)
@@ -339,8 +342,8 @@ class PlaylistGenerator:
         # self.__log.debug('%s', type(item))
         if isinstance(item, types.GeneratorType):
             yield from self.expander_generator(item, **opts)
-        elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
-            yield from self.expander_generator(item, **opts)
+        # elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
+        #     yield from self.expander_generator(item, **opts)
         elif isinstance(item, spotipy.serialise.ModelList):
             yield from self.expander_modellist(item, **opts)
         elif isinstance(item, spotipy.model.track.FullTrack):

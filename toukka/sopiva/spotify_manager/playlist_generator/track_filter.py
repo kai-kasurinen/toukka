@@ -2,7 +2,7 @@
 
 from typing import List, Set, Generator, Union
 
-import autologging
+import logging
 import spotipy
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -11,7 +11,6 @@ from toukka.sopiva.spotify_history.util import get_spotify_history
 # TODO: rewrite
 
 
-@autologging.logged
 class TrackFilter:
 
     def __init__(self,
@@ -29,6 +28,8 @@ class TrackFilter:
         self._isrc_seen: Set[str] = set()
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas', 'joulu']
+        # FIXME: do something (emulates what autologging provides
+        self.__log = logging.getLogger(__name__)
 
     def is_track_ok_to_add(self, track_id: str):
 
