@@ -1,6 +1,6 @@
 #
 
-from typing import Union
+from typing import Union, List
 
 import logging
 import textwrap
@@ -23,7 +23,7 @@ class Playlist:
                  uri: str = None,
                  spotify: spotipy.Spotify = None,
                  market: str = None
-                 ):
+                 ) -> None:
 
         self.spotify = spotify or get_spotify()
         self.playlist_uri = uri or _get_playlist_uri_from_config()
@@ -41,25 +41,25 @@ class Playlist:
         self.__log = logging.getLogger(__name__)
 
     @property
-    def description(self):
+    def description(self) -> str:
         return self.playlist_description
 
     @description.setter
     def description(self, value: str):
         self.playlist_description = value
 
-    def clear(self):
+    def clear(self) -> None:
         self.spotify.playlist_tracks_replace(self.playlist.id, [])
 
-    def reload(self):
+    def reload(self) -> None:
         self.playlist = self.spotify.playlist(self.playlist.id)
 
-    def tracks_add(self, track_ids):
+    def tracks_add(self, track_ids: List) -> None:
         chunks = more_itertools.chunked(track_ids, 100)
         for chunk in chunks:
             self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, chunk)
 
-    def details_update(self):
+    def details_update(self) -> None:
         if self.playlist_description is None:
             self.__log.warning('playlist description is None')
         # spotify api silently fails if description is too long
@@ -75,7 +75,7 @@ class Playlist:
 
 #
 
-def _get_playlist_uri_from_config():
+def _get_playlist_uri_from_config() -> str:
     return toukka.config.lazy_config['spotify_manager']['playlist_generator']['playlist_uri'].get()
 
 
