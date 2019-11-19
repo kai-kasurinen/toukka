@@ -169,7 +169,7 @@ def genres_make():
         logger.info('processing user: %s, year: %i', user_id, year)
         playlists = playlists_cached(user_id)
         logger.info('%s playlists count: %i', user_id, len(playlists))
-        ret = dict()
+        ret = Genres()
         for playlist in playlists:
             if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
@@ -190,7 +190,7 @@ def genres_make():
     females = process_particle_filter()
     year_2018 = process_particle_detector_year(particle_detector_2018_id, 2018)
     year_2019 = process_particle_detector_year(particle_detector_2019_id, 2019)
-    genres = dict()
+    genres = Genres()
 
     for genre_name in sounds.keys():
 
@@ -226,18 +226,18 @@ def genres() -> Genres:
         return Genres()
 
 
-def genres_refresh():
+def genres_refresh() -> None:
     genres_save()
 
 
-def genres_save():
+def genres_save() -> None:
     genres = genres_make()
     _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
     with open(_file, 'wb') as file:
         pickle.dump(genres, file)
 
 
-def genres_load():
+def genres_load() -> Genres:
     _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
     with open(_file, 'rb') as file:
         return pickle.load(file)
