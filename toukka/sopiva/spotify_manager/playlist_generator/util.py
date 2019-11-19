@@ -1,12 +1,14 @@
 #
 
+from typing import Generator, Any
+
 import itertools
 import random
 
 
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
-def shuffle_generator(generator, buffer_size):
+def shuffle_generator(generator: Generator, buffer_size: int) -> Generator[Any, None, None]:
     while True:
         buffer = list(itertools.islice(generator, buffer_size))
         if len(buffer) == 0:
@@ -18,7 +20,7 @@ def shuffle_generator(generator, buffer_size):
 
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
-def scramble_generator(generator, buffer_size):
+def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any, None, None]:
     buf = []
     i = iter(generator)
     while True:
