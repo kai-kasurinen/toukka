@@ -99,8 +99,12 @@ class PlaylistGenerator:
         progress_tracks = progress_bars.progress_bar_for_tracks(opts.looper_target_count)
         progress_looper = progress_bars.progress_bar_for_loops(opts.looper_max_tries)
 
-        # TODO: rename track to item
-        for counter, track in enumerate(self.sources.generator()):
+        sources = self.sources.generator()
+
+        # wanted type
+        track: spotipy.model.track.Track
+
+        for counter, track in enumerate(sources):
 
             self.__log.debug(
                 'counter: %i, tracks: %i, sources: %i',
@@ -110,6 +114,7 @@ class PlaylistGenerator:
 
             progress_looper.update()
 
+            # TODO: remove
             # actually we do not care as long track.id is usable
             if not isinstance(track, spotipy.model.track.Track):
                 self.__log.warning('wrong type received: %s', type(track))
