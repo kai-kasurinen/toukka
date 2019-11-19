@@ -5,9 +5,9 @@ from typing import List, Set, Generator, Union
 import logging
 import spotipy
 
+from spotipy.model.track import FullTrack, Track
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
-
 # TODO: rewrite
 
 
@@ -17,7 +17,7 @@ class TrackFilter:
                  spotify: spotipy.Spotify = None,
                  track_ids_to_playlist: list = None,
                  user_country: str = None
-                 ):
+                 ) -> None:
         self.spotify = spotify or get_spotify()
         self.spotify_history = get_spotify_history()
         self.user_country = user_country
@@ -31,7 +31,7 @@ class TrackFilter:
         # FIXME: do something (emulates what autologging provides
         self.__log = logging.getLogger(__name__)
 
-    def is_track_ok_to_add(self, track_id: str):
+    def is_track_ok_to_add(self, track_id: str) -> bool:
 
         # TODO: cleanup this mess and move to new class
         # track and track_relinked may be totally different
@@ -88,14 +88,16 @@ class TrackFilter:
         else:
             return True
 
-    def is_track_already_played(self, track):
+    def is_track_already_played(self, track: Track) -> bool:
+
         if self.spotify_history.count_by_track_id(track.uri) > 0:
             return True
         else:
             return False
 
     # TODO: isrc is only on FullTrack?
-    def is_track_isrc_already_played(self, track):
+    def is_track_isrc_already_played(self, track: FullTrack) -> bool:
+
         isrc = track.external_ids.get('isrc')
         if isrc is None:
             self.__log.warning('track:%s: isrc is %s', track.id, isrc)
@@ -107,7 +109,8 @@ class TrackFilter:
 
     # TODO: isrc is only on FullTrack?
     # FIXME: split check and add
-    def is_track_isrc_already_seen(self, track):
+    def is_track_isrc_already_seen(self, track: FullTrack) -> bool:
+
         isrc = track.external_ids.get('isrc')
         if isrc is None:
             self.__log.warning('track:%s: isrc is %s', track.id, isrc)
@@ -118,14 +121,16 @@ class TrackFilter:
             self._isrc_seen.add(isrc)
             return False
 
-    def has_tracks_same_isrc(self, track1, track2):
+    def has_tracks_same_isrc(self, track1: FullTrack, track2: FullTrack) -> bool:
+
         if track1.external_ids.get('isrc') == track2.external_ids.get('isrc'):
             return True
         else:
             self.__log.warning('track:%s and track:%s has different ISRC', track1.id, track2.id)
             return False
 
-    def is_track_playable(self, track):
+    def is_track_playable(self, track: FullTrack) -> bool:
+
         if track.is_playable is None:
             # TODO: raise exception
             self.__log.warning('%s: is_playable is None', track.id)
@@ -133,7 +138,8 @@ class TrackFilter:
         else:
             return track.is_playable
 
-    def is_track_on_market(self, track, market):
+    def is_track_on_market(self, track: FullTrack, market: str) -> bool:
+
         markets = track.available_markets
         if markets is None:
             # TODO: raise exception
@@ -144,7 +150,8 @@ class TrackFilter:
         else:
             return False
 
-    def is_track_album_name_good(self, track):
+    def is_track_album_name_good(self, track: FullTrack) -> bool:
+
         if any(bad in track.album.name.lower() for bad in self.bad_words_in_album_names):
             return False
         else:
