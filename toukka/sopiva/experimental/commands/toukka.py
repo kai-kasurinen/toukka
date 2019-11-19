@@ -1,4 +1,5 @@
 #
+# type: ignore
 
 import re
 import logging

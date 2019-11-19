@@ -1,6 +1,5 @@
 #
-
-#
+# type: ignore
 
 '''experimental spotify artist commands'''
 

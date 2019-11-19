@@ -1,4 +1,5 @@
 #
+# type: ignore
 
 """Pandas loves Spotify"""
 

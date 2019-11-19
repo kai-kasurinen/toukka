@@ -1,4 +1,5 @@
 #
+# type: ignore
 
 import logging
 import pycountry

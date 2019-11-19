@@ -1,4 +1,5 @@
 #
+# type: ignore
 
 '''itunes commands'''
 

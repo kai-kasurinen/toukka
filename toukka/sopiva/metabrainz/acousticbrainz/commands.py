@@ -1,4 +1,5 @@
 #
+# type: ignore
 
 '''acousticbrainz module'''
 
