@@ -38,7 +38,7 @@ class PlaylistGenerator:
     def __init__(self,
                  playlist_uri=None,
                  **kwargs
-                 ):
+                 ) -> None:
 
         # TODO: move
         options = Options(
