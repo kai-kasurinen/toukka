@@ -90,9 +90,6 @@ class PlaylistGenerator:
         self.looper(**opts)
         self.commit(**opts)
 
-    def stop_looper_progress_bar(self):
-        self.enlighten_manager.stop()
-
     def looper(self, **kwargs):
         opts = self.options.push(kwargs)
 

@@ -5,7 +5,7 @@ from typing import Union
 import logging
 import textwrap
 
-import autologging
+# import autologging
 import more_itertools
 
 import spotipy
@@ -16,7 +16,7 @@ from toukka.sopiva.spotify.util import get_spotify
 
 
 # @autologging.traced
-@autologging.logged
+# @autologging.logged
 class Playlist:
 
     def __init__(self,
@@ -37,6 +37,8 @@ class Playlist:
         self.playlist_name = '< g e n e r a t e d >'
         # NOTE: not None -> get updated. '' -> fails
         self.playlist_description = '<empty>'
+        # FIXME: remove
+        self.__log = logging.getLogger(__name__)
 
     @property
     def description(self):
