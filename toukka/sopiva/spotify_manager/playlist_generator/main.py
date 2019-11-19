@@ -182,7 +182,7 @@ class PlaylistGenerator:
         self.__log.debug('method options: %s', opts)
 
         s = self.search_generator(query_type=query_type, query=query)
-        e = self.expander(s, **opts)
+        e = self.expander(self.randomizer(s, **opts), **opts)
         self.sources.add(e)
         self.playlist.description = f'source: search {query_type} "{query}"'
         self.generate(**opts)
@@ -212,7 +212,7 @@ class PlaylistGenerator:
             seed_track_ids=seed_track_ids,
             seed_genres=seed_genres,
             seed_attributes=seed_attributes)
-        e = self.expander(s, **opts)
+        e = self.expander(self.randomizer(s), **opts)
         self.sources.add(e)
         self.playlist.description = ', '.join((
             f'source: recommendations',
