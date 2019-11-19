@@ -1,5 +1,7 @@
 #
 
+from typing import Set
+
 import logging
 import click
 import spotipy.convert
@@ -46,7 +48,7 @@ def playlist_cleaner(uri: str,
     spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
     market = spotify.current_user().country
     tracks_to_remove = set()
-    isrcs = set()
+    isrcs: Set[str] = set()
 
     playlist = spotify.playlist(playlist_id=uri_id, market=market)
     printer(playlist)

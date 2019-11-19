@@ -1,7 +1,7 @@
 #
 #
 
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import logging
 import re
@@ -116,7 +116,7 @@ def from_genres(generator,
         if genre is None:
             raise click.ClickException(f'genre "{name}" not found')
         logger.debug(genre)
-        uris = []
+        uris: List[str] = []
         try:
             uris = [genre.playlists[k] for k in playlists]
         except KeyError as e:
