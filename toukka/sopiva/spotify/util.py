@@ -14,7 +14,7 @@ import toukka.sopiva.spotify.state
 
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 def _read_from_config():
@@ -46,7 +46,7 @@ def get_user_token():
         logger.debug('refresh token found, using it')
         # TODO: catch spotipy.auth.OAuthError
         try:
-            token = spotipy.util.token_from_refresh_token(client_id, client_secret, redirect_uri, refresh_token)
+            token = spotipy.util.request_refreshed_token(client_id, client_secret, redirect_uri, refresh_token)
         except spotipy.auth.OAuthError as e:
             logger.warning(e)
 
@@ -59,32 +59,42 @@ def get_user_token():
     return token
 
 
-def get_spotify_with_user_credentials():
-    token = get_user_token()
+def get_sender():
+    # our session handless retrying, so this not needed
+    # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
     sender = spotipy.sender.PersistentSender()
     sender.session = toukka.hub.requests.get_cached_session()
-    # NOTE: our session handless retrying, so this not neededs
-    # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
-    #
+    return sender
+
+
+def get_client_token():
+    # client_id, client_secret, client_redirect = spotipy.util.read_environment()
+    client_id, client_secret, redirect_uri = _read_from_config()
+    credentials = spotipy.util.RefreshingCredentials(client_id, client_secret, redirect_uri)
+    token = credentials.request_client_token()
+    return token
+
+
+def get_client(token, sender):
     # https://github.com/psf/requests/issues/3070
     requests_kwargs = {'timeout': 10.0}
     client = toukka.sopiva.spotify.client.current.Spotify(
-        token=token,
-        sender=sender,
-        requests_kwargs=requests_kwargs)
+        token=token, sender=sender, requests_kwargs=requests_kwargs)
     return client
 
 
-# FIXME: update
+# TODO: combine with_user_credentials and with_client_credentialss
+def get_spotify_with_user_credentials():
+    token = get_user_token()
+    sender = get_sender()
+    client = get_client(token, sender)
+    return client
+
+
 def get_spotify_with_client_credentials():
-    # client_id, client_secret, client_redirect = spotipy.util.read_environment()
-    client_id, client_secret, redirect_uri = _read_from_config()
-    credentials = spotipy.auth.Credentials(client_id, client_secret, redirect_uri)
-    token = credentials.request_client_token()
-    # FIXME: current RefreshingToken does not work with client credentials
-    client = toukka.sopiva.spotify.client.current.Spotify(
-        token=token,
-        sender=spotipy.sender.PersistentSender())
+    token = get_client_token()
+    sender = get_sender()
+    client = get_client(token, sender)
     return client
 
 
