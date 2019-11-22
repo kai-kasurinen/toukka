@@ -55,6 +55,7 @@ class PlaylistGenerator:
             expand_artist_to_related_artists=False,
             expand_artist_to_recommendations=False,
             expand_album_to_tracks=False,
+            expand_album_to_artists=False,
             expand_playlist_to_tracks=False,
             expand_generator_to_items=True
         )
@@ -550,11 +551,20 @@ class PlaylistGenerator:
 
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        did = False
         if self.is_uri_already_seen(item.uri):
             return
+
+        # add as new source
+        if opts.expand_album_to_artists:
+            self.add_album_artists_as_source(item, **opts)
+            did = True
+
         if opts.expand_album_to_tracks:
             yield from self.expand_album_to_tracks(item, **opts)
-        else:
+            did = True
+
+        if not did:
             self.__log.warning('did not do anything with: %s', item.uri)
 
     def expand_album_to_tracks(self,
@@ -567,6 +577,16 @@ class PlaylistGenerator:
         opts.set(expand_track_to_album=False)
         e = self.expander(self.album_tracks_generator(album.id), **opts)
         yield from e
+
+    def add_album_artists_as_source(self,
+                                    album: spotipy.model.album.Album,
+                                    **kwargs) -> None:
+
+        opts = self.options.push(kwargs)
+        if self.is_uri_already_seen(album.uri + '#artists'):
+            return
+        for artist in album.artists:
+            self.add_artist_as_source(artist, **opts)
 
     def expander_playlist(self,
                           item: spotipy.model.playlist.Playlist,
