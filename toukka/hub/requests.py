@@ -27,7 +27,7 @@ def get_retry() -> urllib3.util.retry.Retry:
     retry = urllib3.util.retry.Retry(
         total=4,
         backoff_factor=1,
-        status_forcelist=[500, 502],
+        status_forcelist=[500, 502, 503],
         method_whitelist=default_method_whitelist+['POST'])
     return retry
 
