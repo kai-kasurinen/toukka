@@ -54,11 +54,11 @@ class TrackFilter:
         track_relinked = self.spotify.track(track.id, market=self.user_country)
 
         # is relinked ... do it better
-        if track.id == track_relinked.id:
-            relinked = False
-        else:
+        if track.id != track_relinked.id:
             self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
             relinked = True
+        else:
+            relinked = False
 
         # check playable from relinked track
         if not self.is_track_playable(track_relinked):
