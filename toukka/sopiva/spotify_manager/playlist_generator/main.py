@@ -489,6 +489,7 @@ class PlaylistGenerator:
                 **opts), **opts)
         self.sources.add(e)
 
+    # TODO: remove, not needed
     # NOTE: simpletrack do not have album informations
     def expander_simple_track(self,
                               item: spotipy.model.track.SimpleTrack,
