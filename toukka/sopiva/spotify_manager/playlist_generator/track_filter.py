@@ -90,11 +90,11 @@ class TrackFilter:
                 return False
 
             if not self.is_track_album_name_good(track_relinked):
-                self.__log.debug('track:%s: album name "%s" not good',
+                self.__log.debug('track:%s: album name "%s" not good (relinked)',
                                  track_relinked.id, track_relinked.album.name)
                 return False
 
-            if (not self.has_tracks_same_isrc(track_full, track_relinked)
+            if (self.has_tracks_different_isrc(track_full, track_relinked)
                     and self.is_track_isrc_already_seen(track_relinked)):
                 self.__log.debug('track:%s: isrc already seen (relinked)', track_relinked.id)
                 return False
@@ -143,13 +143,13 @@ class TrackFilter:
             self._isrc_seen.add(isrc)
             return False
 
-    def has_tracks_same_isrc(self, track1: FullTrack, track2: FullTrack) -> bool:
+    def has_tracks_different_isrc(self, track1: FullTrack, track2: FullTrack) -> bool:
 
         if track1.external_ids.get('isrc') == track2.external_ids.get('isrc'):
-            return True
+            return False
         else:
             self.__log.warning('track:%s and track:%s has different ISRC', track1.id, track2.id)
-            return False
+            return True
 
     def is_track_playable(self, track: FullTrack) -> bool:
 
