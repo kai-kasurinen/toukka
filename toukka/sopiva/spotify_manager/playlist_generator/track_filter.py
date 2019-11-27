@@ -70,12 +70,12 @@ class TrackFilter:
             self.__log.debug('track:%s: not playable', track_relinked.id)
             return False
 
-        if self.is_track_isrc_already_seen(track_full):
-            self.__log.debug('track:%s: isrc already seen', track_full.id)
-            return False
-
         if not self.is_track_album_name_good(track_full):
             self.__log.debug('track:%s: album name "%s" not good', track_full.id, track_full.album.name)
+            return False
+
+        if self.is_track_isrc_already_seen(track_full):
+            self.__log.debug('track:%s: isrc already seen', track_full.id)
             return False
 
         if self.is_track_isrc_already_played(track_full):
@@ -84,7 +84,6 @@ class TrackFilter:
 
         # all checks that use relinked
         if relinked:
-
             if track_relinked.id in self.track_ids_to_playlist:
                 self.__log.debug('track:%s: already added (relinked)', track_relinked.id)
                 return False
@@ -94,18 +93,17 @@ class TrackFilter:
                                  track_relinked.id, track_relinked.album.name)
                 return False
 
-            if (self.has_tracks_different_isrc(track_full, track_relinked)
-                    and self.is_track_isrc_already_seen(track_relinked)):
-                self.__log.debug('track:%s: isrc already seen (relinked)', track_relinked.id)
-                return False
-
             if self.is_track_already_played(track_relinked):
                 self.__log.debug('track:%s: already played (relinked)', track_relinked.id)
                 return False
 
-            if self.is_track_isrc_already_played(track_relinked):
-                self.__log.debug('track:%s: isrc already played (relinked)', track_relinked.id)
-                return False
+            if self.has_tracks_different_isrc(track_relinked, track_full):
+                if self.is_track_isrc_already_seen(track_relinked):
+                    self.__log.debug('track:%s: isrc already seen (relinked)', track_relinked.id)
+                    return False
+                if self.is_track_isrc_already_played(track_relinked):
+                    self.__log.debug('track:%s: isrc already played (relinked)', track_relinked.id)
+                    return False
 
         # finally return True if all checks passed
         return True
