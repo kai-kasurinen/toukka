@@ -51,13 +51,17 @@ class TrackFilter:
         if track.id != track_relinked.id:
             relinked = True
             self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
+        else:
+            relinked = False
+
+        # original FullTrack
+        if relinked:
             # get full track if track_relinked is really relinked
             if isinstance(track, FullTrack):
                 track_full = track
             else:
                 track_full = self.spotify.track(track.id, market=None)
         else:
-            relinked = False
             # use relinked track if its not relinked
             track_full = track_relinked
 
