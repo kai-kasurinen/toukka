@@ -31,62 +31,79 @@ class TrackFilter:
         # FIXME: do something (emulates what autologging provides
         self.__log = logging.getLogger(__name__)
 
-    def is_track_ok_to_add(self, track_id: str) -> bool:
+    def is_track_ok_to_add(self, track: Track) -> bool:
 
-        # TODO: cleanup this mess and move to new class
-        # track and track_relinked may be totally different
-        # isrc can be different, album can be different ...
+        # TODO: more cleanup
 
-        # NOTE: we need correct relinking information
-        track_relinked = self.spotify.track(track_id, market=self.user_country)
-
-        # NOTE: to speed up things, use relinked track as track if id matches
-        if track_relinked.id == track_id:
-            track = track_relinked
-            relinked = False
-        else:
-            self.__log.warning('track:%s: relinked to track:%s', track_id, track_relinked.id)
-            track = self.spotify.track(track_id, market=None)
-            relinked = True
-
-        # and long list checks
+        # first use checks that not need FullTrack
         if track.id in self.track_ids_to_playlist:
             self.__log.debug('track:%s: already added', track.id)
             return False
-        elif relinked and track_relinked.id in self.track_ids_to_playlist:
-            self.__log.debug('track:%s: already added (relinked)', track.id)
-            return False
-        # NOTE: check playable on relinked track
-        elif not self.is_track_playable(track_relinked):
-            self.__log.debug('track:%s: not playable', track.id)
-            return False
-        elif not self.is_track_album_name_good(track):
-            self.__log.debug('track:%s: album name "%s" not good', track.id, track.album.name)
-            return False
-        elif self.is_track_isrc_already_seen(track):
-            self.__log.debug('track:%s: isrc already seen', track.id)
-            return False
-        elif (
-            relinked
-            and not self.has_tracks_same_isrc(track, track_relinked)
-            and self.is_track_isrc_already_seen(track_relinked)
-        ):
-            self.__log.debug('track:%s: isrc already seen (relinked)', track.id)
-            return False
-        elif self.is_track_already_played(track):
+
+        if self.is_track_already_played(track):
             self.__log.debug('track:%s: already played', track.id)
             return False
-        elif relinked and self.is_track_already_played(track_relinked):
-            self.__log.debug('track:%s: already played (relinked)', track.id)
-            return False
-        elif self.is_track_isrc_already_played(track):
-            self.__log.debug('track:%s: isrc already played', track.id)
-            return False
-        elif relinked and self.is_track_isrc_already_played(track_relinked):
-            self.__log.debug('track:%s: isrc already played (relinked)', track.id)
-            return False
+
+        # get FullTrack and FullTrack with relinked informations
+        if isinstance(track, FullTrack):
+            track_full = track
         else:
-            return True
+            track_full = self.spotify.track(track.id, market=None)
+
+        # relinked track may be totally different
+        track_relinked = self.spotify.track(track.id, market=self.user_country)
+
+        # is relinked ... do it better
+        if track.id == track_relinked.id:
+            relinked = False
+        else:
+            self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
+            relinked = True
+
+        # check playable from relinked track
+        if not self.is_track_playable(track_relinked):
+            self.__log.debug('track:%s: not playable', track_relinked.id)
+            return False
+
+        if self.is_track_isrc_already_seen(track_full):
+            self.__log.debug('track:%s: isrc already seen', track_full.id)
+            return False
+
+        if not self.is_track_album_name_good(track_full):
+            self.__log.debug('track:%s: album name "%s" not good', track_full.id, track_full.album.name)
+            return False
+
+        if self.is_track_isrc_already_played(track_full):
+            self.__log.debug('track:%s: isrc already played', track_full.id)
+            return False
+
+        # all checks that use relinked
+        if relinked:
+
+            if track_relinked.id in self.track_ids_to_playlist:
+                self.__log.debug('track:%s: already added (relinked)', track_relinked.id)
+                return False
+
+            if not self.is_track_album_name_good(track_relinked):
+                self.__log.debug('track:%s: album name "%s" not good',
+                                 track_relinked.id, track_relinked.album.name)
+                return False
+
+            if (not self.has_tracks_same_isrc(track_full, track_relinked)
+                    and self.is_track_isrc_already_seen(track_relinked)):
+                self.__log.debug('track:%s: isrc already seen (relinked)', track_relinked.id)
+                return False
+
+            if self.is_track_already_played(track_relinked):
+                self.__log.debug('track:%s: already played (relinked)', track_relinked.id)
+                return False
+
+            if self.is_track_isrc_already_played(track_relinked):
+                self.__log.debug('track:%s: isrc already played (relinked)', track_relinked.id)
+                return False
+
+        # finally return True if all checks passed
+        return True
 
     def is_track_already_played(self, track: Track) -> bool:
 

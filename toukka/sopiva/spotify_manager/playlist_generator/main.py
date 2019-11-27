@@ -1,7 +1,7 @@
 #
 #
 
-from typing import List, Set, Generator, Union, Any, Dict
+from typing import List, Set, Generator, Union, Any, Dict, cast
 
 import logging
 import pprint
@@ -118,15 +118,14 @@ class PlaylistGenerator:
             # TODO: remove
             # actually we do not care as long track.id is usable
             if not isinstance(track, spotipy.model.track.Track):
-                self.__log.warning('wrong type received: %s', type(track))
+                raise Exception(f'wrong type received: {type(track)}')
 
             # shortcut, for speedup things
             if self.track_filter.is_track_already_played(track):
                 self.__log.debug('track:%s: already played', track.id)
                 continue
 
-            # NOTE: we use track.id not whole track object
-            if self.track_filter.is_track_ok_to_add(track.id):
+            if self.track_filter.is_track_ok_to_add(track):
                 self.track_ids_to_playlist.append(track.id)
                 self.__log.debug('track:%s: added', track.id)
                 progress_tracks.update()
@@ -340,7 +339,7 @@ class PlaylistGenerator:
 
     # TODO: use single dispatch method
     def expander(self, item, **kwargs
-                 ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+                 ) -> Generator[spotipy.model.track.Track, None, None]:
         opts = self.options.push(kwargs)
         # self.__log.debug('%s', type(item))
         if isinstance(item, types.GeneratorType):
@@ -349,10 +348,12 @@ class PlaylistGenerator:
         #     yield from self.expander_generator(item, **opts)
         elif isinstance(item, spotipy.serialise.ModelList):
             yield from self.expander_modellist(item, **opts)
-        elif isinstance(item, spotipy.model.track.FullTrack):
+        elif isinstance(item, spotipy.model.track.Track):
             yield from self.expander_track(item, **opts)
-        elif isinstance(item, spotipy.model.track.SimpleTrack):
-            yield from self.expander_simple_track(item, **opts)
+        # elif isinstance(item, spotipy.model.track.FullTrack):
+        #    yield from self.expander_track(item, **opts)
+        # elif isinstance(item, spotipy.model.track.SimpleTrack):
+        #    yield from self.expander_simple_track(item, **opts)
         elif isinstance(item, spotipy.model.artist.Artist):
             yield from self.expander_artist(item, **opts)
         elif isinstance(item, spotipy.model.album.Album):
@@ -384,9 +385,9 @@ class PlaylistGenerator:
             self.__log.warning('did not do anything with: %s', item)
 
     def expander_track(self,
-                       item: spotipy.model.track.FullTrack,
+                       item: spotipy.model.track.Track,
                        **kwargs
-                       ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+                       ) -> Generator[spotipy.model.track.Track, None, None]:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
@@ -412,15 +413,22 @@ class PlaylistGenerator:
             self.__log.warning('did not do anything with: %s', item.uri)
 
     def expand_track_to_album(self,
-                              track: spotipy.model.track.FullTrack,
+                              track: spotipy.model.track.Track,
                               **kwargs) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(track.uri + '#album'):
             return
+        # only FullTrack has album property
+        if not isinstance(track, spotipy.model.track.FullTrack):
+            track = self.spotify.track(track.id, market=None)
+        # makes mypy happy
+        track = cast(spotipy.model.track.FullTrack, track)
+
         # set expand_track_to_album option False, so we dont hit again
         opts.set(expand_track_to_album=False)
-        e = self.expander(self.spotify.album(track.album.id, market=self.market), **opts)
+        e = self.expander(
+            self.spotify.album(track.album.id, market=self.market), **opts)
         yield from e
 
     def add_artist_as_source(self,
@@ -485,7 +493,7 @@ class PlaylistGenerator:
     def expander_simple_track(self,
                               item: spotipy.model.track.SimpleTrack,
                               **kwargs
-                              ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+                              ) -> Generator[spotipy.model.track.Track, None, None]:
 
         opts = self.options.push(kwargs)
         yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
