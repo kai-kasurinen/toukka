@@ -28,14 +28,15 @@ class TrackFilter:
         self._isrc_seen: Set[str] = set()
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas', 'joulu']
-        # FIXME: do something (emulates what autologging provides
+        # FIXME: do something (emulates what autologging provides)
         self.__log = logging.getLogger(__name__)
+        self.__log.setLevel(logging.DEBUG)
 
     def is_track_ok_to_add(self, track: Track) -> bool:
 
         # TODO: more cleanup
 
-        # first use checks that not need FullTrack
+        # first checks not need FullTrack
         if track.id in self.track_ids_to_playlist:
             self.__log.debug('track:%s: already added', track.id)
             return False

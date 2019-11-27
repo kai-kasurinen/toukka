@@ -120,11 +120,6 @@ class PlaylistGenerator:
             if not isinstance(track, spotipy.model.track.Track):
                 raise Exception(f'wrong type received: {type(track)}')
 
-            # shortcut, for speedup things
-            if self.track_filter.is_track_already_played(track):
-                self.__log.debug('track:%s: already played', track.id)
-                continue
-
             if self.track_filter.is_track_ok_to_add(track):
                 self.track_ids_to_playlist.append(track.id)
                 self.__log.debug('track:%s: added', track.id)
