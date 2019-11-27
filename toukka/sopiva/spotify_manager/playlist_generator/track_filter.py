@@ -55,15 +55,15 @@ class TrackFilter:
             relinked = False
 
         # original FullTrack
-        if relinked:
-            # get full track if track_relinked is really relinked
-            if isinstance(track, FullTrack):
-                track_full = track
-            else:
-                track_full = self.spotify.track(track.id, market=None)
+        if isinstance(track, FullTrack):
+            track_full = track
         else:
-            # use relinked track if its not relinked
-            track_full = track_relinked
+            if not relinked:
+                # use relinked track cos it's not relinked
+                track_full = track_relinked
+            else:
+                # we need get it
+                track_full = self.spotify.track(track.id, market=None)
 
         # check playable from relinked track
         if not self.is_track_playable(track_relinked):
