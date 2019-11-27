@@ -57,6 +57,7 @@ class TrackFilter:
 
         # original FullTrack
         if isinstance(track, FullTrack):
+            # TODO: track can be relinked, so check it before use it
             track_full = track
         else:
             if not relinked:
