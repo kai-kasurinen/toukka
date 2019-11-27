@@ -176,6 +176,7 @@ def _print_artist_played_count(artist):
 def print_playlist(playlist: spotipy.model.playlist.Playlist):
     print(f'playlist: {playlist.name} ({playlist.uri})')
     print(f'\towner: {playlist.owner.display_name} ({playlist.owner.uri})')
+    print(f'\tdesc: {playlist.description}')
 
     flags = _get_flags(playlist.asdict(), ['public', 'collaborative'])
     if flags:
@@ -183,7 +184,6 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
 
     # only on FullPlaylist
     if isinstance(playlist, spotipy.model.playlist.FullPlaylist):
-        print(f'\tdesc: {playlist.description}')
         print(f'\tfollowers: {playlist.followers.total}')
 
 

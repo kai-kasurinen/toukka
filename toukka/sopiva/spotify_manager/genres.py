@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from xdg.BaseDirectory import save_cache_path
+from bs4 import BeautifulSoup
 
 import spotipy.convert
 
@@ -42,6 +43,7 @@ class GenrePlaylists(dict):
 class Genre:
     name: str
     playlists: Optional[GenrePlaylists] = None
+    related: Optional[List[Optional[str]]] = None
 
 
 # TODO: make somehow frozen
@@ -80,6 +82,7 @@ def genres_make():
         logger.info('%s playlists count: %i', user_id, len(playlists))
         sounds = dict()
         places = dict()
+        related = dict()
 
         for playlist in playlists:
             if playlist.owner.id != user_id:
@@ -90,19 +93,42 @@ def genres_make():
                 thing = playlist.name.split('The Sound of ')[1]
                 logger.debug(f'thing: {thing}')
 
-                playlist_full = playlist_cached(playlist.id)
-                playlist_destriction = playlist_full.description
-
-                # TODO: parse description and get see also genres
-
-                if playlist_destriction.startswith('See also'):
+                if playlist.description.startswith('See also'):
                     genre_name = thing.lower()
                     sounds[genre_name] = playlist.uri
-                elif playlist_destriction.startswith('The songs that define'):
+
+                    desc_parts = playlist.description.split(sep='; ')
+                    related_genres = list()
+
+                    for desc_part in desc_parts:
+
+                        if desc_part.startswith('See also'):
+                            # TODO: parse and use
+                            # intro, pulse, edge, female, year
+                            pass
+
+                        elif (desc_part.startswith('or the Sounds of')
+                              or desc_part.startswith('or the Sound of')):
+                            soup = BeautifulSoup(desc_part, features='html.parser')
+                            for link in soup.find_all('a'):
+                                related_genres.append(link.string.lower())
+                            related[genre_name] = related_genres
+                            # logger.debug('%s related to %s', genre_name, related_genres)
+
+                        elif desc_part.startswith('or much more at'):
+                            # link to evernoise
+                            pass
+
+                        else:
+                            logger.warning('%s: not supported desc part: %s', playlist.uri, desc_part)
+
+                elif playlist.description.startswith('The songs that define'):
                     places[thing] = playlist.uri
+                elif playlist.description.startswith('See much more at'):
+                    # only link to evernoise
+                    pass
                 else:
-                    # TODO: playlists with empty descriptions are "new" genres
-                    logger.warning('%s: not supported desc: %s', playlist.uri, playlist_destriction)
+                    logger.debug('%s: not supported desc: %s', playlist.uri, playlist.description)
 
             elif playlist.name.startswith('The Needle'):
                 pass
@@ -110,7 +136,7 @@ def genres_make():
                 pass
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
-        return sounds, places
+        return sounds, places, related
 
     # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_particle_detector():
@@ -140,6 +166,14 @@ def genres_make():
                 thing = playlist.name.split('The Edge of ')[1]
                 genre_name = thing.lower()
                 edges[genre_name] = playlist.uri
+
+            elif playlist.name.startswith('Metafilter'):
+                pass
+            elif playlist.name.startswith('Metaedge'):
+                pass
+            elif playlist.name.startswith('Metapulse'):
+                pass
+
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
 
@@ -174,10 +208,16 @@ def genres_make():
             if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
                 continue
+
             if playlist.name.startswith('%i in' % year):
                 thing = playlist.name.split('%i in ' % year)[1]
                 genre_name = thing.lower()
                 ret[genre_name] = playlist.uri
+            elif playlist.name.startswith('The Sound of'):
+                # place year
+                pass
+            elif playlist.name.startswith('Meta%i' % year):
+                pass
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return ret
@@ -185,7 +225,7 @@ def genres_make():
     #
     logger.info('generating genres, this may take some time')
 
-    sounds, places = process_sound_of_spotify()
+    sounds, places, related = process_sound_of_spotify()
     intros, pulses, edges = process_particle_detector()
     females = process_particle_filter()
     year_2018 = process_particle_detector_year(particle_detector_2018_id, 2018)
@@ -206,7 +246,8 @@ def genres_make():
 
         genre = Genre(
             name=genre_name,
-            playlists=genre_playlists
+            playlists=genre_playlists,
+            related=related.get(genre_name)
             )
 
         genres[genre.name] = genre
