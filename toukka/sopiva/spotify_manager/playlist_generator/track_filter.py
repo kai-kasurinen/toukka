@@ -28,6 +28,7 @@ class TrackFilter:
         self._isrc_seen: Set[str] = set()
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas', 'joulu']
+        self.bad_words_in_track_names = ['commentary']
         # FIXME: do something (emulates what autologging provides)
         self.__log = logging.getLogger(__name__)
         self.__log.setLevel(logging.DEBUG)
@@ -43,6 +44,10 @@ class TrackFilter:
 
         if self.is_track_already_played(track):
             self.__log.debug('track:%s: already played', track.id)
+            return False
+
+        if not self.is_track_name_good(track):
+            self.__log.debug('track:%s: track name "%s" not good', track.id, track.name)
             return False
 
         # relinked track may be totally different
@@ -88,6 +93,11 @@ class TrackFilter:
         if relinked:
             if track_relinked.id in self.track_ids_to_playlist:
                 self.__log.debug('track:%s: already added (relinked)', track_relinked.id)
+                return False
+
+            if not self.is_track_name_good(track_relinked):
+                self.__log.debug('track:%s: track name "%s" not good (relinked)',
+                                 track_relinked.id, track_relinked.name)
                 return False
 
             if not self.is_track_album_name_good(track_relinked):
@@ -175,6 +185,13 @@ class TrackFilter:
     def is_track_album_name_good(self, track: FullTrack) -> bool:
 
         if any(bad in track.album.name.lower() for bad in self.bad_words_in_album_names):
+            return False
+        else:
+            return True
+
+    def is_track_name_good(self, track: Track) -> bool:
+
+        if any(bad in track.name.lower() for bad in self.bad_words_in_track_names):
             return False
         else:
             return True
