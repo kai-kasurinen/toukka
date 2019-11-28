@@ -202,8 +202,8 @@ class PlaylistGenerator:
                 seed_artist_ids.append(artist.id)
         seed_track_ids: List[str] = list()
         if seed_track_uris is not None:
-            for artist in self.uris_to_items(seed_track_uris):
-                seed_artist_ids.append(artist.id)
+            for track in self.uris_to_items(seed_track_uris):
+                seed_track_ids.append(track.id)
 
         # TODO: move seed_attributes validation here?
 
@@ -255,7 +255,7 @@ class PlaylistGenerator:
                                     artist_id: str
                                     ) -> Generator[spotipy.model.track.FullTrack, None, None]:
         yield from self.spotify.artist_top_tracks(artist_id,
-                                                  country=self.user_country)
+                                                  market=self.user_country)
 
     def album_tracks_generator(self,
                                album_id: str
