@@ -15,13 +15,10 @@ def check_from_token(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         # TODO: remove
-        if not any(key in ('market', 'country') for key in kwargs.keys()):
-            raise Exception('market or country is not defined')
+        if 'market' not in kwargs.keys():
+            raise Exception('market is not defined')
         elif kwargs.get('market') == 'from_token':
             raise Exception('market is from_token')
-        # artist_top_tracks
-        elif kwargs.get('country') == 'from_token':
-            raise Exception('country is from_token')
         else:
             return f(*args, **kwargs)
     return wrapper
