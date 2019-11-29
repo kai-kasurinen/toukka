@@ -33,7 +33,7 @@ def get_user_refresh_token() -> str:
     return statedb.get('user_refresh_token')
 
 
-def set_user_refresh_token(refresh_token) -> None:
+def set_user_refresh_token(refresh_token: str) -> None:
     logger.debug('set user refresh token to statedb')
     statedb = toukka.sopiva.spotify.state.get_statedb()
     statedb.set('user_refresh_token', refresh_token)
@@ -101,7 +101,7 @@ def get_spotify_with_client_credentials() -> toukka.sopiva.spotify.client.curren
     return client
 
 
-def get_spotify() -> toukka.sopiva.spotify.client.current.Spotify::
+def get_spotify() -> toukka.sopiva.spotify.client.current.Spotify:
     logger.debug('get spotify')
     return get_spotify_with_user_credentials()
 
