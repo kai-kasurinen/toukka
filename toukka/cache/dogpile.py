@@ -46,7 +46,7 @@ def configure():
     memory.configure_from_config(config, 'cache.memory.')
     local.configure_from_config(config, 'cache.local.')
     redis.configure_from_config(config, 'cache.redis.')
-    # mongo.configure_from_config(config, 'cache.mongo.')
+    mongo.configure_from_config(config, 'cache.mongo.')
 
 
 # FIXME: removes

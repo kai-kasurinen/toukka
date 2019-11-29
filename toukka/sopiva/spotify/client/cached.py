@@ -48,5 +48,4 @@ class SpotifyCached(Spotify):
     track_audio_features = region.cache_on_arguments()(Spotify.track_audio_features)
     track_audio_analysis = region.cache_on_arguments()(Spotify.track_audio_analysis)
 
-
 # END
