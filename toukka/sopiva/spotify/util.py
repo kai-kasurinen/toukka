@@ -94,14 +94,14 @@ def get_spotify_with_user_credentials() -> toukka.sopiva.spotify.client.current.
     return client
 
 
-def get_spotify_with_client_credentials():
+def get_spotify_with_client_credentials() -> toukka.sopiva.spotify.client.current.Spotify:
     token = get_client_token()
     sender = get_sender()
     client = get_client(token, sender)
     return client
 
 
-def get_spotify():
+def get_spotify() -> toukka.sopiva.spotify.client.current.Spotify::
     logger.debug('get spotify')
     return get_spotify_with_user_credentials()
 
