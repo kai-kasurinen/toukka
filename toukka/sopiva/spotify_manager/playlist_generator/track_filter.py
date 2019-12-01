@@ -108,9 +108,11 @@ class TrackFilter:
                 return False
 
             if self.has_tracks_different_isrc(track_relinked, track_full):
+
                 if self.is_track_isrc_already_seen(track_relinked):
                     self.__log.debug('track:%s: isrc already seen (relinked)', track_relinked.id)
                     return False
+
                 if self.is_track_isrc_already_played(track_relinked):
                     self.__log.debug('track:%s: isrc already played (relinked)', track_relinked.id)
                     return False
