@@ -88,6 +88,7 @@ class TrackFilter:
 
         # all checks that use relinked
         if relinked:
+
             if self.is_track_already_seen(track_relinked):
                 self.__log.debug('track:%s: already seen (relinked)', track_relinked.id)
                 return False
