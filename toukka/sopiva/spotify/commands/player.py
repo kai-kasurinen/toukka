@@ -42,6 +42,11 @@ def pause(device_id=None):
 
 @playback.command()
 @click.option('--device-id')
+def resume(device_id=None):
+    return get_spotify().playback_resume(**locals())
+
+@playback.command()
+@click.option('--device-id')
 def next(device_id=None):
     return get_spotify().playback_next(**locals())
 
