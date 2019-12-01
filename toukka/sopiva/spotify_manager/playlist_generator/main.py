@@ -421,7 +421,7 @@ class PlaylistGenerator:
         track = cast(spotipy.model.track.FullTrack, track)
 
         # set expand_track_to_album option False, so we dont hit again
-        opts.set(expand_track_to_album=False)
+        # opts.set(expand_track_to_album=False)
         e = self.expander(
             self.spotify.album(track.album.id, market=self.market), **opts)
         yield from e
