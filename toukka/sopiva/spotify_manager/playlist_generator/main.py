@@ -76,7 +76,6 @@ class PlaylistGenerator:
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(
             spotify=self.spotify,
-            track_ids_to_playlist=self.track_ids_to_playlist,
             user_country=self.user_country)
 
         # FIXME: do something (emulates what autologging provides

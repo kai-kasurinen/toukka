@@ -15,17 +15,14 @@ class TrackFilter:
 
     def __init__(self,
                  spotify: spotipy.Spotify = None,
-                 track_ids_to_playlist: list = None,
                  user_country: str = None
                  ) -> None:
         self.spotify = spotify or get_spotify()
         self.spotify_history = get_spotify_history()
         self.user_country = user_country
-        # FIXME: hack
-        if track_ids_to_playlist is None:
-            raise Exception()
-        self.track_ids_to_playlist = track_ids_to_playlist
-        self._isrc_seen: Set[str] = set()
+        # seen
+        self.seen_track_id: Set[str] = set()
+        self.seen_track_isrc: Set[str] = set()
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas', 'joulu']
         self.bad_words_in_track_names = ['commentary']
@@ -38,8 +35,8 @@ class TrackFilter:
         # TODO: more cleanup
 
         # first checks not need FullTrack
-        if track.id in self.track_ids_to_playlist:
-            self.__log.debug('track:%s: already added', track.id)
+        if self.is_track_already_seen(track):
+            self.__log.debug('track:%s: already seen', track.id)
             return False
 
         if self.is_track_already_played(track):
@@ -91,8 +88,8 @@ class TrackFilter:
 
         # all checks that use relinked
         if relinked:
-            if track_relinked.id in self.track_ids_to_playlist:
-                self.__log.debug('track:%s: already added (relinked)', track_relinked.id)
+            if self.is_track_already_seen(track_relinked):
+                self.__log.debug('track:%s: already seen (relinked)', track_relinked.id)
                 return False
 
             if not self.is_track_name_good(track_relinked):
@@ -139,18 +136,22 @@ class TrackFilter:
         else:
             return False
 
-    # TODO: isrc is only on FullTrack?
-    # FIXME: split check and add
-    def is_track_isrc_already_seen(self, track: FullTrack) -> bool:
+    def is_track_already_seen(self, track: Track) -> bool:
+        if track.id in self.seen_track_id:
+            return True
+        else:
+            self.seen_track_id.add(track.id)
+            return False
 
+    def is_track_isrc_already_seen(self, track: FullTrack) -> bool:
         isrc = track.external_ids.get('isrc')
         if isrc is None:
             self.__log.warning('track:%s: isrc is %s', track.id, isrc)
             return False
-        elif isrc in self._isrc_seen:
+        elif isrc in self.seen_track_isrc:
             return True
         else:
-            self._isrc_seen.add(isrc)
+            self.seen_track_isrc.add(isrc)
             return False
 
     def has_tracks_different_isrc(self, track1: FullTrack, track2: FullTrack) -> bool:
@@ -195,5 +196,6 @@ class TrackFilter:
             return False
         else:
             return True
+
 
 # END
