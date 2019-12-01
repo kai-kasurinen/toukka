@@ -137,6 +137,7 @@ class TrackFilter:
             return False
 
     def is_track_already_seen(self, track: Track) -> bool:
+
         if track.id in self.seen_track_id:
             return True
         else:
@@ -144,6 +145,7 @@ class TrackFilter:
             return False
 
     def is_track_isrc_already_seen(self, track: FullTrack) -> bool:
+
         isrc = track.external_ids.get('isrc')
         if isrc is None:
             self.__log.warning('track:%s: isrc is %s', track.id, isrc)
