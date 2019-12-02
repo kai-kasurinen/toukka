@@ -637,6 +637,7 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
+    # TODO: remove
     def uris_to_items(self, uris: List) -> List:
 
         items = list()
