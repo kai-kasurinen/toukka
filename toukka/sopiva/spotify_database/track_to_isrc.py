@@ -9,8 +9,8 @@ import toukka.config
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_mpris_history.database.current import SpotifyMprisHistory
-from .database.first import SpotifyDB, SpotifyTrackISRC
-from .util import get_database_uri_from_config
+from toukka.sopiva.spotify_database.database.first import SpotifyDB, SpotifyTrackISRC
+from toukka.sopiva.spotify_database.util import get_database_uri_from_config
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)

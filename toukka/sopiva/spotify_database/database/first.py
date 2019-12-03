@@ -3,9 +3,11 @@
 from contextlib import contextmanager
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, DateTime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
+
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -16,6 +18,28 @@ class SpotifyTrackISRC(Base):
     id = Column(Integer, primary_key=True)
     track_uri = Column(Text, unique=True, index=True)
     track_isrc = Column(Text, index=True)
+
+
+class SpotifyBannedUri(Base):
+    __tablename__ = 'spotify_ban_uri'
+    id = Column(Integer, primary_key=True)
+    uri = Column(Text, unique=True, index=True)
+    created_ts = Column(DateTime,
+                        nullable=False,
+                        server_default=func.now(),
+                        index=True)
+    reason = Column(Text)
+
+
+class SpotifyBannedWord(Base):
+    __tablename__ = 'spotify_ban_word'
+    id = Column(Integer, primary_key=True)
+    word = Column(Text, index=True)
+    created_ts = Column(DateTime,
+                        nullable=False,
+                        server_default=func.now(),
+                        index=True)
+    reason = Column(Text)
 
 
 class SpotifyDB:
