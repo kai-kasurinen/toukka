@@ -115,8 +115,8 @@ def print_album_simple(album: spotipy.model.album.SimpleAlbum):
         print(f'\talbum group: {album.album_group}')
     if album.available_markets:
         print(f'\tmarkets: {len(album.available_markets)}')
-    if album.restrictions:
-        print(f'\trestrictions: {album.restrictions}')
+    if album.is_playable is not None:
+        print(f'\tplayable: {album.is_playable}')
 
 
 @printer.register
@@ -135,8 +135,8 @@ def print_album_full(album: spotipy.model.FullAlbum):
         print('\texternal urls: {album.external_urls}'.format(album=album))
     if album.available_markets:
         print('\tmarkets: %s' % (len(album.available_markets)))
-    if album.restrictions:
-        print('\trestrictions: {album.restrictions}'.format(album=album))
+    if album.is_playable is not None:
+        print(f'\tplayable: {album.is_playable}')
     if album.label:
         print('\tlabel: {album.label}'.format(album=album))
     if album.copyrights:
@@ -180,6 +180,9 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
     if playlist.description:
         print(f'\tdesc: {playlist.description}')
 
+    if playlist.primary_color:
+        print(f'\tprimary color: {playlist.primary_color}')
+
     flags = _get_flags(playlist.asdict(), ['public', 'collaborative'])
     if flags:
         print(f'\tflags: {flags}')
@@ -190,8 +193,8 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
 
 
 @printer.register
-def print_playlist(playlisttrack: spotipy.model.playlist.PlaylistTrack):
-    plt = playlisttrack
+def print_playlist_track(playlist_track: spotipy.model.playlist.PlaylistTrack):
+    plt = playlist_track
     # TODOE: added_at and added_by may be None
     print(f'playlist track:',
           f'added at {plt.added_at} by {plt.added_by.display_name or plt.added_by.id} ({plt.added_by.uri})')
