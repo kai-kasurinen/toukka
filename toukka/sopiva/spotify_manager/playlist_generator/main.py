@@ -564,7 +564,7 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(item.uri):
             return
 
-        # FIXME: move?
+        # TODO: move?
         if opts.expand_ignore_various_artists:
             various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
             artist_ids = [artist.id for artist in item.artists]
