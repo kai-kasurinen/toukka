@@ -10,6 +10,7 @@ import random
 
 # import autologging
 import enlighten
+import more_itertools
 
 from options import Options
 
@@ -26,7 +27,7 @@ from toukka.sopiva.spotify.printer.first import printer
 from .playlist import Playlist
 from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter
-from .util import scramble_generator, random_item
+from .util import scramble_generator
 from .progress_bar import ProgressBars
 
 
@@ -420,11 +421,10 @@ class PlaylistGenerator:
             track = self.spotify.track(track.id, market=None)
         # makes mypy happy
         track = cast(spotipy.model.track.FullTrack, track)
-
+        album = self.spotify.album(track.album.id, market=self.market)
         # set expand_track_to_album option False, so we dont hit again
         # opts.set(expand_track_to_album=False)
-        e = self.expander(
-            self.spotify.album(track.album.id, market=self.market), **opts)
+        e = self.expander(album, **opts)
         yield from e
 
     def add_artist_as_source(self,
@@ -434,7 +434,8 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#source'):
             return
-        e = self.expander(self.spotify.artist(artist.id), **opts)
+        artist = self.spotify.artist(artist.id)
+        e = self.expander(artist, **opts)
         self.sources.add(e)
 
     def add_track_recommendations_as_source(self,
@@ -444,9 +445,8 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(track.uri + '#recommendations'):
             return
-        e = self.expander(self.randomizer(
-                self.recommendations_generator(seed_track_ids=[track.id]),
-                **opts), **opts)
+        recommendations = self.recommendations_generator(seed_track_ids=[track.id])
+        e = self.expander(self.randomizer(recommendations, **opts), **opts)
         self.sources.add(e)
 
     def add_track_artists_as_source(self,
@@ -515,11 +515,8 @@ class PlaylistGenerator:
             self.add_artist_recommendations_as_source(item, **opts)
             did = True
         # yield tracks
-        if opts.expand_artist_to_albums:
+        if opts.expand_artist_to_albums or opts.expand_artist_to_random_album:
             yield from self.expand_artist_to_albums(item, **opts)
-            did = True
-        elif opts.expand_artist_to_random_album:
-            yield from self.expand_artist_to_random_album(item, **opts)
             did = True
         elif opts.expand_artist_to_top_tracks:
             yield from self.expand_artist_to_top_tracks(item, **opts)
@@ -535,21 +532,13 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#albums'):
             return
-        e = self.expander(self.randomizer(
-                self.artist_albums_generator(artist.id),
-                **opts), **opts)
-        yield from e
 
-    # TODO: combine this and normal
-    def expand_artist_to_random_album(self,
-                                      artist: spotipy.model.artist.Artist,
-                                      **kwargs) -> Generator[Any, None, None]:
+        if opts.expand_artist_to_random_album:
+            albums = more_itertools.random_product(self.artist_albums_generator(artist.id))
+        else:
+            albums = self.artist_albums_generator(artist.id)
 
-        opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(artist.uri + '#random-album'):
-            return
-        a = random_item(self.artist_albums_generator(artist.id))
-        e = self.expander(self.randomizer(a, **opts), **opts)
+        e = self.expander(self.randomizer(albums, **opts), **opts)
         yield from e
 
     def expand_artist_to_top_tracks(self,
@@ -559,9 +548,9 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#top-tracks'):
             return
-        e = self.expander(self.randomizer(
-                self.artist_top_tracks_generator(artist.id),
-                **opts), **opts)
+
+        tracks = self.artist_top_tracks_generator(artist.id)
+        e = self.expander(self.randomizer(tracks, **opts), **opts)
         yield from e
 
     def expander_album(self,
@@ -595,7 +584,8 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(album.uri + '#tracks'):
             return
         opts.set(expand_track_to_album=False)
-        e = self.expander(self.album_tracks_generator(album.id), **opts)
+        tracks = self.album_tracks_generator(album.id)
+        e = self.expander(tracks, **opts)
         yield from e
 
     def add_album_artists_as_source(self,
@@ -629,9 +619,8 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(playlist.uri + '#tracks'):
             return
-        e = self.expander(self.randomizer(
-                self.playlist_all_tracks_generator(playlist.id),
-                **opts), **opts)
+        tracks = self.playlist_all_tracks_generator(playlist.id),
+        e = self.expander(self.randomizer(tracks,**opts), **opts)
         yield from e
 
     # TODO: add uri model class

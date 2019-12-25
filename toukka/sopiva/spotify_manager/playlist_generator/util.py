@@ -37,7 +37,5 @@ def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any,
             return
 
 
-def random_item(*args, repeat=1):
-    return more_itertools.random_product(*args, repeat=repeat)
 
 # END
