@@ -479,7 +479,7 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#recommendations'):
             return
-        recommendations = self.recommendations_generator(seed_artist_ids=[artist.id]),
+        recommendations = self.recommendations_generator(seed_artist_ids=[artist.id])
         e = self.expander(self.randomizer(recommendations, **opts), **opts)
         self.sources.add(e)
 
