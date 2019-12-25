@@ -60,7 +60,7 @@ class PlaylistGenerator:
             expand_album_to_artists=False,
             expand_playlist_to_tracks=False,
             expand_generator_to_items=True,
-            expand_ignore_various_artists=False
+            ignore_various_artists_albums=False
         )
 
         self.options = options.push(kwargs)
@@ -565,7 +565,7 @@ class PlaylistGenerator:
             return
 
         # TODO: move?
-        if opts.expand_ignore_various_artists:
+        if opts.ignore_various_artists_albums:
             various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
             artist_ids = [artist.id for artist in item.artists]
             if various_artists_id in artist_ids:

@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-album-to-tracks', is_flag=True)
 @click.option('--expand-album-to-artists', is_flag=True)
 @click.option('--expand-playlist-to-tracks', is_flag=True)
-@click.option('--expand-ignore-various-artists', is_flag=True)
+@click.option('--ignore-various-artists-albums', is_flag=True)
 @click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=5000)
 @click.pass_context

@@ -52,7 +52,7 @@ kwargs_for_genre = {
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': False,
     'expand_artist_to_recommendations': False,
-    'expand_ignore_various_artists': True
+    'ignore_various_artists_albums': True
 }
 
 kwargs_for_uri = {
