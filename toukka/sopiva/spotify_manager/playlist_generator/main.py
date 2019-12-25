@@ -325,10 +325,11 @@ class PlaylistGenerator:
             if playlist_track.track is not None and not playlist_track.is_local:
                 yield playlist_track.track
 
+    # FIXME: generator -> iterable
     def randomizer(self, generator: Generator, **kwargs) -> Generator[Any, None, None]:
         opts = self.options.push(kwargs)
         if opts.randomize:
-            self.__log.debug('randomizing %s', generator)
+            self.__log.debug('randomizing: %s: %s', type(generator), generator)
             yield from scramble_generator(generator, 100)
         else:
             yield from generator

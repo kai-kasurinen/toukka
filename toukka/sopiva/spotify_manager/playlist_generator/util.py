@@ -6,6 +6,7 @@ import itertools
 import random
 import more_itertools
 
+
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
 def shuffle_generator(generator: Generator, buffer_size: int) -> Generator[Any, None, None]:
@@ -35,7 +36,6 @@ def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any,
             random.shuffle(buf)
             yield from buf
             return
-
 
 
 # END
