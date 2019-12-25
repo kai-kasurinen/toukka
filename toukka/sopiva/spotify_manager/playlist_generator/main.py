@@ -468,9 +468,8 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#related'):
             return
-        e = self.expander(self.randomizer(
-                self.related_artists_generator(artist.id),
-                **opts), **opts)
+        artists = self.related_artists_generator(artist.id)
+        e = self.expander(self.randomizer(artists, **opts), **opts)
         self.sources.add(e)
 
     def add_artist_recommendations_as_source(self,
@@ -480,9 +479,8 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(artist.uri + '#recommendations'):
             return
-        e = self.expander(self.randomizer(
-                self.recommendations_generator(seed_artist_ids=[artist.id]),
-                **opts), **opts)
+        recommendations = self.recommendations_generator(seed_artist_ids=[artist.id]),
+        e = self.expander(self.randomizer(recommendations, **opts), **opts)
         self.sources.add(e)
 
     # TODO: remove, not needed
