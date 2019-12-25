@@ -27,7 +27,7 @@ from toukka.sopiva.spotify.printer.first import printer
 from .playlist import Playlist
 from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter
-from .util import scramble_generator, one_random_item_generator
+from .util import scramble_generator, take_random_items_generator
 from .progress_bar import ProgressBars
 
 
@@ -533,7 +533,7 @@ class PlaylistGenerator:
             return
 
         if opts.expand_artist_to_random_album:
-            albums = one_random_item_generator(self.artist_albums_generator(artist.id))
+            albums = take_random_items_generator(self.artist_albums_generator(artist.id))
         else:
             albums = self.artist_albums_generator(artist.id)
 
