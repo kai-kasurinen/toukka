@@ -59,7 +59,8 @@ class PlaylistGenerator:
             expand_album_to_tracks=False,
             expand_album_to_artists=False,
             expand_playlist_to_tracks=False,
-            expand_generator_to_items=True
+            expand_generator_to_items=True,
+            expand_ignore_various_artists=False
         )
 
         self.options = options.push(kwargs)
@@ -562,6 +563,14 @@ class PlaylistGenerator:
         did = False
         if self.is_uri_already_seen(item.uri):
             return
+
+        # FIXME: move?
+        if opts.expand_ignore_various_artists:
+            various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
+            artist_ids = [artist.id for artist in item.artists]
+            if various_artists_id in artist_ids:
+                self.__log.debug('%s:%s: various artists album, ignoring', item.type, item.id)
+                return
 
         # add as new source
         if opts.expand_album_to_artists:

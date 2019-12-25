@@ -44,6 +44,17 @@ kwargs_for_playlist = {
     'expand_artist_to_recommendations': False
 }
 
+kwargs_for_genre = {
+    'progress_bar': True,
+    'expand_playlist_to_tracks': True,
+    'expand_track_to_album': True,
+    'expand_track_to_artists': False,
+    'expand_album_to_tracks': True,
+    'expand_artist_to_albums': False,
+    'expand_artist_to_recommendations': False,
+    'expand_ignore_various_artists': True
+}
+
 kwargs_for_uri = {
     'progress_bar': True,
     'expand_playlist_to_tracks': True,
@@ -128,7 +139,7 @@ def genre(genre_name: tuple,
           ):
     args = locals()
     context = click.get_current_context()
-    context.invoke(from_genres, **args, **kwargs, **kwargs_for_playlist)
+    context.invoke(from_genres, **args, **kwargs, **kwargs_for_genre)
 
 
 @cli.command()
@@ -140,7 +151,7 @@ def genre_re(genre_name_re: str,
              ):
     args = locals()
     context = click.get_current_context()
-    context.invoke(from_genres_re, **args, **kwargs, **kwargs_for_playlist)
+    context.invoke(from_genres_re, **args, **kwargs, **kwargs_for_genre)
 
 ##
 
