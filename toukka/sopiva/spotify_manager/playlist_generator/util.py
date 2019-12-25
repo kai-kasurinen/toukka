@@ -4,7 +4,7 @@ from typing import Generator, Any
 
 import itertools
 import random
-
+import more_itertools
 
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
@@ -36,5 +36,8 @@ def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any,
             yield from buf
             return
 
+
+def random_item(*args, repeat=1):
+    return more_itertools.random_product(*args, repeat=repeat)
 
 # END
