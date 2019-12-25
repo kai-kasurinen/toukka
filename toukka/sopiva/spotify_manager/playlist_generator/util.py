@@ -38,4 +38,9 @@ def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any,
             return
 
 
+def one_random_item_generator(iterable):
+    item = more_itertools.first(scramble_generator(iterable, 100), None)
+    if item is not None:
+        yield item
+
 # END

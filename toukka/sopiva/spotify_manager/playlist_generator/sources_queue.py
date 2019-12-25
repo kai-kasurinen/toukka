@@ -2,7 +2,11 @@
 
 from typing import Generator, Any, Deque
 
+import logging
 import collections
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class SourcesQueue:
@@ -15,9 +19,11 @@ class SourcesQueue:
     def generator(self) -> Generator[Any, None, None]:
         while True:
             try:
-                yield from self.sources_queue.popleft()
+                source = self.sources_queue.popleft()
             except IndexError:
+                logger.debug('No sources left (breaking)')
                 break
+            yield from source
 
     def __len__(self) -> int:
         return len(self.sources_queue)
