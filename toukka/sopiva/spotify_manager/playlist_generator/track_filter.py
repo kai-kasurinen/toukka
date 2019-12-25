@@ -26,6 +26,8 @@ class TrackFilter:
         # FIXME: from config?
         self.bad_words_in_album_names = ['christmas', 'joulu']
         self.bad_words_in_track_names = ['commentary']
+        # TODO: add filter
+        self.various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
         # FIXME: do something (emulates what autologging provides)
         self.__log = logging.getLogger(__name__)
         self.__log.setLevel(logging.DEBUG)
