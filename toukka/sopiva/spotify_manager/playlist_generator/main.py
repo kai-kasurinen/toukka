@@ -1,7 +1,7 @@
 #
 #
 
-from typing import List, Set, Generator, Union, Any, Dict, cast
+from typing import List, Set, Generator, Union, Any, Dict, cast, Optional
 
 import logging
 import pprint
@@ -239,7 +239,7 @@ class PlaylistGenerator:
 
     def artist_albums_generator(self,
                                 artist_id: str,
-                                include_groups: list = None
+                                include_groups: Optional[List] = None
                                 ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
         # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
         if include_groups is None:
