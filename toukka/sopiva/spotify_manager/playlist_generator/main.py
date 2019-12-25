@@ -619,8 +619,8 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         if self.is_uri_already_seen(playlist.uri + '#tracks'):
             return
-        tracks = self.playlist_all_tracks_generator(playlist.id),
-        e = self.expander(self.randomizer(tracks,**opts), **opts)
+        tracks = self.playlist_all_tracks_generator(playlist.id)
+        e = self.expander(self.randomizer(tracks, **opts), **opts)
         yield from e
 
     # TODO: add uri model class
