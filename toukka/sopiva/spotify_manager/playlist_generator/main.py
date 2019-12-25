@@ -60,7 +60,8 @@ class PlaylistGenerator:
             expand_album_to_artists=False,
             expand_playlist_to_tracks=False,
             expand_generator_to_items=True,
-            ignore_various_artists_albums=False
+            exclude_various_artists_albums=False,
+            include_album_groups=['album', 'single', 'compilation']
         )
 
         self.options = options.push(kwargs)
@@ -237,13 +238,15 @@ class PlaylistGenerator:
     # generators
 
     def artist_albums_generator(self,
-                                artist_id: str
+                                artist_id: str,
+                                include_groups: list = None
                                 ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
-        # NOTE: 'album', 'single', 'appears_on', 'compilation'
-        include_album_groups = ['album', 'single', 'compilation']
+        # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
+        if include_groups is None:
+            self.__log.warning('include_groups is None')
         paging = self.spotify.artist_albums(
             artist_id,
-            include_groups=include_album_groups,
+            include_groups=include_groups,
             limit=50,
             market=self.market)
         for album in self.spotify.all_items_from_paging(paging):
@@ -533,10 +536,12 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(artist.uri + '#albums'):
             return
 
+        albums = self.artist_albums_generator(
+            artist.id,
+            include_groups=opts.include_album_groups)
+
         if opts.expand_artist_to_random_album:
-            albums = take_random_items_generator(self.artist_albums_generator(artist.id))
-        else:
-            albums = self.artist_albums_generator(artist.id)
+            albums = take_random_items_generator(albums)
 
         e = self.expander(self.randomizer(albums, **opts), **opts)
         yield from e
@@ -565,7 +570,7 @@ class PlaylistGenerator:
             return
 
         # TODO: move?
-        if opts.ignore_various_artists_albums:
+        if opts.exclude_various_artists_albums:
             various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
             artist_ids = [artist.id for artist in item.artists]
             if various_artists_id in artist_ids:
