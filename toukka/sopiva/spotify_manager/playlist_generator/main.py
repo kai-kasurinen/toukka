@@ -329,7 +329,6 @@ class PlaylistGenerator:
     def randomizer(self, generator: Generator, **kwargs) -> Generator[Any, None, None]:
         opts = self.options.push(kwargs)
         if opts.randomize:
-            self.__log.debug('randomizing: %s: %s', type(generator), generator)
             yield from scramble_generator(generator, 100)
         else:
             yield from generator
