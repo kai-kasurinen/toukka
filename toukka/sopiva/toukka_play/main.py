@@ -46,6 +46,7 @@ kwargs_for_playlist = {
 
 kwargs_for_genre = {
     'progress_bar': True,
+    'expand_genre_to_playlists': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': False,

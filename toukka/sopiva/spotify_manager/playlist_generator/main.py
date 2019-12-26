@@ -26,6 +26,7 @@ import spotipy.model.album
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.uri import SpotifyUri
+from toukka.sopiva.spotify_manager.genres import Genre
 
 
 from .playlist import Playlist
@@ -64,9 +65,18 @@ class PlaylistGenerator:
             expand_album_to_artists=False,
             expand_playlist_to_tracks=False,
             expand_generator_to_items=True,
+            expand_genre_to_playlists=False,
             exclude_various_artists_albums=False,
-            include_album_groups=['album', 'single', 'compilation']
-        )
+            include_album_groups=['album',
+                                  'single',
+                                  'compilation'],
+            include_genre_playlists=['intro',
+                                     'sound',
+                                     'female',
+                                     'year_2018',
+                                     'year_2019',
+                                     'pulse',
+                                     'edge'])
 
         self.options = options.push(kwargs)
 
@@ -179,6 +189,18 @@ class PlaylistGenerator:
         for uri in uris:
             self.sources.add(self.expander(SpotifyUri(uri), **opts))
         self.playlist.description = f'source: {", ".join(uris)}'
+        self.generate(**opts)
+
+    def generate_from_genres(self,
+                             genres: List[Genre],
+                             **kwargs) -> None:
+        opts = self.options.push(kwargs)
+        self.__log.debug('method options: %s', opts)
+        genre_names: List[str] = []
+        for genre in genres:
+            self.sources.add(self.expander(genre, **opts))
+            genre_names.append(genre.name)
+        self.playlist.description = f'source: {", ".join(genre_names)}'
         self.generate(**opts)
 
     def generate_from_search(self,
@@ -632,24 +654,25 @@ class PlaylistGenerator:
     @expander.register
     def expander_uri(self,
                      item: SpotifyUri,
-                     **kwargs) -> Generator[Any, None, None]:
+                     **kwargs) -> None:
 
         opts = self.options.push(kwargs)
         item_type, item_id = spotipy.convert.from_uri(item)
-        self.__log.debug('%s: %s', item_type, item_id)
+        self.__log.debug('%s: %s: %s', item, item_type, item_id)
         if self.is_uri_already_seen(item + '#uri'):
             return
         if item_type == 'artist':
-            yield from self.expander(self.spotify.artist(item_id), **opts)
+            item_object = self.spotify.artist(item_id)
         elif item_type == 'album':
-            yield from self.expander(self.spotify.album(item_id, market=self.market), **opts)
+            item_object = self.spotify.album(item_id, market=self.market)
         elif item_type == 'track':
-            yield from self.expander(self.spotify.track(item_id, market=self.market), **opts)
+            item_object = self.spotify.track(item_id, market=self.market)
         elif item_type == 'playlist':
-            yield from self.expander(self.spotify.playlist(item_id, market=self.market), **opts)
+            item_object = self.spotify.playlist(item_id, market=self.market)
         else:
-            self.__log.warning('did not do anything with: %s', item)
+            self.__log.warning('unsupported uri: %s', item)
             return
+        self.sources.add(self.expander(item_object, **opts))
 
     # TODO: remove
     def uris_to_items(self, uris: List) -> List:
@@ -669,5 +692,46 @@ class PlaylistGenerator:
             else:
                 self.__log.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
         return items
+
+    @expander.register
+    def expander_genre(self,
+                       item: Genre,
+                       **kwargs) -> None:
+
+        opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s', type(item), item.name)
+
+        if self.is_uri_already_seen(f'genre:{item.name}'):
+            return
+
+        if opts.expand_genre_to_playlists:
+            self.expand_genre_to_playlists(item, **opts)
+        else:
+            self.__log.warning('did not do anything with: %s:%s', type(item), item.name)
+            return
+
+    def expand_genre_to_playlists(self,
+                                  genre: Genre,
+                                  **kwargs) -> None:
+
+        opts = self.options.push(kwargs)
+
+        if genre.playlists is None:
+            self.__log.debug('genre:%s: no playlists, skipping', genre.name)
+            return
+
+        # select only wanted playlists
+        playlist_uris: List[str] = []
+        try:
+            uris = [genre.playlists[k] for k in opts.include_genre_playlists]
+        except KeyError as e:
+            raise Exception(f'unknown playlist name: {e}')
+        playlist_uris = list(filter(None, uris))
+
+        for playlist_uri in playlist_uris:
+            # TODO: support selecting playlists
+            expander = self.expander(SpotifyUri(playlist_uri), **opts)
+            self.sources.add(expander)
+
 
 # END

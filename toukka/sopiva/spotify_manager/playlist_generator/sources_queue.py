@@ -23,6 +23,10 @@ class SourcesQueue:
             except IndexError:
                 logger.debug('No sources left (breaking)')
                 break
+            # hack, source should always be iterable
+            if source is None:
+                logger.warning('source is None, should be iterable')
+                continue
             yield from source
 
     def __len__(self) -> int:

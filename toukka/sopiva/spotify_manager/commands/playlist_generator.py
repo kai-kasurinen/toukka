@@ -37,10 +37,13 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-album-to-tracks', is_flag=True)
 @click.option('--expand-album-to-artists', is_flag=True)
 @click.option('--expand-playlist-to-tracks', is_flag=True)
+@click.option('--expand-genre-to-playlists', is_flag=True)
 @click.option('--exclude-various-artists-albums', is_flag=True)
 @click.option('--include-album-groups', type=click_params.StringListParamType(),
               help='album, single, appears_on, compilation',
               default='album,single,compilation')
+@click.option('--include-genre-playlists', type=click_params.StringListParamType(),
+              default='intro,sound,female,year_2018,year_2019,pulse,edge')
 @click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=5000)
 @click.pass_context
@@ -104,37 +107,24 @@ def from_recommendations(generator,
 @generate_playlist.command()
 @click.argument('genre_name', required=True, nargs=-1,
                 autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
-@click.option('--playlists', type=click_params.StringListParamType())
 @pass_generator
 def from_genres(generator,
                 genre_name: tuple,
-                playlists: list = None,
                 **kwargs):
 
-    # TODO: get all keys from somewhere
-    if playlists is None:
-        # playlists = ['intro', 'sound', 'pulse', 'edge', 'female', 'year_2018', 'year_2019']
-        playlists = ['intro', 'sound', 'female', 'year_2018', 'year_2019', 'pulse', 'edge']
     genres = toukka.sopiva.spotify_manager.genres.genres()
-    uris_all = list()
+    genres_list = list()
     for name in genre_name:
         genre = genres.get(name)
         if genre is None:
             raise click.ClickException(f'genre "{name}" not found')
         logger.debug(genre)
-        uris: List[str] = []
-        try:
-            uris = [genre.playlists[k] for k in playlists]
-        except KeyError as e:
-            raise click.ClickException(f'unknown playlist name: {e}')
-        uris = list(filter(None, uris))
-        uris_all.extend(uris)
-    generator.generate_from_uris(uris=uris_all, **kwargs)
+        genres_list.append(genre)
+    generator.generate_from_genres(genres=genres_list, **kwargs)
 
 
 @generate_playlist.command()
 @click.argument('genre_name_re', required=True)
-@click.option('--playlists', type=click_params.StringListParamType())
 def from_genres_re(genre_name_re: str,
                    **kwargs):
     regex = re.compile(genre_name_re)
