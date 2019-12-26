@@ -350,7 +350,7 @@ class PlaylistGenerator:
     # TODO: use single dispatch method
     @singledispatchmethod
     def expander(self, item, **kwargs):
-        raise NotImplementedError('Not yet supported: %s' % type(item))
+        raise NotImplementedError('not yet supported expander type: %s' % type(item))
 
     @expander.register
     def expander_generator(self,
@@ -603,6 +603,7 @@ class PlaylistGenerator:
         for artist in album.artists:
             self.add_artist_as_source(artist, **opts)
 
+    @expander.register
     def expander_playlist(self,
                           item: spotipy.model.playlist.Playlist,
                           **kwargs
