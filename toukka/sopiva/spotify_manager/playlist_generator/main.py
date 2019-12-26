@@ -674,10 +674,7 @@ class PlaylistGenerator:
         else:
             self.__log.warning('unsupported uri: %s', item)
             return
-        self.sources.add(self.expander(item_object, **opts))
-
-        # NOTE: return empty generator
-        yield from ()
+        yield from self.expander(item_object, **opts)
 
     # TODO: remove
     def uris_to_items(self, uris: List) -> List:
@@ -710,19 +707,18 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(f'genre:{item.name}'):
             return
 
+        # yield
         if opts.expand_genre_to_playlists:
-            self.expand_genre_to_playlists(item, **opts)
+            yield from self.expand_genre_to_playlists(item, **opts)
             did = True
 
+        # add as new source
         if opts.expand_genre_to_related_genres:
             self.expand_genre_to_related_genres(item, **opts)
             did = True
 
         if not did:
             self.__log.warning('did not do anything with: genre:%s', item.name)
-
-        # NOTE: return empty generator
-        yield from ()
 
     def expand_genre_to_playlists(self,
                                   genre: Genre,
@@ -746,8 +742,7 @@ class PlaylistGenerator:
         playlist_uris = list(filter(None, uris))
 
         for playlist_uri in playlist_uris:
-            expander = self.expander(SpotifyUri(playlist_uri), **opts)
-            self.sources.add(expander)
+            yield from self.expander(SpotifyUri(playlist_uri), **opts)
 
     def expand_genre_to_related_genres(self,
                                        genre: Genre,
