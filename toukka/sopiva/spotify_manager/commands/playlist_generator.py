@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-album-to-artists', is_flag=True)
 @click.option('--expand-playlist-to-tracks', is_flag=True)
 @click.option('--expand-genre-to-playlists', is_flag=True)
+@click.option('--expand-genre-to-related-genres', is_flag=True)
 @click.option('--exclude-various-artists-albums', is_flag=True)
 @click.option('--include-album-groups', type=click_params.StringListParamType(),
               help='album, single, appears_on, compilation',

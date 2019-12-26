@@ -28,6 +28,7 @@ from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.uri import SpotifyUri
 from toukka.sopiva.spotify_manager.genres import Genre
 
+import toukka.sopiva.spotify_manager.genres
 
 from .playlist import Playlist
 from .sources_queue import SourcesQueue
@@ -66,6 +67,7 @@ class PlaylistGenerator:
             expand_playlist_to_tracks=False,
             expand_generator_to_items=True,
             expand_genre_to_playlists=False,
+            expand_genre_to_related_genres=False,
             exclude_various_artists_albums=False,
             include_album_groups=['album',
                                   'single',
@@ -654,7 +656,7 @@ class PlaylistGenerator:
     @expander.register
     def expander_uri(self,
                      item: SpotifyUri,
-                     **kwargs) -> None:
+                     **kwargs) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
         item_type, item_id = spotipy.convert.from_uri(item)
@@ -673,6 +675,9 @@ class PlaylistGenerator:
             self.__log.warning('unsupported uri: %s', item)
             return
         self.sources.add(self.expander(item_object, **opts))
+
+        # NOTE: return empty generator
+        yield from ()
 
     # TODO: remove
     def uris_to_items(self, uris: List) -> List:
@@ -696,25 +701,37 @@ class PlaylistGenerator:
     @expander.register
     def expander_genre(self,
                        item: Genre,
-                       **kwargs) -> None:
+                       **kwargs) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s', type(item), item.name)
+        self.__log.debug('%s:%s', 'genre', item.name)
+        did = False
 
         if self.is_uri_already_seen(f'genre:{item.name}'):
             return
 
         if opts.expand_genre_to_playlists:
             self.expand_genre_to_playlists(item, **opts)
-        else:
-            self.__log.warning('did not do anything with: %s:%s', type(item), item.name)
-            return
+            did = True
+
+        if opts.expand_genre_to_related_genres:
+            self.expand_genre_to_related_genres(item, **opts)
+            did = True
+
+        if not did:
+            self.__log.warning('did not do anything with: genre:%s', item.name)
+
+        # NOTE: return empty generator
+        yield from ()
 
     def expand_genre_to_playlists(self,
                                   genre: Genre,
                                   **kwargs) -> None:
 
         opts = self.options.push(kwargs)
+
+        if self.is_uri_already_seen(f'genre:{genre.name}#playlists'):
+            return
 
         if genre.playlists is None:
             self.__log.debug('genre:%s: no playlists, skipping', genre.name)
@@ -729,8 +746,30 @@ class PlaylistGenerator:
         playlist_uris = list(filter(None, uris))
 
         for playlist_uri in playlist_uris:
-            # TODO: support selecting playlists
             expander = self.expander(SpotifyUri(playlist_uri), **opts)
+            self.sources.add(expander)
+
+    def expand_genre_to_related_genres(self,
+                                       genre: Genre,
+                                       **kwargs) -> None:
+
+        opts = self.options.push(kwargs)
+
+        if self.is_uri_already_seen(f'genre:{genre.name}#related'):
+            return
+
+        if genre.related is None:
+            self.__log.debug('genre:%s: no related genres, skipping', genre.name)
+            return
+
+        genres = toukka.sopiva.spotify_manager.genres.genres()
+        for related_genre_name in genre.related:
+            related_genre = genres.get(related_genre_name)
+            if related_genre is None:
+                self.__log.debug('genre:%s: not found, skipping', related_genre_name)
+                continue
+
+            expander = self.expander(related_genre, **opts)
             self.sources.add(expander)
 
 

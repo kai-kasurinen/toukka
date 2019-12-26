@@ -41,4 +41,9 @@ def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any,
 def take_random_items_generator(iterable, count=1):
     yield from more_itertools.take(count, scramble_generator(iterable, 100))
 
+
+def empty_generator():
+    yield from ()
+
+
 # END
