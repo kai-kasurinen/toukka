@@ -23,6 +23,8 @@ import spotipy.model.album
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
+from toukka.sopiva.spotify_manager.uri import SpotifyUri
+
 
 from .playlist import Playlist
 from .sources_queue import SourcesQueue
@@ -173,7 +175,7 @@ class PlaylistGenerator:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
         for uri in uris:
-            self.sources.add(self.expand_uri(uri, **opts))
+            self.sources.add(self.expander(SpotifyUri(uri), **opts))
         self.playlist.description = f'source: {", ".join(uris)}'
         self.generate(**opts)
 
@@ -338,6 +340,11 @@ class PlaylistGenerator:
         else:
             yield from generator
 
+    # TODO: rename? use?
+    def expand_and_randomize(self, item, **kwargs):
+        opts = self.options.push(kwargs)
+        return self.expander(self.randomizer(item, **opts), **opts)
+
     # TODO: use single dispatch method
     def expander(self, item, **kwargs
                  ) -> Generator[spotipy.model.track.Track, None, None]:
@@ -361,6 +368,8 @@ class PlaylistGenerator:
             yield from self.expander_album(item, **opts)
         elif isinstance(item, spotipy.model.playlist.Playlist):
             yield from self.expander_playlist(item, **opts)
+        elif isinstance(item, SpotifyUri):
+            yield from self.expander_uri(item, **opts)
         else:
             raise Exception('not yet supported: %s', type(item))
 
@@ -636,15 +645,15 @@ class PlaylistGenerator:
         e = self.expander(self.randomizer(tracks, **opts), **opts)
         yield from e
 
-    # TODO: add uri model class
-    # NOTE: not used by expander
-    def expand_uri(self,
-                   item: str,
-                   **kwargs) -> Generator[Any, None, None]:
+    def expander_uri(self,
+                     item: SpotifyUri,
+                     **kwargs) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
         item_type, item_id = spotipy.convert.from_uri(item)
         self.__log.debug('%s: %s', item_type, item_id)
+        if self.is_uri_already_seen(item + '#uri'):
+            return
         if item_type == 'artist':
             yield from self.expander(self.spotify.artist(item_id), **opts)
         elif item_type == 'album':
@@ -655,6 +664,7 @@ class PlaylistGenerator:
             yield from self.expander(self.spotify.playlist(item_id, market=self.market), **opts)
         else:
             self.__log.warning('did not do anything with: %s', item)
+            return
 
     # TODO: remove
     def uris_to_items(self, uris: List) -> List:
