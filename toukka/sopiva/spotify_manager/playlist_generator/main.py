@@ -13,6 +13,8 @@ import enlighten
 import more_itertools
 
 from options import Options
+# TODO: remove after upgraded to python3.8
+from singledispatchmethod import singledispatchmethod
 
 import spotipy.convert
 import spotipy.serialise
@@ -346,33 +348,11 @@ class PlaylistGenerator:
         return self.expander(self.randomizer(item, **opts), **opts)
 
     # TODO: use single dispatch method
-    def expander(self, item, **kwargs
-                 ) -> Generator[spotipy.model.track.Track, None, None]:
-        opts = self.options.push(kwargs)
-        # self.__log.debug('%s', type(item))
-        if isinstance(item, types.GeneratorType):
-            yield from self.expander_generator(item, **opts)
-        # elif isinstance(item, autologging._GeneratorIteratorTracingProxy):
-        #     yield from self.expander_generator(item, **opts)
-        elif isinstance(item, spotipy.serialise.ModelList):
-            yield from self.expander_modellist(item, **opts)
-        elif isinstance(item, spotipy.model.track.Track):
-            yield from self.expander_track(item, **opts)
-        # elif isinstance(item, spotipy.model.track.FullTrack):
-        #    yield from self.expander_track(item, **opts)
-        # elif isinstance(item, spotipy.model.track.SimpleTrack):
-        #    yield from self.expander_simple_track(item, **opts)
-        elif isinstance(item, spotipy.model.artist.Artist):
-            yield from self.expander_artist(item, **opts)
-        elif isinstance(item, spotipy.model.album.Album):
-            yield from self.expander_album(item, **opts)
-        elif isinstance(item, spotipy.model.playlist.Playlist):
-            yield from self.expander_playlist(item, **opts)
-        elif isinstance(item, SpotifyUri):
-            yield from self.expander_uri(item, **opts)
-        else:
-            raise Exception('not yet supported: %s', type(item))
+    @singledispatchmethod
+    def expander(self, item, **kwargs):
+        raise NotImplementedError('Not yet supported: %s' % type(item))
 
+    @expander.register
     def expander_generator(self,
                            item: types.GeneratorType,
                            **kwargs) -> Generator[Any, None, None]:
@@ -395,6 +375,7 @@ class PlaylistGenerator:
         else:
             self.__log.warning('did not do anything with: %s', item)
 
+    @expander.register
     def expander_track(self,
                        item: spotipy.model.track.Track,
                        **kwargs
@@ -507,6 +488,7 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
 
+    @expander.register
     def expander_artist(self,
                         item: spotipy.model.artist.Artist,
                         **kwargs
@@ -567,6 +549,7 @@ class PlaylistGenerator:
         e = self.expander(self.randomizer(tracks, **opts), **opts)
         yield from e
 
+    @expander.register
     def expander_album(self,
                        item: spotipy.model.album.Album,
                        **kwargs
@@ -645,6 +628,7 @@ class PlaylistGenerator:
         e = self.expander(self.randomizer(tracks, **opts), **opts)
         yield from e
 
+    @expander.register
     def expander_uri(self,
                      item: SpotifyUri,
                      **kwargs) -> Generator[Any, None, None]:
