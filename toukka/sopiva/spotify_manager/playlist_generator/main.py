@@ -699,14 +699,11 @@ class PlaylistGenerator:
     def expander_genre(self,
                        item: Genre,
                        **kwargs) -> Generator[Any, None, None]:
-
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s', 'genre', item.name)
-        did = False
-
         if self.is_uri_already_seen(f'genre:{item.name}'):
             return
-
+        self.__log.debug('%s:%s', 'genre', item.name)
+        did = False
         # yield
         if opts.expand_genre_to_playlists:
             yield from self.expand_genre_to_playlists(item, **opts)
