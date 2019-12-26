@@ -9,6 +9,7 @@ import click
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.cli import cli_root
+from toukka.sopiva.spotify_history.util import get_spotify_history
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,18 @@ logger = logging.getLogger(__name__)
 @cli_root.command()
 @click.option('--market')
 @click.option('--limit', type=int)
-def new_albums(limit: int = None, market: str = None):
+@click.option('--filter-by-genre')
+@click.option('--filter-by-genre-contains')
+@click.option('--filter-by-played-artist', is_flag=True)
+@click.option('--filter-by-album-type')
+def new_albums(
+        limit: int = None,
+        market: str = None,
+        filter_by_genre: str = None,
+        filter_by_genre_contains: str = None,
+        filter_by_played_artist: bool = False,
+        filter_by_album_type: str = None,
+        ):
 
     def album_to_genres(album):
         artists = list()
@@ -29,21 +41,41 @@ def new_albums(limit: int = None, market: str = None):
         artists_genres = list(itertools.chain.from_iterable(artists_genres))
         return artists_genres
 
-    def filter_by_genre(album, wanted_genre=None, contains=False):
-        album_genres = album_to_genres(album)
-        if contains is False:
-            if wanted_genre in album_genres:
+    def make_filter_by_genre(wanted_genre, contains=False):
+        def filter_by_genre(album):
+            album_genres = album_to_genres(album)
+            if contains is False:
+                if wanted_genre in album_genres:
+                    return True
+                else:
+                    return False
+            elif contains is True:
+                if any(wanted_genre in genre for genre in album_genres):
+                    return True
+                else:
+                    return False
+        return filter_by_genre
+
+    def make_filter_by_played_artist():
+        def filter_by_played_artist(album):
+            for artist_simple in album.artists:
+                played_count = spotify_history.count_by_artist_name(artist_simple.name)
+                if played_count > 0:
+                    return True
+            return False
+        return filter_by_played_artist
+
+    def make_filter_by_album_type(album_type):
+        def filter_by_album_type(album):
+            if album.album_type == album_type:
                 return True
             else:
                 return False
-        elif contains is True:
-            if any(wanted_genre in genre for genre in album_genres):
-                return True
-            else:
-                return False
+        return filter_by_album_type
     #
 
     spotify = get_spotify()
+    spotify_history = get_spotify_history()
 
     search = spotify.search(query='tag:new',
                             types=['album'],
@@ -52,9 +84,21 @@ def new_albums(limit: int = None, market: str = None):
     print(f'results total: {paging.total}')
     print()
 
+    filters = list()
+    if filter_by_genre:
+        filters.append(make_filter_by_genre(filter_by_genre))
+    if filter_by_genre_contains:
+        filters.append(make_filter_by_genre(filter_by_genre_contains, contains=True))
+    if filter_by_played_artist:
+        filters.append(make_filter_by_played_artist())
+    if filter_by_album_type:
+        filters.append(make_filter_by_album_type(filter_by_album_type))
+
     albums = spotify.all_items(paging)
-    genre_filter = functools.partial(filter_by_genre, wanted_genre='post-rock', contains=True)
-    albums = filter(genre_filter, albums)
+    albums = filter(make_multi_filter(filters), albums)
+
+    # foo
+    count = 0
 
     for count, album in enumerate(albums, start=1):
         printer(album)
@@ -63,5 +107,12 @@ def new_albums(limit: int = None, market: str = None):
         if limit is not None and count >= limit:
             break
 
+    print(f'results after filters: {count}')
+
+
+def make_multi_filter(filters):
+    def multi_filter(x):
+        return all([f(x) for f in filters])
+    return multi_filter
 
 # END
