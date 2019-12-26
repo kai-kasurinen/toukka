@@ -722,7 +722,7 @@ class PlaylistGenerator:
 
     def expand_genre_to_playlists(self,
                                   genre: Genre,
-                                  **kwargs) -> None:
+                                  **kwargs) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
 
