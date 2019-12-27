@@ -87,12 +87,14 @@ def from_search(generator,
 @click.option('--seed-genres', multiple=True)
 @click.option('--attributes', 'attributes_list', multiple=True)
 @pass_generator
-def from_recommendations(generator,
-                         seed_artist_uris: tuple = None,
-                         seed_track_uris: tuple = None,
-                         seed_genres: tuple = None,
-                         attributes_list: tuple = None,
-                         **kwargs):
+def from_recommendations(
+        generator,
+        seed_artist_uris: tuple = None,
+        seed_track_uris: tuple = None,
+        seed_genres: tuple = None,
+        attributes_list: tuple = None,
+        **kwargs
+        ):
 
     '''generate playlist from recommendation'''
     attributes_dict: Dict[str, Union[float, int]] = {}
@@ -111,9 +113,11 @@ def from_recommendations(generator,
 @click.argument('genre_name', required=True, nargs=-1,
                 autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
 @pass_generator
-def from_genres(generator,
-                genre_name: tuple,
-                **kwargs):
+def from_genres(
+        generator,
+        genre_name: tuple,
+        **kwargs
+        ):
 
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genres_list = list()
@@ -128,8 +132,10 @@ def from_genres(generator,
 
 @generate_playlist.command()
 @click.argument('genre_name_re', required=True)
-def from_genres_re(genre_name_re: str,
-                   **kwargs):
+def from_genres_re(
+        genre_name_re: str,
+        **kwargs
+        ):
     regex = re.compile(genre_name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
     genre_names_match = filter(regex.fullmatch, genres.keys())
@@ -144,6 +150,7 @@ def from_genres_re(genre_name_re: str,
 @click.option('--filter-by-genre-contains', multiple=True)
 @click.option('--filter-by-artist-played-count', type=int)
 @click.option('--filter-by-album-type')
+@click.option('--filter-mode')
 @click.option('--sort-by-release-date', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
 def from_new_releases(
@@ -153,8 +160,11 @@ def from_new_releases(
         filter_by_no_genre: bool = None,
         filter_by_artist_played_count: int = None,
         filter_by_album_type: str = None,
+        filter_mode: str = None,
         sort_by_release_date: bool = False,
-        sort_reversed: bool = False):
+        sort_reversed: bool = False
+        ):
+
     albums = search_new_releases(**locals())
     uris = list()
     for album in albums:

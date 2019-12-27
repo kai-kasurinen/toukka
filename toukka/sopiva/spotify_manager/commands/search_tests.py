@@ -33,7 +33,7 @@ def new_releases(
         filter_by_album_name_lang: str = None,
         filter_mode: str = None,
         sort_by_release_date: bool = False,
-        sort_reversed: bool = False,
+        sort_reversed: bool = False
         ):
 
     spotify = get_spotify()
