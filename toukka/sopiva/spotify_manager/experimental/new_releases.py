@@ -53,7 +53,6 @@ def search_new_releases(
         spotify: object = None,
         spotify_history: object = None
         ):
-    print(locals())
 
     def make_filter_by_genre(wanted_genre, contains=False, empty=False):
         def filter_by_genre(album):
