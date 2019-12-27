@@ -14,7 +14,6 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
 
 @cli_root.command()
 @click.option('--market')
-@click.option('--limit', type=int)
 @click.option('--filter-by-genre')
 @click.option('--filter-by-no-genre', is_flag=True)
 @click.option('--filter-by-genre-contains')
@@ -23,7 +22,6 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
 @click.option('--sort-by-release-date', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
 def new_releases(
-        limit: int = None,
         market: str = None,
         filter_by_genre: str = None,
         filter_by_genre_contains: str = None,

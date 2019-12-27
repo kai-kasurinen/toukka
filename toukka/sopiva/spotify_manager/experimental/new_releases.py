@@ -38,7 +38,6 @@ def artists_played_counts(artists, spotify_history=None):
 
 
 def search_new_releases(
-        limit: int = None,
         market: str = None,
         filter_by_genre: str = None,
         filter_by_genre_contains: str = None,

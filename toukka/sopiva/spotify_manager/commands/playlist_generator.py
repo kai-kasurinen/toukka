@@ -15,6 +15,8 @@ import toukka.sopiva.spotify_manager.genres
 
 from toukka.sopiva.spotify_manager.playlist_generator import PlaylistGenerator
 from toukka.sopiva.spotify_manager.cli import cli_root
+from toukka.sopiva.spotify_manager.experimental.new_releases import search_new_releases
+
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +135,32 @@ def from_genres_re(genre_name_re: str,
     genre_names_match = filter(regex.fullmatch, genres.keys())
     context = click.get_current_context()
     context.invoke(from_genres, genre_name=genre_names_match, **kwargs)
+
+
+@generate_playlist.command()
+@click.option('--market')
+@click.option('--filter-by-genre')
+@click.option('--filter-by-no-genre', is_flag=True)
+@click.option('--filter-by-genre-contains')
+@click.option('--filter-by-artist-played-count', type=int)
+@click.option('--filter-by-album-type')
+@click.option('--sort-by-release-date', is_flag=True)
+@click.option('--sort-reversed', is_flag=True)
+def from_new_releases(
+        market: str = None,
+        filter_by_genre: str = None,
+        filter_by_genre_contains: str = None,
+        filter_by_no_genre: bool = None,
+        filter_by_artist_played_count: int = None,
+        filter_by_album_type: str = None,
+        sort_by_release_date: bool = False,
+        sort_reversed: bool = False):
+    albums = search_new_releases(**locals())
+    uris = list()
+    for album in albums:
+        uris.append(album.uri)
+    context = click.get_current_context()
+    context.invoke(from_uris, uris=uris)
 
 
 @generate_playlist.command()
