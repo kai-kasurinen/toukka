@@ -63,10 +63,10 @@ def get_user_token() -> spotipy.util.RefreshingToken:
 
 
 def get_sender() -> spotipy.sender.Sender:
+    session = toukka.hub.requests.get_cached_session()
+    sender = spotipy.sender.PersistentSender(session=session)
     # our session handless retrying, so this not needed
     # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
-    sender = spotipy.sender.PersistentSender()
-    sender.session = toukka.hub.requests.get_cached_session()
     return sender
 
 
