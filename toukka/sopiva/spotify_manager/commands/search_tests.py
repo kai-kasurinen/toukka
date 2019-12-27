@@ -1,10 +1,5 @@
 #
 
-import logging
-import itertools
-import functools
-import operator
-
 import click
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -12,7 +7,9 @@ from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.cli import cli_root
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
-logger = logging.getLogger(__name__)
+from toukka.sopiva.spotify_manager.experimental.new_releases import (
+    search_new_releases, album_to_genres, artists_played_counts
+)
 
 
 @cli_root.command()
@@ -25,7 +22,7 @@ logger = logging.getLogger(__name__)
 @click.option('--filter-by-album-type')
 @click.option('--sort-by-release-date', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
-def new_albums(
+def new_releases(
         limit: int = None,
         market: str = None,
         filter_by_genre: str = None,
@@ -37,96 +34,27 @@ def new_albums(
         sort_reversed: bool = False,
         ):
 
-    def album_to_genres(album):
-        artists = list()
-
-        for artist_simple in album.artists:
-            artist = spotify.artist(artist_simple.id)
-            artists.append(artist)
-
-        artists_genres = [artist.genres for artist in artists]
-        artists_genres = list(itertools.chain.from_iterable(artists_genres))
-        return artists_genres
-
-    def artists_played_counts(artists):
-        ret = list()
-        for artist in artists:
-            ret.append((artist.id, spotify_history.count_by_artist_name(artist.name)))
-        return ret
-
-    def make_filter_by_genre(wanted_genre, contains=False, empty=False):
-        def filter_by_genre(album):
-            album_genres = album_to_genres(album)
-            if empty and not album_genres:
-                return True
-            elif contains is False:
-                if wanted_genre in album_genres:
-                    return True
-            elif contains is True:
-                if any(wanted_genre in genre for genre in album_genres):
-                    return True
-            return False
-        return filter_by_genre
-
-    def make_filter_by_played_artist(wanted_count):
-        def filter_by_played_artist(album):
-            for artist_simple in album.artists:
-                played_count = spotify_history.count_by_artist_name(artist_simple.name)
-                if played_count >= wanted_count:
-                    return True
-            return False
-        return filter_by_played_artist
-
-    def make_filter_by_album_type(album_type):
-        def filter_by_album_type(album):
-            if album.album_type == album_type:
-                return True
-            else:
-                return False
-        return filter_by_album_type
-    #
-
     spotify = get_spotify()
     spotify_history = get_spotify_history()
 
-    search = spotify.search(query='tag:new',
-                            types=['album'],
-                            market=market)
-    paging = search[0]
-    print(f'results total: {paging.total}')
-    print()
-
-    filters = list()
-    if filter_by_genre:
-        filters.append(make_filter_by_genre(filter_by_genre))
-    if filter_by_genre_contains:
-        filters.append(make_filter_by_genre(filter_by_genre_contains, contains=True))
-    if filter_by_no_genre:
-        filters.append(make_filter_by_genre(None, empty=True))
-    if filter_by_artist_played_count:
-        filters.append(make_filter_by_played_artist(filter_by_artist_played_count))
-    if filter_by_album_type:
-        filters.append(make_filter_by_album_type(filter_by_album_type))
-
-    albums = spotify.all_items(paging)
-    albums = filter(make_multi_filter(filters), albums)
-
-    if sort_by_release_date:
-        albums = sorted(albums, key=operator.attrgetter('release_date'), reverse=sort_reversed)
+    albums = search_new_releases(**locals())
 
     count = 0
     for count, album in enumerate(albums, start=1):
+        genres = album_to_genres(
+            album,
+            spotify=spotify)
+
+        played_counts = artists_played_counts(
+            album.artists,
+            spotify_history=spotify_history)
+
         printer(album)
-        print(f'\tgenres: {album_to_genres(album)}')
-        print(f'\tplayed: {artists_played_counts(album.artists)}')
+        print(f'\tgenres: {genres}')
+        print(f'\tplayed: {played_counts}')
 
     print()
     print(f'results after filters: {count}')
 
-
-def make_multi_filter(filters):
-    def multi_filter(x):
-        return all([f(x) for f in filters])
-    return multi_filter
 
 # END
