@@ -650,8 +650,8 @@ class PlaylistGenerator:
         if self.is_uri_already_seen(playlist.uri + '#tracks'):
             return
         tracks = self.playlist_all_tracks_generator(playlist.id)
-        e = self.expander(self.randomizer(tracks, **opts), **opts)
-        yield from e
+        expander = self.expander(self.randomizer(tracks, **opts), **opts)
+        yield from expander
 
     @expander.register
     def expander_uri(self,
