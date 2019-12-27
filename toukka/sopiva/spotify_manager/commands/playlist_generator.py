@@ -139,17 +139,17 @@ def from_genres_re(genre_name_re: str,
 
 @generate_playlist.command()
 @click.option('--market')
-@click.option('--filter-by-genre')
+@click.option('--filter-by-genre', multiple=True)
 @click.option('--filter-by-no-genre', is_flag=True)
-@click.option('--filter-by-genre-contains')
+@click.option('--filter-by-genre-contains', multiple=True)
 @click.option('--filter-by-artist-played-count', type=int)
 @click.option('--filter-by-album-type')
 @click.option('--sort-by-release-date', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
 def from_new_releases(
         market: str = None,
-        filter_by_genre: str = None,
-        filter_by_genre_contains: str = None,
+        filter_by_genre: tuple = None,
+        filter_by_genre_contains: tuple = None,
         filter_by_no_genre: bool = None,
         filter_by_artist_played_count: int = None,
         filter_by_album_type: str = None,

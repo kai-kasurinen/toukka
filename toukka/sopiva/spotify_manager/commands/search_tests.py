@@ -14,20 +14,24 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
 
 @cli_root.command()
 @click.option('--market')
-@click.option('--filter-by-genre')
+@click.option('--filter-by-genre', multiple=True)
 @click.option('--filter-by-no-genre', is_flag=True)
-@click.option('--filter-by-genre-contains')
+@click.option('--filter-by-genre-contains', multiple=True)
 @click.option('--filter-by-artist-played-count', type=int)
 @click.option('--filter-by-album-type')
+@click.option('--filter-by-album-name-lang')
+@click.option('--filter-mode')
 @click.option('--sort-by-release-date', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
 def new_releases(
         market: str = None,
-        filter_by_genre: str = None,
-        filter_by_genre_contains: str = None,
+        filter_by_genre: tuple = None,
+        filter_by_genre_contains: tuple = None,
         filter_by_no_genre: bool = None,
         filter_by_artist_played_count: int = None,
         filter_by_album_type: str = None,
+        filter_by_album_name_lang: str = None,
+        filter_mode: str = None,
         sort_by_release_date: bool = False,
         sort_reversed: bool = False,
         ):

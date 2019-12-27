@@ -5,6 +5,8 @@ import itertools
 import functools
 import operator
 
+import langdetect
+from langdetect.lang_detect_exception import LangDetectException
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
@@ -39,16 +41,19 @@ def artists_played_counts(artists, spotify_history=None):
 
 def search_new_releases(
         market: str = None,
-        filter_by_genre: str = None,
-        filter_by_genre_contains: str = None,
+        filter_by_genre: tuple = None,
+        filter_by_genre_contains: tuple = None,
         filter_by_no_genre: bool = None,
         filter_by_artist_played_count: int = None,
         filter_by_album_type: str = None,
+        filter_by_album_name_lang: str = None,
+        filter_mode: str = None,
         sort_by_release_date: bool = False,
         sort_reversed: bool = False,
         spotify: object = None,
         spotify_history: object = None
         ):
+    print(locals())
 
     def make_filter_by_genre(wanted_genre, contains=False, empty=False):
         def filter_by_genre(album):
@@ -80,6 +85,18 @@ def search_new_releases(
             else:
                 return False
         return filter_by_album_type
+
+    def make_filter_by_album_name_lang(wanted_lang):
+        def filter_by_album_name_lang(album):
+            try:
+                detected_lang = langdetect.detect(album.name)
+            except LangDetectException:
+                detected_lang = None
+            if detected_lang == wanted_lang:
+                return True
+            else:
+                return False
+        return filter_by_album_name_lang
     #
 
     spotify = spotify or get_spotify()
@@ -93,17 +110,24 @@ def search_new_releases(
 
     filters = list()
     if filter_by_genre:
-        filters.append(make_filter_by_genre(filter_by_genre))
+        for genre in filter_by_genre:
+            filters.append(make_filter_by_genre(genre))
     if filter_by_genre_contains:
-        filters.append(make_filter_by_genre(filter_by_genre_contains, contains=True))
+        for genre in filter_by_genre_contains:
+            filters.append(make_filter_by_genre(genre, contains=True))
     if filter_by_no_genre:
         filters.append(make_filter_by_genre(None, empty=True))
     if filter_by_artist_played_count:
         filters.append(make_filter_by_played_artist(filter_by_artist_played_count))
     if filter_by_album_type:
         filters.append(make_filter_by_album_type(filter_by_album_type))
+    if filter_by_album_name_lang:
+        filters.append(make_filter_by_album_name_lang(filter_by_album_name_lang))
 
-    albums = filter(make_multi_filter(filters), albums)
+    filter_mode_mappings = {'any': any, 'all': all}
+    filter_mode_function = filter_mode_mappings.get(filter_mode, all)
+
+    albums = filter(make_multi_filter(filters, func=filter_mode_function), albums)
 
     if sort_by_release_date:
         albums = sorted(albums, key=operator.attrgetter('release_date'), reverse=sort_reversed)
@@ -111,9 +135,9 @@ def search_new_releases(
     return albums
 
 
-def make_multi_filter(filters):
+def make_multi_filter(filters, func=all):
     def multi_filter(x):
-        return all([f(x) for f in filters])
+        return func([f(x) for f in filters])
     return multi_filter
 
 # END
