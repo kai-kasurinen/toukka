@@ -3,6 +3,7 @@
 import logging
 import itertools
 import functools
+import operator
 
 import click
 
@@ -21,6 +22,8 @@ logger = logging.getLogger(__name__)
 @click.option('--filter-by-genre-contains')
 @click.option('--filter-by-artist-played-count', type=int)
 @click.option('--filter-by-album-type')
+@click.option('--sort-by-release-date', is_flag=True)
+@click.option('--sort-reversed', is_flag=True)
 def new_albums(
         limit: int = None,
         market: str = None,
@@ -28,6 +31,8 @@ def new_albums(
         filter_by_genre_contains: str = None,
         filter_by_artist_played_count: int = None,
         filter_by_album_type: str = None,
+        sort_by_release_date: bool = False,
+        sort_reversed: bool = False,
         ):
 
     def album_to_genres(album):
@@ -103,18 +108,15 @@ def new_albums(
     albums = spotify.all_items(paging)
     albums = filter(make_multi_filter(filters), albums)
 
-    # foo
-    count = 0
+    if sort_by_release_date:
+        albums = sorted(albums, key=operator.attrgetter('release_date'), reverse=sort_reversed)
 
-    for count, album in enumerate(albums, start=1):
+    for album in albums:
         printer(album)
         print(f'\tgenres: {album_to_genres(album)}')
         print(f'\tplayed: {artists_played_counts(album.artists)}')
 
-        if limit is not None and count >= limit:
-            break
-
-    print(f'results after filters: {count}')
+    print(f'results after filters: {len(albums)}')
 
 
 def make_multi_filter(filters):
