@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 @click.option('--market')
 @click.option('--limit', type=int)
 @click.option('--filter-by-genre')
+@click.option('--filter-by-no-genre', is_flag=True)
 @click.option('--filter-by-genre-contains')
 @click.option('--filter-by-artist-played-count', type=int)
 @click.option('--filter-by-album-type')
@@ -29,6 +30,7 @@ def new_albums(
         market: str = None,
         filter_by_genre: str = None,
         filter_by_genre_contains: str = None,
+        filter_by_no_genre: bool = None,
         filter_by_artist_played_count: int = None,
         filter_by_album_type: str = None,
         sort_by_release_date: bool = False,
@@ -52,19 +54,18 @@ def new_albums(
             ret.append((artist.id, spotify_history.count_by_artist_name(artist.name)))
         return ret
 
-    def make_filter_by_genre(wanted_genre, contains=False):
+    def make_filter_by_genre(wanted_genre, contains=False, empty=False):
         def filter_by_genre(album):
             album_genres = album_to_genres(album)
-            if contains is False:
+            if empty and not album_genres:
+                return True
+            elif contains is False:
                 if wanted_genre in album_genres:
                     return True
-                else:
-                    return False
             elif contains is True:
                 if any(wanted_genre in genre for genre in album_genres):
                     return True
-                else:
-                    return False
+            return False
         return filter_by_genre
 
     def make_filter_by_played_artist(wanted_count):
@@ -100,6 +101,8 @@ def new_albums(
         filters.append(make_filter_by_genre(filter_by_genre))
     if filter_by_genre_contains:
         filters.append(make_filter_by_genre(filter_by_genre_contains, contains=True))
+    if filter_by_no_genre:
+        filters.append(make_filter_by_genre(None, empty=True))
     if filter_by_artist_played_count:
         filters.append(make_filter_by_played_artist(filter_by_artist_played_count))
     if filter_by_album_type:
@@ -111,12 +114,14 @@ def new_albums(
     if sort_by_release_date:
         albums = sorted(albums, key=operator.attrgetter('release_date'), reverse=sort_reversed)
 
-    for album in albums:
+    count = 0
+    for count, album in enumerate(albums, start=1):
         printer(album)
         print(f'\tgenres: {album_to_genres(album)}')
         print(f'\tplayed: {artists_played_counts(album.artists)}')
 
-    print(f'results after filters: {len(albums)}')
+    print()
+    print(f'results after filters: {count}')
 
 
 def make_multi_filter(filters):
