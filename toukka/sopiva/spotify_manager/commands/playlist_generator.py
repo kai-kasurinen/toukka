@@ -8,6 +8,9 @@ import re
 
 import click
 import click_params
+
+from click_params import StringListParamType
+
 import spotipy.convert
 import spotipy.client.browse.validate
 
@@ -41,11 +44,13 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-playlist-to-tracks', is_flag=True)
 @click.option('--expand-genre-to-playlists', is_flag=True)
 @click.option('--expand-genre-to-related-genres', is_flag=True)
+@click.option('--sort-artist-albums-by-keys', type=StringListParamType())
+@click.option('--sort-artist-albums-reverse', is_flag=True)
 @click.option('--exclude-various-artists-albums', is_flag=True)
-@click.option('--include-album-groups', type=click_params.StringListParamType(),
+@click.option('--include-album-groups', type=StringListParamType(),
               help='album, single, appears_on, compilation',
               default='album,single,compilation')
-@click.option('--include-genre-playlists', type=click_params.StringListParamType(),
+@click.option('--include-genre-playlists', type=StringListParamType(),
               default='intro,sound,female,year_2018,year_2019,pulse,edge')
 @click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=5000)

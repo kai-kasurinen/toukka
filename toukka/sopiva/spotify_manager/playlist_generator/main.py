@@ -7,6 +7,7 @@ import logging
 import pprint
 import types
 import random
+import operator
 
 # import autologging
 import enlighten
@@ -78,8 +79,10 @@ class PlaylistGenerator:
                                      'year_2018',
                                      'year_2019',
                                      'pulse',
-                                     'edge'])
-
+                                     'edge'],
+            sort_artist_albums_by_keys=None,
+            sort_artist_albums_reverse=False
+            )
         self.options = options.push(kwargs)
 
         self.spotify = get_spotify()
@@ -267,8 +270,11 @@ class PlaylistGenerator:
 
     def artist_albums_generator(self,
                                 artist_id: str,
-                                include_groups: Optional[List] = None
+                                include_groups: Optional[List] = None,
+                                **kwargs
                                 ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
+        opts = self.options.push(kwargs)
+
         # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
         if include_groups is None:
             self.__log.warning('include_groups is None')
@@ -277,7 +283,16 @@ class PlaylistGenerator:
             include_groups=include_groups,
             limit=50,
             market=self.market)
-        for album in self.spotify.all_items_from_paging(paging):
+
+        albums = self.spotify.all_items(paging)
+
+        # FIXME: move?
+        if opts.sort_artist_albums_by_keys:
+            albums = sorted(albums,
+                            key=operator.attrgetter(*opts.sort_artist_albums_by_keys),
+                            reverse=opts.sort_artist_albums_reverse)
+
+        for album in albums:
             # speed up things
             if self.user_country not in album.available_markets:
                 self.__log.debug('album:%s: is not available %s', album.id, self.user_country)
