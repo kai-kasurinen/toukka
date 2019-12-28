@@ -83,7 +83,8 @@ class PlaylistGenerator:
                                      'edge'],
             sort_artist_albums_by_keys=None,
             sort_artist_albums_reverse=False
-            )
+        )
+
         self.options = options.push(kwargs)
 
         self.spotify = get_spotify()
@@ -305,28 +306,33 @@ class PlaylistGenerator:
                 continue
             yield album
 
-    def artist_top_tracks_generator(self,
-                                    artist_id: str
-                                    ) -> Generator[spotipy.model.track.FullTrack, None, None]:
-        yield from self.spotify.artist_top_tracks(artist_id,
-                                                  market=self.user_country)
+    def artist_top_tracks_generator(
+            self,
+            artist_id: str
+            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
 
-    def album_tracks_generator(self,
-                               album_id: str
-                               ) -> Generator[spotipy.model.track.SimpleTrack, None, None]:
+        yield from self.spotify.artist_top_tracks(
+            artist_id,
+            market=self.user_country)
+
+    def album_tracks_generator(
+            self,
+            album_id: str
+            ) -> Generator[spotipy.model.track.SimpleTrack, None, None]:
+
         paging = self.spotify.album_tracks(
             album_id,
             market=self.market,
             limit=50)
-        # NOTE: yield SimpleTracks
-        yield from self.spotify.all_items_from_paging(paging)
+        yield from self.spotify.all_items(paging)
 
-    def recommendations_generator(self,
-                                  seed_artist_ids: List = None,
-                                  seed_track_ids: List = None,
-                                  seed_genres: List = None,
-                                  seed_attributes: Dict = None
-                                  ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+    def recommendations_generator(
+            self,
+            seed_artist_ids: List = None,
+            seed_track_ids: List = None,
+            seed_genres: List = None,
+            seed_attributes: Dict = None
+            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
 
         if seed_attributes is None:
             seed_attributes = {}
