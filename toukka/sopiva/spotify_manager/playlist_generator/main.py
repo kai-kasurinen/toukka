@@ -43,10 +43,11 @@ from .progress_bar import ProgressBars
 class PlaylistGenerator:
     '''generates playlist'''
 
-    def __init__(self,
-                 playlist_uri: str = None,
-                 **kwargs
-                 ) -> None:
+    def __init__(
+            self,
+            playlist_uri: str = None,
+            **kwargs
+            ) -> None:
 
         # TODO: move
         options = Options(
@@ -268,11 +269,13 @@ class PlaylistGenerator:
 
     # generators
 
-    def artist_albums_generator(self,
-                                artist_id: str,
-                                include_groups: Optional[List] = None,
-                                **kwargs
-                                ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
+    def artist_albums_generator(
+            self,
+            artist_id: str,
+            include_groups: Optional[List] = None,
+            **kwargs
+            ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
+
         opts = self.options.push(kwargs)
 
         # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
@@ -288,6 +291,9 @@ class PlaylistGenerator:
 
         # FIXME: move?
         if opts.sort_artist_albums_by_keys:
+            self.__log.debug('adding sorting by %s, reverse: %s',
+                             opts.sort_artist_albums_by_keys,
+                             opts.sort_artist_albums_reverse)
             albums = sorted(albums,
                             key=operator.attrgetter(*opts.sort_artist_albums_by_keys),
                             reverse=opts.sort_artist_albums_reverse)
