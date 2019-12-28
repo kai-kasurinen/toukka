@@ -12,6 +12,7 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 # FIXME: move
@@ -49,6 +50,7 @@ def search_new_releases(
         filter_by_album_name_lang: str = None,
         filter_mode: str = None,
         sort_by_release_date: bool = False,
+        sort_by_album_type: bool = False,
         sort_reversed: bool = False,
         spotify: object = None,
         spotify_history: object = None
@@ -101,11 +103,13 @@ def search_new_releases(
     spotify = spotify or get_spotify()
     spotify_history = spotify_history or get_spotify_history()
 
+    logger.debug('searching new releases')
     search = spotify.search(query='tag:new',
                             types=['album'],
                             market=market)
     paging = search[0]
     albums = spotify.all_items(paging)
+    logger.debug(f'total results: {paging.total}')
 
     filters = list()
     if filter_by_genre:
@@ -126,11 +130,18 @@ def search_new_releases(
     filter_mode_mappings = {'any': any, 'all': all}
     filter_mode_function = filter_mode_mappings.get(filter_mode, all)
 
+    logger.debug(f'add {len(filters)} filters')
     albums = filter(make_multi_filter(filters, func=filter_mode_function), albums)
 
     if sort_by_release_date:
+        logger.debug('add sorting by release date')
         albums = sorted(albums, key=operator.attrgetter('release_date'), reverse=sort_reversed)
 
+    if sort_by_album_type:
+        logger.debug('add sorting by album type')
+        albums = sorted(albums, key=operator.attrgetter('album_type'), reverse=sort_reversed)
+
+    logger.debug('done')
     return albums
 
 

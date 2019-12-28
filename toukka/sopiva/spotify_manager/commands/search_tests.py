@@ -22,24 +22,16 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
 @click.option('--filter-by-album-name-lang')
 @click.option('--filter-mode')
 @click.option('--sort-by-release-date', is_flag=True)
+@click.option('--sort-by-album-type', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
 def new_releases(
-        market: str = None,
-        filter_by_genre: tuple = None,
-        filter_by_genre_contains: tuple = None,
-        filter_by_no_genre: bool = None,
-        filter_by_artist_played_count: int = None,
-        filter_by_album_type: str = None,
-        filter_by_album_name_lang: str = None,
-        filter_mode: str = None,
-        sort_by_release_date: bool = False,
-        sort_reversed: bool = False
+        **kwargs
         ):
 
     spotify = get_spotify()
     spotify_history = get_spotify_history()
 
-    albums = search_new_releases(**locals())
+    albums = search_new_releases(**kwargs)
 
     count = 0
     for count, album in enumerate(albums, start=1):

@@ -152,6 +152,7 @@ def from_genres_re(
 @click.option('--filter-by-album-type')
 @click.option('--filter-mode')
 @click.option('--sort-by-release-date', is_flag=True)
+@click.option('--sort-by-album-type', is_flag=True)
 @click.option('--sort-reversed', is_flag=True)
 def from_new_releases(
         market: str = None,
@@ -162,6 +163,7 @@ def from_new_releases(
         filter_by_album_type: str = None,
         filter_mode: str = None,
         sort_by_release_date: bool = False,
+        sort_by_album_type: bool = False,
         sort_reversed: bool = False
         ):
 
