@@ -2,6 +2,8 @@
 
 '''spotify artist commands'''
 
+import operator
+
 import click
 import spotipy
 
@@ -34,14 +36,25 @@ def info(uri):
               type=StringListParamType(','),
               help='album,appears_on,compilation,single',
               default='album,single,compilation')
-def albums(uri,
-           market: str = None,
-           include_groups: list = None):
+@click.option('--sort-by-keys', type=StringListParamType())
+@click.option('--sort-reversed', is_flag=True)
+def albums(
+        uri,
+        market: str = None,
+        include_groups: list = None,
+        sort_by_keys: list = None,
+        sort_reversed: bool = False
+        ):
     '''get artist albums'''
     spotify = get_spotify()
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     paging = spotify.artist_albums(uri_id, market=market, include_groups=include_groups)
-    for album in spotify.all_items_from_paging(paging):
+    albums = spotify.all_items(paging)
+
+    if sort_by_keys:
+        albums = sorted(albums, key=operator.attrgetter(*sort_by_keys), reverse=sort_reversed)
+
+    for album in albums:
         printer(album)
 
 

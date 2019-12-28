@@ -2,6 +2,8 @@
 
 import click
 
+from click_params import StringListParamType
+
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.cli import cli_root
@@ -21,8 +23,7 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
 @click.option('--filter-by-album-type')
 @click.option('--filter-by-album-name-lang')
 @click.option('--filter-mode')
-@click.option('--sort-by-release-date', is_flag=True)
-@click.option('--sort-by-album-type', is_flag=True)
+@click.option('--sort-by-keys', type=StringListParamType())
 @click.option('--sort-reversed', is_flag=True)
 def new_releases(
         **kwargs

@@ -49,8 +49,7 @@ def search_new_releases(
         filter_by_album_type: str = None,
         filter_by_album_name_lang: str = None,
         filter_mode: str = None,
-        sort_by_release_date: bool = False,
-        sort_by_album_type: bool = False,
+        sort_by_keys: tuple = None,
         sort_reversed: bool = False,
         spotify: object = None,
         spotify_history: object = None
@@ -133,14 +132,9 @@ def search_new_releases(
     logger.debug(f'add {len(filters)} filters')
     albums = filter(make_multi_filter(filters, func=filter_mode_function), albums)
 
-    sort_keys = list()
-    if sort_by_release_date:
-        sort_keys.append('release_date')
-    if sort_by_album_type:
-        sort_keys.append('album_type')
-    if sort_keys:
-        logger.debug(f'add sorting by {sort_keys}')
-        albums = sorted(albums, key=operator.attrgetter(*sort_keys), reverse=sort_reversed)
+    if sort_by_keys:
+        logger.debug(f'add sorting by {sort_by_keys}')
+        albums = sorted(albums, key=operator.attrgetter(*sort_by_keys), reverse=sort_reversed)
 
     logger.debug('done')
     return albums
