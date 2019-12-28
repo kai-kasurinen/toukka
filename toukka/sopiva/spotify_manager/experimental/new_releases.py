@@ -133,13 +133,14 @@ def search_new_releases(
     logger.debug(f'add {len(filters)} filters')
     albums = filter(make_multi_filter(filters, func=filter_mode_function), albums)
 
+    sort_keys = list()
     if sort_by_release_date:
-        logger.debug('add sorting by release date')
-        albums = sorted(albums, key=operator.attrgetter('release_date'), reverse=sort_reversed)
-
+        sort_keys.append('release_date')
     if sort_by_album_type:
-        logger.debug('add sorting by album type')
-        albums = sorted(albums, key=operator.attrgetter('album_type'), reverse=sort_reversed)
+        sort_keys.append('album_type')
+    if sort_keys:
+        logger.debug(f'add sorting by {sort_keys}')
+        albums = sorted(albums, key=operator.attrgetter(*sort_keys), reverse=sort_reversed)
 
     logger.debug('done')
     return albums
