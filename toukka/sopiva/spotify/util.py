@@ -49,7 +49,7 @@ def get_user_token() -> spotipy.util.RefreshingToken:
         logger.debug('refresh token found, using it')
         # TODO: catch spotipy.auth.OAuthError
         try:
-            token = spotipy.util.request_refreshed_token(client_id, client_secret, redirect_uri, refresh_token)
+            token = spotipy.util.refresh_user_token(client_id, client_secret, redirect_uri, refresh_token)
         except spotipy.auth.OAuthError as e:
             logger.warning(e)
 
