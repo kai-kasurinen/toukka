@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def user_analyze_1(**kwargs):
+def analyze_user_1(**kwargs):
 
     spotify = get_spotify()
 

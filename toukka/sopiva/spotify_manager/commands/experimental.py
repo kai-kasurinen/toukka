@@ -13,7 +13,7 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
     search_new_releases, album_to_genres, artists_played_counts
 )
 
-from toukka.sopiva.spotify_manager.experimental.user_analyze import user_analyze_1
+from toukka.sopiva.spotify_manager.experimental.user_analyze import analyze_user_1
 
 
 @cli_root.command()
@@ -55,10 +55,10 @@ def new_releases(
 
 
 @cli_root.command()
-def user_analyze(
+def analyze_user(
         **kwargs
         ):
-    user_analyze_1(**kwargs)
+    analyze_user_1(**kwargs)
 
 
 # END
