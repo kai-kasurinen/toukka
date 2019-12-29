@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 
 import spotipy.convert
 
-import toukka.cache.dogpile
+# import toukka.cache.dogpile
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 
@@ -62,32 +62,26 @@ def genres_make():
     particle_detector_2018_id = 'particledetector2018'
     particle_detector_2019_id = 'particledetector2019'
 
-    # TODO: move to Spotify
-    @toukka.cache.dogpile.local.cache_on_arguments()
-    def playlists_cached(user_id: str):
-        paging = spotify.playlists(user_id, limit=50)
-        logger.debug('playlists total: %i', paging.total)
-        playlists = list(spotify.all_items_from_paging(paging))
-        return playlists
-
-    @toukka.cache.dogpile.local.cache_on_arguments()
-    def playlist_cached(playlist_id: str):
-        return spotify.playlist(playlist_id, market=None)
-
-    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_sound_of_spotify():
+
         user_id = sound_of_spotify_id
         logger.info('processing user: %s', user_id)
-        playlists = playlists_cached(user_id)
-        logger.info('%s playlists count: %i', user_id, len(playlists))
+        paging = spotify.playlists(user_id)
+        playlists = spotify.all_items(paging)
+        logger.info('%s playlists count: %i', user_id, paging.total)
+
         sounds = dict()
         places = dict()
         related = dict()
 
         for playlist in playlists:
+
             if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
                 continue
+
+            if not playlist.description:
+                logger.warning('%s: no description', playlist.uri)
 
             if playlist.name.startswith('The Sound of'):
                 thing = playlist.name.split('The Sound of ')[1]
@@ -138,15 +132,18 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return sounds, places, related
 
-    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_particle_detector():
+
         user_id = particle_detector_id
         logger.info('processing user: %s', user_id)
-        playlists = playlists_cached(user_id)
-        logger.info('%s playlists count: %i', user_id, len(playlists))
+        paging = spotify.playlists(user_id)
+        playlists = spotify.all_items(paging)
+        logger.info('%s playlists count: %i', user_id, paging.total)
+
         intros = dict()
         pulses = dict()
         edges = dict()
+
         for playlist in playlists:
             if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
@@ -179,13 +176,16 @@ def genres_make():
 
         return intros, pulses, edges
 
-    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_particle_filter():
+
         user_id = particle_filter_id
         logger.info('processing user: %s', user_id)
-        playlists = playlists_cached(user_id)
-        logger.info('%s playlists count: %i', user_id, len(playlists))
+        paging = spotify.playlists(user_id)
+        playlists = spotify.all_items(paging)
+        logger.info('%s playlists count: %i', user_id, paging.total)
+
         females = dict()
+
         for playlist in playlists:
             if playlist.owner.id != user_id:
                 logger.warning('%s: not supported owner: %s', playlist.uri, playlist.owner.id)
@@ -198,11 +198,13 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return females
 
-    # @toukka.cache.dogpile.local.cache_on_arguments(expiration_time=604800)
     def process_particle_detector_year(user_id: str, year: int):
+
         logger.info('processing user: %s, year: %i', user_id, year)
-        playlists = playlists_cached(user_id)
-        logger.info('%s playlists count: %i', user_id, len(playlists))
+        paging = spotify.playlists(user_id)
+        playlists = spotify.all_items(paging)
+        logger.info('%s playlists count: %i', user_id, paging.total)
+
         ret = Genres()
         for playlist in playlists:
             if playlist.owner.id != user_id:
@@ -222,7 +224,8 @@ def genres_make():
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
         return ret
 
-    #
+    # main
+
     logger.info('generating genres, this may take some time')
 
     sounds, places, related = process_sound_of_spotify()
