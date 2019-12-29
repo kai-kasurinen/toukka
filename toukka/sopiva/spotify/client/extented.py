@@ -8,30 +8,15 @@ from spotipy.model.base import Item
 
 import spotipy.convert
 
+from deprecated import deprecated
 
 # TODO: clean (some methods added to spotipy)
 
 
 class SpotifyExtended(Spotify):
 
-    all_pages_from_paging = Spotify.all_pages
-    all_items_from_paging = Spotify.all_items
-
-#    def all_pages_from_paging(self,
-#                              paging: Paging
-#                              ) -> Generator[Paging, None, None]:
-#        '''all pages from Paging generator'''
-#        yield paging
-#        while paging.next is not None:
-#            paging = self.next(paging)
-#            yield paging
-#
-#    def all_items_from_paging(self,
-#                              paging: Paging
-#                              ) -> Generator[Item, None, None]:
-#        '''all items from Paging generator'''
-#        for page in self.all_pages_from_paging(paging):
-#            yield from page.items
+    all_pages_from_paging = deprecated()(Spotify.all_pages)
+    all_items_from_paging = deprecated()(Spotify.all_items)
 
     def uri_to_item(self, uri: str) -> Item:
         uri_type, uri_id = spotipy.convert.from_uri(uri)
