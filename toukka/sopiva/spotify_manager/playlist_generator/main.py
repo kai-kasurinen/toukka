@@ -36,7 +36,7 @@ from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter
 from .util import scramble_generator, take_random_items_generator
 from .progress_bar import ProgressBars
-
+from .seen import Seen
 
 # @autologging.traced
 # @autologging.logged
@@ -93,7 +93,7 @@ class PlaylistGenerator:
         self.market = None
 
         # init empty
-        self._uris_seen: Set[str] = set()
+        self._uris_seen = Seen()
         # FIXME: use orderedset
         self.track_ids_to_playlist: List[str] = list()
 
@@ -258,15 +258,9 @@ class PlaylistGenerator:
         print(self.playlist.description)
         self.generate(**opts)
 
-    # TODO: split check and add
-    def is_uri_already_seen(self, uri: str, debug=False) -> bool:
-        if uri in self._uris_seen:
-            if debug:
-                self.__log.debug('%s is already seen', uri)
-            return True
-        else:
-            self._uris_seen.add(uri)
-            return False
+    # TODO: remove
+    def is_uri_already_seen(self, uri: str) -> bool:
+        return self._uris_seen.see(uri)
 
     # generators
 
