@@ -13,6 +13,8 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
     search_new_releases, album_to_genres, artists_played_counts
 )
 
+from toukka.sopiva.spotify_manager.experimental.user_analyze import user_analyze_1
+
 
 @cli_root.command()
 @click.option('--market')
@@ -50,6 +52,13 @@ def new_releases(
 
     print()
     print(f'results after filters: {count}')
+
+
+@cli_root.command()
+def user_analyze(
+        **kwargs
+        ):
+    user_analyze_1(**kwargs)
 
 
 # END
