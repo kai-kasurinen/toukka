@@ -10,6 +10,7 @@ from langdetect.lang_detect_exception import LangDetectException
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
+from toukka.sopiva.spotify.helper import Helper
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -71,8 +72,8 @@ def search_new_releases(
 
     def make_filter_by_played_artist(wanted_count):
         def filter_by_played_artist(album):
-            for artist_simple in album.artists:
-                played_count = spotify_history.count_by_artist_name(artist_simple.name)
+            for artist in album.artists:
+                played_count = spotify_history.count_by_artist_name(artist.name)
                 if played_count >= wanted_count:
                     return True
             return False
@@ -101,6 +102,7 @@ def search_new_releases(
 
     spotify = spotify or get_spotify()
     spotify_history = spotify_history or get_spotify_history()
+    helper = Helper(spotify=spotify)
 
     logger.debug('searching new releases')
     search = spotify.search(query='tag:new',
