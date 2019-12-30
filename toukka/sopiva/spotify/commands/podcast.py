@@ -26,7 +26,7 @@ def show(uri,
     show = spotify.show(uri_id, market=market)
     printer(show)
     if episodes:
-        for episode in spotify.all_items_from_paging(show.episodes):
+        for episode in spotify.all_items(show.episodes):
             printer(episode)
 
 

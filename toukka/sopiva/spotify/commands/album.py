@@ -21,7 +21,7 @@ def album(uri,
     album = spotify.album(uri_id, market=market)
     printer(album)
     if tracks:
-        for track in spotify.all_items_from_paging(album.tracks):
+        for track in spotify.all_items(album.tracks):
             printer(track)
 
 # END

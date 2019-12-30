@@ -380,7 +380,7 @@ class PlaylistGenerator:
                                      market=self.market)
         # FIXME: handle all types not just one
         paging = search[0]
-        for item in self.spotify.all_items_from_paging(paging):
+        for item in self.spotify.all_items(paging):
             # NOTE: item can me track, album, artist, playlist ...
             yield item
 
@@ -393,7 +393,7 @@ class PlaylistGenerator:
                                               limit=100,
                                               market=self.market)
 
-        for playlist_track in self.spotify.all_items_from_paging(paging):
+        for playlist_track in self.spotify.all_items(paging):
             if playlist_track.track is not None and not playlist_track.is_local:
                 yield playlist_track.track
 

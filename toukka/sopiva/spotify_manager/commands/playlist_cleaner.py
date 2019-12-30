@@ -53,7 +53,7 @@ def playlist_cleaner(uri: str,
     playlist = spotify.playlist(playlist_id=uri_id, market=market)
     printer(playlist)
 
-    playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
+    playlist_tracks = spotify.all_items(playlist.tracks)
 
     enlighten_manager = enlighten.get_manager(enabled=progress_bar)
     progress_tracks = enlighten_manager.counter(

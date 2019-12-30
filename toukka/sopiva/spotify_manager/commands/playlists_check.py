@@ -20,12 +20,12 @@ def playlists_check():
 
     spotify = toukka.sopiva.spotify.util.get_spotify()
 
-    playlists = list(spotify.all_items_from_paging(spotify.current_user_playlists(limit=50)))
+    playlists = list(spotify.all_items(spotify.current_user_playlists(limit=50)))
 
     for playlist in playlists:
         logger.info(playlist.name)
         paging = spotify.playlist_tracks(playlist.id)
-        ptracks = list(spotify.all_items_from_paging(paging))
+        ptracks = list(spotify.all_items(paging))
 
         for ptrack in ptracks:
             if ptrack.track is None:
@@ -44,7 +44,7 @@ def playlist_check(uri):
     paging = playlist.tracks
 
     logger.info(playlist.name)
-    ptracks = spotify.all_items_from_paging(paging)
+    ptracks = spotify.all_items(paging)
 
     for ptrack in ptracks:
         if ptrack.track is None:

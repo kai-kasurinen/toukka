@@ -8,15 +8,8 @@ from spotipy.model.base import Item
 
 import spotipy.convert
 
-from deprecated import deprecated
-
-# TODO: clean (some methods added to spotipy)
-
 
 class SpotifyExtended(Spotify):
-
-    all_pages_from_paging = deprecated()(Spotify.all_pages)
-    all_items_from_paging = deprecated()(Spotify.all_items)
 
     def uri_to_item(self, uri: str) -> Item:
         uri_type, uri_id = spotipy.convert.from_uri(uri)

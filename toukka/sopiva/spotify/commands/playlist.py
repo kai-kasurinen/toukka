@@ -31,7 +31,7 @@ def current_user_playlists():
     paging = spotify.current_user_playlists(limit=50)
     print(f'user has {paging.total} playlists')
 
-    for playlist in spotify.all_items_from_paging(paging):
+    for playlist in spotify.all_items(paging):
         printer(playlist)
 
 
@@ -44,7 +44,7 @@ def user_playlists_info(user):
     spotify = get_spotify()
     paging = spotify.playlists(user, limit=50)
     print(f'user has {paging.total} playlists')
-    playlists = spotify.all_items_from_paging(paging)
+    playlists = spotify.all_items(paging)
 
     own = [p for p in playlists if p.owner.id == user]
     public = [p for p in playlists if p.public is True]
@@ -61,7 +61,7 @@ def user_playlists(user):
     spotify = get_spotify()
     paging = spotify.playlists(user, limit=50)
     print(f'user has {paging.total} playlists')
-    for playlist in spotify.all_items_from_paging(paging):
+    for playlist in spotify.all_items(paging):
         printer(playlist)
 
 
@@ -77,7 +77,7 @@ def playlist_info(uri: str,
     printer(playlist)
 
     if print_tracks:
-        playlist_tracks = spotify.all_items_from_paging(playlist.tracks)
+        playlist_tracks = spotify.all_items(playlist.tracks)
         for playlist_track in playlist_tracks:
             printer(playlist_track)
             track = playlist_track.track
@@ -92,7 +92,7 @@ def playlist_tracks(uri: str,
     uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
     playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market)
-    playlist_tracks = spotify.all_items_from_paging(playlist_tracks_paging)
+    playlist_tracks = spotify.all_items(playlist_tracks_paging)
     for playlist_track in playlist_tracks:
         printer(playlist_track)
         track = playlist_track.track

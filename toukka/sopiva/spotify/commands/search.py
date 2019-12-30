@@ -27,7 +27,7 @@ def search(type: str,
     print(f'results total: {paging.total}')
     print()
 
-    for count, item in enumerate(spotify.all_items_from_paging(paging), start=1):
+    for count, item in enumerate(spotify.all_items(paging), start=1):
         printer(item)
 
         if limit is not None and count >= limit:

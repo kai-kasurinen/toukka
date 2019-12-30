@@ -21,7 +21,7 @@ def playlists(
     paging = spotify.playlists()
 
     print(f'user has {paging.total} playlists')
-    playlists = spotify.all_items_from_paging(paging)
+    playlists = spotify.all_items(paging)
 
     # FIXME:
     '''

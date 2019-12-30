@@ -114,6 +114,6 @@ def transfer_playback(device_id, force_play: bool = False):
 def recently_played():
     spotify = get_spotify()
     paging = spotify.playback_recently_played()
-    for played in spotify.all_items_from_paging(paging):
+    for played in spotify.all_items(paging):
         printer(played)
 # END

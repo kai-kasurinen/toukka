@@ -15,7 +15,7 @@ def follow():
 def followed_artists():
     spotify = get_spotify()
     paging = spotify.current_user_followed_artists()
-    for artist in spotify.all_items_from_paging(paging):
+    for artist in spotify.all_items(paging):
         printer(artist)
 
 

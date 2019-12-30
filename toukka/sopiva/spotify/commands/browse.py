@@ -30,7 +30,7 @@ def featured_playlists(country: str = None,
         limit=50)
     print(f'message: {message}')
     print(f'found {paging.total} featured playlists')
-    playlists = spotify.all_items_from_paging(paging)
+    playlists = spotify.all_items(paging)
     for playlist in playlists:
         printer(playlist)
 
@@ -42,7 +42,7 @@ def new_releases(country: str = None):
     spotify = get_spotify()
     paging = spotify.new_releases(country=country, limit=50)
     print(f'found {paging.total} releases')
-    for album in spotify.all_items_from_paging(paging):
+    for album in spotify.all_items(paging):
         printer(album)
 
 
@@ -55,7 +55,7 @@ def categories(country: str = None,
     spotify = get_spotify()
     paging = spotify.categories(country=country, locale=locale, limit=50)
     print(f'found {paging.total} categories')
-    for category in spotify.all_items_from_paging(paging):
+    for category in spotify.all_items(paging):
         printer(category)
 
 
@@ -84,7 +84,7 @@ def category_playlists(category_id: str,
         country=country,
         limit=50)
     print(f'found {paging.total} playlists')
-    playlists = spotify.all_items_from_paging(paging)
+    playlists = spotify.all_items(paging)
     for playlist in playlists:
         printer(playlist)
 
