@@ -64,7 +64,8 @@ def get_user_token() -> spotipy.util.RefreshingToken:
 
 def get_sender() -> spotipy.sender.Sender:
     session = toukka.hub.requests.get_cached_session()
-    sender = spotipy.sender.PersistentSender(session=session)
+    requests_kwargs = {'timeout': 10.0}
+    sender = spotipy.sender.PersistentSender(session=session, **requests_kwargs)
     # our session handless retrying, so this not needed
     # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
     return sender
@@ -80,9 +81,8 @@ def get_client_token() -> spotipy.util.RefreshingToken:
 
 def get_client(token, sender) -> toukka.sopiva.spotify.client.current.Spotify:
     # https://github.com/psf/requests/issues/3070
-    requests_kwargs = {'timeout': 10.0}
     client = toukka.sopiva.spotify.client.current.Spotify(
-        token=token, sender=sender, requests_kwargs=requests_kwargs)
+        token=token, sender=sender)
     return client
 
 
