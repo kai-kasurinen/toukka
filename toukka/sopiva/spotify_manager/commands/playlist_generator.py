@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 @click.option('--sort-artist-albums-by-keys', type=StringListParamType())
 @click.option('--sort-artist-albums-reverse', is_flag=True)
 @click.option('--exclude-various-artists-albums', is_flag=True)
+@click.option('--exclude-uris', multiple=True)
 @click.option('--include-album-groups', type=StringListParamType(),
               help='album, single, appears_on, compilation',
               default='album,single,compilation')

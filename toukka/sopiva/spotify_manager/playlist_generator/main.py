@@ -72,6 +72,7 @@ class PlaylistGenerator:
             expand_genre_to_playlists=False,
             expand_genre_to_related_genres=False,
             exclude_various_artists_albums=False,
+            exclude_uris=False,
             include_album_groups=['album',
                                   'single',
                                   'compilation'],
@@ -270,8 +271,22 @@ class PlaylistGenerator:
         print(self.playlist.description)
         self.generate(**opts)
 
-    # TODO: remove
-    def is_uri_already_seen(self, uri: str) -> bool:
+    # NOTE: returns False when uri is OK and True when uri is NOT ok
+    # TODO: rename? swap returns?
+    def check_uri(
+            self,
+            uri: str,
+            **kwargs
+            ) -> bool:
+
+        opts = self.options.push(kwargs)
+
+        exclude_uris = opts.exclude_uris
+
+        if exclude_uris:
+            if uri in exclude_uris:
+                return True
+
         return self._uris_seen.see(uri)
 
     # generators
@@ -483,7 +498,7 @@ class PlaylistGenerator:
             yield from self.expand_track_to_album(item, **opts)
             did = True
         # and finally use track if not seen
-        if not self.is_uri_already_seen(item.uri):
+        if not self.check_uri(item.uri):
             yield item
             did = True
         # nice hack
@@ -497,7 +512,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(track.uri + '#album'):
+        if self.check_uri(track.uri + '#album'):
             return
         # only FullTrack has album property
         if not isinstance(track, spotipy.model.track.FullTrack):
@@ -517,7 +532,7 @@ class PlaylistGenerator:
             ) -> None:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(artist.uri + '#source'):
+        if self.check_uri(artist.uri + '#source'):
             return
         artist = self.spotify.artist(artist.id)
         e = self.expander(artist, **opts)
@@ -530,7 +545,7 @@ class PlaylistGenerator:
             ) -> None:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(track.uri + '#recommendations'):
+        if self.check_uri(track.uri + '#recommendations'):
             return
         recommendations = self.recommendations_generator(seed_track_ids=[track.id])
         e = self.expander(self.randomizer(recommendations, **opts), **opts)
@@ -543,7 +558,7 @@ class PlaylistGenerator:
             ) -> None:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(track.uri + '#artists'):
+        if self.check_uri(track.uri + '#artists'):
             return
         # set expand_track_to_artists option to False, so we dont hit again
         # opts.set(expand_track_to_artists=False)
@@ -557,7 +572,7 @@ class PlaylistGenerator:
             ) -> None:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(artist.uri + '#related'):
+        if self.check_uri(artist.uri + '#related'):
             return
         artists = self.related_artists_generator(artist.id)
         e = self.expander(self.randomizer(artists, **opts), **opts)
@@ -570,7 +585,7 @@ class PlaylistGenerator:
             ) -> None:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(artist.uri + '#recommendations'):
+        if self.check_uri(artist.uri + '#recommendations'):
             return
         recommendations = self.recommendations_generator(seed_artist_ids=[artist.id])
         e = self.expander(self.randomizer(recommendations, **opts), **opts)
@@ -597,7 +612,7 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
-        if self.is_uri_already_seen(item.uri):
+        if self.check_uri(item.uri):
             return
 
         # add as new source
@@ -626,7 +641,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(artist.uri + '#albums'):
+        if self.check_uri(artist.uri + '#albums'):
             return
 
         albums = self.artist_albums_generator(
@@ -646,7 +661,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(artist.uri + '#top-tracks'):
+        if self.check_uri(artist.uri + '#top-tracks'):
             return
 
         tracks = self.artist_top_tracks_generator(artist.id)
@@ -663,7 +678,7 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
-        if self.is_uri_already_seen(item.uri):
+        if self.check_uri(item.uri):
             return
 
         # TODO: move?
@@ -693,7 +708,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(album.uri + '#tracks'):
+        if self.check_uri(album.uri + '#tracks'):
             return
         opts.set(expand_track_to_album=False)
         tracks = self.album_tracks_generator(album.id)
@@ -707,7 +722,7 @@ class PlaylistGenerator:
             ) -> None:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(album.uri + '#artists'):
+        if self.check_uri(album.uri + '#artists'):
             return
         for artist in album.artists:
             self.add_artist_as_source(artist, **opts)
@@ -721,7 +736,7 @@ class PlaylistGenerator:
 
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
-        if self.is_uri_already_seen(item.uri):
+        if self.check_uri(item.uri):
             return
         elif opts.expand_playlist_to_tracks:
             yield from self.expand_playlist_to_tracks(item, **opts)
@@ -735,7 +750,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(playlist.uri + '#tracks'):
+        if self.check_uri(playlist.uri + '#tracks'):
             return
         tracks = self.playlist_all_tracks_generator(playlist.id)
         expander = self.expander(self.randomizer(tracks, **opts), **opts)
@@ -751,7 +766,7 @@ class PlaylistGenerator:
         opts = self.options.push(kwargs)
         item_type, item_id = spotipy.convert.from_uri(item)
         self.__log.debug('%s: %s: %s', item, item_type, item_id)
-        if self.is_uri_already_seen(item + '#uri'):
+        if self.check_uri(item + '#uri'):
             return
         if item_type == 'artist':
             item_object = self.spotify.artist(item_id)
@@ -793,7 +808,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        if self.is_uri_already_seen(f'genre:{item.name}'):
+        if self.check_uri(f'genre:{item.name}'):
             return
         self.__log.debug('%s:%s', 'genre', item.name)
         did = False
@@ -818,7 +833,7 @@ class PlaylistGenerator:
 
         opts = self.options.push(kwargs)
 
-        if self.is_uri_already_seen(f'genre:{genre.name}#playlists'):
+        if self.check_uri(f'genre:{genre.name}#playlists'):
             return
 
         if genre.playlists is None:
@@ -844,7 +859,7 @@ class PlaylistGenerator:
 
         opts = self.options.push(kwargs)
 
-        if self.is_uri_already_seen(f'genre:{genre.name}#related'):
+        if self.check_uri(f'genre:{genre.name}#related'):
             return
 
         if genre.related is None:
