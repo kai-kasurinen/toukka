@@ -3,18 +3,19 @@
 import logging
 import requests
 import requests.adapters
-import urllib3.util.retry
 import cachecontrol
 import cachecontrol.caches
 import redis
 import xdg.BaseDirectory
 
+from urllib3.util.retry import Retry
+from toukka.adapted.retry import RetryA
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def get_retry() -> urllib3.util.retry.Retry:
+def get_retry() -> Retry:
     logging.getLogger('urllib3.util.retry').setLevel(logging.DEBUG)
     #
     # RETRY_AFTER_STATUS_CODES = frozenset([413, 429, 503]
@@ -23,8 +24,8 @@ def get_retry() -> urllib3.util.retry.Retry:
     # DEFAULT_METHOD_WHITELIST = frozenset(['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'])
     #
     #
-    default_method_whitelist = list(urllib3.util.retry.Retry.DEFAULT_METHOD_WHITELIST)
-    retry = urllib3.util.retry.Retry(
+    default_method_whitelist = list(Retry.DEFAULT_METHOD_WHITELIST)
+    retry = RetryA(
         total=4,
         backoff_factor=1,
         status_forcelist=[500, 502, 503],
