@@ -292,6 +292,7 @@ class PlaylistGenerator:
 
         if uri in self.uriban:
             self.__log.debug('%s: banned (skipping)', uri)
+            return True
 
         return self._uris_seen.see(uri)
 
