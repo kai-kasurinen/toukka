@@ -37,6 +37,7 @@ from .track_filter import TrackFilter
 from .util import scramble_generator, take_random_items_generator
 from .progress_bar import ProgressBars
 from .seen import Seen
+from .banner import UriBanDict
 
 
 # @autologging.traced
@@ -97,6 +98,8 @@ class PlaylistGenerator:
         # init empty
         self._uris_seen = Seen()
         self.track_ids_to_playlist: List[str] = list()
+
+        self.uriban = UriBanDict()
 
         self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
@@ -286,6 +289,9 @@ class PlaylistGenerator:
         if exclude_uris:
             if uri in exclude_uris:
                 return True
+
+        if uri in self.uriban:
+            self.__log.debug('%s: banned (skipping)', uri)
 
         return self._uris_seen.see(uri)
 

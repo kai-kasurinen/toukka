@@ -8,7 +8,8 @@ import spotipy
 from spotipy.model.track import FullTrack, Track
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
-# TODO: rewrite
+
+from .banner import UriBanDict
 
 
 class TrackFilter:
@@ -23,9 +24,11 @@ class TrackFilter:
         # seen
         self.seen_track_id: Set[str] = set()
         self.seen_track_isrc: Set[str] = set()
-        # FIXME: from config?
+        #
+        self.uriban = UriBanDict()
+        # FIXME: move
         self.bad_words_in_album_names = ['christmas', 'joulu']
-        self.bad_words_in_track_names = ['commentary']
+        self.bad_words_in_track_names = ['christmas', 'joulu', 'commentary']
         # TODO: add filter
         self.various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
         # FIXME: do something (emulates what autologging provides)
@@ -43,10 +46,6 @@ class TrackFilter:
 
         if self.is_track_already_played(track):
             self.__log.debug('track:%s: already played', track.id)
-            return False
-
-        if not self.is_track_name_good(track):
-            self.__log.debug('track:%s: track name "%s" not good', track.id, track.name)
             return False
 
         # relinked track may be totally different
@@ -76,6 +75,14 @@ class TrackFilter:
             self.__log.debug('track:%s: not playable', track_relinked.id)
             return False
 
+        if self.is_banned(track_full):
+            self.__log.debug('track:%s: banned', track_full.id)
+            return False
+
+        if not self.is_track_name_good(track_full):
+            self.__log.debug('track:%s: track name "%s" not good', track_full.id, track_full.name)
+            return False
+
         if not self.is_track_album_name_good(track_full):
             self.__log.debug('track:%s: album name "%s" not good', track_full.id, track_full.album.name)
             return False
@@ -90,6 +97,10 @@ class TrackFilter:
 
         # all checks that use relinked
         if relinked:
+
+            if self.is_banned(track_relinked):
+                self.__log.debug('track:%s: banned', track_relinked.id)
+                return false
 
             if self.is_track_already_seen(track_relinked):
                 self.__log.debug('track:%s: already seen (relinked)', track_relinked.id)
@@ -192,17 +203,29 @@ class TrackFilter:
 
     def is_track_album_name_good(self, track: FullTrack) -> bool:
 
-        if any(bad in track.album.name.lower() for bad in self.bad_words_in_album_names):
-            return False
-        else:
+        for bad_word in self.bad_words_in_album_names:
+            if bad_word in track.album.name.lower():
+                self.uriban.add(track.album.uri, reason=f'album_name, contains {bad_word}')
+                return False
+
+        return True
+
+    def is_track_name_good(self, track: FullTrack) -> bool:
+
+        for bad_word in self.bad_words_in_track_names:
+            if bad_word in track.name.lower():
+                self.uriban.add(track.album.uri, reason=f'track_name, contains {bad_word}')
+                return False
+        return True
+
+    def is_banned(self, track: FullTrack) -> bool:
+
+        if track.uri in self.uriban:
+            self.__log.debug('%s: banned (skipping)', track.uri)
             return True
-
-    def is_track_name_good(self, track: Track) -> bool:
-
-        if any(bad in track.name.lower() for bad in self.bad_words_in_track_names):
-            return False
-        else:
+        if track.album.uri in self.uriban:
+            self.__log.debug('%s: banned (skipping)', track.album.uri)
             return True
-
+        return False
 
 # END
