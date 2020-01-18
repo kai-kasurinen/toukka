@@ -261,6 +261,10 @@ def genres_make():
     return genres
 
 
+def _get_genres_filename():
+    return os.path.join(save_cache_path('toukka', 'spotify_manager'), 'genres.pickle')
+
+
 # FIXME: rename
 def genres() -> Genres:
     try:
@@ -276,13 +280,13 @@ def genres_refresh() -> None:
 
 def genres_save() -> None:
     genres = genres_make()
-    _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
+    _file = _get_genres_filename()
     with open(_file, 'wb') as file:
         pickle.dump(genres, file)
 
 
 def genres_load() -> Genres:
-    _file = os.path.join(save_cache_path('toukka', 'spotify'), 'genres.pickle')
+    _file = _get_genres_filename()
     with open(_file, 'rb') as file:
         return pickle.load(file)
 
