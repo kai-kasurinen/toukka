@@ -28,7 +28,7 @@ class TrackFilter:
         self.uriban = UriBanDict()
         # FIXME: move
         self.bad_words_in_album_names = ['christmas', 'joulu']
-        self.bad_words_in_track_names = ['christmas', 'joulu', 'commentary', 'what child is this']
+        self.bad_words_in_track_names = ['christmas', 'joulu', 'commentary', 'what child is this', 'jingle bells', 'o tannenbaum', 'o little town of bethlehem']
         # TODO: add filter
         self.various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
         # FIXME: do something (emulates what autologging provides)
