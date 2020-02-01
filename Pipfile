@@ -11,11 +11,11 @@ python_version = "3.8"
 [packages]
 confuse = "*"
 sqlitedict = "*"
-autologging = "*"
 sqlalchemy = "*"
-argh = "*"
-argcomplete = "*"
 options = "*"
+enlighten = "*"
+cachecontrol = "*"
+tekore = "*"
+click = "*"
+click_params = "*"
 
-[packages.spotipy]
-git = "https://github.com/felix-hilden/spotipy.git"

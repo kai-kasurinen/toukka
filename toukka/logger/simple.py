@@ -1,7 +1,7 @@
 #
 
 import logging
-import autologging
+# import autologging
 
 # TODO:  https://pythonhosted.org/Autologging/examples-separate.html
 
@@ -21,7 +21,7 @@ def set_logging_level(level):
     logging.getLogger().setLevel(level)
 
 
-def set_logging_level_to_trace():
-    set_logging_level(autologging.TRACE)
+# def set_logging_level_to_trace():
+#     set_logging_level(autologging.TRACE)
 
 # END

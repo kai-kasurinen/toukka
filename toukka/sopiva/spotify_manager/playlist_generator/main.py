@@ -14,8 +14,6 @@ import enlighten
 import more_itertools
 
 from options import Options
-# TODO: remove after upgraded to python3.8
-from singledispatchmethod import singledispatchmethod
 
 import spotipy.convert
 import spotipy.serialise
@@ -23,6 +21,8 @@ import spotipy.model.track
 import spotipy.model.artist
 import spotipy.model.playlist
 import spotipy.model.album
+
+from functools import singledispatchmethod
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer

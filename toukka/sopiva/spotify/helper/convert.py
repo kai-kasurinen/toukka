@@ -1,6 +1,6 @@
 #
 
-from singledispatchmethod import singledispatchmethod
+from functools import singledispatchmethod
 
 from spotipy.model.track import FullTrack, SimpleTrack
 from spotipy.model.artist import FullArtist, SimpleArtist
