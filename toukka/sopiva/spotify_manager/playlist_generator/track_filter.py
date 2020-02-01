@@ -100,7 +100,7 @@ class TrackFilter:
 
             if self.is_banned(track_relinked):
                 self.__log.debug('track:%s: banned', track_relinked.id)
-                return false
+                return False
 
             if self.is_track_already_seen(track_relinked):
                 self.__log.debug('track:%s: already seen (relinked)', track_relinked.id)
