@@ -17,12 +17,16 @@ from options import Options
 
 import spotipy.convert
 import spotipy.serialise
-import spotipy.model.track
-import spotipy.model.artist
-import spotipy.model.playlist
-import spotipy.model.album
 
-from functools import singledispatchmethod
+from spotipy.model.track import FullTrack, SimpleTrack, Track
+from spotipy.model.album import SimpleAlbum, Album
+# FIXME: Why?
+from spotipy.model.album.full import FullAlbum
+from spotipy.model.artist import FullArtist, SimpleArtist, Artist
+from spotipy.model.playlist import Playlist, SimplePlaylist, FullPlaylist
+from spotipy.serialise import ModelList
+
+from functools import singledispatchmethod  # type: ignore[attr-defined] # typeshed needs fixed
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -31,7 +35,7 @@ from toukka.sopiva.spotify_manager.genres import Genre
 
 import toukka.sopiva.spotify_manager.genres
 
-from .playlist import Playlist
+from .playlist import PlaylistModifier
 from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter
 from .util import scramble_generator, take_random_items_generator
@@ -101,7 +105,7 @@ class PlaylistGenerator:
 
         self.uriban = UriBanDict()
 
-        self.playlist = Playlist(uri=playlist_uri, spotify=self.spotify)
+        self.playlist = PlaylistModifier(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(
             spotify=self.spotify,
@@ -145,7 +149,7 @@ class PlaylistGenerator:
 
             # TODO: remove
             # actually we do not care as long track.id is usable
-            if not isinstance(track, spotipy.model.track.Track):
+            if not isinstance(track, Track):
                 raise Exception(f'wrong type received: {type(track)}')
 
             if self.track_filter.is_track_ok_to_add(track):
@@ -303,7 +307,7 @@ class PlaylistGenerator:
             artist_id: str,
             include_groups: Optional[List] = None,
             **kwargs
-            ) -> Generator[spotipy.model.album.full.FullAlbum, None, None]:
+            ) -> Generator[FullAlbum, None, None]:
 
         opts = self.options.push(kwargs)
 
@@ -337,7 +341,7 @@ class PlaylistGenerator:
     def artist_top_tracks_generator(
             self,
             artist_id: str
-            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+            ) -> Generator[FullTrack, None, None]:
 
         yield from self.spotify.artist_top_tracks(
             artist_id,
@@ -346,7 +350,7 @@ class PlaylistGenerator:
     def album_tracks_generator(
             self,
             album_id: str
-            ) -> Generator[spotipy.model.track.SimpleTrack, None, None]:
+            ) -> Generator[SimpleTrack, None, None]:
 
         paging = self.spotify.album_tracks(
             album_id,
@@ -360,7 +364,7 @@ class PlaylistGenerator:
             seed_track_ids: List = None,
             seed_genres: List = None,
             seed_attributes: Dict = None
-            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+            ) -> Generator[FullTrack, None, None]:
 
         if seed_attributes is None:
             seed_attributes = {}
@@ -381,7 +385,7 @@ class PlaylistGenerator:
     def related_artists_generator(
             self,
             artist_id: str
-            ) -> Generator[spotipy.model.artist.FullArtist, None, None]:
+            ) -> Generator[FullArtist, None, None]:
 
         yield from self.spotify.artist_related_artists(artist_id)
 
@@ -390,10 +394,10 @@ class PlaylistGenerator:
             query_type: str,
             query: str
             ) -> Generator[
-                    Union[spotipy.model.track.FullTrack,
-                          spotipy.model.album.SimpleAlbum,
-                          spotipy.model.artist.FullArtist,
-                          spotipy.model.playlist.SimplePlaylist],
+                    Union[FullTrack,
+                          SimpleAlbum,
+                          FullArtist,
+                          SimplePlaylist],
                     None, None]:
 
         search = self.spotify.search(query=query,
@@ -409,7 +413,7 @@ class PlaylistGenerator:
     def playlist_all_tracks_generator(
             self,
             playlist_id: str
-            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+            ) -> Generator[FullTrack, None, None]:
 
         paging = self.spotify.playlist_tracks(playlist_id=playlist_id,
                                               limit=100,
@@ -468,7 +472,7 @@ class PlaylistGenerator:
     # FIXME: is used?
     def expander_modellist(
             self,
-            item: spotipy.serialise.ModelList,
+            item: ModelList,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -484,9 +488,9 @@ class PlaylistGenerator:
     @expander.register
     def expander_track(
             self,
-            item: spotipy.model.track.Track,
+            item: Track,
             **kwargs
-            ) -> Generator[spotipy.model.track.Track, None, None]:
+            ) -> Generator[Track, None, None]:
 
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
@@ -514,7 +518,7 @@ class PlaylistGenerator:
 
     def expand_track_to_album(
             self,
-            track: spotipy.model.track.Track,
+            track: Track,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -522,10 +526,10 @@ class PlaylistGenerator:
         if self.check_uri(track.uri + '#album'):
             return
         # only FullTrack has album property
-        if not isinstance(track, spotipy.model.track.FullTrack):
+        if not isinstance(track, FullTrack):
             track = self.spotify.track(track.id, market=None)
         # makes mypy happy
-        track = cast(spotipy.model.track.FullTrack, track)
+        track = cast(FullTrack, track)
         album = self.spotify.album(track.album.id, market=self.market)
         # set expand_track_to_album option False, so we dont hit again
         # opts.set(expand_track_to_album=False)
@@ -534,7 +538,7 @@ class PlaylistGenerator:
 
     def add_artist_as_source(
             self,
-            artist: spotipy.model.artist.Artist,
+            artist: Artist,
             **kwargs
             ) -> None:
 
@@ -547,7 +551,7 @@ class PlaylistGenerator:
 
     def add_track_recommendations_as_source(
             self,
-            track: spotipy.model.track.Track,
+            track: Track,
             **kwargs
             ) -> None:
 
@@ -560,7 +564,7 @@ class PlaylistGenerator:
 
     def add_track_artists_as_source(
             self,
-            track: spotipy.model.track.Track,
+            track: Track,
             **kwargs
             ) -> None:
 
@@ -574,7 +578,7 @@ class PlaylistGenerator:
 
     def add_artist_related_artists_as_source(
             self,
-            artist: spotipy.model.artist.Artist,
+            artist: Artist,
             **kwargs
             ) -> None:
 
@@ -587,7 +591,7 @@ class PlaylistGenerator:
 
     def add_artist_recommendations_as_source(
             self,
-            artist: spotipy.model.artist.Artist,
+            artist: Artist,
             **kwargs
             ) -> None:
 
@@ -602,9 +606,9 @@ class PlaylistGenerator:
     # NOTE: simpletrack do not have album informations
     def expander_simple_track(
             self,
-            item: spotipy.model.track.SimpleTrack,
+            item: SimpleTrack,
             **kwargs
-            ) -> Generator[spotipy.model.track.Track, None, None]:
+            ) -> Generator[Track, None, None]:
 
         opts = self.options.push(kwargs)
         yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
@@ -612,9 +616,9 @@ class PlaylistGenerator:
     @expander.register
     def expander_artist(
             self,
-            item: spotipy.model.artist.Artist,
+            item: Artist,
             **kwargs
-            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+            ) -> Generator[FullTrack, None, None]:
 
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
@@ -643,7 +647,7 @@ class PlaylistGenerator:
 
     def expand_artist_to_albums(
             self,
-            artist: spotipy.model.artist.Artist,
+            artist: Artist,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -663,7 +667,7 @@ class PlaylistGenerator:
 
     def expand_artist_to_top_tracks(
             self,
-            artist: spotipy.model.artist.Artist,
+            artist: Artist,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -678,9 +682,9 @@ class PlaylistGenerator:
     @expander.register
     def expander_album(
             self,
-            item: spotipy.model.album.Album,
+            item: Album,
             **kwargs
-            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+            ) -> Generator[FullTrack, None, None]:
 
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
@@ -710,7 +714,7 @@ class PlaylistGenerator:
 
     def expand_album_to_tracks(
             self,
-            album: spotipy.model.album.Album,
+            album: Album,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -724,7 +728,7 @@ class PlaylistGenerator:
 
     def add_album_artists_as_source(
             self,
-            album: spotipy.model.album.Album,
+            album: Album,
             **kwargs
             ) -> None:
 
@@ -737,9 +741,9 @@ class PlaylistGenerator:
     @expander.register
     def expander_playlist(
             self,
-            item: spotipy.model.playlist.Playlist,
+            item: Playlist,
             **kwargs
-            ) -> Generator[spotipy.model.track.FullTrack, None, None]:
+            ) -> Generator[FullTrack, None, None]:
 
         opts = self.options.push(kwargs)
         self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
@@ -752,7 +756,7 @@ class PlaylistGenerator:
 
     def expand_playlist_to_tracks(
             self,
-            playlist: spotipy.model.playlist.Playlist,
+            playlist: Playlist,
             **kwargs
             ) -> Generator[Any, None, None]:
 

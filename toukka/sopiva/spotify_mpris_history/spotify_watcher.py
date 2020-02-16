@@ -39,7 +39,7 @@ class SpotifyWatcher(PlayerCtlManager, GObject.GObject):
             logger.debug('check player timeout already added')
         else:
             # NOTE: 10 seconds delay for checking
-            self.check_player_timeout_source = GLib.timeout_add_seconds(10, self.check_player)
+            self.check_player_timeout_source = GLib.timeout_add_seconds(5, self.check_player)
             logger.debug('check player timeout added')
 
     def on_manager_player_appeared(self, manager, player):

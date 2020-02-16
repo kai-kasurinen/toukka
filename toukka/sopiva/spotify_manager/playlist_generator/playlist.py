@@ -17,7 +17,7 @@ from toukka.sopiva.spotify.util import get_spotify
 
 # @autologging.traced
 # @autologging.logged
-class Playlist:
+class PlaylistModifier:
 
     def __init__(self,
                  uri: str = None,
