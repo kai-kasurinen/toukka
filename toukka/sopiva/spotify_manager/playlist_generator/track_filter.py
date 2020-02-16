@@ -5,7 +5,7 @@ from typing import List, Set, Generator, Union
 import logging
 import spotipy
 
-from spotipy.model.track import FullTrack, Track
+from toukka.spotify.model import FullTrack, Track
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 

@@ -11,16 +11,7 @@ import humanize
 
 import deprecated
 
-import spotipy.model
-import spotipy.model.base
-import spotipy.model.playlist
-import spotipy.model.album
-import spotipy.model.category
-import spotipy.model.recommendations
-import spotipy.model.currently_playing
-import spotipy.model.local
-import spotipy.model.play_history
-import spotipy.model.podcast
+from toukka.sopiva.spotify.model import *
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
@@ -32,12 +23,12 @@ def printer(arg):
 
 
 @printer.register
-def print_item(item: spotipy.model.base.Item):
+def print_item(item: Item):
     print(f'{type(item)}, {item.type}, {item.id}, {item.uri}')
 
 
 @printer.register
-def print_track(track: spotipy.model.track.Track,
+def print_track(track: Track,
                 use_play_count=True):
     print(f'track: {track.name} ({track.uri})', end='')
 
@@ -88,7 +79,7 @@ def _print_track_played_count(track):
 
 
 @printer.register
-def print_track_audio_features(features: spotipy.model.AudioFeatures):
+def print_track_audio_features(features: AudioFeatures):
     print(f'track features: ({features.uri})')
     print(f'\tacousticness: {features.acousticness:f},',
           f'danceability: {features.danceability:f},',
@@ -105,7 +96,7 @@ def print_track_audio_features(features: spotipy.model.AudioFeatures):
 
 # FIXME: compine album_simple and album_full
 @printer.register
-def print_album_simple(album: spotipy.model.album.SimpleAlbum):
+def print_album_simple(album: SimpleAlbum):
     # NOTE: popularity is only on FullAlbum
     print(f'album: {album.name} ({album.album_type.name}) ({album.uri})',
           f'({album.release_date} {album.release_date_precision.name})',
@@ -120,7 +111,7 @@ def print_album_simple(album: spotipy.model.album.SimpleAlbum):
 
 
 @printer.register
-def print_album_full(album: spotipy.model.FullAlbum):
+def print_album_full(album: FullAlbum):
     '''print album'''
     print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
           '({album.release_date} {album.release_date_precision.name})'.format(album=album),
@@ -151,7 +142,7 @@ def print_album_full(album: spotipy.model.FullAlbum):
 
 # FIXME: use Artist
 @printer.register
-def print_artist(artist: spotipy.model.FullArtist,
+def print_artist(artist: FullArtist,
                  use_play_count=True):
     print('artist: {artist.name} ({artist.uri})'.format(artist=artist),
           '(popularity: {artist.popularity},'.format(artist=artist),
@@ -173,7 +164,7 @@ def _print_artist_played_count(artist):
 
 
 @printer.register
-def print_playlist(playlist: spotipy.model.playlist.Playlist):
+def print_playlist(playlist: Playlist):
     print(f'playlist: {playlist.name} ({playlist.uri})')
     print(f'\towner: {playlist.owner.display_name} ({playlist.owner.uri})')
 
@@ -188,12 +179,12 @@ def print_playlist(playlist: spotipy.model.playlist.Playlist):
         print(f'\tflags: {flags}')
 
     # only on FullPlaylist
-    if isinstance(playlist, spotipy.model.playlist.FullPlaylist):
+    if isinstance(playlist, FullPlaylist):
         print(f'\tfollowers: {playlist.followers.total}')
 
 
 @printer.register
-def print_playlist_track(playlist_track: spotipy.model.playlist.PlaylistTrack):
+def print_playlist_track(playlist_track: PlaylistTrack):
     plt = playlist_track
     # TODOE: added_at and added_by may be None
     print(f'playlist track:',
@@ -207,18 +198,18 @@ def print_playlist_track(playlist_track: spotipy.model.playlist.PlaylistTrack):
 
 
 @printer.register
-def print_category(category: spotipy.model.category.Category):
+def print_category(category: Category):
     print(f'category: {category.name} ({category.id})')
 
 
 @printer.register
-def print_recommendationseed(seed: spotipy.model.recommendations.RecommendationSeed):
+def print_recommendationseed(seed: RecommendationSeed):
     print(f'recommendation seed: {seed}')
 
 
 # TODO: combine cpt and cpc
 @printer.register
-def print_currently_playing(cp: spotipy.model.currently_playing.CurrentlyPlaying):
+def print_currently_playing(cp: CurrentlyPlaying):
     print(f'currently playing: playing {cp.is_playing}')
     cpt_timestamp = datetime.datetime.fromtimestamp(cp.timestamp/1000.0)
     print('\ttimestamp: %s (%s)' % (
@@ -236,7 +227,7 @@ def print_currently_playing(cp: spotipy.model.currently_playing.CurrentlyPlaying
 
 
 @printer.register
-def print_currently_playing_context(cpc: spotipy.model.currently_playing.CurrentlyPlayingContext):
+def print_currently_playing_context(cpc: CurrentlyPlayingContext):
     print(f'currently playing context: playing {cpc.is_playing}')
     print(f'\tdevice: {cpc.device}')
     print(f'\tstate: repeat: {cpc.repeat_state}, shuffle: {cpc.shuffle_state}')
@@ -249,7 +240,7 @@ def print_currently_playing_context(cpc: spotipy.model.currently_playing.Current
 
 
 @printer.register
-def print_track_local(track: spotipy.model.local.LocalTrack):
+def print_track_local(track: LocalTrack):
     print(f'local track: {track.name} ({track.uri})')
 
     print(f'\talbum: {track.album.name} ({track.album.uri})')
@@ -271,7 +262,7 @@ def print_track_local(track: spotipy.model.local.LocalTrack):
 
 
 @printer.register
-def print_playhistory(playhistory: spotipy.model.play_history.PlayHistory):
+def print_playhistory(playhistory: PlayHistory):
     print(f'played at: {playhistory.played_at}')
     if playhistory.context:
         print(f'context: {playhistory.context}')
@@ -279,7 +270,7 @@ def print_playhistory(playhistory: spotipy.model.play_history.PlayHistory):
 
 
 @printer.register
-def print_episode(episode: spotipy.model.podcast.Episode):
+def print_episode(episode: Episode):
     print(f'episode: {episode.name} ({episode.uri})')
     print(f'\treleased: {episode.release_date} {episode.release_date_precision.name}')
     print(f'\tdesc: {episode.description}')
@@ -302,7 +293,7 @@ def print_episode(episode: spotipy.model.podcast.Episode):
 
 
 @printer.register
-def print_show(show: spotipy.model.podcast.Show):
+def print_show(show: Show):
     print(f'show: {show.name} ({show.uri}) ({show.media_type})')
     print(f'\tdesc: {show.description}')
     print(f'\tpublisher: {show.publisher}')

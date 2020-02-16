@@ -18,15 +18,16 @@ from options import Options
 import spotipy.convert
 import spotipy.serialise
 
-from spotipy.model.track import FullTrack, SimpleTrack, Track
-from spotipy.model.album import SimpleAlbum, Album
-# FIXME: Why?
-from spotipy.model.album.full import FullAlbum
-from spotipy.model.artist import FullArtist, SimpleArtist, Artist
-from spotipy.model.playlist import Playlist, SimplePlaylist, FullPlaylist
-from spotipy.serialise import ModelList
 
 from functools import singledispatchmethod  # type: ignore[attr-defined] # typeshed needs fixed
+
+from toukka.sopiva.spotify.model import (
+        FullTrack, SimpleTrack, Track,
+        FullAlbum, SimpleAlbum, Album,
+        FullArtist, SimpleArtist, Artist,
+        FullPlaylist, SimplePlaylist, Playlist,
+        ModelList
+)
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
