@@ -98,8 +98,4 @@ class SpotifyExtended(Spotify):
     def convert(self):
         return tekore.convert
 
-    # FIXME: move?
-    def convert_from_uri(self, uri: str) -> Tuple:
-        return tekore.convert.from_uri(uri)
-
 # END
