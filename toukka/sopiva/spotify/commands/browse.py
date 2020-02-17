@@ -28,8 +28,7 @@ def featured_playlists(country: str = None,
     message, paging = spotify.featured_playlists(
         country=country,
         locale=locale,
-        timestamp=timestamp,
-        limit=50)
+        timestamp=timestamp)
     print(f'message: {message}')
     print(f'found {paging.total} featured playlists')
     playlists = spotify.all_items(paging)
@@ -42,7 +41,7 @@ def featured_playlists(country: str = None,
 def new_releases(country: str = None):
     '''Get a list of new album releases featured in Spotify'''
     spotify = get_spotify()
-    paging = spotify.new_releases(country=country, limit=50)
+    paging = spotify.new_releases(country=country)
     print(f'found {paging.total} releases')
     for album in spotify.all_items(paging):
         printer(album)
@@ -55,7 +54,7 @@ def categories(country: str = None,
                locale: str = None):
     '''Get a list of categories used to tag items in Spotify'''
     spotify = get_spotify()
-    paging = spotify.categories(country=country, locale=locale, limit=50)
+    paging = spotify.categories(country=country, locale=locale)
     print(f'found {paging.total} categories')
     for category in spotify.all_items(paging):
         printer(category)
@@ -83,8 +82,7 @@ def category_playlists(category_id: str,
     spotify = get_spotify()
     paging = spotify.category_playlists(
         category_id,
-        country=country,
-        limit=50)
+        country=country)
     print(f'found {paging.total} playlists')
     playlists = spotify.all_items(paging)
     for playlist in playlists:
@@ -97,13 +95,11 @@ def category_playlists(category_id: str,
 @click.option('--seed-genres', multiple=True)
 @click.option('--attributes', multiple=True)
 @click.option('--market')
-@click.option('--limit', default=100)
 def recommendations(seed_artist_uris: list = None,
                     seed_track_uris: list = None,
                     seed_genres: list = None,
                     attributes: list = None,
-                    market: str = None,
-                    limit: int = 100):
+                    market: str = None):
     '''get a list of recommended tracks for seeds'''
     print(locals())
 
@@ -135,7 +131,6 @@ def recommendations(seed_artist_uris: list = None,
         track_ids=seed_track_ids,
         genres=seed_genres,
         market=market,
-        limit=limit,
         **attributes_dict)
 
     for seed in recommendations.seeds:

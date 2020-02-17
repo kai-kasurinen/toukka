@@ -24,16 +24,6 @@ def check_from_token(f):
     return wrapper
 
 
-def alter_limit(f, altered_limit=None):
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        if 'limit' in kwargs.keys():
-            return f(*args, **kwargs)
-        else:
-            return f(*args, **kwargs, limit=altered_limit)
-    return wrapper
-
-
 class SpotifyCached(Spotify):
 
     # cache-control: public, max-age>0
