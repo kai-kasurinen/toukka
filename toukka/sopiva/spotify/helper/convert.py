@@ -2,10 +2,11 @@
 
 from functools import singledispatchmethod
 
-from spotipy.model.track import FullTrack, SimpleTrack
-from spotipy.model.artist import FullArtist, SimpleArtist
-from spotipy.model.album import SimpleAlbum
-from spotipy.model.album.full import FullAlbum
+from ..model import (
+    FullTrack, SimpleTrack,
+    FullArtist, SimpleArtist,
+    SimpleAlbum, FullAlbum
+)
 
 
 from .base import HelperBase

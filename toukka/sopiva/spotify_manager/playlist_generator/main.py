@@ -15,8 +15,8 @@ import more_itertools
 
 from options import Options
 
-import spotipy.convert
-import spotipy.serialise
+import tekore.convert
+import tekore.serialise
 
 
 from functools import singledispatchmethod  # type: ignore[attr-defined] # typeshed needs fixed
@@ -136,7 +136,7 @@ class PlaylistGenerator:
         sources = self.sources.generator()
 
         # wanted type
-        track: spotipy.model.track.Track
+        track: tekore.model.track.Track
 
         for counter, track in enumerate(sources):
 
@@ -776,7 +776,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        item_type, item_id = spotipy.convert.from_uri(item)
+        item_type, item_id = tekore.convert.from_uri(item)
         self.__log.debug('%s: %s: %s', item, item_type, item_id)
         if self.check_uri(item + '#uri'):
             return
@@ -798,7 +798,7 @@ class PlaylistGenerator:
 
         items = list()
         for uri in uris:
-            uri_type, uri_id = spotipy.convert.from_uri(uri)
+            uri_type, uri_id = tekore.convert.from_uri(uri)
             self.__log.debug('%s: %s', uri_type, uri_id)
             if uri_type == 'artist':
                 items.append(self.spotify.artist(uri_id))

@@ -4,7 +4,7 @@ from typing import Set
 
 import logging
 import click
-import spotipy.convert
+import tekore.convert
 import enlighten
 import more_itertools
 
@@ -42,7 +42,7 @@ def playlist_cleaner(uri: str,
         else:
             raise click.ClickException('not currently playing playlist?')
 
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    uri_type, uri_id = tekore.convert.from_uri(uri)
 
     spotify = toukka.sopiva.spotify.util.get_spotify()
     spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
@@ -128,7 +128,7 @@ def _playlist_current():
         uri = playing.context.uri
         # username = uri.split(':')[2]
         playlist_id = uri.split(':')[4]
-        new_uri = spotipy.convert.to_uri('playlist', playlist_id)
+        new_uri = tekore.convert.to_uri('playlist', playlist_id)
         return new_uri
     else:
         return False

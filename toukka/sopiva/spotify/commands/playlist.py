@@ -9,8 +9,6 @@ import statistics
 import pprint
 import click
 
-import spotipy.convert
-
 from toukka.util import _get_flags, _list_to_string
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -71,8 +69,8 @@ def user_playlists(user):
 def playlist_info(uri: str,
                   market: str = None,
                   print_tracks: bool = False):
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     playlist = spotify.playlist(playlist_id=uri_id, market=market)
     printer(playlist)
 
@@ -89,8 +87,8 @@ def playlist_info(uri: str,
 @click.option('--market')
 def playlist_tracks(uri: str,
                     market: str = None):
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market)
     playlist_tracks = spotify.all_items(playlist_tracks_paging)
     for playlist_track in playlist_tracks:

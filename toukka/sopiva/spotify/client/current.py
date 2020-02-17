@@ -6,7 +6,11 @@ from .cached import SpotifyCached
 # from .cached_mongo import SpotifyMongo
 
 
-class Spotify(SpotifyExtended, SpotifyCached):
+# class Spotify(SpotifyExtended, SpotifyCached):
+#    pass
+
+
+class Spotify(SpotifyExtended):
     pass
 
 

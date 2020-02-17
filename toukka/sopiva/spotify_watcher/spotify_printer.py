@@ -1,7 +1,6 @@
 #
 
 import logging
-import spotipy
 
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.util import get_spotify
@@ -16,7 +15,7 @@ class SpotifyPrinter:
         self.market = self.spotify.current_user().country
 
     def print_all_from_uri(self, uri):
-        uri_type, uri_id = spotipy.convert.from_uri(uri)
+        uri_type, uri_id = self.spotify.convert.from_uri(uri)
         if uri_type == 'track':
             self.print_all_from_track_id(uri_id)
         if uri_type == 'episode':

@@ -4,7 +4,6 @@ import logging
 
 import sqlalchemy.sql
 
-import spotipy.convert
 import toukka.config
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -38,7 +37,7 @@ def update():
     for track_uri, in query:
         logger.debug('%s', track_uri)
 
-        track_uri_type, track_uri_id = spotipy.convert.from_uri(track_uri)
+        track_uri_type, track_uri_id = spotify.convert.from_uri(track_uri)
 
         track = spotify.track(track_uri_id, market=None)
         isrc = track.external_ids.get('isrc')

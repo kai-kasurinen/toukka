@@ -5,9 +5,9 @@ from typing import Tuple
 import logging
 import pprint
 
-import spotipy
-import spotipy.util
-import spotipy.sender
+import tekore
+import tekore.util
+import tekore.sender
 
 import toukka.config
 import toukka.hub.requests
@@ -39,7 +39,7 @@ def set_user_refresh_token(refresh_token: str) -> None:
     statedb.set('user_refresh_token', refresh_token)
 
 
-def get_user_token() -> spotipy.util.RefreshingToken:
+def get_user_token() -> tekore.auth.refreshing.RefreshingToken:
     client_id, client_secret, redirect_uri = _read_from_config()
     # client_id, client_secret, client_redirect = read_environment()
     refresh_token = get_user_refresh_token()
@@ -47,34 +47,34 @@ def get_user_token() -> spotipy.util.RefreshingToken:
 
     if refresh_token:
         logger.debug('refresh token found, using it')
-        # TODO: catch spotipy.auth.OAuthError
+        # TODO: catch tekore.auth.OAuthError
         try:
-            token = spotipy.util.refresh_user_token(client_id, client_secret, refresh_token)
-        except spotipy.auth.OAuthError as e:
+            token = tekore.util.refresh_user_token(client_id, client_secret, refresh_token)
+        except tekore.auth.OAuthError as e:
             logger.warning(e)
 
     if token is None:
         logger.debug('referesh token not found, prompt user input')
-        scope = spotipy.Scope(spotipy.scope.every)
-        token = spotipy.util.prompt_for_user_token(client_id, client_secret, scope)
+        scope = tekore.Scope(tekore.scope.every)
+        token = tekore.util.prompt_for_user_token(client_id, client_secret, scope)
         set_user_refresh_token(token.refresh_token)
 
     return token
 
 
-def get_sender() -> spotipy.sender.Sender:
+def get_sender() -> tekore.sender.Sender:
     session = toukka.hub.requests.get_cached_session()
     requests_kwargs = {'timeout': 10.0}
-    sender = spotipy.sender.PersistentSender(session=session, **requests_kwargs)
+    sender = tekore.sender.PersistentSender(session=session, **requests_kwargs)
     # our session handless retrying, so this not needed
-    # retrying_sender = spotipy.sender.RetryingSender(retries=2, sender=sender)
+    # retrying_sender = tekore.sender.RetryingSender(retries=2, sender=sender)
     return sender
 
 
-def get_client_token() -> spotipy.util.RefreshingToken:
-    # client_id, client_secret, client_redirect = spotipy.util.read_environment()
+def get_client_token() -> tekore.auth.refreshing.RefreshingToken:
+    # client_id, client_secret, client_redirect = tekore.util.read_environment()
     client_id, client_secret, redirect_uri = _read_from_config()
-    credentials = spotipy.util.RefreshingCredentials(client_id, client_secret)
+    credentials = tekore.util.RefreshingCredentials(client_id, client_secret)
     token = credentials.request_client_token()
     return token
 

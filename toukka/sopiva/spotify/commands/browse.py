@@ -1,8 +1,10 @@
 #
 
 import click
-import spotipy.convert
-import spotipy.client.browse.validate
+
+# TODO: remove?
+import tekore.convert
+import tekore.client.api.browse
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer import first as printer
@@ -108,7 +110,7 @@ def recommendations(seed_artist_uris: list = None,
     def uris_to_ids(uris: list):
         ids = list()
         for uri in uris:
-            uri_type, uri_id = spotipy.convert.from_uri(uri)
+            uri_type, uri_id = tekore.convert.from_uri(uri)
             ids.append(uri_id)
         return ids
 
@@ -125,7 +127,7 @@ def recommendations(seed_artist_uris: list = None,
     if attributes_list is not None:
         attributes_dict = {k: v for k, v in (x.split(':') for x in attributes_list)}
         print(attributes_dict)
-        spotipy.client.browse.validate.validate_attributes(attributes_dict)
+        tekore.client.api.browse.validate_attributes(attributes_dict)
 
     spotify = get_spotify()
     recommendations = spotify.recommendations(

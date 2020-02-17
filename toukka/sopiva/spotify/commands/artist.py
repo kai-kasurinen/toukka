@@ -5,7 +5,6 @@
 import operator
 
 import click
-import spotipy
 
 from click_params import StringListParamType
 
@@ -24,7 +23,7 @@ def artist():
 def info(uri):
     '''get artist info'''
     spotify = get_spotify()
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     artist = spotify.artist(uri_id)
     printer(artist)
 
@@ -47,7 +46,7 @@ def albums(
         ):
     '''get artist albums'''
     spotify = get_spotify()
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     paging = spotify.artist_albums(uri_id, market=market, include_groups=include_groups)
     albums = spotify.all_items(paging)
 
@@ -65,7 +64,7 @@ def top_tracks(uri,
                country='from_token'):
     '''get artist top tracks'''
     spotify = get_spotify()
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     for track in spotify.artist_top_tracks(uri_id, country=country):
         printer(track)
 
@@ -75,7 +74,7 @@ def top_tracks(uri,
 def related_artists(uri):
     '''get artist related artists'''
     spotify = get_spotify()
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     for artist in spotify.artist_related_artists(uri_id):
         printer(artist)
 

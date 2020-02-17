@@ -1,7 +1,6 @@
 #
 
 import click
-import spotipy.convert
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -16,8 +15,8 @@ def album(uri,
           market: str = None,
           tracks: bool = False
           ):
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     album = spotify.album(uri_id, market=market)
     printer(album)
     if tracks:

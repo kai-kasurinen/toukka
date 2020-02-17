@@ -3,9 +3,9 @@
 from typing import List, Set, Generator, Union
 
 import logging
-import spotipy
+import tekore
 
-from toukka.spotify.model import FullTrack, Track
+from toukka.sopiva.spotify.model import FullTrack, Track
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
@@ -15,7 +15,7 @@ from .banner import UriBanDict
 class TrackFilter:
 
     def __init__(self,
-                 spotify: spotipy.Spotify = None,
+                 spotify: tekore.Spotify = None,
                  user_country: str = None
                  ) -> None:
         self.spotify = spotify or get_spotify()

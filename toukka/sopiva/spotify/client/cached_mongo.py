@@ -1,7 +1,7 @@
 #
 
-from spotipy.client import Spotify
-from spotipy.model import FullTrack
+from tekore.client import Spotify
+from tekore.model import FullTrack
 from toukka.cache.dogpile import mongo
 
 # TODO: it works, but needs...

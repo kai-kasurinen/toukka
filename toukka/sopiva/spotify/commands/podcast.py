@@ -1,7 +1,6 @@
 #
 
 import click
-import spotipy.convert
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -21,8 +20,8 @@ def show(uri,
          market: str = None,
          episodes: bool = False
          ):
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     show = spotify.show(uri_id, market=market)
     printer(show)
     if episodes:
@@ -36,8 +35,8 @@ def show(uri,
 def episode(uri,
             market: str = None
             ):
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
     spotify = get_spotify()
+    uri_type, uri_id = spotify.convert.from_uri(uri)
     episode = spotify.episode(uri_id, market=market)
     printer(episode)
 

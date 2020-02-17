@@ -1,15 +1,16 @@
 #
 
-from spotipy.model import *
-from spotipy.model.artist import *
-from spotipy.model.album import *
-from spotipy.model.track import *
-from spotipy.model.playlist import *
-from spotipy.model.podcast import *
-from spotipy.model.play_history import *
-from spotipy.model.local import *
-from spotipy.model.recommendations import *
-from spotipy.model.base import Item
+from tekore.model import *
+from tekore.model.artist import *
+from tekore.model.album import *
+from tekore.model.track import *
+from tekore.model.playlist import *
+from tekore.model.play_history import *
+from tekore.model.local import *
+from tekore.model.recommendations import *
+from tekore.model.base import Item
 # TODO: remove?
-from spotipy.serialise import ModelList
+from tekore.serialise import ModelList
+
+from .podcast import *
 

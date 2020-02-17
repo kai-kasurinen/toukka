@@ -2,7 +2,7 @@
 
 import logging
 import click
-import spotipy.convert
+import tekore.convert
 import enlighten
 import more_itertools
 
@@ -37,7 +37,7 @@ def playlists_check():
 @click.argument('uri')
 def playlist_check(uri):
 
-    uri_type, uri_id = spotipy.convert.from_uri(uri)
+    uri_type, uri_id = tekore.convert.from_uri(uri)
 
     spotify = toukka.sopiva.spotify.util.get_spotify()
     playlist = spotify.playlist(uri_id)

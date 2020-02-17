@@ -1,6 +1,6 @@
 #
 
-import spotipy.convert
+import tekore.convert
 
 from toukka.util import _get_flags, _list_to_string
 from toukka.sopiva.spotify.util import get_spotify

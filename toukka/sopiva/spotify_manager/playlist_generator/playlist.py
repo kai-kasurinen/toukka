@@ -8,8 +8,8 @@ import textwrap
 # import autologging
 import more_itertools
 
-import spotipy
-import spotipy.convert
+import tekore
+import tekore.convert
 import toukka.config
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -21,7 +21,7 @@ class PlaylistModifier:
 
     def __init__(self,
                  uri: str = None,
-                 spotify: spotipy.Spotify = None,
+                 spotify: tekore.Spotify = None,
                  market: str = None
                  ) -> None:
 
@@ -29,7 +29,7 @@ class PlaylistModifier:
         self.playlist_uri = uri or _get_playlist_uri_from_config()
         self.market = market
 
-        uri_type, uri_id = spotipy.convert.from_uri(self.playlist_uri)
+        uri_type, uri_id = tekore.convert.from_uri(self.playlist_uri)
         self.playlist = self.spotify.playlist(uri_id, market=self.market)
         self.playlist_snapshot_id = self.playlist.snapshot_id
 

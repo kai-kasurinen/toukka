@@ -1,7 +1,7 @@
 #
 
 import functools
-from spotipy.client import Spotify
+from tekore.client import Spotify
 
 from toukka.cache.dogpile import redis
 
