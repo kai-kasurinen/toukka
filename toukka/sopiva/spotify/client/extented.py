@@ -1,6 +1,6 @@
 #
 
-from typing import Generator, Tuple
+from typing import Generator, Tuple, Optional
 
 import functools
 
@@ -10,6 +10,8 @@ from tekore.model.base import Item
 
 import tekore.convert
 
+from requests import HTTPError
+
 
 def alter_limit(f, limit=None):
     @functools.wraps(f)
@@ -18,6 +20,21 @@ def alter_limit(f, limit=None):
             return f(*args, **kwargs)
         else:
             return f(*args, **kwargs, limit=limit)
+    return wrapper
+
+
+def catch_404(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            ret = f(*args, **kwargs)
+        except HTTPError as e:
+            if e.response.status_code == 404:
+                return None
+            else:
+                raise
+        else:
+            return ret
     return wrapper
 
 
@@ -50,6 +67,18 @@ class SpotifyExtended(Spotify):
     # playlist
     followed_playlists = alter_limit(Spotify.followed_playlists, limit=50)
     playlists = alter_limit(Spotify.playlists, limit=50)
+
+    # https://github.com/felix-hilden/tekore/issues/145
+    # catch 404
+    next = catch_404(Spotify.next)
+
+    def _sync_all_pages(self, page: Paging):
+        yield page
+        while page.next is not None:
+            page = self.next(page)
+            if page is None:
+                return
+            yield page
 
     #
     def uri_to_item(self, uri: str) -> Item:
