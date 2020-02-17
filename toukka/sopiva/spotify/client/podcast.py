@@ -6,7 +6,8 @@ import tekore.client.api.search
 import tekore.convert
 
 from tekore.serialise import SerialisableEnum
-from tekore.client.base import SpotifyBase, send_and_process
+from tekore.client.base import SpotifyBase
+from tekore.client.decor import send_and_process
 from tekore.client.process import single, model_list
 
 from ..model.podcast import Episode, Show, EpisodePaging, ShowPaging
