@@ -12,6 +12,9 @@ from tekore.client.process import single, model_list
 
 from ..model.podcast import Episode, Show, EpisodePaging, ShowPaging
 
+# web client uses
+# https://api.spotify.com/v1/playlists/<playlist_id>?type=track%2Cepisode&market=from_token
+
 
 class SpotifyPodcast(SpotifyBase):
 

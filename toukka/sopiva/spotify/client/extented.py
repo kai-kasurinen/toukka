@@ -3,14 +3,18 @@
 from typing import Generator, Tuple, Optional
 
 import functools
+import logging
+import textwrap
 
 from tekore.client import Spotify
 from tekore.model.paging import Paging
 from tekore.model.base import Item
+from requests import HTTPError
 
 import tekore.convert
 
-from requests import HTTPError
+
+logger = logging.getLogger(__name__)
 
 
 def alter_limit(f, limit=None):
@@ -20,6 +24,20 @@ def alter_limit(f, limit=None):
             return f(*args, **kwargs)
         else:
             return f(*args, **kwargs, limit=limit)
+    return wrapper
+
+
+def alter_description(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        if 'description' in kwargs.keys():
+            if kwargs['description'] is not None:
+                description_len = len(kwargs['description'])
+                if description_len > 300:
+                    logger.warning('playlist description is too long (%i), shortening it', description_len)
+                    kwargs['description'] = textwrap.shorten(
+                        kwargs['description'], width=300)
+        return f(*args, **kwargs)
     return wrapper
 
 
@@ -39,6 +57,9 @@ def catch_404(f):
 
 
 class SpotifyExtended(Spotify):
+
+    # for shortening long description
+    playlist_change_details = alter_description(Spotify.playlist_change_details)
 
     # TODO: remove?
     def uri_to_item(self, uri: str) -> Item:
