@@ -83,7 +83,7 @@ def get_client(token, sender) -> toukka.sopiva.spotify.client.current.Spotify:
     # https://github.com/psf/requests/issues/3070
     client = toukka.sopiva.spotify.client.current.Spotify(
         token=token, sender=sender,
-        max_limits_on=True, chunked_on=False)
+        max_limits_on=True, chunked_on=True)
     return client
 
 

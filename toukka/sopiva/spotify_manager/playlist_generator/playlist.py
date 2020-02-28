@@ -52,10 +52,10 @@ class PlaylistModifier:
     def reload(self) -> None:
         self.playlist = self.spotify.playlist(self.playlist.id)
 
-    def tracks_add_(self, track_ids: List) -> None:
+    def tracks_add(self, track_ids: List) -> None:
         self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, track_ids)
 
-    def tracks_add(self, track_ids: List) -> None:
+    def tracks_add_old(self, track_ids: List) -> None:
         chunks = more_itertools.chunked(track_ids, 100)
         for chunk in chunks:
             self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, chunk)
