@@ -9,6 +9,7 @@ import os
 from dataclasses import dataclass
 from typing import List, Optional
 
+# TODO: use appdirs instead?
 from xdg.BaseDirectory import save_cache_path
 from bs4 import BeautifulSoup
 
