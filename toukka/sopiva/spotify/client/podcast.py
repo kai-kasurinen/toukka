@@ -42,7 +42,7 @@ _paging_type = {
 
 tekore.client.api.search.paging_type.update(_paging_type)
 
-
+'''
 class _IdentifierType(SerialisableEnum):
     show = 'show'
     episode = 'episode'
@@ -54,5 +54,6 @@ IdentifierTypePatched = SerialisableEnum('IdentifierType',
                                              _IdentifierType)])
 
 tekore.convert.IdentifierType = IdentifierTypePatched
+'''
 
 # END
