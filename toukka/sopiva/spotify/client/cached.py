@@ -17,8 +17,8 @@ def check_from_token(f):
         # TODO: remove
         if kwargs.get('market') == 'from_token':
             raise Exception('market is from_token')
-       # elif 'market' not in kwargs.keys():
-       #     raise Exception('market is not defined')
+        # elif 'market' not in kwargs.keys():
+        #     raise Exception('market is not defined')
         else:
             return f(*args, **kwargs)
     return wrapper
