@@ -5,7 +5,7 @@ from .cached import SpotifyCached
 from .podcast import SpotifyPodcast
 
 
-class Spotify(SpotifyExtended, SpotifyPodcast):
+class Spotify(SpotifyExtended, SpotifyPodcast, SpotifyCached):
     pass
 
 

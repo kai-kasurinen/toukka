@@ -1,6 +1,6 @@
 #
 
-import functools
+from boltons.funcutils import wraps
 from tekore.client import Spotify
 
 from toukka.cache.dogpile import redis
@@ -12,13 +12,13 @@ region = redis
 
 
 def check_from_token(f):
-    @functools.wraps(f)
+    @wraps(f)
     def wrapper(*args, **kwargs):
         # TODO: remove
-        if 'market' not in kwargs.keys():
-            raise Exception('market is not defined')
-        elif kwargs.get('market') == 'from_token':
+        if kwargs.get('market') == 'from_token':
             raise Exception('market is from_token')
+       # elif 'market' not in kwargs.keys():
+       #     raise Exception('market is not defined')
         else:
             return f(*args, **kwargs)
     return wrapper
@@ -29,6 +29,7 @@ class SpotifyCached(Spotify):
     # cache-control: public, max-age>0
     track = check_from_token(
         region.cache_on_arguments()(Spotify.track))
+
     tracks = check_from_token(
         region.cache_on_arguments()(Spotify.tracks))
     artist = region.cache_on_arguments()(Spotify.artist)

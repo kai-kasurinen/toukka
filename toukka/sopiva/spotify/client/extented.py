@@ -2,9 +2,10 @@
 
 from typing import Generator, Tuple, Optional
 
-import functools
 import logging
 import textwrap
+
+from boltons.funcutils import wraps
 
 from tekore.client import Spotify
 from tekore.model.paging import Paging
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def alter_limit(f, limit=None):
-    @functools.wraps(f)
+    @wraps(f)
     def wrapper(*args, **kwargs):
         if 'limit' in kwargs.keys():
             return f(*args, **kwargs)
@@ -28,7 +29,7 @@ def alter_limit(f, limit=None):
 
 
 def alter_description(f):
-    @functools.wraps(f)
+    @wraps(f)
     def wrapper(*args, **kwargs):
         if 'description' in kwargs.keys():
             if kwargs['description'] is not None:
@@ -42,7 +43,7 @@ def alter_description(f):
 
 
 def catch_404(f):
-    @functools.wraps(f)
+    @wraps(f)
     def wrapper(*args, **kwargs):
         try:
             ret = f(*args, **kwargs)
