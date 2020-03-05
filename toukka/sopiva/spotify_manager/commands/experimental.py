@@ -1,5 +1,7 @@
 #
 
+import collections
+
 import click
 
 from click_params import StringListParamType
@@ -59,6 +61,27 @@ def analyze_user(
         **kwargs
         ):
     analyze_user_1(**kwargs)
+
+
+@cli_root.command()
+def analyze_playlist_test():
+    spotify = get_spotify()
+
+    def count_artists(playlist_id: str):
+        tracks = spotify.playlist_tracks(playlist_id)
+        tracks = spotify.all_items(tracks)
+        return collections.Counter([t.track.artists[0].name for t in tracks if t.track is not None])
+
+    def get_artist_counters() -> collections.Counter:
+        playlists = spotify.followed_playlists()
+        playlists = spotify.all_items(playlists)
+        counts = [count_artists(p.id) for p in playlists]
+        return sum(counts, collections.Counter())
+
+    artists = get_artist_counters()
+
+    for name, count in artists.most_common(3):
+        print(count, name)
 
 
 # END

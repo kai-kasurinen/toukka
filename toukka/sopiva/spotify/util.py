@@ -3,11 +3,11 @@
 from typing import Tuple
 
 import logging
-import pprint
+# import pprint
 
 import tekore
-import tekore.util
-import tekore.sender
+# import tekore.util
+# import tekore.sender
 
 import toukka.config
 import toukka.hub.requests
@@ -64,6 +64,7 @@ def get_user_token() -> tekore.auth.refreshing.RefreshingToken:
 
 def get_sender() -> tekore.sender.Sender:
     session = toukka.hub.requests.get_cached_session()
+    # https://github.com/psf/requests/issues/3070
     requests_kwargs = {'timeout': 10.0}
     sender = tekore.sender.PersistentSender(session=session, **requests_kwargs)
     # our session handless retrying, so this not needed
@@ -80,7 +81,6 @@ def get_client_token() -> tekore.auth.refreshing.RefreshingToken:
 
 
 def get_client(token, sender) -> toukka.sopiva.spotify.client.current.Spotify:
-    # https://github.com/psf/requests/issues/3070
     client = toukka.sopiva.spotify.client.current.Spotify(
         token=token, sender=sender,
         max_limits_on=True, chunked_on=True)
