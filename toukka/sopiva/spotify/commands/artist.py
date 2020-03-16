@@ -59,13 +59,13 @@ def albums(
 
 @artist.command()
 @click.argument('uri')
-@click.option('--country', default='from_token')
+@click.option('--market', default='from_token')
 def top_tracks(uri,
-               country='from_token'):
+               market='from_token'):
     '''get artist top tracks'''
     spotify = get_spotify()
     uri_type, uri_id = spotify.convert.from_uri(uri)
-    for track in spotify.artist_top_tracks(uri_id, country=country):
+    for track in spotify.artist_top_tracks(uri_id, market=market):
         printer(track)
 
 
