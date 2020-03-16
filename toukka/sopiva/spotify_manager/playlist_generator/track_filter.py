@@ -54,7 +54,7 @@ class TrackFilter:
         # is relinked ... (do it better)
         if track.id != track_relinked.id:
             relinked = True
-            self.__log.warning('track:%s: relinked to track:%s', track.id, track_relinked.id)
+            self.__log.debug('track:%s: relinked to track:%s', track.id, track_relinked.id)
         else:
             relinked = False
 

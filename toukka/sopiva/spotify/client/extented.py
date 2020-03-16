@@ -80,4 +80,15 @@ class SpotifyExtended(Spotify):
     def convert(self):
         return tekore.convert
 
+
+'''
+    # 2020-03-05 test
+    def _create_headers(self, content_type: str = 'application/json'):
+        return {
+            'Authorization': f'Bearer {str(self.token)}',
+            'Content-Type': content_type,
+            # 'Accept-Language': 'ru'
+        }
+'''
+
 # END

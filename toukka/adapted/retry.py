@@ -8,6 +8,8 @@ class RetryA(Retry):
     def get_retry_after(self, response):
         retry_after = super().get_retry_after(response)
         log.debug('Retry-After: %s', retry_after)
+        if retry_after is None:
+            log.debug('Response: %s, %s', response.status_code, response.headers)
 
         # https://github.com/plamere/spotipy/pull/391
         # Spotify convert from millis to seconds and then floor it to give the retry-after time.

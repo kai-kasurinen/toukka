@@ -68,20 +68,29 @@ def analyze_playlist_test():
     spotify = get_spotify()
 
     def count_artists(playlist_id: str):
-        tracks = spotify.playlist_tracks(playlist_id)
-        tracks = spotify.all_items(tracks)
-        return collections.Counter([t.track.artists[0].name for t in tracks if t.track is not None])
+        playlist_tracks = spotify.playlist_tracks(playlist_id)
+        counter = collections.Counter()
+        for playlist_track in spotify.all_items(playlist_tracks):
+            if playlist_track.track is None:
+                continue
+            for artist in playlist_track.track.artists:
+                counter += collections.Counter([artist.id])
+        return counter
 
     def get_artist_counters() -> collections.Counter:
         playlists = spotify.followed_playlists()
-        playlists = spotify.all_items(playlists)
-        counts = [count_artists(p.id) for p in playlists]
-        return sum(counts, collections.Counter())
+        print(f'playlists count {playlists.total}')
+        counter = collections.Counter()
+        for playlist in spotify.all_items(playlists):
+            counter += count_artists(playlist.id)
+        print('all counts retrieved')
+        return counter
 
     artists = get_artist_counters()
 
-    for name, count in artists.most_common(3):
-        print(count, name)
+    for artist_id, count in artists.most_common(100):
+        artist = spotify.artist(artist_id)
+        print(count, artist.id, artist.name)
 
 
 # END
