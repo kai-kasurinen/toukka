@@ -47,10 +47,17 @@ def get_user_token() -> tekore.auth.refreshing.RefreshingToken:
 
     if refresh_token:
         logger.debug('refresh token found, using it')
-        # TODO: catch tekore.auth.OAuthError
+        # NOTE: use RefreshingCredentials directly to get retrying
+        # NOTE: use our sender with urllib3.retry retrying
+        # TODO: use RetryingSender
+        sender = get_sender()
+        cred = tekore.auth.refreshing.RefreshingCredentials(client_id, client_secret, sender=sender)
         try:
-            token = tekore.util.refresh_user_token(client_id, client_secret, refresh_token)
-        except tekore.auth.OAuthError as e:
+            # token = tekore.util.refresh_user_token(client_id, client_secret, refresh_token)
+            token = cred.refresh_user_token(refresh_token)
+        # TODO: catch tekore.auth.expiring.OAuthError
+        # TODO: catch 50x: requests.exceptions.HTTPError: Unexpected error!
+        except tekore.auth.expiring.OAuthError as e:
             logger.warning(e)
 
     if token is None:
