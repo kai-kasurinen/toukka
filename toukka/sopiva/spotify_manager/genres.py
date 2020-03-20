@@ -97,18 +97,22 @@ def genres_make():
 
                     for desc_part in desc_parts:
 
-                        if desc_part.startswith('See also'):
-                            # TODO: parse and use
-                            # intro, pulse, edge, female, year
-                            pass
+                        if (desc_part.startswith('See also the Sounds of')
+                                or desc_part.startswith('or the Sounds of')
+                                or desc_part.startswith('or the Sound of')):
 
-                        elif (desc_part.startswith('or the Sounds of')
-                              or desc_part.startswith('or the Sound of')):
+                            # TODO: move to function
                             soup = BeautifulSoup(desc_part, features='html.parser')
                             for link in soup.find_all('a'):
                                 related_genres.append(link.string.lower())
                             related[genre_name] = related_genres
                             # logger.debug('%s related to %s', genre_name, related_genres)
+
+                        elif desc_part.startswith('See also'):
+                            # NOTE: 'See also' can be:
+                            # NOTE: - related genres
+                            # NOTE: - intro, pulse, edge, female, year playlists
+                            pass
 
                         elif desc_part.startswith('or much more at'):
                             # link to evernoise
