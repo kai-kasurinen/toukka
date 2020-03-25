@@ -12,5 +12,5 @@ from tekore.model.base import Item
 # TODO: remove?
 from tekore.serialise import ModelList
 
-from .podcast import *
+# from .podcast import *
 
