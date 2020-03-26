@@ -771,26 +771,17 @@ class PlaylistGenerator:
     @expander.register
     def expander_uri(
             self,
-            item: SpotifyUri,
+            uri: SpotifyUri,
             **kwargs
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        item_type, item_id = tekore.convert.from_uri(item)
-        self.__log.debug('%s: %s: %s', item, item_type, item_id)
-        if self.check_uri(item + '#uri'):
+        uri_type, uri_id = tekore.convert.from_uri(uri)
+        self.__log.debug('%s: %s: %s', uri, uri_type, uri_id)
+        if self.check_uri(uri + '#uri'):
             return
-        if item_type == 'artist':
-            item_object = self.spotify.artist(item_id)
-        elif item_type == 'album':
-            item_object = self.spotify.album(item_id, market=self.market)
-        elif item_type == 'track':
-            item_object = self.spotify.track(item_id, market=self.market)
-        elif item_type == 'playlist':
-            item_object = self.spotify.playlist(item_id, market=self.market)
-        else:
-            self.__log.warning('unsupported uri: %s', item)
-            return
+
+        item_object = self.spotify.uri_to_item(uri)
         yield from self.expander(item_object, **opts)
 
     # TODO: remove
@@ -800,16 +791,7 @@ class PlaylistGenerator:
         for uri in uris:
             uri_type, uri_id = tekore.convert.from_uri(uri)
             self.__log.debug('%s: %s', uri_type, uri_id)
-            if uri_type == 'artist':
-                items.append(self.spotify.artist(uri_id))
-            elif uri_type == 'album':
-                items.append(self.spotify.album(uri_id, market=self.market))
-            elif uri_type == 'track':
-                items.append(self.spotify.track(uri_id, market=self.market))
-            elif uri_type == 'playlist':
-                items.append(self.spotify.playlist(uri_id, market=self.market))
-            else:
-                self.__log.warning('unsupported uri: %s (%s, %s)', uri, uri_type, uri_id)
+            items.append(self.spotify.uri_to_item(uri))
         return items
 
     @expander.register

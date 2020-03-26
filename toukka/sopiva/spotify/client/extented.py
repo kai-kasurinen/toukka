@@ -10,7 +10,7 @@ from boltons.funcutils import wraps
 from tekore.client import Spotify
 from tekore.model.paging import Paging
 from tekore.model.base import Item
-from requests import HTTPError
+# from requests import HTTPError
 
 import tekore.convert
 
@@ -42,6 +42,7 @@ def alter_description(f):
     return wrapper
 
 
+'''
 def catch_404(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -55,6 +56,7 @@ def catch_404(f):
         else:
             return ret
     return wrapper
+'''
 
 
 class SpotifyExtended(Spotify):
@@ -64,7 +66,7 @@ class SpotifyExtended(Spotify):
 
     # TODO: remove?
     def uri_to_item(self, uri: str) -> Item:
-        uri_type, uri_id = tekore.convert.from_uri(uri)
+        uri_type, uri_id = self.convert.from_uri(uri)
         if uri_type == 'artist':
             return self.artist(uri_id)
         elif uri_type == 'album':
@@ -73,6 +75,10 @@ class SpotifyExtended(Spotify):
             return self.track(uri_id)
         elif uri_type == 'playlist':
             return self.playlist(uri_id)
+        elif uri_type == 'show':
+            return self.show(uri_id)
+        elif uri_type == 'episode':
+            return self.episode(uri_id)
         else:
             raise Exception(f'unsupported uri: {uri} ({uri_type}, {uri_id})')
 
@@ -80,15 +86,5 @@ class SpotifyExtended(Spotify):
     def convert(self):
         return tekore.convert
 
-
-'''
-    # 2020-03-05 test
-    def _create_headers(self, content_type: str = 'application/json'):
-        return {
-            'Authorization': f'Bearer {str(self.token)}',
-            'Content-Type': content_type,
-            # 'Accept-Language': 'ru'
-        }
-'''
 
 # END
