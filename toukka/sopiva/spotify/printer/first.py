@@ -99,7 +99,7 @@ def print_track_audio_features(features: AudioFeatures):
 def print_album_simple(album: SimpleAlbum):
     # NOTE: popularity is only on FullAlbum
     print(f'album: {album.name} ({album.album_type.name}) ({album.uri})',
-          f'({album.release_date} {album.release_date_precision.name})',
+          f'({album.release_date} {album.release_date_precision})',
           f'(tracks: {album.total_tracks})')
     print('\tartists: %s' % _artists_to_string(album.artists))
     if album.album_group:
@@ -114,7 +114,7 @@ def print_album_simple(album: SimpleAlbum):
 def print_album_full(album: FullAlbum):
     '''print album'''
     print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
-          '({album.release_date} {album.release_date_precision.name})'.format(album=album),
+          '({album.release_date} {album.release_date_precision})'.format(album=album),
           '(popularity: {album.popularity}, tracks: {album.total_tracks})'.format(album=album))
     print('\tartists: %s' % _artists_to_string(album.artists))
 
@@ -272,7 +272,7 @@ def print_playhistory(playhistory: PlayHistory):
 @printer.register
 def print_episode(episode: Episode):
     print(f'episode: {episode.name} ({episode.uri})')
-    print(f'\treleased: {episode.release_date} {episode.release_date_precision.name}')
+    print(f'\treleased: {episode.release_date} {episode.release_date_precision}')
     print(f'\tdesc: {episode.description}')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {episode.languages}')
@@ -287,7 +287,7 @@ def print_episode(episode: Episode):
     # FIXME: move
     _print_track_played_count(episode)
 
-    if episode.show:
+    if hasattr(episode, 'show'):
         print()
         printer(episode.show)
 

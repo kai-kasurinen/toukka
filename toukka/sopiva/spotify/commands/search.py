@@ -10,10 +10,11 @@ from toukka.sopiva.spotify.cli import cli_root
 
 # TODO: support multiple types
 
-
+# GRR
+_types = {k[:-1] for k in tekore.client.api.search.paging_type.keys()}
 
 @cli_root.command()
-@click.argument('type', type=click.Choice(list(tekore.client.api.search.paging_type)))
+@click.argument('type', type=click.Choice(_types))
 @click.argument('query')
 @click.option('--market')
 @click.option('--limit', type=int)
