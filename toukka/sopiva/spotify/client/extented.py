@@ -98,7 +98,6 @@ class SpotifyExtended(Spotify):
             uris: list,
             position: int = None
     ) -> str:
-        logger.info(uris)
         payload = {'uris': uris}
         return self._post(
             f'playlists/{playlist_id}/tracks',

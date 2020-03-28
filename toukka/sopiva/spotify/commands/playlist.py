@@ -71,7 +71,8 @@ def playlist_info(uri: str,
                   print_tracks: bool = False):
     spotify = get_spotify()
     uri_type, uri_id = spotify.convert.from_uri(uri)
-    playlist = spotify.playlist(playlist_id=uri_id, market=market)
+    playlist = spotify.playlist(playlist_id=uri_id, market=market, additional_types=['track', 'episode'])
+    print(type(playlist))
     printer(playlist)
 
     if print_tracks:

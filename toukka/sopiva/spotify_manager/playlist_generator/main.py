@@ -166,7 +166,7 @@ class PlaylistGenerator:
 
             if self.track_filter.is_track_ok_to_add(track):
                 self.track_ids_to_playlist.append(track.id)
-                self.uris_to_playlist.append(track.uri)
+                #self.uris_to_playlist.append(track.uri)
                 self.__log.debug('track:%s: added', track.id)
                 progress_tracks.update()
 
