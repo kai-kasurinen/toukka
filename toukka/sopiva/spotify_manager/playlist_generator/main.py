@@ -105,6 +105,7 @@ class PlaylistGenerator:
         # init empty
         self._uris_seen = Seen()
         self.track_ids_to_playlist: List[str] = list()
+        self.uris_to_playlist: List[str] = list()
 
         self.uriban = UriBanDict()
 
@@ -150,6 +151,14 @@ class PlaylistGenerator:
 
             progress_looper.update()
 
+            # TODO: remove track_ids_to_playlist
+
+            # TODO: GRR
+            if isinstance(track, Episode):
+                self.uris_to_playlist.append(track.uri)
+                self.__log.debug('episode:%s: added', track.id)
+                continue
+
             # TODO: remove
             # actually we do not care as long track.id is usable
             if not isinstance(track, Track):
@@ -157,6 +166,7 @@ class PlaylistGenerator:
 
             if self.track_filter.is_track_ok_to_add(track):
                 self.track_ids_to_playlist.append(track.id)
+                self.uris_to_playlist.append(track.uri)
                 self.__log.debug('track:%s: added', track.id)
                 progress_tracks.update()
 
@@ -183,11 +193,14 @@ class PlaylistGenerator:
     def commit(self, **kwargs) -> None:
         opts = self.options.push(kwargs)
 
-        track_ids_to_playlist = self.track_ids_to_playlist
         if not opts.dry_run:
-            if len(track_ids_to_playlist) > 0:
+            if len(self.track_ids_to_playlist) > 0 or len(self.uris_to_playlist) > 0:
                 self.playlist.clear()
-                self.playlist.tracks_add(track_ids_to_playlist)
+                # TODO: cleanup
+                if self.track_ids_to_playlist:
+                    self.playlist.tracks_add(self.track_ids_to_playlist)
+                if self.uris_to_playlist:
+                    self.playlist.uris_add(self.uris_to_playlist)
                 self.playlist.details_update()
             else:
                 self.__log.info('try something else?')
