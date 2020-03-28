@@ -3,6 +3,8 @@
 from tekore.model import *
 from tekore.model.artist import *
 from tekore.model.album import *
+from tekore.model.album.full import *
+from tekore.model.album.base import *
 from tekore.model.track import *
 from tekore.model.playlist import *
 from tekore.model.play_history import *
@@ -14,6 +16,8 @@ from tekore.serialise import ModelList
 #
 from tekore.model.episode import *
 from tekore.model.show import *
+from tekore.model.show.full import *
+from tekore.model.show.base import *
 
 # from .podcast import *
 

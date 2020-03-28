@@ -26,7 +26,8 @@ from toukka.sopiva.spotify.model import (
         FullAlbum, SimpleAlbum, Album,
         FullArtist, SimpleArtist, Artist,
         FullPlaylist, SimplePlaylist, Playlist,
-        ModelList
+        ModelList,
+        Show, Episode
 )
 
 from toukka.sopiva.spotify.util import get_spotify
@@ -74,6 +75,7 @@ class PlaylistGenerator:
             expand_album_to_tracks=False,
             expand_album_to_artists=False,
             expand_playlist_to_tracks=False,
+            expand_show_to_episodes=False,
             expand_generator_to_items=True,
             expand_genre_to_playlists=False,
             expand_genre_to_related_genres=False,
@@ -355,8 +357,17 @@ class PlaylistGenerator:
 
         paging = self.spotify.album_tracks(
             album_id,
-            market=self.market,
-            limit=50)
+            market=self.market)
+        yield from self.spotify.all_items(paging)
+
+    def show_episodes_generator(
+            self,
+            show_id: str
+            ) -> Generator[SimpleTrack, None, None]:
+
+        paging = self.spotify.show_episodes(
+            show_id,
+            market=self.market)
         yield from self.spotify.all_items(paging)
 
     def recommendations_generator(
@@ -869,6 +880,57 @@ class PlaylistGenerator:
 
             expander = self.expander(related_genre, **opts)
             self.sources.add(expander)
+
+    @expander.register
+    def expander_show(
+            self,
+            item: Show,
+            **kwargs
+            ) -> Generator[Episode, None, None]:
+
+        opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        did = False
+
+        if self.check_uri(item.uri):
+            return
+
+        if opts.expand_show_to_episodes:
+            yield from self.expand_show_to_episodes(item, **opts)
+            did = True
+
+        if not did:
+            self.__log.warning('did not do anything with: %s', item.uri)
+
+    def expand_show_to_episodes(
+            self,
+            show: Show,
+            **kwargs
+            ) -> Generator[Any, None, None]:
+
+        opts = self.options.push(kwargs)
+        if self.check_uri(show.uri + '#episodes'):
+            return
+        opts.set(expand_track_to_album=False)
+        episodes = self.show_episodes_generator(show.id)
+        e = self.expander(episodes, **opts)
+        yield from e
+
+    @expander.register
+    def expander_episode(
+            self,
+            item: Episode,
+            **kwargs
+            ) -> Generator[Episode, None, None]:
+
+        opts = self.options.push(kwargs)
+        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        did = False
+        if not self.check_uri(item.uri):
+            yield item
+            did = True
+        if not did:
+            self.__log.warning('did not do anything with: %s', item.uri)
 
 
 # END

@@ -65,7 +65,8 @@ kwargs_for_uri = {
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': True,
     'expand_artist_to_related_artists': True,
-    'expand_artist_to_recommendations': True
+    'expand_artist_to_recommendations': True,
+    'expand_show_to_episodes': True
 }
 
 kwargs_for_uri_second = {
