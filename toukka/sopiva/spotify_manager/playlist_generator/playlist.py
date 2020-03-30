@@ -27,6 +27,7 @@ class PlaylistModifier:
 
         uri_type, uri_id = self.spotify.convert.from_uri(self.playlist_uri)
         self.playlist = self.spotify.playlist(uri_id, market=self.market)
+        # TODO: remove, useless
         self.playlist_snapshot_id = self.playlist.snapshot_id
 
         # defaults
@@ -55,6 +56,7 @@ class PlaylistModifier:
     def uris_add(self, uris: List) -> None:
         self.playlist_snapshot_id = self.spotify.playlist_uris_add(self.playlist.id, uris)
 
+    '''
     # TODO: remove
     def tracks_add(self, track_ids: List) -> None:
         self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, track_ids)
@@ -64,6 +66,7 @@ class PlaylistModifier:
         chunks = more_itertools.chunked(track_ids, 100)
         for chunk in chunks:
             self.playlist_snapshot_id = self.spotify.playlist_tracks_add(self.playlist.id, chunk)
+    '''
 
     # TODO: remove?
     def details_update(self) -> None:
@@ -77,19 +80,20 @@ class PlaylistModifier:
             name=self.playlist_name,
             description=self.playlist_description)
 
-#    def details_update(self) -> None:
-#        if self.playlist_description is None:
-#            self.__log.warning('playlist description is None')
-#        # spotify api silently fails if description is too long
-#        self.playlist_description = textwrap.shorten(self.playlist_description, width=300)
-#        self.__log.debug(
-#            'playlist details update: name: %s, desc: %s',
-#            self.playlist_name, self.playlist_description)
-#        self.spotify.playlist_change_details(
-#            self.playlist.id,
-#            name=self.playlist_name,
-#            description=self.playlist_description)
-
+    '''
+    def details_update(self) -> None:
+        if self.playlist_description is None:
+            self.__log.warning('playlist description is None')
+        # spotify api silently fails if description is too long
+        self.playlist_description = textwrap.shorten(self.playlist_description, width=300)
+        self.__log.debug(
+            'playlist details update: name: %s, desc: %s',
+            self.playlist_name, self.playlist_description)
+        self.spotify.playlist_change_details(
+            self.playlist.id,
+            name=self.playlist_name,
+            description=self.playlist_description)
+    '''
 
 #
 

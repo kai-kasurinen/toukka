@@ -72,6 +72,7 @@ def playlist_info(uri: str,
     spotify = get_spotify()
     uri_type, uri_id = spotify.convert.from_uri(uri)
     playlist = spotify.playlist(playlist_id=uri_id, market=market, additional_types=['track', 'episode'])
+    #playlist = spotify.playlist(playlist_id=uri_id, market=market)
     print(type(playlist))
     printer(playlist)
 
@@ -90,7 +91,8 @@ def playlist_tracks(uri: str,
                     market: str = None):
     spotify = get_spotify()
     uri_type, uri_id = spotify.convert.from_uri(uri)
-    playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market)
+    #playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market)
+    playlist_tracks_paging = spotify.playlist_tracks(playlist_id=uri_id, market=market,additional_types=['track', 'episode'])
     playlist_tracks = spotify.all_items(playlist_tracks_paging)
     for playlist_track in playlist_tracks:
         printer(playlist_track)

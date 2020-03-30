@@ -92,7 +92,10 @@ class PlaylistGenerator:
                                      'pulse',
                                      'edge'],
             sort_artist_albums_by_keys=None,
-            sort_artist_albums_reverse=False
+            sort_artist_albums_reverse=False,
+            # FIXME: move
+            sort_show_episodes_by_keys=['release_date'],
+            sort_show_episodes_reverse=False
         )
 
         self.options = options.push(kwargs)
@@ -104,7 +107,7 @@ class PlaylistGenerator:
 
         # init empty
         self._uris_seen = Seen()
-        self.track_ids_to_playlist: List[str] = list()
+        # TODO: move to PlaylistModifier
         self.uris_to_playlist: List[str] = list()
 
         self.uriban = UriBanDict()
@@ -146,12 +149,10 @@ class PlaylistGenerator:
             self.__log.debug(
                 'counter: %i, tracks: %i, sources: %i',
                 counter,
-                len(self.track_ids_to_playlist),
+                len(self.uris_to_playlist),
                 len(self.sources))
 
             progress_looper.update()
-
-            # TODO: remove track_ids_to_playlist
 
             # TODO: GRR
             if isinstance(track, Episode):
@@ -165,18 +166,17 @@ class PlaylistGenerator:
                 raise Exception(f'wrong type received: {type(track)}')
 
             if self.track_filter.is_track_ok_to_add(track):
-                self.track_ids_to_playlist.append(track.id)
-                #self.uris_to_playlist.append(track.uri)
+                self.uris_to_playlist.append(track.uri)
                 self.__log.debug('track:%s: added', track.id)
                 progress_tracks.update()
 
-            if len(self.track_ids_to_playlist) >= opts.looper_target_count:
+            if len(self.uris_to_playlist) >= opts.looper_target_count:
                 self.__log.info('we have enough tracks to add (target count)')
                 break
 
             # playlist can contains only ~10000 tracks
             # (actually 11000 and then 500 ISE)
-            if len(self.track_ids_to_playlist) >= 10000:
+            if len(self.uris_to_playlist) >= 10000:
                 self.__log.info('we have enough tracks to add (playlist max)')
                 break
 
@@ -187,20 +187,16 @@ class PlaylistGenerator:
 
         progress_bars.stop()
 
-        self.__log.info(f'{len(self.track_ids_to_playlist)} tracks to add')
+        self.__log.info(f'{len(self.uris_to_playlist)} tracks to add')
 
     # TODO: split and move to Playlist
     def commit(self, **kwargs) -> None:
         opts = self.options.push(kwargs)
 
         if not opts.dry_run:
-            if len(self.track_ids_to_playlist) > 0 or len(self.uris_to_playlist) > 0:
+            if len(self.uris_to_playlist) > 0:
                 self.playlist.clear()
-                # TODO: cleanup
-                if self.track_ids_to_playlist:
-                    self.playlist.tracks_add(self.track_ids_to_playlist)
-                if self.uris_to_playlist:
-                    self.playlist.uris_add(self.uris_to_playlist)
+                self.playlist.uris_add(self.uris_to_playlist)
                 self.playlist.details_update()
             else:
                 self.__log.info('try something else?')
@@ -375,13 +371,27 @@ class PlaylistGenerator:
 
     def show_episodes_generator(
             self,
-            show_id: str
+            show_id: str,
+            **kwargs
             ) -> Generator[SimpleTrack, None, None]:
+
+        opts = self.options.push(kwargs)
 
         paging = self.spotify.show_episodes(
             show_id,
             market=self.market)
-        yield from self.spotify.all_items(paging)
+        episodes = self.spotify.all_items(paging)
+
+        # FIXME: move?
+        if opts.sort_artist_albums_by_keys:
+            self.__log.debug('adding sorting by %s, reverse: %s',
+                             opts.sort_show_episodes_by_keys,
+                             opts.sort_show_episodes_reverse)
+            episodes = sorted(episodes,
+                              key=operator.attrgetter(*opts.sort_show_episodes_by_keys),
+                              reverse=opts.sort_show_episodes_reverse)
+
+        yield from episodes
 
     def recommendations_generator(
             self,
