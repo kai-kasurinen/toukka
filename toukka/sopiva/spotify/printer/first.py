@@ -287,9 +287,9 @@ def print_episode(episode: Episode):
     # FIXME: move
     _print_track_played_count(episode)
 
-    if hasattr(episode, 'show'):
-        print()
-        printer(episode.show)
+    # if hasattr(episode, 'show'):
+    #    print()
+    #    printer(episode.show)
 
 
 @printer.register
