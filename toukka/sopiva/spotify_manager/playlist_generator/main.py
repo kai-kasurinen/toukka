@@ -450,9 +450,11 @@ class PlaylistGenerator:
             playlist_id: str
             ) -> Generator[FullTrack, None, None]:
 
-        paging = self.spotify.playlist_tracks(playlist_id=playlist_id,
-                                              limit=100,
-                                              market=self.market)
+        paging = self.spotify.playlist_tracks(
+            playlist_id=playlist_id,
+            limit=100,
+            market=self.market,
+            additional_types=['track', 'episode'])
 
         for playlist_track in self.spotify.all_items(paging):
             if playlist_track.track is not None and not playlist_track.is_local:
@@ -935,7 +937,7 @@ class PlaylistGenerator:
         if self.check_uri(show.uri + '#episodes'):
             return
         opts.set(expand_track_to_album=False)
-        episodes = self.show_episodes_generator(show.id)
+        episodes = self.show_episodes_generator(show.id, **opts)
         e = self.expander(episodes, **opts)
         yield from e
 
