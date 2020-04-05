@@ -99,9 +99,7 @@ def current_playback(market=None):
 @playback.command()
 def currently_playing(market=None):
     ''' Get user's currently playing track.'''
-    spotify = get_spotify()
-    playing = spotify.playback_currently_playing(market=market, additional_types=['track', 'episode'])
-    printer(playing)
+    printer(get_spotify().playback_currently_playing(**locals()))
 
 
 @playback.command()
