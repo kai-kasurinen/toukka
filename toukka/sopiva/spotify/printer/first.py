@@ -279,8 +279,8 @@ def print_episode(episode: Episode):
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {episode.languages}')
     print(f'\tresume point: {episode.resume_point}')
-    print(f'\tdescription:')
 
+    print(f'\tdescription:')
     print(textwrap.TextWrapper(
         width=70,
         initial_indent='\t\t',
@@ -303,7 +303,6 @@ def print_episode(episode: Episode):
 @printer.register
 def print_show(show: Show):
     print(f'show: {show.name} ({show.uri}) ({show.media_type})')
-    print(f'\tdesc: {show.description}')
     print(f'\tpublisher: {show.publisher}')
     print(f'\tlanguages: {show.languages}')
 
@@ -318,6 +317,7 @@ def print_show(show: Show):
         for copyright in show.copyrights:
             print(f'\t\t{copyright.type}: {copyright.text}')
 
+    print(f'\tdescription:')
     print(textwrap.TextWrapper(
         width=70,
         initial_indent='\t\t',
