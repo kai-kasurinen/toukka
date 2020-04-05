@@ -6,6 +6,7 @@ import functools
 import pprint
 import logging
 import datetime
+import textwrap
 
 import humanize
 
@@ -275,10 +276,16 @@ def print_episode(episode: Episode):
         f'episode: {episode.name} ({episode.uri})',
         f'({episode.release_date} {episode.release_date_precision})')
     print(f'\tshow: {episode.show.name} ({episode.show.uri})')
-    print(f'\tdesc: {episode.description}')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {episode.languages}')
     print(f'\tresume point: {episode.resume_point}')
+    print(f'\tdescription:')
+
+    print(textwrap.TextWrapper(
+        width=70,
+        initial_indent='\t\t',
+        subsequent_indent='\t\t'
+        ).fill(episode.description))
 
     if episode.external_urls:
         print(f'\texternal urls: {episode.external_urls}')
@@ -310,6 +317,12 @@ def print_show(show: Show):
         print('\tcopyrights:')
         for copyright in show.copyrights:
             print(f'\t\t{copyright.type}: {copyright.text}')
+
+    print(textwrap.TextWrapper(
+        width=70,
+        initial_indent='\t\t',
+        subsequent_indent='\t\t'
+        ).fill(show.description))
 
     flags = _get_flags(
         show.asdict(),
