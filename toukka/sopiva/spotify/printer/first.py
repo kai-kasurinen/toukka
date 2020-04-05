@@ -303,7 +303,7 @@ def print_show(show: Show):
     if show.available_markets:
         print(f'\tmarkets: {len(show.available_markets)}')
 
-    if show.episodes:
+    if hasattr(show, 'episodes'):
         print(f'\tepisodes: {len(show.episodes)}')
 
     if show.copyrights:

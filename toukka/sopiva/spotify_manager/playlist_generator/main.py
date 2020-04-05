@@ -453,8 +453,7 @@ class PlaylistGenerator:
         paging = self.spotify.playlist_tracks(
             playlist_id=playlist_id,
             limit=100,
-            market=self.market,
-            additional_types=['track', 'episode'])
+            market=self.market)
 
         for playlist_track in self.spotify.all_items(paging):
             if playlist_track.track is not None and not playlist_track.is_local:
