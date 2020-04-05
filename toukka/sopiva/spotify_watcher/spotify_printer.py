@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+# TODO: cleanup
+
 class SpotifyPrinter:
     def __init__(self):
         self.spotify = get_spotify()
@@ -53,8 +55,10 @@ class SpotifyPrinter:
         print(''.ljust(80, '='))
 
     def print_episode(self, episode_id):
-        episode = self.spotify.episode(episode_id, market=None)
+        episode = self.spotify.episode(episode_id, market=self.market)
         print(''.ljust(80, '='))
+        printer(episode.show)
+        print()
         printer(episode)
         print(''.ljust(80, '='))
 
