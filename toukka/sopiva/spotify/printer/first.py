@@ -132,8 +132,8 @@ def print_album_full(album: FullAlbum):
         print('\tlabel: {album.label}'.format(album=album))
     if album.copyrights:
         print('\tcopyrights:')
-        for copyright_ in album.copyrights:
-            print(f'\t\t{copyright_.type}: {copyright_.text}')
+        for copyright in album.copyrights:
+            print(f'\t\t{copyright.type}: {copyright.text}')
 
     flags = _get_flags(dataclasses.asdict(album), ['is_playable'])
     if flags:
@@ -271,25 +271,26 @@ def print_playhistory(playhistory: PlayHistory):
 
 @printer.register
 def print_episode(episode: Episode):
-    print(f'episode: {episode.name} ({episode.uri})')
-    print(f'\treleased: {episode.release_date} {episode.release_date_precision}')
+    print(
+        f'episode: {episode.name} ({episode.uri})',
+        f'({episode.release_date} {episode.release_date_precision})')
+    print(f'\tshow: {episode.show.name} ({episode.show.uri})')
     print(f'\tdesc: {episode.description}')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {episode.languages}')
+    print(f'\tresume point: {episode.resume_point}')
 
     if episode.external_urls:
         print(f'\texternal urls: {episode.external_urls}')
 
-    flags = _get_flags(episode.asdict(), ['explicit', 'is_playable', 'is_externally_hosted'])
+    flags = _get_flags(
+        episode.asdict(),
+        ['explicit', 'is_playable', 'is_externally_hosted'])
     if flags:
         print(f'\tflags: {flags}')
 
     # FIXME: move
     _print_track_played_count(episode)
-
-    # if hasattr(episode, 'show'):
-    #    print()
-    #    printer(episode.show)
 
 
 @printer.register
@@ -302,6 +303,19 @@ def print_show(show: Show):
     if show.available_markets:
         print(f'\tmarkets: {len(show.available_markets)}')
 
+    if show.episodes:
+        print(f'\tepisodes: {len(show.episodes)}')
+
+    if show.copyrights:
+        print('\tcopyrights:')
+        for copyright in show.copyrights:
+            print(f'\t\t{copyright.type}: {copyright.text}')
+
+    flags = _get_flags(
+        show.asdict(),
+        ['is_externally_hosted'])
+    if flags:
+        print(f'\tflags: {flags}')
 
 # UTILS
 
