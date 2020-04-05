@@ -275,7 +275,9 @@ def print_episode(episode: Episode):
     print(
         f'episode: {episode.name} ({episode.uri})',
         f'({episode.release_date} {episode.release_date_precision})')
-    print(f'\tshow: {episode.show.name} ({episode.show.uri})')
+
+    if hasattr(episode, 'show'):
+        print(f'\tshow: {episode.show.name} ({episode.show.uri})')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {episode.languages}')
     print(f'\tresume point: {episode.resume_point}')
