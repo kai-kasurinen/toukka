@@ -13,6 +13,7 @@ from toukka.sopiva.spotify.cli import cli_root
 # GRR
 _types = {k[:-1] for k in tekore.client.api.search.paging_type.keys()}
 
+
 @cli_root.command()
 @click.argument('type', type=click.Choice(_types))
 @click.argument('query')
