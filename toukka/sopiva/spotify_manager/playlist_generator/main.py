@@ -12,6 +12,7 @@ import operator
 # import autologging
 import enlighten
 import more_itertools
+import unidecode
 
 from options import Options
 
@@ -29,6 +30,11 @@ from toukka.sopiva.spotify.model import (
         ModelList,
         Show, Episode
 )
+
+from toukka.sopiva.spotify_manager.filters import (
+    make_multi_filter, make_filter_by_artist_genre
+)
+
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -78,6 +84,7 @@ class PlaylistGenerator:
             expand_show_to_episodes=False,
             expand_generator_to_items=True,
             expand_genre_to_playlists=False,
+            expand_genre_to_artists=False,
             expand_genre_to_related_genres=False,
             exclude_various_artists_albums=False,
             exclude_uris=False,
@@ -851,6 +858,11 @@ class PlaylistGenerator:
             self.expand_genre_to_related_genres(item, **opts)
             did = True
 
+        # add as new source
+        if opts.expand_genre_to_artists:
+            self.expand_genre_to_artists(item, **opts)
+            did = True
+
         if not did:
             self.__log.warning('did not do anything with: genre:%s', item.name)
 
@@ -879,6 +891,29 @@ class PlaylistGenerator:
 
         for playlist_uri in playlist_uris:
             yield from self.expander(SpotifyUri(playlist_uri), **opts)
+
+    def expand_genre_to_artists(
+            self,
+            genre: Genre,
+            **kwargs
+            ) -> None:
+
+        opts = self.options.push(kwargs)
+
+        if self.check_uri(f'genre:{genre.name}#artists'):
+            return
+
+        # genre.name is unicode and artists.genres contains ascii
+        genre_name = unidecode.unidecode(genre.name)
+
+        query = f'genre:"{genre_name}"'
+        query_type = 'artist'
+
+        search = self.search_generator(query_type=query_type, query=query)
+        # search genre matches substrings, so filter
+        search = filter(make_filter_by_artist_genre(genre_name), search)
+        expander = self.expander(self.randomizer(search, **opts), **opts)
+        self.sources.add(expander)
 
     def expand_genre_to_related_genres(
             self,
