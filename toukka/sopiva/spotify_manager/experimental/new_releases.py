@@ -12,8 +12,13 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 from toukka.sopiva.spotify.helper import Helper
 
+from toukka.sopiva.spotify_manager.filters import make_multi_filter
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+
+# TODO: move filters
 
 
 # FIXME: move
@@ -142,9 +147,6 @@ def search_new_releases(
     return albums
 
 
-def make_multi_filter(filters, func=all):
-    def multi_filter(x):
-        return func([f(x) for f in filters])
-    return multi_filter
+
 
 # END

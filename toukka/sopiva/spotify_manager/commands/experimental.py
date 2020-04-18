@@ -16,6 +16,7 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
 )
 
 from toukka.sopiva.spotify_manager.experimental.user_analyze import analyze_user_1
+from toukka.sopiva.spotify_manager.experimental.search_test import search_artists_by_genre
 
 
 @cli_root.command()
@@ -61,6 +62,14 @@ def analyze_user(
         **kwargs
         ):
     analyze_user_1(**kwargs)
+
+
+@cli_root.command()
+@click.argument('genre')
+def artists_by_genre(
+        **kwargs
+        ):
+    search_artists_by_genre(**kwargs)
 
 
 @cli_root.command()
