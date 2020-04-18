@@ -60,7 +60,6 @@ kwargs_for_genre = {
 kwargs_for_genre_artists = {
     'progress_bar': True,
     'expand_genre_to_artists': True,
-    'expand_genre_to_related_genres': True,
     'expand_artist_to_random_album': True,
     'expand_artist_to_related_artists': True,
     'expand_album_to_tracks': True,
