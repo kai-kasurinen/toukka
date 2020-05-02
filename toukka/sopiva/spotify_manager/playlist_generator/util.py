@@ -9,7 +9,11 @@ import more_itertools
 
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
-def shuffle_generator(generator: Generator, buffer_size: int) -> Generator[Any, None, None]:
+def shuffle_generator(
+        generator: Generator,
+        buffer_size: int = 100
+        ) -> Generator[Any, None, None]:
+
     while True:
         buffer = list(itertools.islice(generator, buffer_size))
         if len(buffer) == 0:
@@ -21,7 +25,11 @@ def shuffle_generator(generator: Generator, buffer_size: int) -> Generator[Any, 
 
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
-def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any, None, None]:
+def scramble_generator(
+        generator: Generator,
+        buffer_size: int = 1000
+        ) -> Generator[Any, None, None]:
+
     buf = []
     i = iter(generator)
     while True:
@@ -40,7 +48,7 @@ def scramble_generator(generator: Generator, buffer_size: int) -> Generator[Any,
 
 # TODO: convert iterable to list (so all items is used) and randomize list
 def take_random_items_generator(iterable, count=1):
-    yield from more_itertools.take(count, scramble_generator(iterable, 100))
+    yield from more_itertools.take(count, scramble_generator(iterable))
 
 
 def empty_generator():

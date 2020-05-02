@@ -477,7 +477,7 @@ class PlaylistGenerator:
 
         if opts.randomize:
             self.__log.debug('randomizing: %s', type(generator))
-            yield from scramble_generator(generator, 100)
+            yield from scramble_generator(generator)
         else:
             yield from generator
 
