@@ -308,11 +308,11 @@ def print_show(show: Show):
     print(f'\tpublisher: {show.publisher}')
     print(f'\tlanguages: {show.languages}')
 
+    if show.episodes is not None:
+        print(f'\tepisodes: {show.episodes.total}')
+
     if show.available_markets:
         print(f'\tmarkets: {len(show.available_markets)}')
-
-    if hasattr(show, 'episodes'):
-        print(f'\tepisodes: {len(show.episodes)}')
 
     if show.copyrights:
         print('\tcopyrights:')
