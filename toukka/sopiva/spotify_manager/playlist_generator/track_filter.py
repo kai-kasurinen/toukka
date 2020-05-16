@@ -239,14 +239,14 @@ class TrackFilter:
     def is_banned(self, track: FullTrack) -> bool:
 
         if track.uri in self.uriban:
-            self.__log.debug('%s: is banned', track.uri)
+            self.__log.debug('%s: banned', track.uri)
             return True
         if track.album.uri in self.uriban:
-            self.__log.debug('%s: is banned', track.album.uri)
+            self.__log.debug('%s: banned', track.album.uri)
             return True
         for artist in track.artists:
             if artist.uri in self.uriban:
-                self.__log.debug('%s: is banned', artist.uri)
+                self.__log.debug('%s: banned', artist.uri)
                 return True
 
         return False
