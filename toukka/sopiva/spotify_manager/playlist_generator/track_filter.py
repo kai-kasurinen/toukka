@@ -12,6 +12,24 @@ from toukka.sopiva.spotify_history.util import get_spotify_history
 from .banner import UriBanDict
 
 
+# FIXME: move
+_bad_words_in_album_names = [
+    'christmas',
+    'joulu'
+    ]
+
+_bad_words_in_track_names = [
+    'christmas',
+    'joulu',
+    'commentary',
+    'what child is this',
+    'jingle bells',
+    'o tannenbaum',
+    'o little town of bethlehem',
+    'silent night'
+    ]
+
+
 class TrackFilter:
 
     def __init__(self,
@@ -27,8 +45,8 @@ class TrackFilter:
         #
         self.uriban = UriBanDict()
         # FIXME: move
-        self.bad_words_in_album_names = ['christmas', 'joulu']
-        self.bad_words_in_track_names = ['christmas', 'joulu', 'commentary', 'what child is this', 'jingle bells', 'o tannenbaum', 'o little town of bethlehem', 'silent night']
+        self.bad_words_in_album_names = _bad_words_in_album_names
+        self.bad_words_in_track_names = _bad_words_in_track_names
         # TODO: add filter
         self.various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
         # FIXME: do something (emulates what autologging provides)
@@ -221,9 +239,16 @@ class TrackFilter:
     def is_banned(self, track: FullTrack) -> bool:
 
         if track.uri in self.uriban:
+            self.__log.debug('%s: is banned', track.uri)
             return True
         if track.album.uri in self.uriban:
+            self.__log.debug('%s: is banned', track.album.uri)
             return True
+        for artist in track.artists:
+            if artist.uri in self.uriban:
+                self.__log.debug('%s: is banned', artist.uri)
+                return True
+
         return False
 
 # END
