@@ -163,7 +163,7 @@ class TrackFilter:
 
         isrc = track.external_ids.get('isrc')
         if isrc is None:
-            self.__log.warning('track:%s: isrc is %s', track.id, isrc)
+            self.__log.debug('track:%s: isrc is %s', track.id, isrc)
             return False
         if self.spotify_history.count_by_track_isrc(isrc) > 0:
             return True
@@ -182,7 +182,7 @@ class TrackFilter:
 
         isrc = track.external_ids.get('isrc')
         if isrc is None:
-            self.__log.warning('track:%s: isrc is %s', track.id, isrc)
+            self.__log.debug('track:%s: isrc is %s', track.id, isrc)
             return False
         elif isrc in self.seen_track_isrc:
             return True
@@ -195,7 +195,7 @@ class TrackFilter:
         if track1.external_ids.get('isrc') == track2.external_ids.get('isrc'):
             return False
         else:
-            self.__log.warning('track:%s and track:%s has different ISRC', track1.id, track2.id)
+            self.__log.debug('track:%s and track:%s has different ISRC', track1.id, track2.id)
             return True
 
     def is_track_playable(self, track: FullTrack) -> bool:
