@@ -28,7 +28,7 @@ def get_retry() -> Retry:
     retry = RetryA(
         total=4,
         backoff_factor=1,
-        status_forcelist=[500, 502, 503],
+        status_forcelist=[500, 502, 503, 504],
         method_whitelist=default_method_whitelist+['POST'])
     return retry
 
