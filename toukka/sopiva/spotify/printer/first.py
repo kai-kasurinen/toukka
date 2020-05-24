@@ -57,7 +57,7 @@ def print_track(track: Track,
     if track.restrictions:
         print(f'\trestrictions: {track.restrictions}')
 
-    flags = _get_flags(track.asdict(), ['explicit', 'is_playable', 'is_local'])
+    flags = _get_flags(dataclasses.asdict(track), ['explicit', 'is_playable', 'is_local'])
     if flags:
         print(f'\tflags: {flags}')
 
@@ -145,14 +145,14 @@ def print_album_full(album: FullAlbum):
 @printer.register
 def print_artist(artist: FullArtist,
                  use_play_count=True):
-    print('artist: {artist.name} ({artist.uri})'.format(artist=artist),
-          '(popularity: {artist.popularity},'.format(artist=artist),
-          'followers: {artist.followers.total})'.format(artist=artist))
+    print(f'artist: {artist.name} ({artist.uri})',
+          f'(popularity: {artist.popularity},',
+          f'followers: {artist.followers.total})')
 
     if artist.genres:
-        print('\tgenres: {artist.genres}'.format(artist=artist))
+        print(f'\tgenres: {list(artist.genres)}')
     if artist.external_urls:
-        print('\texternal urls: {artist.external_urls}'.format(artist=artist))
+        print(f'\texternal urls: {artist.external_urls}')
 
     # FIXME: move
     if use_play_count:

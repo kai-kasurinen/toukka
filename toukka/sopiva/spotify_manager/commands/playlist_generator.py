@@ -11,8 +11,7 @@ import click_params
 
 from click_params import StringListParamType
 
-import tekore.convert
-import tekore.client.api.browse
+import tekore._client.api.browse
 
 import toukka.sopiva.spotify_manager.genres
 
@@ -108,7 +107,7 @@ def from_recommendations(
     attributes_dict: Dict[str, Union[float, int]] = {}
     if attributes_list is not None:
         attributes_dict = {k: v for k, v in (x.split(':') for x in attributes_list)}
-        tekore.client.api.browse.validate_attributes(attributes_dict)
+        tekore._client.api.browse.validate_attributes(attributes_dict)
     generator.generate_from_recommendations(
         seed_artist_uris=seed_artist_uris,
         seed_track_uris=seed_track_uris,

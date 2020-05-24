@@ -4,7 +4,6 @@ from typing import Set
 
 import logging
 import click
-import tekore.convert
 import enlighten
 import more_itertools
 
@@ -35,6 +34,9 @@ def playlist_cleaner(uri: str,
                      ):
     '''clean playlist'''
 
+    spotify = toukka.sopiva.spotify.util.get_spotify()
+    spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
+
     if uri == 'current':
         uri_current = _playlist_current()
         if uri_current:
@@ -42,10 +44,8 @@ def playlist_cleaner(uri: str,
         else:
             raise click.ClickException('not currently playing playlist?')
 
-    uri_type, uri_id = tekore.convert.from_uri(uri)
+    uri_type, uri_id = spotify.convert.from_uri(uri)
 
-    spotify = toukka.sopiva.spotify.util.get_spotify()
-    spotify_history = toukka.sopiva.spotify_history.util.get_spotify_history()
     market = spotify.current_user().country
     tracks_to_remove = set()
     isrcs: Set[str] = set()

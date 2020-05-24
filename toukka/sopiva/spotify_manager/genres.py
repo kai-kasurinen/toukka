@@ -13,8 +13,6 @@ from typing import List, Optional
 from xdg.BaseDirectory import save_cache_path
 from bs4 import BeautifulSoup
 
-import tekore.convert
-
 # import toukka.cache.dogpile
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer

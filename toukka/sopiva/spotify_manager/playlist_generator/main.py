@@ -16,8 +16,6 @@ import unidecode
 
 from options import Options
 
-import tekore.convert
-import tekore.serialise
 
 
 from functools import singledispatchmethod  # type: ignore[attr-defined] # typeshed needs fixed
@@ -818,7 +816,7 @@ class PlaylistGenerator:
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        uri_type, uri_id = tekore.convert.from_uri(uri)
+        uri_type, uri_id = self.spotify.convert.from_uri(uri)
         self.__log.debug('%s: %s: %s', uri, uri_type, uri_id)
         if self.check_uri(uri + '#uri'):
             return
@@ -831,7 +829,7 @@ class PlaylistGenerator:
 
         items = list()
         for uri in uris:
-            uri_type, uri_id = tekore.convert.from_uri(uri)
+            uri_type, uri_id = self.spotify.convert.from_uri(uri)
             self.__log.debug('%s: %s', uri_type, uri_id)
             items.append(self.spotify.uri_to_item(uri))
         return items

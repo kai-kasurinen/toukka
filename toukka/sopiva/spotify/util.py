@@ -39,7 +39,7 @@ def set_user_refresh_token(refresh_token: str) -> None:
     statedb.set('user_refresh_token', refresh_token)
 
 
-def get_user_token() -> tekore.auth.refreshing.RefreshingToken:
+def get_user_token() -> tekore.RefreshingToken:
     client_id, client_secret, redirect_uri = _read_from_config()
     # client_id, client_secret, client_redirect = read_environment()
     refresh_token = get_user_refresh_token()
@@ -51,14 +51,19 @@ def get_user_token() -> tekore.auth.refreshing.RefreshingToken:
         # NOTE: use our sender with urllib3.retry retrying
         # TODO: use RetryingSender
         sender = get_sender()
-        cred = tekore.auth.refreshing.RefreshingCredentials(client_id, client_secret, sender=sender)
-        try:
+        cred = tekore.RefreshingCredentials(client_id, client_secret, sender=sender)
+        # TODO: exceptions?
+        token = cred.refresh_user_token(refresh_token)
+
+        # FIXME: remove?
+        #try:
             # token = tekore.util.refresh_user_token(client_id, client_secret, refresh_token)
-            token = cred.refresh_user_token(refresh_token)
+            # token = cred.refresh_user_token(refresh_token)
         # TODO: catch tekore.auth.expiring.OAuthError
         # TODO: catch 50x: requests.exceptions.HTTPError: Unexpected error!
-        except tekore.auth.expiring.OAuthError as e:
-            logger.warning(e)
+        #except tekore.auth.expiring.OAuthError as e:
+        #    logger.warning(e)
+
 
     if token is None:
         logger.debug('referesh token not found, prompt user input')
@@ -69,17 +74,17 @@ def get_user_token() -> tekore.auth.refreshing.RefreshingToken:
     return token
 
 
-def get_sender() -> tekore.sender.Sender:
+def get_sender() -> tekore.Sender:
     session = toukka.hub.requests.get_cached_session()
     # https://github.com/psf/requests/issues/3070
     requests_kwargs = {'timeout': 10.0}
-    sender = tekore.sender.PersistentSender(session=session, **requests_kwargs)
+    sender = tekore.PersistentSender(session=session, **requests_kwargs)
     # our session handless retrying, so this not needed
     # retrying_sender = tekore.sender.RetryingSender(retries=2, sender=sender)
     return sender
 
 
-def get_client_token() -> tekore.auth.refreshing.RefreshingToken:
+def get_client_token() -> tekore.RefreshingToken:
     # client_id, client_secret, client_redirect = tekore.util.read_environment()
     client_id, client_secret, redirect_uri = _read_from_config()
     credentials = tekore.util.RefreshingCredentials(client_id, client_secret)

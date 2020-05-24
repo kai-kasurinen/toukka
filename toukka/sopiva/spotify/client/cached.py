@@ -1,7 +1,7 @@
 #
 
 from boltons.funcutils import wraps
-from tekore.client import Spotify
+from tekore import Spotify
 
 from toukka.cache.dogpile import redis
 

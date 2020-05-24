@@ -7,16 +7,16 @@ import textwrap
 
 from boltons.funcutils import wraps
 
-from tekore.client import Spotify
-from tekore.model.paging import Paging
-from tekore.model.base import Item
+from tekore import Spotify
+from tekore.model import Paging
+from tekore.model import Item
 # from requests import HTTPError
 
-from tekore.client.process import top_item, nothing
-from tekore.client.chunked import chunked, return_last
-from tekore.client.decor import send_and_process
+from tekore._client.process import top_item, nothing
+from tekore._client.chunked import chunked, return_last
+from tekore._client.decor import send_and_process
 
-import tekore.convert
+import tekore._convert
 
 
 logger = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ class SpotifyExtended(Spotify):
 
     @property
     def convert(self):
-        return tekore.convert
+        return tekore._convert
 
     @chunked('uris', 2, 100, return_last, reverse='position', reverse_pos=3)
     @send_and_process(top_item('snapshot_id'))

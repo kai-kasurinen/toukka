@@ -10,8 +10,8 @@ from toukka.sopiva.spotify.cli import cli_root
 
 # TODO: support multiple types
 
-# GRR
-_types = {k[:-1] for k in tekore.client.api.search.paging_type.keys()}
+# TODO: move?
+_types = {k[:-1] for k in tekore._client.api.search.paging_type.keys()}
 
 
 @cli_root.command()
