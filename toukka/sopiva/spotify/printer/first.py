@@ -57,7 +57,8 @@ def print_track(track: Track,
     if track.restrictions:
         print(f'\trestrictions: {track.restrictions}')
 
-    flags = _get_flags(dataclasses.asdict(track), ['explicit', 'is_playable', 'is_local'])
+    track_dict = dataclasses.asdict(track)
+    flags = _get_flags(track_dict, ['explicit', 'is_playable', 'is_local'])
     if flags:
         print(f'\tflags: {flags}')
 
@@ -136,7 +137,8 @@ def print_album_full(album: FullAlbum):
         for copyright in album.copyrights:
             print(f'\t\t{copyright.type}: {copyright.text}')
 
-    flags = _get_flags(dataclasses.asdict(album), ['is_playable'])
+    album_dict = dataclasses.asdict(album)
+    flags = _get_flags(album_dict, ['is_playable'])
     if flags:
         print('\tflags: %s' % flags)
 
@@ -175,7 +177,8 @@ def print_playlist(playlist: Playlist):
     if playlist.primary_color:
         print(f'\tprimary color: {playlist.primary_color}')
 
-    flags = _get_flags(playlist.asdict(), ['public', 'collaborative'])
+    playlist_dict = dataclasses.asdict(playlist)
+    flags = _get_flags(playlist_dict, ['public', 'collaborative'])
     if flags:
         print(f'\tflags: {flags}')
 
@@ -193,7 +196,9 @@ def print_playlist_track(playlist_track: PlaylistTrack):
     if plt.primary_color:
         print(f'\tprimary color: {plt.primary_color}')
     # TODO: video_thumbnail?
-    flags = _get_flags(plt.asdict(), ['is_local'])
+
+    plt_dict = dataclasses.asdict(plt)
+    flags = _get_flags(plt_dict, ['is_local'])
     if flags:
         print(f'\tflags: {flags}')
 
@@ -220,7 +225,9 @@ def print_currently_playing(cp: CurrentlyPlaying):
     if cp.context:
         print(f'\tcontext: {cp.context.type.name} ({cp.context.uri})')
     print(f'\ttype: {cp.currently_playing_type}')
-    disallows = _get_flags(cp.actions.disallows.asdict(), cp.actions.disallows.asdict().keys())
+
+    disallows_dict = dataclasses.asdict(cp.actions.disallows)
+    disallows = _get_flags(disallows_dict, disallows_dict.keys())
     print(f'\tactions disallows: {disallows}')
     print()
     if cp.item:
@@ -257,7 +264,8 @@ def print_track_local(track: LocalTrack):
     if track.available_markets:
         print(f'\tmarkets: {len(track.available_markets)}')
 
-    flags = _get_flags(track.asdict(), ['explicit', 'is_playable', 'is_local'])
+    track_dict = dataclasses.asdict(track)
+    flags = _get_flags(track_dict, ['explicit', 'is_playable', 'is_local'])
     if flags:
         print(f'\tflags: {flags}')
 
@@ -292,8 +300,9 @@ def print_episode(episode: Episode):
     if episode.external_urls:
         print(f'\texternal urls: {episode.external_urls}')
 
+    episode_dict = dataclasses.asdict(episode)
     flags = _get_flags(
-        episode.asdict(),
+        episode_dict,
         ['explicit', 'is_playable', 'is_externally_hosted'])
     if flags:
         print(f'\tflags: {flags}')
@@ -326,8 +335,9 @@ def print_show(show: Show):
         subsequent_indent='\t\t'
         ).fill(show.description))
 
+    show_dict = dataclasses.asdict(show)
     flags = _get_flags(
-        show.asdict(),
+        show_dict,
         ['is_externally_hosted'])
     if flags:
         print(f'\tflags: {flags}')
