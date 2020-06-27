@@ -287,7 +287,7 @@ def print_episode(episode: Episode):
     if hasattr(episode, 'show'):
         print(f'\tshow: {episode.show.name} ({episode.show.uri})')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
-    print(f'\tlanguages: {episode.languages}')
+    print(f'\tlanguages: {list(episode.languages)}')
     print(f'\tresume point: {episode.resume_point}')
 
     print(f'\tdescription:')
@@ -315,9 +315,9 @@ def print_episode(episode: Episode):
 def print_show(show: Show):
     print(f'show: {show.name} ({show.uri}) ({show.media_type})')
     print(f'\tpublisher: {show.publisher}')
-    print(f'\tlanguages: {show.languages}')
+    print(f'\tlanguages: {list(show.languages)}')
 
-    if show.episodes is not None:
+    if hasattr(show, 'episodes'):
         print(f'\tepisodes: {show.episodes.total}')
 
     if show.available_markets:
