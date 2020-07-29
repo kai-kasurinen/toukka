@@ -35,7 +35,7 @@ class SpotifyMprisHistory(Base):
 
 class SpotifyMprisHistoryDB:
     def __init__(self, database_uri):
-        self.engine = create_engine(database_uri, echo=False)
+        self.engine = create_engine(database_uri, echo=False, pool_pre_ping=True)
         self.Session = sessionmaker(bind=self.engine)
         Base.metadata.create_all(self.engine)
 

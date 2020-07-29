@@ -44,7 +44,7 @@ class SpotifyBannedWord(Base):
 
 class SpotifyDB:
     def __init__(self, database_uri):
-        self.engine = create_engine(database_uri, echo=False)
+        self.engine = create_engine(database_uri, echo=False, pool_pre_ping=True)
         self.Session = sessionmaker(bind=self.engine)
         #self.session = self.Session()
 
