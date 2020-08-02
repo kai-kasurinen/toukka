@@ -34,6 +34,8 @@ def configure():
         'cache.redis.arguments.redis_expiration_time': 60*60*24,
         # NOTE: Use this when multiple processes will be talking to the same redis instance
         'cache.redis.arguments.distributed_lock': True,
+        # NOTE: should be set to False when distributed_lock is True
+        'cache.redis.arguments.thread_local_lock': False,
         # mongo
         'cache.mongo.backend': 'mongo',
         'cache.mongo.expiration_time': 60*60*24,
