@@ -155,7 +155,7 @@ def genre(genre_name: tuple,
 
 
 @cli.command()
-@click.argument('genre_name_re', required=True)
+@click.argument('genre_name_re', required=True, nargs=-1)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--randomize', is_flag=True, default=False)
 def genre_re(genre_name_re: str,

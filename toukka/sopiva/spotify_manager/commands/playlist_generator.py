@@ -138,16 +138,21 @@ def from_genres(
 
 
 @generate_playlist.command()
-@click.argument('genre_name_re', required=True)
+@click.argument('genre_name_re', required=True, nargs=-1)
 def from_genres_re(
-        genre_name_re: str,
+        genre_name_re: tuple,
         **kwargs
         ):
-    regex = re.compile(genre_name_re)
+    genres_match_list = list()
     genres = toukka.sopiva.spotify_manager.genres.genres()
-    genre_names_match = filter(regex.fullmatch, genres.keys())
+
+    for name_re in genre_name_re:
+        name_re_regex = re.compile(name_re)
+        name_re_match = filter(name_re_regex.fullmatch, genres.keys())
+        genres_match_list.extend(name_re_match)
+
     context = click.get_current_context()
-    context.invoke(from_genres, genre_name=genre_names_match, **kwargs)
+    context.invoke(from_genres, genre_name=genres_match_list, **kwargs)
 
 
 @generate_playlist.command()
