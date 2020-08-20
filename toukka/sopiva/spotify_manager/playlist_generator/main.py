@@ -221,8 +221,10 @@ class PlaylistGenerator:
         if opts.randomize:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
+
         for uri in uris:
             self.sources.add(self.expander(SpotifyUri(uri), **opts))
+
         self.playlist.description = f'source: {", ".join(uris)}'
         self.generate(**opts)
 
@@ -234,10 +236,16 @@ class PlaylistGenerator:
 
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
+
+        if opts.randomize:
+            self.__log.debug('shuffling genres')
+            random.shuffle(genres)
+
         genre_names: List[str] = []
         for genre in genres:
             self.sources.add(self.expander(genre, **opts))
             genre_names.append(genre.name)
+
         self.playlist.description = f'source: {", ".join(genre_names)}'
         self.generate(**opts)
 
