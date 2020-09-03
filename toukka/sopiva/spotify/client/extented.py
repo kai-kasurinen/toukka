@@ -39,9 +39,21 @@ def alter_description(f):
             if kwargs['description'] is not None:
                 description_len = len(kwargs['description'])
                 if description_len > 300:
-                    logger.warning('playlist description is too long (%i), shortening it', description_len)
-                    kwargs['description'] = textwrap.shorten(
-                        kwargs['description'], width=300)
+
+                    logger.warning(
+                        'playlist description is too long (%i), shortening it',
+                        description_len)
+
+                    description_shorted = textwrap.shorten(kwargs['description'], width=300)
+                    kwargs['description'] = description_shorted
+
+                    description_shorted_len = description_shorted.encode('utf-8')
+
+                    if description_shorted_len > 300:
+                        logger.warning(
+                            'playlist description is STILL too long (%i)',
+                            description_shorted_len)
+
         return f(*args, **kwargs)
     return wrapper
 
