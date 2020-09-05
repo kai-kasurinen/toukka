@@ -15,6 +15,8 @@ import toukka.hub.requests
 import toukka.sopiva.spotify.client.current
 import toukka.sopiva.spotify.state
 
+from toukka.sopiva.spotify.sender.requests_senders import PersistentSender
+
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
@@ -55,16 +57,6 @@ def get_user_token() -> tekore.RefreshingToken:
         # TODO: exceptions?
         token = cred.refresh_user_token(refresh_token)
 
-        # FIXME: remove?
-        #try:
-            # token = tekore.util.refresh_user_token(client_id, client_secret, refresh_token)
-            # token = cred.refresh_user_token(refresh_token)
-        # TODO: catch tekore.auth.expiring.OAuthError
-        # TODO: catch 50x: requests.exceptions.HTTPError: Unexpected error!
-        #except tekore.auth.expiring.OAuthError as e:
-        #    logger.warning(e)
-
-
     if token is None:
         logger.debug('referesh token not found, prompt user input')
         scope = tekore.Scope(tekore.scope.every)
@@ -76,11 +68,7 @@ def get_user_token() -> tekore.RefreshingToken:
 
 def get_sender() -> tekore.Sender:
     session = toukka.hub.requests.get_cached_session()
-    # https://github.com/psf/requests/issues/3070
-    requests_kwargs = {'timeout': 10.0}
-    sender = tekore.PersistentSender(session=session, **requests_kwargs)
-    # our session handless retrying, so this not needed
-    # retrying_sender = tekore.sender.RetryingSender(retries=2, sender=sender)
+    sender = PersistentSender(session=session)
     return sender
 
 

@@ -10,11 +10,6 @@ from boltons.funcutils import wraps
 from tekore import Spotify
 from tekore.model import Paging
 from tekore.model import Item
-# from requests import HTTPError
-
-from tekore._client.process import top_item, nothing
-from tekore._client.chunked import chunked, return_last
-from tekore._client.decor import send_and_process
 
 import tekore._convert
 
@@ -107,21 +102,5 @@ class SpotifyExtended(Spotify):
     @property
     def convert(self):
         return tekore._convert
-
-    @chunked('uris', 2, 100, return_last, reverse='position', reverse_pos=3)
-    @send_and_process(top_item('snapshot_id'))
-    def playlist_uris_add(
-            self,
-            playlist_id: str,
-            uris: list,
-            position: int = None
-    ) -> str:
-        payload = {'uris': uris}
-        return self._post(
-            f'playlists/{playlist_id}/tracks',
-            payload=payload,
-            position=position
-        )
-
 
 # END
