@@ -13,7 +13,7 @@ def try_parse_json(response):
         return None
 
 
-class PersistentSender(Sender):
+class RequestsSender(Sender):
 
     def __init__(self, session: requests.Session = None):
         # https://github.com/psf/requests/issues/3070
