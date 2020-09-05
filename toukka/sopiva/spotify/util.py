@@ -15,7 +15,7 @@ import toukka.hub.requests
 import toukka.sopiva.spotify.client.current
 import toukka.sopiva.spotify.state
 
-from toukka.sopiva.spotify.sender.requests_senders import PersistentSender
+from toukka.sopiva.spotify.sender.requests_sender import RequestsSender
 
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ def get_user_token() -> tekore.RefreshingToken:
 
 def get_sender() -> tekore.Sender:
     session = toukka.hub.requests.get_cached_session()
-    sender = PersistentSender(session=session)
+    sender = RequestsSender(session=session)
     return sender
 
 
