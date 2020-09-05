@@ -16,8 +16,6 @@ import unidecode
 
 from options import Options
 
-
-
 from functools import singledispatchmethod  # type: ignore[attr-defined] # typeshed needs fixed
 
 from toukka.sopiva.spotify.model import (
@@ -147,7 +145,7 @@ class PlaylistGenerator:
         sources = self.sources.generator()
 
         # wanted type
-        track: tekore.model.track.Track
+        track: Track
 
         for counter, track in enumerate(sources):
 
