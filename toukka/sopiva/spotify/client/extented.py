@@ -103,4 +103,18 @@ class SpotifyExtended(Spotify):
     def convert(self):
         return tekore._convert
 
+    def convert_old_playlist_uri(self, uri):
+        playlist_id = uri.split(':')[4]
+        new_uri = self.convert.to_uri('playlist', playlist_id)
+        return new_uri
+
+    def currently_playing_playlist(self):
+        playing = self.playback_currently_playing()
+
+        if playing.context and playing.context.type.name == 'playlist':
+            # NOTE: still old format
+            return self.convert_old_playlist_uri(playing.context.uri)
+        else:
+            return None
+
 # END

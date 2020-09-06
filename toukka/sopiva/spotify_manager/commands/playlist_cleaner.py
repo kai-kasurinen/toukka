@@ -117,6 +117,7 @@ def playlist_cleaner(uri: str,
     enlighten_manager.stop()
 
 
+# FIXME: use spotify.currently_playing_playlist()
 def _playlist_current():
     '''get currently playing playlist'''
 
@@ -128,7 +129,7 @@ def _playlist_current():
         uri = playing.context.uri
         # username = uri.split(':')[2]
         playlist_id = uri.split(':')[4]
-        new_uri = tekore.convert.to_uri('playlist', playlist_id)
+        new_uri = spotify.convert.to_uri('playlist', playlist_id)
         return new_uri
     else:
         return False
