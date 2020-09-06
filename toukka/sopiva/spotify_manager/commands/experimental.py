@@ -15,7 +15,6 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
     search_new_releases, album_to_genres, artists_played_counts
 )
 
-from toukka.sopiva.spotify_manager.experimental.user_analyze import analyze_user_1
 from toukka.sopiva.spotify_manager.experimental.search_test import search_artists_by_genre
 
 
@@ -58,48 +57,11 @@ def new_releases(
 
 
 @cli_root.command()
-def analyze_user(
-        **kwargs
-        ):
-    analyze_user_1(**kwargs)
-
-
-@cli_root.command()
 @click.argument('genre')
 def artists_by_genre(
         **kwargs
         ):
     search_artists_by_genre(**kwargs)
-
-
-@cli_root.command()
-def analyze_playlist_test():
-    spotify = get_spotify()
-
-    def count_artists(playlist_id: str):
-        playlist_tracks = spotify.playlist_tracks(playlist_id)
-        counter = collections.Counter()
-        for playlist_track in spotify.all_items(playlist_tracks):
-            if playlist_track.track is None:
-                continue
-            for artist in playlist_track.track.artists:
-                counter += collections.Counter([artist.id])
-        return counter
-
-    def get_artist_counters() -> collections.Counter:
-        playlists = spotify.followed_playlists()
-        print(f'playlists count {playlists.total}')
-        counter = collections.Counter()
-        for playlist in spotify.all_items(playlists):
-            counter += count_artists(playlist.id)
-        print('all counts retrieved')
-        return counter
-
-    artists = get_artist_counters()
-
-    for artist_id, count in artists.most_common(100):
-        artist = spotify.artist(artist_id)
-        print(count, artist.id, artist.name)
 
 
 # END

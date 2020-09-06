@@ -6,5 +6,5 @@ from . import playlists
 from . import playlists_check
 from . import genres
 from . import experimental
-
+from . import analyze
 
