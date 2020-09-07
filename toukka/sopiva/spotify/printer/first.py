@@ -169,10 +169,15 @@ def _print_artist_played_count(artist):
 @printer.register
 def print_playlist(playlist: Playlist):
     print(f'playlist: {playlist.name} ({playlist.uri})')
-    print(f'\towner: {playlist.owner.display_name} ({playlist.owner.uri})')
+
+    if playlist.owner:
+        print(f'\towner: {playlist.owner.display_name} ({playlist.owner.uri})')
 
     if playlist.description:
         print(f'\tdesc: {playlist.description}')
+
+    if hasattr(playlist, 'tracks'):
+        print(f'\ttracks: {playlist.tracks.total}')
 
     if playlist.primary_color:
         print(f'\tprimary color: {playlist.primary_color}')
@@ -183,7 +188,7 @@ def print_playlist(playlist: Playlist):
         print(f'\tflags: {flags}')
 
     # only on FullPlaylist
-    if isinstance(playlist, FullPlaylist):
+    if hasattr(playlist, 'followers'):
         print(f'\tfollowers: {playlist.followers.total}')
 
 

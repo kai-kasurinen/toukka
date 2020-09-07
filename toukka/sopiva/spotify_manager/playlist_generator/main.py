@@ -223,7 +223,7 @@ class PlaylistGenerator:
         for uri in uris:
             self.sources.add(self.expander(SpotifyUri(uri), **opts))
 
-        self.playlist.description = f'source: {", ".join(uris)}'
+        self.playlist.description = ', '.join(uris)
         self.generate(**opts)
 
     def generate_from_genres(
@@ -244,7 +244,7 @@ class PlaylistGenerator:
             self.sources.add(self.expander(genre, **opts))
             genre_names.append(genre.name)
 
-        self.playlist.description = f'source: {", ".join(genre_names)}'
+        self.playlist.description = ', '.join(genre_names)
         self.generate(**opts)
 
     def generate_from_search(
@@ -260,7 +260,7 @@ class PlaylistGenerator:
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(self.randomizer(s, **opts), **opts)
         self.sources.add(e)
-        self.playlist.description = f'source: search {query_type} "{query}"'
+        self.playlist.description = f'search {query_type} "{query}"'
         self.generate(**opts)
 
     def generate_from_recommendations(

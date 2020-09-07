@@ -11,7 +11,7 @@ from tekore import Spotify
 from tekore.model import Paging
 from tekore.model import Item
 
-import tekore._convert
+import toukka.sopiva.spotify.convert
 
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ class SpotifyExtended(Spotify):
 
     @property
     def convert(self):
-        return tekore._convert
+        return toukka.sopiva.spotify.convert
 
     def convert_old_playlist_uri(self, uri):
         playlist_id = uri.split(':')[4]
