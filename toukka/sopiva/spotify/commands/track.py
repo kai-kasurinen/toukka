@@ -27,4 +27,12 @@ def track_audio_features(uri: str):
     printer(track_features)
 
 
+@cli_root.command()
+@click.argument('uri')
+def track_audio_analysis(uri: str):
+    spotify = get_spotify()
+    uri_type, uri_id = spotify.convert.from_uri(uri)
+    track_analysis = spotify.track_audio_analysis(uri_id)
+    printer(track_analysis)
+
 # END
