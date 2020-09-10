@@ -90,9 +90,10 @@ def print_track_audio_features(features: AudioFeatures):
           f'liveness: {features.liveness:f},',
           f'speechiness: {features.speechiness:f},',
           f'valence: {features.valence:f}')
-    print(f'\tkey: {features.key}',
-          f'mode: {features.mode}',
-          f'tempo: {features.tempo:f},',
+    print(f'\tkey: {features.key},',
+          f'mode: {features.mode},',
+          f'time signature: {features.time_signature}')
+    print(f'\ttempo: {features.tempo:f},',
           f'loudness: {features.loudness:f}')
 
 
