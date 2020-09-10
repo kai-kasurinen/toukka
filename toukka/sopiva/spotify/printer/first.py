@@ -100,7 +100,7 @@ def print_track_audio_features(features: AudioFeatures):
 @printer.register
 def print_album_simple(album: SimpleAlbum):
     # NOTE: popularity is only on FullAlbum
-    print(f'album: {album.name} ({album.album_type.name}) ({album.uri})',
+    print(f'album: {album.name} ({album.album_type}) ({album.uri})',
           f'({album.release_date} {album.release_date_precision})',
           f'(tracks: {album.total_tracks})')
     print('\tartists: %s' % _artists_to_string(album.artists))
@@ -115,7 +115,7 @@ def print_album_simple(album: SimpleAlbum):
 @printer.register
 def print_album_full(album: FullAlbum):
     '''print album'''
-    print('album: {album.name} ({album.album_type.name}) ({album.uri})'.format(album=album),
+    print('album: {album.name} ({album.album_type}) ({album.uri})'.format(album=album),
           '({album.release_date} {album.release_date_precision})'.format(album=album),
           '(popularity: {album.popularity}, tracks: {album.total_tracks})'.format(album=album))
     print('\tartists: %s' % _artists_to_string(album.artists))
