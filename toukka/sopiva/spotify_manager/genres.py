@@ -53,17 +53,9 @@ class Genres(dict):
 # TODO: fix caching, currently it caches ~1.7GiB
 
 def genres_make():
-    spotify = get_spotify()
 
-    sound_of_spotify_id = 'thesoundsofspotify'
-    particle_detector_id = 'particledetector'
-    particle_filter_id = 'particlefilter'
-    particle_detector_2018_id = 'particledetector2018'
-    particle_detector_2019_id = 'particledetector2019'
+    def process_sound_of_spotify(user_id: str):
 
-    def process_sound_of_spotify():
-
-        user_id = sound_of_spotify_id
         logger.info('processing user: %s', user_id)
         paging = spotify.playlists(user_id)
         playlists = spotify.all_items(paging)
@@ -133,11 +125,14 @@ def genres_make():
                 pass
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+
+        logger.info('%s, found %i sounds, %i places, %s related',
+                    user_id, len(sounds), len(places), len(related))
+
         return sounds, places, related
 
-    def process_particle_detector():
+    def process_particle_detector(user_id: str):
 
-        user_id = particle_detector_id
         logger.info('processing user: %s', user_id)
         paging = spotify.playlists(user_id)
         playlists = spotify.all_items(paging)
@@ -177,11 +172,13 @@ def genres_make():
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
 
+        logger.info('%s, found %i intros, %i pulses, %s edges',
+                    user_id, len(intros), len(pulses), len(edges))
+
         return intros, pulses, edges
 
-    def process_particle_filter():
+    def process_particle_filter(user_id: str):
 
-        user_id = particle_filter_id
         logger.info('processing user: %s', user_id)
         paging = spotify.playlists(user_id)
         playlists = spotify.all_items(paging)
@@ -199,6 +196,10 @@ def genres_make():
                 females[genre_name] = playlist.uri
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+
+        logger.info('%s, found %i females',
+                    user_id, len(females))
+
         return females
 
     def process_particle_detector_year(user_id: str, year: int):
@@ -225,15 +226,35 @@ def genres_make():
                 pass
             else:
                 logger.warning('%s: not supported name: %s', playlist.uri, playlist.name)
+
+        logger.info('%s, found %i',
+                    user_id, len(ret))
+
         return ret
 
     # main
 
     logger.info('generating genres, this may take some time')
 
-    sounds, places, related = process_sound_of_spotify()
-    intros, pulses, edges = process_particle_detector()
-    females = process_particle_filter()
+    spotify = get_spotify()
+
+    sound_of_spotify_id = 'thesoundsofspotify'
+    particle_detector_id = 'particledetector'
+    particle_introductor_id = 'particleintroductor'
+    particle_filter_id = 'particlefilter'
+    particle_detector_2018_id = 'particledetector2018'
+    particle_detector_2019_id = 'particledetector2019'
+
+    sounds, places, related = process_sound_of_spotify(sound_of_spotify_id)
+    # NOTE: intros is empty
+    intros, pulses, edges = process_particle_detector(particle_detector_id)
+
+    # FIXME: cleanup
+    if not intros:
+        logger.info('no intros, trying different user')
+        intros, pulses_, edges_ = process_particle_detector(particle_introductor_id)
+
+    females = process_particle_filter(particle_filter_id)
     year_2018 = process_particle_detector_year(particle_detector_2018_id, 2018)
     year_2019 = process_particle_detector_year(particle_detector_2019_id, 2019)
     genres = Genres()
