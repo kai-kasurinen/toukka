@@ -70,11 +70,11 @@ kwargs_for_uri = {
     'progress_bar': True,
     'expand_playlist_to_tracks': True,
     'expand_track_to_album': True,
-    'expand_track_to_artists': True,
+    'expand_track_to_artists': False,
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': True,
     'expand_artist_to_related_artists': True,
-    'expand_artist_to_recommendations': True,
+    'expand_artist_to_recommendations': False,
     'expand_show_to_episodes': True
 }
 

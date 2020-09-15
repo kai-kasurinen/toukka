@@ -94,7 +94,7 @@ class PlaylistGenerator:
                                      'year_2019',
                                      'pulse',
                                      'edge'],
-            sort_artist_albums_by_keys=None,
+            sort_artist_albums_by_keys=['album_group', 'release_date'],
             sort_artist_albums_reverse=False,
             # FIXME: move
             sort_show_episodes_by_keys=['release_date'],
