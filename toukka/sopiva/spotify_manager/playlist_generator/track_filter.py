@@ -26,7 +26,9 @@ _bad_words_in_track_names = [
     'jingle bells',
     'o tannenbaum',
     'o little town of bethlehem',
-    'silent night'
+    'silent night',
+    'o come emmanuel',
+    'o holy night'
     ]
 
 
