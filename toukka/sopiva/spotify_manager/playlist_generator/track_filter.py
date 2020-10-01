@@ -19,16 +19,18 @@ _bad_words_in_album_names = [
     ]
 
 _bad_words_in_track_names = [
+    'commentary',
     'christmas',
     'joulu',
-    'commentary',
     'what child is this',
     'jingle bells',
-    'o tannenbaum',
-    'o little town of bethlehem',
     'silent night',
     'o come emmanuel',
-    'o holy night'
+    'o holy night',
+    'o tannenbaum',
+    'o little town of bethlehem',
+    'we three kings',
+    'coventry carol'
     ]
 
 
