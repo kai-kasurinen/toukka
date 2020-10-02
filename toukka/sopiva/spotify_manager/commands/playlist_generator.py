@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 # TODO: add genetator options group and remove cxt.obj usage
 # TODO: https://github.com/pallets/click/issues/108
+# TODO: defaults?
 
 @cli_root.group()
 @click.option('--dry-run', is_flag=True, default=False)
@@ -45,7 +46,8 @@ logger = logging.getLogger(__name__)
 @click.option('--expand-genre-to-playlists', is_flag=True)
 @click.option('--expand-genre-to-artists', is_flag=True)
 @click.option('--expand-genre-to-related-genres', is_flag=True)
-@click.option('--sort-artist-albums-by-keys', type=StringListParamType())
+@click.option('--sort-artist-albums-by-keys', type=StringListParamType(),
+              default='album_group,release_date')
 @click.option('--sort-artist-albums-reverse', is_flag=True)
 @click.option('--exclude-various-artists-albums', is_flag=True)
 @click.option('--exclude-uris', multiple=True)
