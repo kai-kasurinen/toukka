@@ -65,7 +65,7 @@ class PlaylistGenerator:
             progress_bar=False,
             randomize=False,
             looper_target_count=500,
-            looper_max_tries=10000,
+            looper_max_tries=100000,
             expand_track_to_album=False,
             expand_track_to_artists=False,
             expand_track_to_recommendations=False,

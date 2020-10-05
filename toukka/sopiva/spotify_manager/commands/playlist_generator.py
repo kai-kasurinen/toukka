@@ -57,7 +57,7 @@ logger = logging.getLogger(__name__)
 @click.option('--include-genre-playlists', type=StringListParamType(),
               default='intro,sound,female,year_2018,year_2019,pulse,edge')
 @click.option('--looper-target-count', default=500)
-@click.option('--looper-max-tries', default=10000)
+@click.option('--looper-max-tries', default=100000)
 @click.pass_context
 def generate_playlist(ctx, **kwargs):
     # FIXME: subcommand --help calls this
