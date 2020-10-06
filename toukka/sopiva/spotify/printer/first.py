@@ -50,9 +50,9 @@ def print_track(track: Track,
         print(f'\texternal ids: {track.external_ids}')
     if track.external_urls:
         print(f'\texternal urls: {track.external_urls}')
-    if track.available_markets:
+    if track.available_markets is not None:
         print(f'\tmarkets: {len(track.available_markets)}')
-    if track.linked_from:
+    if track.linked_from is not None:
         print(f'\tlinked from: {track.linked_from}')
     if track.restrictions:
         print(f'\trestrictions: {track.restrictions}')
@@ -107,7 +107,7 @@ def print_album_simple(album: SimpleAlbum):
     print('\tartists: %s' % _artists_to_string(album.artists))
     if album.album_group:
         print(f'\talbum group: {album.album_group}')
-    if album.available_markets:
+    if album.available_markets is not None:
         print(f'\tmarkets: {len(album.available_markets)}')
     if album.is_playable is not None:
         print(f'\tplayable: {album.is_playable}')
@@ -127,7 +127,7 @@ def print_album_full(album: FullAlbum):
         print('\texternal ids: {album.external_ids}'.format(album=album))
     if album.external_urls:
         print('\texternal urls: {album.external_urls}'.format(album=album))
-    if album.available_markets:
+    if album.available_markets is not None:
         print('\tmarkets: %s' % (len(album.available_markets)))
     if album.is_playable is not None:
         print(f'\tplayable: {album.is_playable}')
