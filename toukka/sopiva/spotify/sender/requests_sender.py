@@ -39,6 +39,9 @@ class RequestsSender(Sender):
     def __del__(self):
         self.session.close()
 
+    def close(self):
+        self.session.close()
+
     @property
     def is_async(self) -> bool:
         return False
