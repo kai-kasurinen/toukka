@@ -55,7 +55,7 @@ logger = logging.getLogger(__name__)
               help='album, single, appears_on, compilation',
               default='album,single,compilation')
 @click.option('--include-genre-playlists', type=StringListParamType(),
-              default='intro,sound,female,year_2018,year_2019,pulse,edge')
+              default='intro,sound,female,year_2018,year_2019,year_2020,pulse,edge')
 @click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=100000)
 @click.pass_context

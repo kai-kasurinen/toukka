@@ -92,6 +92,7 @@ class PlaylistGenerator:
                                      'female',
                                      'year_2018',
                                      'year_2019',
+                                     'year_2020',
                                      'pulse',
                                      'edge'],
             sort_artist_albums_by_keys=['album_group', 'release_date'],
