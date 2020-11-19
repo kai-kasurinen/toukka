@@ -55,7 +55,7 @@ def print_track(track: Track,
     if track.linked_from is not None:
         print(f'\tlinked from: {track.linked_from}')
     if track.restrictions:
-        print(f'\trestrictions: {track.restrictions}')
+        print(f'\trestrictions: {track.restrictions.reason}')
 
     track_dict = dataclasses.asdict(track)
     flags = _get_flags(track_dict, ['explicit', 'is_playable', 'is_local'])
