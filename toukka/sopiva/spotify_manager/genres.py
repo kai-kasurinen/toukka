@@ -272,7 +272,7 @@ def genres_make():
             edge=edges.get(genre_name),
             female=females.get(genre_name),
             year_2018=year_2018.get(genre_name),
-            year_2019=year_2019.get(genre_name)
+            year_2019=year_2019.get(genre_name),
             year_2020=year_2020.get(genre_name)
             )
 
