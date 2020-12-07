@@ -9,4 +9,3 @@ requests
 cachecontrol
 options
 enlighten
-validators

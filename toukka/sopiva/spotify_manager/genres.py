@@ -242,10 +242,10 @@ def genres_make():
     particle_detector_id = 'particledetector'
     particle_introductor_id = 'particleintroductor'
     particle_filter_id = 'particlefilter'
+
     particle_detector_2018_id = 'particledetector2018'
     particle_detector_2019_id = 'particledetector2019'
-    # NOTE: 2020-11-19 weird
-    particle_detector_2020_id = 'particledetector2019'
+    particle_detector_2020_id = 'particledetector2020'
 
     sounds, places, related = process_sound_of_spotify(sound_of_spotify_id)
     # NOTE: intros is empty
