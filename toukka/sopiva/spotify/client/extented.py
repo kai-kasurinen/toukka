@@ -81,6 +81,9 @@ class SpotifyExtended(Spotify):
     # for shortening long description
     playlist_change_details = alter_description(Spotify.playlist_change_details)
 
+    # TODO: remove!
+    playlist_tracks = Spotify.playlist_items
+
     # TODO: remove?
     def uri_to_item(self, uri: str) -> Item:
         uri_type, uri_id = self.convert.from_uri(uri)
