@@ -39,10 +39,14 @@ def current_user_top_artists(time_range):
     print(f'{time_range}: {_RANGES_DESCRIPTION.get(time_range)}')
     print()
     paging = spotify.current_user_top_artists(time_range=time_range, limit=50)
-    for i, item in enumerate(spotify.all_items(paging), start=1):
+    artists = spotify.all_items(paging)
+
+    if len(artists) < 1:
+        artists.pprint()
+
+    for i, item in enumerate(artists, start=1):
         genres = ', '.join(item.genres)
         print(f'{i:2} {item.name:50} {genres}')
-
 
 
 # END
