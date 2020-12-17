@@ -41,7 +41,7 @@ def current_user_top_artists(time_range):
     paging = spotify.current_user_top_artists(time_range=time_range, limit=50)
     artists = spotify.all_items(paging)
 
-    if len(artists) < 1:
+    if paging.total < 1:
         artists.pprint()
 
     for i, item in enumerate(artists, start=1):
