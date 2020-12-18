@@ -1,6 +1,7 @@
 #
 
 import click
+import pprint
 
 from toukka.sopiva.spotify.util import get_spotify
 from ..cli import cli_root
@@ -42,7 +43,7 @@ def current_user_top_artists(time_range):
     artists = spotify.all_items(paging)
 
     if paging.total < 1:
-        artists.pprint()
+        paging.pprint()
 
     for i, item in enumerate(artists, start=1):
         genres = ', '.join(item.genres)
