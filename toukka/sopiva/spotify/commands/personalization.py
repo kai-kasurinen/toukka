@@ -1,7 +1,6 @@
 #
 
 import click
-import pprint
 
 from toukka.sopiva.spotify.util import get_spotify
 from ..cli import cli_root
