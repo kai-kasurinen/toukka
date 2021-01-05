@@ -152,9 +152,10 @@ class PlaylistGenerator:
         for counter, track in enumerate(sources):
 
             self.__log.debug(
-                'counter: %i, tracks: %i, sources: %i',
+                'counter: %i, tracks: %i, sources: %i/%i',
                 counter,
                 len(self.uris_to_playlist),
+                self.sources.sources_used_count,
                 len(self.sources))
 
             progress_looper.update()
