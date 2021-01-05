@@ -937,14 +937,19 @@ class PlaylistGenerator:
             return
 
         genres = toukka.sopiva.spotify_manager.genres.genres()
+        related_genres = list()
         for related_genre_name in genre.related:
             related_genre = genres.get(related_genre_name)
             if related_genre is None:
                 self.__log.debug('genre:%s: not found, skipping', related_genre_name)
                 continue
 
-            expander = self.expander(related_genre, **opts)
-            self.sources.add(expander)
+            related_genres.append(related_genre)
+
+        # NOTE: convert list to _generator_, cos im stupid
+        related_genres = (i for i in related_genres)
+        expander = self.expander(related_genres, **opts)
+        self.sources.add(expander)
 
     @expander.register
     def expander_show(
