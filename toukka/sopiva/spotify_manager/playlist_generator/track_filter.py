@@ -15,7 +15,8 @@ from .banner import UriBanDict
 # FIXME: move
 _bad_words_in_album_names = [
     'christmas',
-    'joulu'
+    'joulu',
+    'radio broadcast'  # Marian McPartland
     ]
 
 _bad_words_in_track_names = [
