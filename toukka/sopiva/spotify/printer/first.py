@@ -53,7 +53,7 @@ def print_track(track: Track,
     if track.available_markets is not None:
         print(f'\tmarkets: {len(track.available_markets)}')
     if track.linked_from is not None:
-        print(f'\tlinked from: {track.linked_from}')
+        print(f'\tlinked from: {track.linked_from.uri}')
     if track.restrictions:
         print(f'\trestrictions: {track.restrictions.reason}')
 
