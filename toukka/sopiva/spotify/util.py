@@ -6,8 +6,6 @@ import logging
 # import pprint
 
 import tekore
-# import tekore.util
-# import tekore.sender
 
 import toukka.config
 import toukka.hub.requests
@@ -60,7 +58,7 @@ def get_user_token() -> tekore.RefreshingToken:
     if token is None:
         logger.debug('referesh token not found, prompt user input')
         scope = tekore.Scope(tekore.scope.every)
-        token = tekore.util.prompt_for_user_token(client_id, client_secret, scope)
+        token = tekore.prompt_for_user_token(client_id, client_secret, scope)
         set_user_refresh_token(token.refresh_token)
 
     return token
@@ -75,7 +73,7 @@ def get_sender() -> tekore.Sender:
 def get_client_token() -> tekore.RefreshingToken:
     # client_id, client_secret, client_redirect = tekore.util.read_environment()
     client_id, client_secret, redirect_uri = _read_from_config()
-    credentials = tekore.util.RefreshingCredentials(client_id, client_secret)
+    credentials = tekore.RefreshingCredentials(client_id, client_secret)
     token = credentials.request_client_token()
     return token
 
