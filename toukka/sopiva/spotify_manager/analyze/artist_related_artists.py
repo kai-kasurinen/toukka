@@ -31,7 +31,7 @@ def build_related_artists_graph(root_id, max_depth=5):
     spotify = get_spotify()
     seen = set()
     seen_childs = set()
-    graph = networkx.Graph()
+    graph = networkx.DiGraph()
 
     def get_related_artists(artist_id):
         return [artist.id for artist in spotify.artist_related_artists(artist_id)]
@@ -40,7 +40,7 @@ def build_related_artists_graph(root_id, max_depth=5):
         artist = spotify.artist(artist_id)
         graph.add_node(artist.id, name=artist.name)
 
-     # recursive loop function
+    # recursive loop function
     def do_recurse(parent_id, current_id, depth):
 
         if depth > max_depth:

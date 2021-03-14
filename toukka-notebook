@@ -1,0 +1,3 @@
+#!/bin/sh
+
+JUPYTER_PATH=~/git/toukka jupyter-notebook
