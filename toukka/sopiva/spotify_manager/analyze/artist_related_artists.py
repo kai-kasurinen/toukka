@@ -17,9 +17,7 @@ def artist_related_artists_test(artist_uri):
         return artist_id
 
     def analyze_graph(graph):
-        print(f'graph has {len(graph.nodes)} nodes and {len(graph.edges)} edges')
-        print(f'successors: {list(graph.successors(root_artist_id))}')
-        print(f'neighbors: {list(graph.neighbors(root_artist_id))}')
+        print(networkx.info(graph))
 
     # main
     root_artist_id = get_artist_id_from_uri(artist_uri)
