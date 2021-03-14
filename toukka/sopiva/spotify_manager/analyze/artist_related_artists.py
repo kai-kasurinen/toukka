@@ -25,17 +25,22 @@ def artist_related_artists_test(artist_uri):
     analyze_graph(related_artists_graph)
 
 
-def build_related_artists_graph(root_id, max_depth=10):
+def build_related_artists_graph(root_id, max_depth=5):
 
     # init
     spotify = get_spotify()
     seen = set()
-    graph = networkx.MultiDiGraph()
+    seen_childs = set()
+    graph = networkx.Graph()
 
     def get_related_artists(artist_id):
         return [artist.id for artist in spotify.artist_related_artists(artist_id)]
 
-    # recursive loop function
+    def add_artist_node(artist_id):
+        artist = spotify.artist(artist_id)
+        graph.add_node(artist.id, name=artist.name)
+
+     # recursive loop function
     def do_recurse(parent_id, current_id, depth):
 
         if depth > max_depth:
@@ -48,11 +53,13 @@ def build_related_artists_graph(root_id, max_depth=10):
 
         print(f'parent: {parent_id}, current: {current_id} depth: {depth}')
 
+        add_artist_node(current_id)
         childs = get_related_artists(current_id)
 
-        graph.add_node(current_id)
-
         for child_id in childs:
+            seen_childs.add(child_id)
+            # If some edges connect nodes not yet in the graph, the nodes are added automatically.
+            # There are no errors when adding nodes or edges that already exist.
             graph.add_edge(current_id, child_id)
 
         for child_id in childs:
@@ -60,6 +67,7 @@ def build_related_artists_graph(root_id, max_depth=10):
 
     do_recurse(None, root_id, 0)
     print(f'seen: {len(seen)}')
+    print(f'seen childs: {len(seen_childs)}')
     return graph
 
 # END
