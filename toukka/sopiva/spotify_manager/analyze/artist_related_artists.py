@@ -4,6 +4,7 @@
 
 
 import collections
+import networkx
 
 from toukka.sopiva.spotify.util import get_spotify
 
@@ -18,26 +19,29 @@ def artist_related_artists_test(artist_uri):
     def get_related_artists(artist_id):
         return [artist.id for artist in spotify.artist_related_artists(artist_id)]
 
-    def do_recurse(parent_id, current_id, depth=0, max_depth=5):
-        if depth > max_depth:
-            return
+    def build_artist_trees(root_id, max_depth=5):
 
-        if current_id in seen:
-            return
-        else:
-            seen.add(current_id)
+        def do_recurse(parent_id, current_id, depth):
+            if depth > max_depth:
+                return
 
-        print(f'parent: {parent_id}, current: {current_id} depth: {depth}')
+            if current_id in seen:
+                return
+            else:
+                seen.add(current_id)
 
-        childs = get_related_artists(current_id)
+            print(f'parent: {parent_id}, current: {current_id} depth: {depth}')
 
-        for child_id in childs:
-            do_recurse(current_id, child_id, depth=depth+1)
+            childs = get_related_artists(current_id)
 
-    seen = set()
+            for child_id in childs:
+                do_recurse(current_id, child_id, depth+1)
 
-    do_recurse(None, get_artist_id_from_uri(artist_uri))
-    print(f'seen: {len(seen)}')
+        seen = set()
+        do_recurse(None, root_id, 0)
+        print(f'seen: {len(seen)}')
+
+    build_artist_trees(get_artist_id_from_uri(artist_uri))
 
 
 # END
