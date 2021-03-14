@@ -11,9 +11,9 @@ from toukka.sopiva.spotify.util import get_spotify
 def artist_related_artists_test(artist_uri):
     spotify = get_spotify()
 
-    artist_type, artist_id = spotify.convert.from_uri(artist_uri)
-
-    seen = set()
+    def get_artist_id_from_uri(artist_uri):
+        artist_type, artist_id = spotify.convert.from_uri(artist_uri)
+        return artist_id
 
     def get_related_artists(artist_id):
         return [artist.id for artist in spotify.artist_related_artists(artist_id)]
@@ -34,7 +34,9 @@ def artist_related_artists_test(artist_uri):
         for child_id in childs:
             do_recurse(current_id, child_id, depth=depth+1)
 
-    do_recurse(None, artist_id)
+    seen = set()
+
+    do_recurse(None, get_artist_id_from_uri(artist_uri))
     print(f'seen: {len(seen)}')
 
 
