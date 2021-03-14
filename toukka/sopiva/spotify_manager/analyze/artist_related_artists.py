@@ -19,11 +19,11 @@ def artist_related_artists_test(artist_uri):
     def get_related_artists(artist_id):
         return [artist.id for artist in spotify.artist_related_artists(artist_id)]
 
-    def build_related_artists_graph(root_id, max_depth=5):
+    def build_related_artists_graph(root_id, max_depth=10):
 
         # init
         seen = set()
-        graph = networkx.DiGraph()
+        graph = networkx.MultiDiGraph()
 
         # recursive loop function
         def do_recurse(parent_id, current_id, depth):
@@ -54,9 +54,12 @@ def artist_related_artists_test(artist_uri):
 
     def analyze_graph(graph):
         print(f'graph has {len(graph.nodes)} nodes and {len(graph.edges)} edges')
+        print(f'successors: {list(graph.successors(root_artist_id))}')
+        print(f'neighbors: {list(graph.neighbors(root_artist_id))}')
 
     # main
-    related_artists_graph = build_related_artists_graph(get_artist_id_from_uri(artist_uri))
+    root_artist_id = get_artist_id_from_uri(artist_uri)
+    related_artists_graph = build_related_artists_graph(root_artist_id)
     analyze_graph(related_artists_graph)
 
 
