@@ -38,6 +38,7 @@ def build_related_artists_graph(root_id, max_depth=5):
 
     def add_artist_node(artist_id):
         artist = spotify.artist(artist_id)
+        # NOTE: pydot.to_pydot confuses name
         graph.add_node(artist.id, name=artist.name)
 
     # recursive loop function
