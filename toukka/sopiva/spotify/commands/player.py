@@ -19,6 +19,7 @@ def playback():
     pass
 
 
+# TODO: split to _tracks/_context?
 @playback.command()
 @click.option('--context-uri')
 @click.option('--track-ids')
@@ -32,6 +33,20 @@ def start(context_uri: str = None,
           device_id: str = None
           ):
     return get_spotify().playback_start(**locals())
+
+
+@playback.command()
+@click.argument('context_uri')
+@click.option('--offset')
+@click.option('--position-ms')
+@click.option('--device-id')
+def start_context(
+        context_uri: str = None,
+        offset: Union[int, str] = None,
+        position_ms: int = None,
+        device_id: str = None
+        ):
+    return get_spotify().playback_start_context(**locals())
 
 
 @playback.command()
