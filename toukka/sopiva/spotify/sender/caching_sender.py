@@ -1,0 +1,26 @@
+#
+
+import os.path
+
+import tekore
+import sqlitedict
+import xdg.BaseDirectory
+
+
+def _get_sqlite_filename():
+    database_path = xdg.BaseDirectory.save_cache_path('toukka', 'spotify')
+    database_file = os.path.join(database_path, 'tekore_cache.db')
+    return database_file
+
+
+class SqliteCachingSender(tekore.CachingSender):
+
+    def __init__(self, max_size: int = None, sender: Sender = None):
+        super().__init__(maxsize, sender)
+
+        self._cache = sqlitedict.SqliteDict(_get_sqlite_filename(),
+                                            tablename='cache',
+                                            autocommit=True)
+
+
+# END

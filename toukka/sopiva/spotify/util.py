@@ -14,7 +14,7 @@ import toukka.sopiva.spotify.client.current
 import toukka.sopiva.spotify.state
 
 from toukka.sopiva.spotify.sender.requests_sender import RequestsSender
-
+from toukka.sopiva.spotify.sender.caching_sender import SqliteCachingSender
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
@@ -65,13 +65,14 @@ def get_user_token() -> tekore.RefreshingToken:
     return token
 
 
-def get_sender(sender_type='requests') -> tekore.Sender:
+def get_sender(sender_type='httpx') -> tekore.Sender:
 
     if sender_type == 'requests':
         session = toukka.hub.requests.get_cached_session()
         sender = RequestsSender(session=session)
     elif sender_type == 'httpx':
-        sender = tekore.CachingSender(max_size=256, sender=tekore.RetryingSender(retries=3))
+        #sender = tekore.CachingSender(max_size=256, sender=tekore.RetryingSender(retries=3))
+        sender = SqliteCachingSender(max_size=10000, sender=tekore.RetryingSender(retries=3))
     else:
         raise Exception
 
