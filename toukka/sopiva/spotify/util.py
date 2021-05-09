@@ -24,6 +24,7 @@ def _read_from_config() -> Tuple[str, str, str]:
     client_id = toukka.config.lazy_config['spotify']['client_id'].get()
     client_secret = toukka.config.lazy_config['spotify']['client_secret'].get()
     redirect_uri = toukka.config.lazy_config['spotify']['redirect_uri'].get()
+    # TODO: return namedtuple or something
     return client_id, client_secret, redirect_uri
 
 
@@ -64,9 +65,16 @@ def get_user_token() -> tekore.RefreshingToken:
     return token
 
 
-def get_sender() -> tekore.Sender:
-    session = toukka.hub.requests.get_cached_session()
-    sender = RequestsSender(session=session)
+def get_sender(sender_type='requests') -> tekore.Sender:
+
+    if sender_type == 'requests':
+        session = toukka.hub.requests.get_cached_session()
+        sender = RequestsSender(session=session)
+    elif sender_type == 'httpx':
+        sender = tekore.CachingSender(max_size=256, sender=tekore.RetryingSender(retries=2))
+    else:
+        raise Exception
+
     return sender
 
 
