@@ -1,12 +1,15 @@
 #
 
 import os.path
+import json
 
 import tekore
 import sqlitedict
 import xdg.BaseDirectory
 
 from tekore._sender import Sender
+
+# NOTE: does not work. keys stored, but not data
 
 
 def _get_sqlite_filename():
@@ -23,6 +26,5 @@ class SqliteCachingSender(tekore.CachingSender):
         self._cache = sqlitedict.SqliteDict(_get_sqlite_filename(),
                                             tablename='cache',
                                             autocommit=True)
-
 
 # END
