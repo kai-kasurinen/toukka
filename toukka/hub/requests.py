@@ -54,7 +54,7 @@ def get_filecache() -> cachecontrol.caches.FileCache:
     return cache
 
 
-def get_cached_session(cache_type='redis') -> requests.Session:
+def get_cached_session(cache_type='file') -> requests.Session:
     session = requests.Session()
     retry = get_retry()
     if cache_type == 'redis':
