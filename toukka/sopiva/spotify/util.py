@@ -71,7 +71,7 @@ def get_sender(sender_type='requests') -> tekore.Sender:
         session = toukka.hub.requests.get_cached_session()
         sender = RequestsSender(session=session)
     elif sender_type == 'httpx':
-        sender = tekore.CachingSender(max_size=256, sender=tekore.RetryingSender(retries=2))
+        sender = tekore.CachingSender(max_size=256, sender=tekore.RetryingSender(retries=3))
     else:
         raise Exception
 
