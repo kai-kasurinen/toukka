@@ -17,7 +17,7 @@ def analyze_user_1(**kwargs):
     printer(user)
 
     playlists_paging = spotify.followed_playlists()
-    print(f'user has {playlists_paging.total} playlists')
+    print(f'user has {playlists_paging.total} followed playlists')
 
     playlists = spotify.all_items(playlists_paging)
 
