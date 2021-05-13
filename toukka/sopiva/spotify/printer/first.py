@@ -2,7 +2,6 @@
 
 import datetime
 import dataclasses
-import functools
 import pprint
 import logging
 import datetime
@@ -12,15 +11,11 @@ import humanize
 
 import deprecated
 
+from toukka.printer import printer
 from toukka.sopiva.spotify.model import *
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
-
-
-@functools.singledispatch
-def printer(arg):
-    print(arg)
 
 
 @printer.register
