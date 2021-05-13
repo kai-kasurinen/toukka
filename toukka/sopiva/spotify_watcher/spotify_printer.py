@@ -21,18 +21,20 @@ class SpotifyPrinter:
         if uri_type == 'track':
             self.print_all_from_track_id(uri_id)
         if uri_type == 'episode':
-            self.print_episode(uri_id)
+            self.print_all_from_episode_id(uri_id)
 
     def check_and_print_relink(self, track_id):
         track = self.spotify.track(track_id, market=self.market)
         if track.linked_from:
-            logger.info('track %s is relinked from %s', track.id, track.linked_from.id)
+            print()
+            print('track %s is relinked from %s', track.id, track.linked_from.id)
             # re-get _linked_ track without market
             track_relinked = self.spotify.track(track.id, market=None)
             print()
             printer(track_relinked)
 
     def print_all_from_track_id(self, track_id):
+        print(''.ljust(80, '='))
         track = self.spotify.track(track_id, market=None)
         album = self.spotify.album(track.album.id, market=None)
 
@@ -40,7 +42,6 @@ class SpotifyPrinter:
         artists.update(_get_all_artist_ids_from_item(track))
         artists.update(_get_all_artist_ids_from_item(album))
 
-        print(''.ljust(80, '='))
         for artist_id in artists:
             artist = self.spotify.artist(artist_id)
             printer(artist)
@@ -55,8 +56,8 @@ class SpotifyPrinter:
         print(''.ljust(80, '='))
 
     def print_episode(self, episode_id):
-        episode = self.spotify.episode(episode_id, market=self.market)
         print(''.ljust(80, '='))
+        episode = self.spotify.episode(episode_id, market=self.market)
         printer(episode.show)
         print()
         printer(episode)
