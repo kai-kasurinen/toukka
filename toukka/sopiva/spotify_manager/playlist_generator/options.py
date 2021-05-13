@@ -47,6 +47,9 @@ class PlaylistGeneratorOptions:
         sort_show_episodes_reverse=False
         )
 
+    def __init__(self, **kwargs):
+        self.options = PlaylistGeneratorOptions.options.push(kwargs)
+
     # TODO: add read and write methods
 
 

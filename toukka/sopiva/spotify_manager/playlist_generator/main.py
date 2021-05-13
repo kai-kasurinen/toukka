@@ -58,7 +58,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        self.options = PlaylistGenerator.options.push(kwargs)
+        super().__init__(**kwargs)
 
         self.spotify = get_spotify()
         self.user_country = self.spotify.current_user().country
