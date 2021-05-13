@@ -53,7 +53,11 @@ class PlaylistGeneratorOptions:
 
         self.options = self.options.push(kwargs)
 
-        # TODO: add read and write methods
+    # TODO: add read and write methods
+
+    def update_options_from_file(self, filename):
+        new_options = Options.read(filename)
+        self.options.update(new_options)
 
 
 # END
