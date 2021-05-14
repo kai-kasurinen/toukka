@@ -54,12 +54,13 @@ def get_user_token() -> tekore.RefreshingToken:
         sender = get_sender()
         cred = tekore.RefreshingCredentials(client_id, client_secret, sender=sender)
         # TODO: exceptions?
+        # for example: tekore.BadRequest: 400 invalid_grant: Refresh token revoked
         token = cred.refresh_user_token(refresh_token)
 
     if token is None:
         logger.debug('referesh token not found, prompt user input')
         scope = tekore.Scope(tekore.scope.every)
-        token = tekore.prompt_for_user_token(client_id, client_secret, scope)
+        token = tekore.prompt_for_user_token(client_id, client_secret, redirect_uri, scope)
         set_user_refresh_token(token.refresh_token)
 
     return token
