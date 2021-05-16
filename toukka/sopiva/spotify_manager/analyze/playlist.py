@@ -46,7 +46,7 @@ def analyze_playlist(playlist_uri=None):
         tracks.append(playlist_item.track)
 
     tracks_dataframe = pandas.DataFrame(tracks)
-    print(tracks_dataframe[['popularity']].describe())
+    print(tracks_dataframe['popularity'].describe())
     print()
 
     tracks_features = spotify.tracks_audio_features(tracks_ids)
