@@ -243,6 +243,7 @@ def genres_make():
     particle_introductor_id = 'particleintroductor'
     particle_filter_id = 'particlefilter'
 
+
     particle_detector_2018_id = 'particledetector2018'
     particle_detector_2019_id = 'particledetector2019'
     particle_detector_2020_id = 'particledetector2020'
@@ -258,6 +259,7 @@ def genres_make():
 
     females = process_particle_filter(particle_filter_id)
     # TODO: grrrr
+
     year_2018 = process_particle_detector_year(particle_detector_2018_id, 2018)
     year_2019 = process_particle_detector_year(particle_detector_2019_id, 2019)
     year_2020 = process_particle_detector_year(particle_detector_2020_id, 2020)
