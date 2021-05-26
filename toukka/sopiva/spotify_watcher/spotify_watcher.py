@@ -39,7 +39,7 @@ class SpotifyWatcher(PlayerCtlManager):
         self.print_metadata(metadata)
 
         if 'spotify:ad:' in track_id:
-            logger.info('advertisement: %s', track_id)
+            #logger.info('advertisement: %s', track_id)
             self.last_seen = track_id
             return
         elif 'spotify:track:' in track_id:
@@ -59,8 +59,10 @@ class SpotifyWatcher(PlayerCtlManager):
               (metadata['xesam:title'],
                metadata['mpris:trackid'],
                metadata['xesam:autoRating'])),
-        print('\tartists: %s' %
+        print('\ttracks artists: %s' %
               (metadata['xesam:artist']))
+        print('\talbum artists: %s' %
+              (metadata['xesam:albumArtist']))
         print('\talbum: %s' %
               (metadata['xesam:album']))
         print('\tlength: %s' %
