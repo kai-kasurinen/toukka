@@ -9,7 +9,6 @@ import types
 import random
 import operator
 
-# import autologging
 import enlighten
 import more_itertools
 import unidecode
@@ -47,8 +46,6 @@ from .banner import UriBanDict
 from .options import PlaylistGeneratorOptions
 
 
-# @autologging.traced
-# @autologging.logged
 class PlaylistGenerator(PlaylistGeneratorOptions):
     '''generates playlist'''
 
