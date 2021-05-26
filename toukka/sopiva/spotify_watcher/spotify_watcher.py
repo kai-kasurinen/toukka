@@ -1,6 +1,9 @@
 #
 
 import logging
+import datetime
+
+from toukka.printer import printer
 
 from .playerctl_manager import PlayerCtlManager, MainLoop, GLib
 from .spotify_printer import SpotifyPrinter
@@ -32,6 +35,9 @@ class SpotifyWatcher(PlayerCtlManager):
         if track_id == self.last_seen:
             return
 
+        #
+        self.print_metadata(metadata)
+
         if 'spotify:ad:' in track_id:
             logger.info('advertisement: %s', track_id)
             self.last_seen = track_id
@@ -47,6 +53,18 @@ class SpotifyWatcher(PlayerCtlManager):
         else:
             logger.debug('unsupported track id: %s', track_id)
             return
+
+    def print_metadata(self, metadata):
+        print('track: %s (%s) (%f)' %
+              (metadata['xesam:title'],
+               metadata['mpris:trackid'],
+               metadata['xesam:autoRating'])),
+        print('\tartists %s' %
+              (metadata['xesam:artist']))
+        print('\talbum: %s' %
+              (metadata['xesam:album']))
+        print('\tlength: %s' %
+              (datetime.timedelta(microseconds=metadata['mpris:length'])))
 
     def _print_spotify_metadata_callback(self):
         self.print_spotify_metadata()
