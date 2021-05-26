@@ -25,12 +25,12 @@ class SpotifyResource:
             raise Exception(f'unknown resource: {resource_str}')
 
     @classmethod
-    def from_uri(cls, uri_str):
+    def from_uri(cls, uri_str: str):
         uri = toukka.sopiva.spotify.convert.from_uri(uri_str)
         return cls(uri.type, uri.id, resource_str=uri_str)
 
     @classmethod
-    def from_url(cls, url_str):
+    def from_url(cls, url_str: str):
         url = toukka.sopiva.spotify.convert.from_url(url_str)
         return cls(url.type, url.id, resource_str=url_str)
 

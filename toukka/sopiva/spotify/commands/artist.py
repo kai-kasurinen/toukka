@@ -8,9 +8,10 @@ import click
 
 from click_params import StringListParamType
 
-from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify.printer.first import printer
+from toukka.printer import printer
 from toukka.sopiva.spotify.cli import cli_root
+from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.resource import SpotifyResource
 
 
 @cli_root.group()
@@ -23,8 +24,8 @@ def artist():
 def info(uri):
     '''get artist info'''
     spotify = get_spotify()
-    uri_type, uri_id = spotify.convert.from_uri(uri)
-    artist = spotify.artist(uri_id)
+    resource = SpotifyResource.from_any(uri)
+    artist = spotify.artist(resource.id)
     printer(artist)
 
 
