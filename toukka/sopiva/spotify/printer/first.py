@@ -46,7 +46,10 @@ def print_track(track: Track,
     if track.external_urls:
         print(f'\texternal urls: {track.external_urls}')
     if track.available_markets is not None:
-        print(f'\tmarkets: {len(track.available_markets)}')
+        if len(track.available_markets) < 10:
+            print(f'\tmarkets: {len(track.available_markets)} ({list(track.available_markets)})')
+        else:
+            print(f'\tmarkets: {len(track.available_markets)}')
     if track.linked_from is not None:
         print(f'\tlinked from: {track.linked_from.uri}')
     if track.restrictions:
