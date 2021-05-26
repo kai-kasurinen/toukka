@@ -7,9 +7,7 @@ import dataclasses
 import re
 
 import click
-import click_log
-# import click_completion
-# click_completion.init()
+import click_logging
 
 import toukka.logger.simple
 
@@ -104,7 +102,7 @@ kwargs_for_uri_third = {
 
 @click.group()
 @click.version_option(version=__version__)
-@click_log.simple_verbosity_option(None, '--loglevel')
+@click_logging.simple_verbosity_option(None, '--loglevel')
 def cli():
     pass
 
@@ -178,10 +176,10 @@ def genre_artists(genre_name: tuple, **kwargs):
 
 
 def main():
-    toukka.logger.simple.init_logging()
+    # toukka.logger.simple.init_logging()
     # toukka.logger.simple.set_logging_level_to_trace()
     # FIXME: format?
-    # click_log.basic_config()
+    click_logging.basic_config()
     cli.main()
 
 
