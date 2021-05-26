@@ -176,10 +176,10 @@ def genre_artists(genre_name: tuple, **kwargs):
 
 
 def main():
-    # toukka.logger.simple.init_logging()
+    toukka.logger.simple.init_logging()
     # toukka.logger.simple.set_logging_level_to_trace()
     # FIXME: format?
-    click_logging.basic_config()
+    # click_logging.basic_config()
     cli.main()
 
 
