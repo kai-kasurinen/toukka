@@ -113,8 +113,14 @@ def current_playback(market=None):
 
 @playback.command()
 def currently_playing(market=None):
-    ''' Get user's currently playing track.'''
-    printer(get_spotify().playback_currently_playing(**locals()))
+    spotify = get_spotify()
+    cp = spotify.playback_currently_playing(market=market)
+    printer(cp)
+    if cp.context and cp.context.uri:
+        printer(spotify.uri_to_item(cp.context.uri))
+        print()
+    if cp.item:
+        printer(cp.item)
 
 
 @playback.command()

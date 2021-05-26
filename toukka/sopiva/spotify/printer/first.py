@@ -231,21 +231,23 @@ def print_currently_playing(cp: CurrentlyPlaying):
     disallows = _get_flags(disallows_dict, disallows_dict.keys())
     print(f'\tactions disallows: {disallows}')
     print()
-    if cp.item:
-        printer(cp.item)
+    # if cp.item:
+    #     printer(cp.item)
 
 
 @printer.register
 def print_currently_playing_context(cpc: CurrentlyPlayingContext):
     print(f'currently playing context: playing {cpc.is_playing}')
-    print(f'\tdevice: {cpc.device}')
     print(f'\tstate: repeat: {cpc.repeat_state}, shuffle: {cpc.shuffle_state}')
+    print(f'\ttype: {cpc.currently_playing_type.name}')
     if cpc.context:
         print(f'\tcontext: {cpc.context.type.name} ({cpc.context.uri})')
-    print(f'\ttype: {cpc.currently_playing_type.name}')
+    #print(f'\tdevice: {cpc.device}')
     print()
-    if cpc.item:
-        printer(cpc.item)
+    print(f'{cpc.device}')
+    print()
+    # if cpc.item:
+    #     printer(cpc.item)
 
 
 @printer.register

@@ -14,10 +14,10 @@ from toukka.sopiva.spotify.resource import SpotifyResource
 
 
 @cli_root.command()
-@click.argument('uri')
-def get(uri: str):
+@click.argument('resource_str')
+def get(resource_str: str):
     spotify = get_spotify()
-    resource = SpotifyResource.from_any(uri)
+    resource = SpotifyResource.from_any(resource_str)
     item = spotify.uri_to_item(resource.to_uri())
     printer(item)
 
