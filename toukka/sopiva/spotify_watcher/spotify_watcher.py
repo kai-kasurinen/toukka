@@ -59,7 +59,7 @@ class SpotifyWatcher(PlayerCtlManager):
               (metadata['xesam:title'],
                metadata['mpris:trackid'],
                metadata['xesam:autoRating'])),
-        print('\tartists %s' %
+        print('\tartists: %s' %
               (metadata['xesam:artist']))
         print('\talbum: %s' %
               (metadata['xesam:album']))
