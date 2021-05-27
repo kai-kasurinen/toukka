@@ -4,6 +4,7 @@ sqlitedict
 sqlalchemy
 click
 click_params
+click_logging
 tekore
 requests
 cachecontrol
