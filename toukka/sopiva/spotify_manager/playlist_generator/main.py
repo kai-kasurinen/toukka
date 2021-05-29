@@ -171,6 +171,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         opts = self.options.push(kwargs)
         self.__log.debug('method options: %s', opts)
 
+        # grr, tuples can't randomized
+        if isinstance(uris, tuple):
+            self.__log.debug('uris is tuple, not list')
+            uris = list(uris)
+
         if opts.randomize:
             self.__log.debug('shuffling uris')
             random.shuffle(uris)
