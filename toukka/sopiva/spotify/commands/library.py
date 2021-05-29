@@ -13,7 +13,7 @@ def library():
 @library.command()
 def saved_albums():
     spotify = get_spotify()
-    paging = spotify.current_user_albums()
+    paging = spotify.saved_albums()
     for artist in spotify.all_items(paging):
         printer(artist)
 
@@ -21,9 +21,26 @@ def saved_albums():
 @library.command()
 def saved_tracks():
     spotify = get_spotify()
-    paging = spotify.current_user_tracks()
+    paging = spotify.saved_tracks()
     for track in spotify.all_items(paging):
         printer(track)
+
+
+@library.command()
+def saved_episodes():
+    spotify = get_spotify()
+    paging = spotify.saved_episodes()
+    for episode in spotify.all_items(paging):
+        printer(episode)
+
+
+@library.command()
+def saved_shows():
+    spotify = get_spotify()
+    paging = spotify.saved_shows()
+    for show in spotify.all_items(paging):
+        printer(show)
+
 
 
 # END
