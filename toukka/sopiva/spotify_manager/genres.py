@@ -243,10 +243,6 @@ def genres_make():
     particle_introductor_id = 'particleintroductor'
     particle_filter_id = 'particlefilter'
 
-    particle_detector_2018_id = 'particledetector2018'
-    particle_detector_2019_id = 'particledetector2019'
-    particle_detector_2020_id = 'particledetector2020'
-
     sounds, places, related = process_sound_of_spotify(sound_of_spotify_id)
     # NOTE: intros is empty
     intros, pulses, edges = process_particle_detector(particle_detector_id)
@@ -257,12 +253,16 @@ def genres_make():
         intros, pulses_, edges_ = process_particle_detector(particle_introductor_id)
 
     females = process_particle_filter(particle_filter_id)
-    # TODO: grrrr
 
-    year_2018 = process_particle_detector_year(particle_detector_2018_id, 2018)
-    year_2019 = process_particle_detector_year(particle_detector_2019_id, 2019)
-    year_2020 = process_particle_detector_year(particle_detector_2020_id, 2020)
+    years_range = range(2018, 2025)
+    years = dict()
+
+    for year in years_range:
+        years[year] = process_particle_detector_year(f'particledetector{year}', year)
+
     genres = Genres()
+
+    logger.info('...')
 
     for genre_name in sounds.keys():
 
@@ -272,10 +272,11 @@ def genres_make():
             pulse=pulses.get(genre_name),
             edge=edges.get(genre_name),
             female=females.get(genre_name),
-            year_2018=year_2018.get(genre_name),
-            year_2019=year_2019.get(genre_name),
-            year_2020=year_2020.get(genre_name)
             )
+
+        # grrrr
+        for year in years_range:
+            genre_playlists[f'year_{year}'] = years[year].get(genre_name)
 
         genre = Genre(
             name=genre_name,
