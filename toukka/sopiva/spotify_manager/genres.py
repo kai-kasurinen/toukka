@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 
 # import toukka.cache.dogpile
 from toukka.sopiva.spotify.util import get_spotify
-from toukka.sopiva.spotify.printer.first import printer
+from toukka.printer import printer
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
@@ -50,7 +50,14 @@ class Genres(dict):
     pass
 
 
-# TODO: fix caching, currently it caches ~1.7GiB
+@printer.register
+def print_genre(genre: Genre):
+    print(f'genre: {genre.name}')
+    # only lists available playlist names
+    playlists = list(filter(genre.playlists.get, genre.playlists))
+    print(f'\tplaylists: {playlists}')
+    print(f'\trelated: {genre.related}')
+
 
 def genres_make():
 

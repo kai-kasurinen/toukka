@@ -6,6 +6,7 @@ import click
 
 import toukka.sopiva.spotify_manager.genres
 
+from toukka.printer import printer
 from toukka.sopiva.spotify_manager.cli import cli_root
 
 
@@ -13,7 +14,7 @@ from toukka.sopiva.spotify_manager.cli import cli_root
 def genres():
     genres = toukka.sopiva.spotify_manager.genres.genres()
     for genre in genres.values():
-        print(genre)
+        printer(genre)
 
 
 @cli_root.command()
@@ -28,7 +29,7 @@ def genre(name: str):
     genre = genres.get(name)
     if genre is None:
         raise click.ClickException(f'genre "{name}" not found')
-    print(genre)
+    printer(genre)
 
 
 @cli_root.command()
@@ -44,9 +45,10 @@ def genre_re(name_re: str):
     # match object is True and None is False
     genre_names_match = filter(regex.fullmatch, genres.keys())
 
+    print()
     for g in genre_names_match:
         genre = genres.get(g)
-        print(genre)
-
+        printer(genre)
+        print()
 
 # END
