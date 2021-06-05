@@ -54,8 +54,8 @@ class Genres(dict):
 def print_genre(genre: Genre):
     print(f'genre: {genre.name}')
     # only lists available playlist names
-    playlists = list(filter(genre.playlists.get, genre.playlists))
-    print(f'\tplaylists: {playlists}')
+    playlist_keys = list(filter(genre.playlists.get, genre.playlists))
+    print(f'\tplaylists: {playlist_keys}')
     print(f'\trelated: {genre.related}')
 
 
