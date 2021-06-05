@@ -45,10 +45,8 @@ def genre_re(name_re: str):
     # match object is True and None is False
     genre_names_match = filter(regex.fullmatch, genres.keys())
 
-    print()
     for g in genre_names_match:
         genre = genres.get(g)
         printer(genre)
-        print()
 
 # END
