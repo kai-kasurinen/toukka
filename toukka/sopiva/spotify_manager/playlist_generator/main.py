@@ -8,11 +8,11 @@ import pprint
 import types
 import random
 import operator
+import functools
 
 import enlighten
 import more_itertools
 import unidecode
-import functools
 
 from toukka.sopiva.spotify.model import (
     FullTrack, SimpleTrack, Track,
