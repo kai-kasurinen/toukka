@@ -73,12 +73,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             spotify=self.spotify,
             user_country=self.user_country)
 
-        # FIXME: do something (emulates what autologging provides
-        self.__log = logging.getLogger(__name__)
-        # FIXME: remove
-        self.__log.setLevel(logging.DEBUG)
-        self.__log.debug('initialized %s', self)
-        self.__log.debug('options %s', self.options)
+        # TODO: move?
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.debug('initialized %s', self)
+        self.logger.debug('options %s', self.options)
 
     def generate(self, **kwargs) -> None:
         opts = self.options.push(kwargs)
@@ -101,7 +100,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         for counter, track in enumerate(sources):
 
-            self.__log.debug(
+            self.logger.debug(
                 'counter: %i, tracks: %i, sources: %i/%i',
                 counter,
                 len(self.uris_to_playlist),
@@ -113,7 +112,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             # TODO: GRR
             if isinstance(track, Episode):
                 self.uris_to_playlist.append(track.uri)
-                self.__log.debug('episode:%s: added', track.id)
+                self.logger.debug('episode:%s: added', track.id)
                 continue
 
             # TODO: remove
@@ -123,27 +122,27 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
             if self.track_filter.is_track_ok_to_add(track):
                 self.uris_to_playlist.append(track.uri)
-                self.__log.debug('track:%s: added', track.id)
+                self.logger.debug('track:%s: added', track.id)
                 progress_tracks.update()
 
             if len(self.uris_to_playlist) >= opts.looper_target_count:
-                self.__log.info('we have enough tracks to add (target count)')
+                self.logger.info('we have enough tracks to add (target count)')
                 break
 
             # playlist can contains only ~10000 tracks
             # (actually 11000 and then 500 ISE)
             if len(self.uris_to_playlist) >= 10000:
-                self.__log.info('we have enough tracks to add (playlist max)')
+                self.logger.info('we have enough tracks to add (playlist max)')
                 break
 
             # safety
             if counter >= opts.looper_max_tries:
-                self.__log.info('we have tried too many tracks')
+                self.logger.info('we have tried too many tracks')
                 break
 
         progress_bars.stop()
 
-        self.__log.info(f'{len(self.uris_to_playlist)} tracks to add')
+        self.logger.info(f'{len(self.uris_to_playlist)} tracks to add')
 
     # TODO: split and move to Playlist
     def commit(self, **kwargs) -> None:
@@ -155,10 +154,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 self.playlist.uris_add(self.uris_to_playlist)
                 self.playlist.details_update()
             else:
-                self.__log.info('try something else?')
+                self.logger.info('try something else?')
         else:
-            self.__log.info('dry_run is True, not committing')
-        self.__log.info('done')
+            self.logger.info('dry_run is True, not committing')
+        self.logger.info('done')
 
     def generate_from_uris(
             self,
@@ -167,15 +166,15 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('method options: %s', opts)
+        self.logger.debug('method options: %s', opts)
 
         # grr, tuples can't randomized
         if isinstance(uris, tuple):
-            self.__log.debug('uris is tuple, not list')
+            self.logger.debug('uris is tuple, not list')
             uris = list(uris)
 
         if opts.randomize:
-            self.__log.debug('shuffling uris')
+            self.logger.debug('shuffling uris')
             random.shuffle(uris)
 
         for uri in uris:
@@ -191,10 +190,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('method options: %s', opts)
+        self.logger.debug('method options: %s', opts)
 
         if opts.randomize:
-            self.__log.debug('shuffling genres')
+            self.logger.debug('shuffling genres')
             random.shuffle(genres)
 
         genre_names: List[str] = []
@@ -213,7 +212,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('method options: %s', opts)
+        self.logger.debug('method options: %s', opts)
 
         s = self.search_generator(query_type=query_type, query=query)
         e = self.expander(self.randomizer(s, **opts), **opts)
@@ -231,7 +230,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('method options: %s', opts)
+        self.logger.debug('method options: %s', opts)
 
         seed_artist_ids: List[str] = list()
         if seed_artist_uris is not None:
@@ -276,7 +275,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 return True
 
         if uri in self.uriban:
-            self.__log.debug('%s: banned (skipping)', uri)
+            self.logger.debug('%s: banned (skipping)', uri)
             return True
 
         return self._uris_seen.see(uri)
@@ -294,7 +293,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
         if include_groups is None:
-            self.__log.warning('include_groups is None')
+            self.logger.warning('include_groups is None')
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_groups,
@@ -305,7 +304,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # FIXME: move?
         if opts.sort_artist_albums_by_keys:
-            self.__log.debug('adding sorting by %s, reverse: %s',
+            self.logger.debug('adding sorting by %s, reverse: %s',
                              opts.sort_artist_albums_by_keys,
                              opts.sort_artist_albums_reverse)
             albums = sorted(albums,
@@ -315,7 +314,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         for album in albums:
             # speed up things
             if self.user_country not in album.available_markets:
-                self.__log.debug('album:%s: is not available %s', album.id, self.user_country)
+                self.logger.debug('album:%s: is not available %s', album.id, self.user_country)
                 continue
             yield album
 
@@ -353,7 +352,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # FIXME: move?
         if opts.sort_artist_albums_by_keys:
-            self.__log.debug('adding sorting by %s, reverse: %s',
+            self.logger.debug('adding sorting by %s, reverse: %s',
                              opts.sort_show_episodes_by_keys,
                              opts.sort_show_episodes_reverse)
             episodes = sorted(episodes,
@@ -383,7 +382,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **seed_attributes)
 
         for seed in recommendations.seeds:
-            self.__log.debug(seed)
+            self.logger.debug(seed)
         yield from recommendations.tracks
 
     def related_artists_generator(
@@ -438,7 +437,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         opts = self.options.push(kwargs)
 
         if opts.randomize:
-            self.__log.debug('randomizing: %s', type(generator))
+            self.logger.debug('randomizing: %s', type(generator))
             yield from scramble_generator(generator)
         else:
             yield from generator
@@ -472,7 +471,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             for item_ in item:
                 yield from self.expander(item_, **opts)
         else:
-            self.__log.warning('did not do anything with: %s', item)
+            self.logger.warning('did not do anything with: %s', item)
 
     # FIXME: is used?
     def expander_modellist(
@@ -482,13 +481,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s: %s', type(item), len(item))
+        self.logger.debug('%s: %s', type(item), len(item))
 
         if opts.expand_modellist_to_items:
             for item_ in item:
                 yield from self.expander(item_, **opts)
         else:
-            self.__log.warning('did not do anything with: %s', item)
+            self.logger.warning('did not do anything with: %s', item)
 
     @expander.register
     def expander_track(
@@ -498,7 +497,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Track, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         # add as new source
@@ -519,7 +518,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
         # nice hack
         if not did:
-            self.__log.warning('did not do anything with: %s', item.uri)
+            self.logger.warning('did not do anything with: %s', item.uri)
 
     def expand_track_to_album(
             self,
@@ -626,7 +625,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[FullTrack, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if self.check_uri(item.uri):
             return
@@ -648,7 +647,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
         # nice hack
         if not did:
-            self.__log.warning('did not do anything with: %s', item.uri)
+            self.logger.warning('did not do anything with: %s', item.uri)
 
     def expand_artist_to_albums(
             self,
@@ -692,7 +691,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[FullTrack, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if self.check_uri(item.uri):
             return
@@ -702,7 +701,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
             artist_ids = [artist.id for artist in item.artists]
             if various_artists_id in artist_ids:
-                self.__log.debug('%s:%s: various artists album, ignoring', item.type, item.id)
+                self.logger.debug('%s:%s: various artists album, ignoring', item.type, item.id)
                 return
 
         # add as new source
@@ -715,7 +714,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
 
         if not did:
-            self.__log.warning('did not do anything with: %s', item.uri)
+            self.logger.warning('did not do anything with: %s', item.uri)
 
     def expand_album_to_tracks(
             self,
@@ -751,13 +750,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[FullTrack, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.check_uri(item.uri):
             return
         elif opts.expand_playlist_to_tracks:
             yield from self.expand_playlist_to_tracks(item, **opts)
         else:
-            self.__log.warning('did not do anything with: %s', item.uri)
+            self.logger.warning('did not do anything with: %s', item.uri)
 
     def expand_playlist_to_tracks(
             self,
@@ -781,7 +780,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         opts = self.options.push(kwargs)
         uri_type, uri_id = self.spotify.convert.from_uri(uri)
-        self.__log.debug('%s: %s: %s', uri, uri_type, uri_id)
+        self.logger.debug('%s: %s: %s', uri, uri_type, uri_id)
         if self.check_uri(uri + '#uri'):
             return
 
@@ -794,7 +793,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         items = list()
         for uri in uris:
             uri_type, uri_id = self.spotify.convert.from_uri(uri)
-            self.__log.debug('%s: %s', uri_type, uri_id)
+            self.logger.debug('%s: %s', uri_type, uri_id)
             items.append(self.spotify.uri_to_item(uri))
         return items
 
@@ -808,7 +807,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         opts = self.options.push(kwargs)
         if self.check_uri(f'genre:{item.name}'):
             return
-        self.__log.debug('%s:%s', 'genre', item.name)
+        self.logger.debug('%s:%s', 'genre', item.name)
         did = False
         # yield
         if opts.expand_genre_to_playlists:
@@ -826,7 +825,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
 
         if not did:
-            self.__log.warning('did not do anything with: genre:%s', item.name)
+            self.logger.warning('did not do anything with: genre:%s', item.name)
 
     def expand_genre_to_playlists(
             self,
@@ -840,7 +839,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             return
 
         if genre.playlists is None:
-            self.__log.debug('genre:%s: no playlists, skipping', genre.name)
+            self.logger.debug('genre:%s: no playlists, skipping', genre.name)
             return
 
         # select only wanted playlists
@@ -889,7 +888,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             return
 
         if genre.related is None:
-            self.__log.debug('genre:%s: no related genres, skipping', genre.name)
+            self.logger.debug('genre:%s: no related genres, skipping', genre.name)
             return
 
         genres = toukka.sopiva.spotify_manager.genres.genres()
@@ -897,7 +896,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         for related_genre_name in genre.related:
             related_genre = genres.get(related_genre_name)
             if related_genre is None:
-                self.__log.debug('genre:%s: not found, skipping', related_genre_name)
+                self.logger.debug('genre:%s: not found, skipping', related_genre_name)
                 continue
 
             related_genres.append(related_genre)
@@ -915,7 +914,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Episode, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         if self.check_uri(item.uri):
@@ -926,7 +925,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
 
         if not did:
-            self.__log.warning('did not do anything with: %s', item.uri)
+            self.logger.warning('did not do anything with: %s', item.uri)
 
     def expand_show_to_episodes(
             self,
@@ -950,13 +949,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Episode, None, None]:
 
         opts = self.options.push(kwargs)
-        self.__log.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if not self.check_uri(item.uri):
             yield item
             did = True
         if not did:
-            self.__log.warning('did not do anything with: %s', item.uri)
+            self.logger.warning('did not do anything with: %s', item.uri)
 
 
 # END
