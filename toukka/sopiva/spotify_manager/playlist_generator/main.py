@@ -58,27 +58,24 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: move?
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
-        self.logger.debug('initialized %s', self)
-        self.logger.debug('options %s', self.options)
+        self.logger.debug(f'initialized {self}')
+        self.logger.debug(f'options {self.options}')
 
         self.spotify = get_spotify()
         self.user_country = self.spotify.current_user().country
+
         # disabling track relinking
         self.market = None
-
         # init empty
         self._uris_seen = Seen()
         # TODO: move to PlaylistModifier
         self.uris_to_playlist: List[str] = list()
-
         self.uriban = UriBanDict()
-
         self.playlist = PlaylistModifier(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(
             spotify=self.spotify,
             user_country=self.user_country)
-
 
     def generate(self, **kwargs) -> None:
         opts = self.options.push(kwargs)
@@ -169,7 +166,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         opts = self.options.push(kwargs)
         self.logger.debug('method options: %s', opts)
 
-        # grr, tuples can't randomized
+        # grr, tuples can't randomized with random.shuffle
         if isinstance(uris, tuple):
             self.logger.debug('uris is tuple, not list')
             uris = list(uris)
