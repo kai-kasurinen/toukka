@@ -12,22 +12,20 @@ import operator
 import enlighten
 import more_itertools
 import unidecode
-
-from functools import singledispatchmethod  # type: ignore[attr-defined] # typeshed needs fixed
+import functools
 
 from toukka.sopiva.spotify.model import (
-        FullTrack, SimpleTrack, Track,
-        FullAlbum, SimpleAlbum, Album,
-        FullArtist, SimpleArtist, Artist,
-        FullPlaylist, SimplePlaylist, Playlist,
-        ModelList,
-        Show, Episode
+    FullTrack, SimpleTrack, Track,
+    FullAlbum, SimpleAlbum, Album,
+    FullArtist, SimpleArtist, Artist,
+    FullPlaylist, SimplePlaylist, Playlist,
+    ModelList,
+    Show, Episode
 )
 
 from toukka.sopiva.spotify_manager.filters import (
     make_multi_filter, make_filter_by_artist_genre
 )
-
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
@@ -454,7 +452,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         opts = self.options.push(kwargs)
         return self.expander(self.randomizer(item, **opts), **opts)
 
-    @singledispatchmethod
+    @functools.singledispatchmethod
     def expander(
             self,
             item,
