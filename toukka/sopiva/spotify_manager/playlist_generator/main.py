@@ -55,6 +55,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         super().__init__(**kwargs)
 
+        # TODO: move?
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.debug('initialized %s', self)
+        self.logger.debug('options %s', self.options)
+
         self.spotify = get_spotify()
         self.user_country = self.spotify.current_user().country
         # disabling track relinking
@@ -73,11 +79,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             spotify=self.spotify,
             user_country=self.user_country)
 
-        # TODO: move?
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
-        self.logger.debug('initialized %s', self)
-        self.logger.debug('options %s', self.options)
 
     def generate(self, **kwargs) -> None:
         opts = self.options.push(kwargs)
