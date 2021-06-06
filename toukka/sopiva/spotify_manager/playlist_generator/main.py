@@ -78,18 +78,18 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             user_country=self.user_country)
 
     def generate(self, **kwargs) -> None:
-        opts = self.options.push(kwargs)
-        self.looper(**opts)
-        self.commit(**opts)
+        options = self.options.push(kwargs)
+        self.looper(**options)
+        self.commit(**options)
 
     def looper(self, **kwargs) -> None:
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
         # FIXME: move?
-        progress_bars = ProgressBars(enabled=opts.progress_bar)
+        progress_bars = ProgressBars(enabled=options.progress_bar)
         # NOTE: order means something
-        progress_tracks = progress_bars.progress_bar_for_tracks(opts.looper_target_count)
-        progress_looper = progress_bars.progress_bar_for_loops(opts.looper_max_tries)
+        progress_tracks = progress_bars.progress_bar_for_tracks(options.looper_target_count)
+        progress_looper = progress_bars.progress_bar_for_loops(options.looper_max_tries)
 
         sources = self.sources.generator()
 
@@ -123,7 +123,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 self.logger.debug('track:%s: added', track.id)
                 progress_tracks.update()
 
-            if len(self.uris_to_playlist) >= opts.looper_target_count:
+            if len(self.uris_to_playlist) >= options.looper_target_count:
                 self.logger.info('we have enough tracks to add (target count)')
                 break
 
@@ -134,7 +134,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 break
 
             # safety
-            if counter >= opts.looper_max_tries:
+            if counter >= options.looper_max_tries:
                 self.logger.info('we have tried too many tracks')
                 break
 
@@ -144,9 +144,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
     # TODO: split and move to Playlist
     def commit(self, **kwargs) -> None:
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
-        if not opts.dry_run:
+        if not options.dry_run:
             if len(self.uris_to_playlist) > 0:
                 self.playlist.clear()
                 self.playlist.uris_add(self.uris_to_playlist)
@@ -163,23 +163,23 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
-        self.logger.debug('method options: %s', opts)
+        options = self.options.push(kwargs)
+        self.logger.debug('method options: %s', options)
 
         # grr, tuples can't randomized with random.shuffle
         if isinstance(uris, tuple):
             self.logger.debug('uris is tuple, not list')
             uris = list(uris)
 
-        if opts.randomize:
+        if options.randomize:
             self.logger.debug('shuffling uris')
             random.shuffle(uris)
 
         for uri in uris:
-            self.sources.add(self.expander(SpotifyUri(uri), **opts))
+            self.sources.add(self.expander(SpotifyUri(uri), **options))
 
         self.playlist.description = ', '.join(uris)
-        self.generate(**opts)
+        self.generate(**options)
 
     def generate_from_genres(
             self,
@@ -187,20 +187,20 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
-        self.logger.debug('method options: %s', opts)
+        options = self.options.push(kwargs)
+        self.logger.debug('method options: %s', options)
 
-        if opts.randomize:
+        if options.randomize:
             self.logger.debug('shuffling genres')
             random.shuffle(genres)
 
         genre_names: List[str] = []
         for genre in genres:
-            self.sources.add(self.expander(genre, **opts))
+            self.sources.add(self.expander(genre, **options))
             genre_names.append(genre.name)
 
         self.playlist.description = ', '.join(genre_names)
-        self.generate(**opts)
+        self.generate(**options)
 
     def generate_from_search(
             self,
@@ -209,14 +209,14 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
-        self.logger.debug('method options: %s', opts)
+        options = self.options.push(kwargs)
+        self.logger.debug('method options: %s', options)
 
         s = self.search_generator(query_type=query_type, query=query)
-        e = self.expander(self.randomizer(s, **opts), **opts)
+        e = self.expander(self.randomizer(s, **options), **options)
         self.sources.add(e)
         self.playlist.description = f'search {query_type} "{query}"'
-        self.generate(**opts)
+        self.generate(**options)
 
     def generate_from_recommendations(
             self,
@@ -227,8 +227,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
-        self.logger.debug('method options: %s', opts)
+        options = self.options.push(kwargs)
+        self.logger.debug('method options: %s', options)
 
         seed_artist_ids: List[str] = list()
         if seed_artist_uris is not None:
@@ -246,7 +246,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             seed_track_ids=seed_track_ids,
             seed_genres=seed_genres,
             seed_attributes=seed_attributes)
-        e = self.expander(self.randomizer(s), **opts)
+        e = self.expander(self.randomizer(s), **options)
         self.sources.add(e)
         self.playlist.description = ', '.join((
             f'source: recommendations',
@@ -254,7 +254,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             f'{seed_track_uris}',
             f'{seed_genres}'))
         print(self.playlist.description)
-        self.generate(**opts)
+        self.generate(**options)
 
     # NOTE: returns False when uri is OK and True when uri is NOT ok
     # TODO: rename? swap returns?
@@ -264,9 +264,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> bool:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
-        exclude_uris = opts.exclude_uris
+        exclude_uris = options.exclude_uris
 
         if exclude_uris:
             if uri in exclude_uris:
@@ -287,7 +287,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[FullAlbum, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
         # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
         if include_groups is None:
@@ -301,13 +301,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         albums = self.spotify.all_items(paging)
 
         # FIXME: move?
-        if opts.sort_artist_albums_by_keys:
+        if options.sort_artist_albums_by_keys:
             self.logger.debug('adding sorting by %s, reverse: %s',
-                             opts.sort_artist_albums_by_keys,
-                             opts.sort_artist_albums_reverse)
+                             options.sort_artist_albums_by_keys,
+                             options.sort_artist_albums_reverse)
             albums = sorted(albums,
-                            key=operator.attrgetter(*opts.sort_artist_albums_by_keys),
-                            reverse=opts.sort_artist_albums_reverse)
+                            key=operator.attrgetter(*options.sort_artist_albums_by_keys),
+                            reverse=options.sort_artist_albums_reverse)
 
         for album in albums:
             # speed up things
@@ -341,7 +341,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[SimpleTrack, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
         paging = self.spotify.show_episodes(
             show_id,
@@ -349,13 +349,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         episodes = self.spotify.all_items(paging)
 
         # FIXME: move?
-        if opts.sort_artist_albums_by_keys:
+        if options.sort_artist_albums_by_keys:
             self.logger.debug('adding sorting by %s, reverse: %s',
-                             opts.sort_show_episodes_by_keys,
-                             opts.sort_show_episodes_reverse)
+                             options.sort_show_episodes_by_keys,
+                             options.sort_show_episodes_reverse)
             episodes = sorted(episodes,
-                              key=operator.attrgetter(*opts.sort_show_episodes_by_keys),
-                              reverse=opts.sort_show_episodes_reverse)
+                              key=operator.attrgetter(*options.sort_show_episodes_by_keys),
+                              reverse=options.sort_show_episodes_reverse)
 
         yield from episodes
 
@@ -432,9 +432,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
-        if opts.randomize:
+        if options.randomize:
             self.logger.debug('randomizing: %s', type(generator))
             yield from scramble_generator(generator)
         else:
@@ -446,8 +446,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             item,
             **kwargs
             ):
-        opts = self.options.push(kwargs)
-        return self.expander(self.randomizer(item, **opts), **opts)
+        options = self.options.push(kwargs)
+        return self.expander(self.randomizer(item, **options), **options)
 
     @functools.singledispatchmethod
     def expander(
@@ -464,10 +464,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
-        if opts.expand_generator_to_items:
+        options = self.options.push(kwargs)
+        if options.expand_generator_to_items:
             for item_ in item:
-                yield from self.expander(item_, **opts)
+                yield from self.expander(item_, **options)
         else:
             self.logger.warning('did not do anything with: %s', item)
 
@@ -478,12 +478,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s: %s', type(item), len(item))
 
-        if opts.expand_modellist_to_items:
+        if options.expand_modellist_to_items:
             for item_ in item:
-                yield from self.expander(item_, **opts)
+                yield from self.expander(item_, **options)
         else:
             self.logger.warning('did not do anything with: %s', item)
 
@@ -494,21 +494,21 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Track, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         # add as new source
-        if opts.expand_track_to_artists:
-            self.add_track_artists_as_source(item, **opts)
+        if options.expand_track_to_artists:
+            self.add_track_artists_as_source(item, **options)
             did = True
         # add as new source
-        if opts.expand_track_to_recommendations:
-            self.add_track_recommendations_as_source(item, **opts)
+        if options.expand_track_to_recommendations:
+            self.add_track_recommendations_as_source(item, **options)
             did = True
         # yields tracks
-        if opts.expand_track_to_album:
-            yield from self.expand_track_to_album(item, **opts)
+        if options.expand_track_to_album:
+            yield from self.expand_track_to_album(item, **options)
             did = True
         # and finally use track if not seen
         if not self.check_uri(item.uri):
@@ -524,7 +524,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(track.uri + '#album'):
             return
         # only FullTrack has album property
@@ -534,8 +534,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         track = cast(FullTrack, track)
         album = self.spotify.album(track.album.id, market=self.market)
         # set expand_track_to_album option False, so we dont hit again
-        # opts.set(expand_track_to_album=False)
-        e = self.expander(album, **opts)
+        # options.set(expand_track_to_album=False)
+        e = self.expander(album, **options)
         yield from e
 
     def add_artist_as_source(
@@ -544,11 +544,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(artist.uri + '#source'):
             return
         artist = self.spotify.artist(artist.id)
-        e = self.expander(artist, **opts)
+        e = self.expander(artist, **options)
         self.sources.add(e)
 
     def add_track_recommendations_as_source(
@@ -557,11 +557,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(track.uri + '#recommendations'):
             return
         recommendations = self.recommendations_generator(seed_track_ids=[track.id])
-        e = self.expander(self.randomizer(recommendations, **opts), **opts)
+        e = self.expander(self.randomizer(recommendations, **options), **options)
         self.sources.add(e)
 
     def add_track_artists_as_source(
@@ -570,13 +570,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(track.uri + '#artists'):
             return
         # set expand_track_to_artists option to False, so we dont hit again
-        # opts.set(expand_track_to_artists=False)
+        # options.set(expand_track_to_artists=False)
         for artist in track.artists:
-            self.add_artist_as_source(artist, **opts)
+            self.add_artist_as_source(artist, **options)
 
     def add_artist_related_artists_as_source(
             self,
@@ -584,11 +584,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(artist.uri + '#related'):
             return
         artists = self.related_artists_generator(artist.id)
-        e = self.expander(self.randomizer(artists, **opts), **opts)
+        e = self.expander(self.randomizer(artists, **options), **options)
         self.sources.add(e)
 
     def add_artist_recommendations_as_source(
@@ -597,11 +597,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(artist.uri + '#recommendations'):
             return
         recommendations = self.recommendations_generator(seed_artist_ids=[artist.id])
-        e = self.expander(self.randomizer(recommendations, **opts), **opts)
+        e = self.expander(self.randomizer(recommendations, **options), **options)
         self.sources.add(e)
 
     # TODO: remove, not needed
@@ -612,8 +612,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Track, None, None]:
 
-        opts = self.options.push(kwargs)
-        yield from self.expander(self.spotify.track(item.id, market=self.market), **opts)
+        options = self.options.push(kwargs)
+        yield from self.expander(self.spotify.track(item.id, market=self.market), **options)
 
     @expander.register
     def expander_artist(
@@ -622,26 +622,26 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[FullTrack, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if self.check_uri(item.uri):
             return
 
         # add as new source
-        if opts.expand_artist_to_related_artists:
-            self.add_artist_related_artists_as_source(item, **opts)
+        if options.expand_artist_to_related_artists:
+            self.add_artist_related_artists_as_source(item, **options)
             did = True
         # add as new source
-        if opts.expand_artist_to_recommendations:
-            self.add_artist_recommendations_as_source(item, **opts)
+        if options.expand_artist_to_recommendations:
+            self.add_artist_recommendations_as_source(item, **options)
             did = True
         # yield tracks
-        if opts.expand_artist_to_albums or opts.expand_artist_to_random_album:
-            yield from self.expand_artist_to_albums(item, **opts)
+        if options.expand_artist_to_albums or options.expand_artist_to_random_album:
+            yield from self.expand_artist_to_albums(item, **options)
             did = True
-        elif opts.expand_artist_to_top_tracks:
-            yield from self.expand_artist_to_top_tracks(item, **opts)
+        elif options.expand_artist_to_top_tracks:
+            yield from self.expand_artist_to_top_tracks(item, **options)
             did = True
         # nice hack
         if not did:
@@ -653,18 +653,18 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(artist.uri + '#albums'):
             return
 
         albums = self.artist_albums_generator(
             artist.id,
-            include_groups=opts.include_album_groups)
+            include_groups=options.include_album_groups)
 
-        if opts.expand_artist_to_random_album:
+        if options.expand_artist_to_random_album:
             albums = take_random_items_generator(albums)
 
-        e = self.expander(self.randomizer(albums, **opts), **opts)
+        e = self.expander(self.randomizer(albums, **options), **options)
         yield from e
 
     def expand_artist_to_top_tracks(
@@ -673,12 +673,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(artist.uri + '#top-tracks'):
             return
 
         tracks = self.artist_top_tracks_generator(artist.id)
-        e = self.expander(self.randomizer(tracks, **opts), **opts)
+        e = self.expander(self.randomizer(tracks, **options), **options)
         yield from e
 
     @expander.register
@@ -688,14 +688,14 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[FullTrack, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if self.check_uri(item.uri):
             return
 
         # TODO: move?
-        if opts.exclude_various_artists_albums:
+        if options.exclude_various_artists_albums:
             various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
             artist_ids = [artist.id for artist in item.artists]
             if various_artists_id in artist_ids:
@@ -703,12 +703,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 return
 
         # add as new source
-        if opts.expand_album_to_artists:
-            self.add_album_artists_as_source(item, **opts)
+        if options.expand_album_to_artists:
+            self.add_album_artists_as_source(item, **options)
             did = True
 
-        if opts.expand_album_to_tracks:
-            yield from self.expand_album_to_tracks(item, **opts)
+        if options.expand_album_to_tracks:
+            yield from self.expand_album_to_tracks(item, **options)
             did = True
 
         if not did:
@@ -720,12 +720,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(album.uri + '#tracks'):
             return
-        opts.set(expand_track_to_album=False)
+        options.set(expand_track_to_album=False)
         tracks = self.album_tracks_generator(album.id)
-        e = self.expander(tracks, **opts)
+        e = self.expander(tracks, **options)
         yield from e
 
     def add_album_artists_as_source(
@@ -734,11 +734,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(album.uri + '#artists'):
             return
         for artist in album.artists:
-            self.add_artist_as_source(artist, **opts)
+            self.add_artist_as_source(artist, **options)
 
     @expander.register
     def expander_playlist(
@@ -747,12 +747,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[FullTrack, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         if self.check_uri(item.uri):
             return
-        elif opts.expand_playlist_to_tracks:
-            yield from self.expand_playlist_to_tracks(item, **opts)
+        elif options.expand_playlist_to_tracks:
+            yield from self.expand_playlist_to_tracks(item, **options)
         else:
             self.logger.warning('did not do anything with: %s', item.uri)
 
@@ -762,11 +762,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(playlist.uri + '#tracks'):
             return
         tracks = self.playlist_all_tracks_generator(playlist.id)
-        expander = self.expander(self.randomizer(tracks, **opts), **opts)
+        expander = self.expander(self.randomizer(tracks, **options), **options)
         yield from expander
 
     @expander.register
@@ -776,14 +776,14 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         uri_type, uri_id = self.spotify.convert.from_uri(uri)
         self.logger.debug('%s: %s: %s', uri, uri_type, uri_id)
         if self.check_uri(uri + '#uri'):
             return
 
         item_object = self.spotify.uri_to_item(uri)
-        yield from self.expander(item_object, **opts)
+        yield from self.expander(item_object, **options)
 
     # TODO: remove
     def uris_to_items(self, uris: List) -> List:
@@ -802,24 +802,24 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(f'genre:{item.name}'):
             return
         self.logger.debug('%s:%s', 'genre', item.name)
         did = False
         # yield
-        if opts.expand_genre_to_playlists:
-            yield from self.expand_genre_to_playlists(item, **opts)
+        if options.expand_genre_to_playlists:
+            yield from self.expand_genre_to_playlists(item, **options)
             did = True
 
         # add as new source
-        if opts.expand_genre_to_related_genres:
-            self.expand_genre_to_related_genres(item, **opts)
+        if options.expand_genre_to_related_genres:
+            self.expand_genre_to_related_genres(item, **options)
             did = True
 
         # add as new source
-        if opts.expand_genre_to_artists:
-            self.expand_genre_to_artists(item, **opts)
+        if options.expand_genre_to_artists:
+            self.expand_genre_to_artists(item, **options)
             did = True
 
         if not did:
@@ -831,7 +831,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
         if self.check_uri(f'genre:{genre.name}#playlists'):
             return
@@ -843,13 +843,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # select only wanted playlists
         playlist_uris: List[str] = []
         try:
-            uris = [genre.playlists[k] for k in opts.include_genre_playlists]
+            uris = [genre.playlists[k] for k in options.include_genre_playlists]
         except KeyError as e:
             raise Exception(f'unknown playlist name: {e}')
         playlist_uris = list(filter(None, uris))
 
         for playlist_uri in playlist_uris:
-            yield from self.expander(SpotifyUri(playlist_uri), **opts)
+            yield from self.expander(SpotifyUri(playlist_uri), **options)
 
     def expand_genre_to_artists(
             self,
@@ -857,7 +857,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
         if self.check_uri(f'genre:{genre.name}#artists'):
             return
@@ -871,7 +871,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         search = self.search_generator(query_type=query_type, query=query)
         # search genre matches substrings, so filter
         search = filter(make_filter_by_artist_genre(genre_name), search)
-        expander = self.expander(self.randomizer(search, **opts), **opts)
+        expander = self.expander(self.randomizer(search, **options), **options)
         self.sources.add(expander)
 
     def expand_genre_to_related_genres(
@@ -880,7 +880,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> None:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
 
         if self.check_uri(f'genre:{genre.name}#related'):
             return
@@ -901,7 +901,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # NOTE: convert list to _generator_, cos im stupid
         related_genres = (i for i in related_genres)
-        expander = self.expander(related_genres, **opts)
+        expander = self.expander(related_genres, **options)
         self.sources.add(expander)
 
     @expander.register
@@ -911,15 +911,15 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Episode, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         if self.check_uri(item.uri):
             return
 
-        if opts.expand_show_to_episodes:
-            yield from self.expand_show_to_episodes(item, **opts)
+        if options.expand_show_to_episodes:
+            yield from self.expand_show_to_episodes(item, **options)
             did = True
 
         if not did:
@@ -931,12 +931,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Any, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         if self.check_uri(show.uri + '#episodes'):
             return
-        opts.set(expand_track_to_album=False)
-        episodes = self.show_episodes_generator(show.id, **opts)
-        e = self.expander(episodes, **opts)
+        options.set(expand_track_to_album=False)
+        episodes = self.show_episodes_generator(show.id, **options)
+        e = self.expander(episodes, **options)
         yield from e
 
     @expander.register
@@ -946,7 +946,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ) -> Generator[Episode, None, None]:
 
-        opts = self.options.push(kwargs)
+        options = self.options.push(kwargs)
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
         if not self.check_uri(item.uri):
