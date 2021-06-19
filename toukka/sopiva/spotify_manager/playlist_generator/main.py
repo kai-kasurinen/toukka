@@ -328,7 +328,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         for album in albums:
             # speed up things
             if self.user_country not in album.available_markets:
-                self.logger.debug('album:%s: is not available %s', album.id, self.user_country)
+                self.logger.debug('album:%s: is not available in %s', album.id, self.user_country)
                 continue
             yield album
 
@@ -337,18 +337,14 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             artist_id: str
             ) -> Generator[FullTrack, None, None]:
 
-        yield from self.spotify.artist_top_tracks(
-            artist_id,
-            market=self.user_country)
+        yield from self.spotify.artist_top_tracks(artist_id, market=self.user_country)
 
     def album_tracks_generator(
             self,
             album_id: str
             ) -> Generator[SimpleTrack, None, None]:
 
-        paging = self.spotify.album_tracks(
-            album_id,
-            market=self.market)
+        paging = self.spotify.album_tracks(album_id, market=self.market)
         yield from self.spotify.all_items(paging)
 
     def show_episodes_generator(

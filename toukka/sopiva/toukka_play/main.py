@@ -61,7 +61,7 @@ kwargs_for_genre_artists = {
     'expand_artist_to_random_album': True,
     'expand_artist_to_related_artists': True,
     'expand_album_to_tracks': True,
-    'randomize': True
+    'randomize_artists': True
 }
 
 kwargs_for_uri = {
@@ -110,7 +110,6 @@ def cli():
 @cli.command()
 @click.argument('uris', required=True, nargs=-1)
 @click.option('--dry-run', is_flag=True, default=False)
-@click.option('--randomize', is_flag=True, default=False)
 def uri(uris: tuple,
         **kwargs):
     args = locals()
@@ -121,7 +120,6 @@ def uri(uris: tuple,
 @cli.command()
 @click.argument('uris', required=True, nargs=-1)
 @click.option('--dry-run', is_flag=True, default=False)
-@click.option('--randomize', is_flag=True, default=False)
 def uri2(uris: tuple,
          **kwargs):
     args = locals()
@@ -132,18 +130,17 @@ def uri2(uris: tuple,
 @cli.command()
 @click.argument('uris', required=True, nargs=-1)
 @click.option('--dry-run', is_flag=True, default=False)
-@click.option('--randomize', is_flag=True, default=False)
 def uri3(uris: tuple,
          **kwargs):
     args = locals()
     context = click.get_current_context()
     context.invoke(from_uris, **args, **kwargs, **kwargs_for_uri_third)
 
+
 # FIXME: autocompletion
 @cli.command()
 @click.argument('genre_name', required=True, nargs=-1, autocompletion=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
-@click.option('--randomize', is_flag=True, default=False)
 def genre(genre_name: tuple,
           **kwargs
           ):
@@ -155,7 +152,6 @@ def genre(genre_name: tuple,
 @cli.command()
 @click.argument('genre_name_re', required=True, nargs=-1)
 @click.option('--dry-run', is_flag=True, default=False)
-@click.option('--randomize', is_flag=True, default=False)
 def genre_re(genre_name_re: str,
              **kwargs
              ):
