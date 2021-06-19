@@ -55,7 +55,8 @@ class PlaylistGeneratorOptions:
             randomize_genres=False,
             randomize_uris=False,
             randomize_search=False,
-            randomize_recommendations=False
+            randomize_recommendations=False,
+            played_count_min=0
         )
 
         self.options = self.options.push(kwargs)

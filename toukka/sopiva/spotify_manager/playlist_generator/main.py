@@ -76,7 +76,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(
             spotify=self.spotify,
-            user_country=self.user_country)
+            user_country=self.user_country,
+            played_count_min=self.options.played_count_min)
 
     def generate(self, **kwargs) -> None:
         options = self.options.push(kwargs)

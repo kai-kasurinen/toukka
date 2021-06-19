@@ -40,7 +40,8 @@ class TrackFilter:
 
     def __init__(self,
                  spotify: tekore.Spotify = None,
-                 user_country: str = None
+                 user_country: str = None,
+                 played_count_min: int = 0
                  ) -> None:
 
         self.logger = logging.getLogger(__name__)
@@ -59,6 +60,8 @@ class TrackFilter:
         self.bad_words_in_track_names = _bad_words_in_track_names
         # TODO: add filter
         self.various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
+        #
+        self.played_count_min = played_count_min
 
     def is_track_ok_to_add(self, track: Track) -> bool:
 
@@ -133,12 +136,12 @@ class TrackFilter:
 
             if not self.is_track_name_good(track_relinked):
                 self.logger.debug('track:%s: track name "%s" not good (relinked)',
-                                 track_relinked.id, track_relinked.name)
+                                  track_relinked.id, track_relinked.name)
                 return False
 
             if not self.is_track_album_name_good(track_relinked):
                 self.logger.debug('track:%s: album name "%s" not good (relinked)',
-                                 track_relinked.id, track_relinked.album.name)
+                                  track_relinked.id, track_relinked.album.name)
                 return False
 
             if self.is_track_already_played(track_relinked):
@@ -160,7 +163,7 @@ class TrackFilter:
 
     def is_track_already_played(self, track: Track) -> bool:
 
-        if self.spotify_history.count_by_track_id(track.uri) > 0:
+        if self.spotify_history.count_by_track_id(track.uri) > self.played_count_min:
             return True
         else:
             return False
@@ -172,7 +175,7 @@ class TrackFilter:
         if isrc is None:
             self.logger.debug('track:%s: isrc is %s', track.id, isrc)
             return False
-        if self.spotify_history.count_by_track_isrc(isrc) > 0:
+        if self.spotify_history.count_by_track_isrc(isrc) > self.played_count_min:
             return True
         else:
             return False
