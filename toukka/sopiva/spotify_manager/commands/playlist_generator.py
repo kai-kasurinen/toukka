@@ -199,36 +199,4 @@ def from_new_releases(
     context = click.get_current_context()
     context.invoke(from_uris, uris=uris)
 
-
-@generate_playlist.command()
-@click.argument('uris', required=True, nargs=-1)
-def easy_uris(uris: tuple):
-    '''easy shortcut to from-uris'''
-    kwargs_for_uris = {
-        'expand_playlist_to_tracks': True,
-        'expand_track_to_album': True,
-        'expand_album_to_tracks': True,
-        'expand_artist_to_albums': True,
-        'expand_artist_to_related_artists': True
-    }
-    context = click.get_current_context()
-    context.invoke(from_uris, uris=uris, **kwargs_for_uris)
-
-
-@generate_playlist.command()
-@click.argument('genre_name', required=True, nargs=-1,
-                autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
-def easy_genres(genre_name: tuple):
-    '''easy shortcut to from-genres'''
-    kwargs_for_playlist = {
-        'expand_playlist_to_tracks': True,
-        'expand_track_to_album': True,
-        'expand_album_to_tracks': True,
-        'expand_track_to_artists': False,
-        'expand_artist_to_albums': False
-    }
-    context = click.get_current_context()
-    context.invoke(from_genres, genre_name=genre_name, **kwargs_for_playlist)
-
-
 # END
