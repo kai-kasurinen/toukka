@@ -14,7 +14,6 @@ class PlaylistGeneratorOptions:
         self.options = Options(
             dry_run=False,
             progress_bar=False,
-            randomize=False,
             looper_target_count=500,
             looper_max_tries=100000,
             expand_track_to_album=False,
@@ -48,7 +47,15 @@ class PlaylistGeneratorOptions:
             sort_artist_albums_by_keys=['album_group', 'release_date'],
             sort_artist_albums_reverse=False,
             sort_show_episodes_by_keys=['release_date'],
-            sort_show_episodes_reverse=False
+            sort_show_episodes_reverse=False,
+            randomize_artists=False,
+            randomize_albums=False,
+            randomize_tracks=False,
+            randomize_playlist_items=False,
+            randomize_genres=False,
+            randomize_uris=False,
+            randomize_search=False,
+            randomize_recommendations=False
         )
 
         self.options = self.options.push(kwargs)
