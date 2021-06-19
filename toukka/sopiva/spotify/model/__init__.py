@@ -1,5 +1,5 @@
 #
 
-from tekore.model import *
+from tekore._model import *
 
 # END
