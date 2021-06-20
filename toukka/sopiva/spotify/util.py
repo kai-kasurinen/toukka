@@ -15,6 +15,7 @@ import toukka.sopiva.spotify.state
 
 from toukka.sopiva.spotify.sender.requests_sender import RequestsSender
 from toukka.sopiva.spotify.sender.caching_sender import SqliteCachingSender
+from toukka.sopiva.spotify.client.current import Spotify
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
@@ -89,29 +90,29 @@ def get_client_token() -> tekore.RefreshingToken:
     return token
 
 
-def get_client(token, sender) -> toukka.sopiva.spotify.client.current.Spotify:
-    client = toukka.sopiva.spotify.client.current.Spotify(
+def get_client(token, sender) -> Spotify:
+    client = Spotify(
         token=token, sender=sender,
         max_limits_on=True, chunked_on=True)
     return client
 
 
 # TODO: combine with_user_credentials and with_client_credentialss
-def get_spotify_with_user_credentials() -> toukka.sopiva.spotify.client.current.Spotify:
+def get_spotify_with_user_credentials() -> Spotify:
     token = get_user_token()
     sender = get_sender()
     client = get_client(token, sender)
     return client
 
 
-def get_spotify_with_client_credentials() -> toukka.sopiva.spotify.client.current.Spotify:
+def get_spotify_with_client_credentials() -> Spotify:
     token = get_client_token()
     sender = get_sender()
     client = get_client(token, sender)
     return client
 
 
-def get_spotify() -> toukka.sopiva.spotify.client.current.Spotify:
+def get_spotify() -> Spotify:
     logger.debug('get spotify')
     return get_spotify_with_user_credentials()
 

@@ -8,7 +8,7 @@ import uuid
 import more_itertools
 import toukka.config
 
-from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.util import (get_spotify, Spotify)
 
 
 # TODO: cleanup or remove?
@@ -17,7 +17,7 @@ class PlaylistModifier:
 
     def __init__(self,
                  uri: str = None,
-                 spotify: object = None,
+                 spotify: Spotify = None,
                  market: str = None
                  ) -> None:
 
