@@ -564,6 +564,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if not isinstance(track, FullTrack):
             self.logger.debug('%s:%s: to FullTrack (slow)', track.type, track.id)
             track = self.spotify.track(track.id, market=None)
+
         # makes mypy happy
         track = cast(FullTrack, track)
 
