@@ -393,7 +393,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **seed_attributes)
 
         for seed in recommendations.seeds:
-            self.logger.debug(seed)
+            self.logger.debug(seed.asbuiltin())
         yield from recommendations.tracks
 
     def related_artists_generator(
