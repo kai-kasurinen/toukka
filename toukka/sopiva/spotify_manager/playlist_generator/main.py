@@ -518,25 +518,33 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Track, None, None]:
 
         options = self.options.push(kwargs)
+
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
         # add as new source
         if options.expand_track_to_artists:
+            # self.logger.debug('%s:%s: to artists', item.type, item.id)
             self.add_track_artists_as_source(item, **options)
             did = True
+
         # add as new source
         if options.expand_track_to_recommendations:
+            # self.logger.debug('%s:%s: to recommendations', item.type, item.id)
             self.add_track_recommendations_as_source(item, **options)
             did = True
+
         # yields tracks
         if options.expand_track_to_album:
+            # self.logger.debug('%s:%s: to album', item.type, item.id)
             yield from self.expand_track_to_album(item, **options)
             did = True
+
         # and finally use track if not seen
         if not self.check_uri(item.uri):
             yield item
             did = True
+
         # nice hack
         if not did:
             self.logger.warning('did not do anything with: %s', item.uri)
@@ -548,13 +556,17 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
+
         if self.check_uri(track.uri + '#album'):
             return
+
         # only FullTrack has album property
         if not isinstance(track, FullTrack):
+            self.logger.debug('%s:%s: to FullTrack (slow)', track.type, track.id)
             track = self.spotify.track(track.id, market=None)
         # makes mypy happy
         track = cast(FullTrack, track)
+
         album = self.spotify.album(track.album.id, market=self.market)
         yielder = self.yielder(album, expander=True, **options)
         yield from yielder
@@ -649,6 +661,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Track, None, None]:
 
         options = self.options.push(kwargs)
+
+        self.logger.debug('%s:%s: SimpleTrack to FullTrack', item.type, item.id)
+
         track = self.spotify.track(item.id, market=self.market)
         yielder = self.yielder(track, **options)
         yield from yielder
@@ -735,10 +750,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[FullTrack, None, None]:
 
         options = self.options.push(kwargs)
-        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
+
         if self.check_uri(item.uri):
             return
+
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
 
         # TODO: move?
         if options.exclude_various_artists_albums:
@@ -771,8 +788,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if self.check_uri(album.uri + '#tracks'):
             return
 
-        # NOTE: ...
+        # NOTE: 20210620 - not really needed
+        # NOTE: 20210620 - but without it, multiple track->fulltrack->album calls
         options.set(expand_track_to_album=False)
+
         tracks = self.album_tracks_generator(album.id)
         yielder = self.yielder(tracks, expander=True, **options)
         yield from yielder
