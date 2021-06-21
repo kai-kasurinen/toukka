@@ -925,11 +925,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             uris = [genre.playlists[k] for k in options.include_genre_playlists]
         except KeyError as e:
             raise Exception(f'unknown playlist name: {e}')
-        playlist_uris = list(filter(None, uris))
 
-        for playlist_uri in playlist_uris:
-            yielder = self.yielder(SpotifyUri(playlist_uri), expander=True, **options)
-            yield from yielder
+        playlist_uris = list(filter(None, uris))
+        playlist_uris_ = [SpotifyUri(uri) for uri in playlist_uris]
+
+        yielder = self.yielder(playlist_uris_, expander=True, **options)
+        yield from yielder
 
     def expand_genre_to_artists(
             self,
@@ -951,7 +952,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         search = self.search_generator(query_type=query_type, query=query)
         # search genre matches substrings, so filter
         search = filter(make_filter_by_artist_genre(genre_name), search)
-        yielder = self.yielder(search, expander=True, **options)
+        # NOTE: to list, cos expander does not understand filter
+        artists = list(search)
+
+        yielder = self.yielder(artists, expander=True, **options)
         self.sources.add(yielder)
 
     def expand_genre_to_related_genres(
@@ -976,12 +980,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             if related_genre is None:
                 self.logger.debug('genre:%s: not found, skipping', related_genre_name)
                 continue
-
             related_genres.append(related_genre)
-
-        # NOTE: convert list to _generator_, cos im stupid
-        # NOTE: 20210621 not needed
-        # related_genres = (genre for genre in related_genres)
 
         yielder = self.yielder(related_genres, expander=True, **options)
         self.sources.add(yielder)
