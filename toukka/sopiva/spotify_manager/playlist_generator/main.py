@@ -305,6 +305,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # NOTE: valid include_groups: 'album', 'single', 'appears_on', 'compilation'
         if include_groups is None:
             self.logger.warning('include_groups is None')
+
         paging = self.spotify.artist_albums(
             artist_id,
             include_groups=include_groups,
@@ -325,10 +326,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                             reverse=options.sort_artist_albums_reverse)
 
         for album in albums:
+
             # speed up things
             if self.user_country not in album.available_markets:
                 self.logger.debug('album:%s: is not available in %s', album.id, self.user_country)
                 continue
+
             yield album
 
     def artist_top_tracks_generator(
@@ -360,7 +363,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         episodes = self.spotify.all_items(paging)
 
         # FIXME: move?
-        if options.sort_artist_albums_by_keys:
+        if options.sort_show_episodes_by_keys:
             self.logger.debug('adding sorting by %s, reverse: %s',
                               options.sort_show_episodes_by_keys,
                               options.sort_show_episodes_reverse)
@@ -418,6 +421,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                                      market=self.market)
         # FIXME: handle all types not just one
         paging = search[0]
+
         for item in self.spotify.all_items(paging):
             # NOTE: item can me track, album, artist, playlist ...
             yield item
