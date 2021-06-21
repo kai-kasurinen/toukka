@@ -1,6 +1,7 @@
 #
 
 from typing import Generator, Any
+from collections.abc import Iterable
 
 import itertools
 import random
@@ -10,7 +11,7 @@ import more_itertools
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
 def shuffle_generator(
-        generator: Generator,
+        generator: Iterable,
         buffer_size: int = 100
         ) -> Generator[Any, None, None]:
 
@@ -26,7 +27,7 @@ def shuffle_generator(
 # source: https://stackoverflow.com/questions/21187131/how-to-use-random-shuffle-on-a-generator-python
 # modified
 def scramble_generator(
-        generator: Generator,
+        generator: Iterable,
         buffer_size: int = 1000
         ) -> Generator[Any, None, None]:
 
@@ -47,7 +48,10 @@ def scramble_generator(
 
 
 # TODO: convert iterable to list (so all items is used) and randomize list
-def take_random_items_generator(iterable, count=1):
+def take_random_items_generator(
+        iterable: Iterable,
+        count: int = 1
+        ) -> Generator[Any, None, None]:
     yield from more_itertools.take(count, scramble_generator(iterable))
 
 

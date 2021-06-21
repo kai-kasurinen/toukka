@@ -2,6 +2,7 @@
 #
 
 from typing import List, Set, Generator, Union, Any, Dict, cast, Optional
+from collections.abc import Iterable
 
 import logging
 import pprint
@@ -177,11 +178,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             self.logger.debug('shuffling uris')
             random.shuffle(uris)
 
-        for uri in uris:
-            yielder = self.yielder(SpotifyUri(uri),
-                                   expander=True,
-                                   **options)
-            self.sources.add(yielder)
+        # TODO: move?
+        uris_ = [SpotifyUri(uri) for uri in uris]
+
+        yielder = self.yielder(uris_, expander=True, **options)
+        self.sources.add(yielder)
 
         self.playlist.description = ', '.join(uris)
         self.generate(**options)
@@ -199,15 +200,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             self.logger.debug('shuffling genres')
             random.shuffle(genres)
 
-        genre_names: List[str] = []
-        for genre in genres:
-            yielder = self.yielder(genre,
-                                   expander=True,
-                                   **options)
-            self.sources.add(yielder)
-            genre_names.append(genre.name)
+        yielder = self.yielder(genres, expander=True, **options)
+        self.sources.add(yielder)
 
+        genre_names = [genre.name for genre in genres]
         self.playlist.description = ', '.join(genre_names)
+
         self.generate(**options)
 
     def generate_from_search(
@@ -438,10 +436,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             if playlist_item.track is not None and not playlist_item.is_local:
                 yield playlist_item.track
 
-    # FIXME: generator -> iterable
     def randomizer(
             self,
-            generator: Generator,
+            generator: Iterable,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -454,7 +451,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
     def yielder(
             self,
-            generator: Generator,
+            generator: Iterable,
             expander=False,
             randomizer=False,
             **kwargs
@@ -494,21 +491,18 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         else:
             self.logger.warning('did not do anything with: %s', item)
 
-    # FIXME: is used?
-    def expander_modellist(
+    @expander.register
+    def expander_list(
             self,
-            item: ModelList,
+            item: list,
             **kwargs
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
         self.logger.debug('%s: %s', type(item), len(item))
 
-        if options.expand_modellist_to_items:
-            for item_ in item:
-                yield from self.expander(item_, **options)
-        else:
-            self.logger.warning('did not do anything with: %s', item)
+        for i in item:
+            yield from self.expander(i, **options)
 
     @expander.register
     def expander_track(
@@ -983,7 +977,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             related_genres.append(related_genre)
 
         # NOTE: convert list to _generator_, cos im stupid
-        related_genres = (genre for genre in related_genres)
+        # NOTE: 20210621 not needed
+        # related_genres = (genre for genre in related_genres)
+
         yielder = self.yielder(related_genres, expander=True, **options)
         self.sources.add(yielder)
 
