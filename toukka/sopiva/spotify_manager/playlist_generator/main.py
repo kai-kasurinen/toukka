@@ -328,7 +328,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
             # speed up things
             if self.user_country not in album.available_markets:
-                self.logger.debug('album:%s: is not available in %s', album.id, self.user_country)
+                self.logger.debug('album:%s: not available in %s', album.id, self.user_country)
                 continue
 
             yield album
