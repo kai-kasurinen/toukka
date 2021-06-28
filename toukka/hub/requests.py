@@ -69,7 +69,7 @@ def get_filecache() -> cachecontrol.caches.FileCache:
 
 def get_diskcache():
     dir = xdg.BaseDirectory.save_cache_path('toukka', 'cachecontrol_diskcache')
-    cache = diskcache.FanoutCache(dir, shards=4, timeout=10, statistics=True)
+    cache = diskcache.FanoutCache(dir, timeout=10, statistics=True)
     return cache
 
 
