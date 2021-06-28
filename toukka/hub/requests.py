@@ -1,15 +1,21 @@
 #
 
+import os
 import logging
 import requests
 import requests.adapters
 import cachecontrol
 import cachecontrol.caches
+# import cachecontrol_sqlite
+
 import redis
 import xdg.BaseDirectory
 
+import diskcache
+
 from urllib3.util.retry import Retry
 from toukka.adapted.retry import RetryA
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -54,13 +60,30 @@ def get_filecache() -> cachecontrol.caches.FileCache:
     return cache
 
 
-def get_cached_session(cache_type='file') -> requests.Session:
+# def get_sqlitecache():
+#    dir = xdg.BaseDirectory.save_cache_path('toukka')
+#    file = os.path.join(dir, 'cachecontrol.db')
+#    cache = cachecontrol_sqlite.SQLiteCache(file)
+#     return cache
+
+
+def get_diskcache():
+    dir = xdg.BaseDirectory.save_cache_path('toukka', 'cachecontrol_diskcache')
+    cache = diskcache.FanoutCache(dir, shards=4, timeout=10, statistics=True)
+    return cache
+
+
+def get_cached_session(cache_type='diskcache') -> requests.Session:
     session = requests.Session()
     retry = get_retry()
     if cache_type == 'redis':
         cache = get_rediscache()
     elif cache_type == 'file':
         cache = get_filecache()
+    # elif cache_type == 'sqlite':
+    #     cache = get_sqlitecache()
+    elif cache_type == 'diskcache':
+        cache = get_diskcache()
     else:
         raise Exception(f'not supported cache_type: {cache_type}')
     adapter = cachecontrol.CacheControlAdapter(cache, max_retries=retry)
