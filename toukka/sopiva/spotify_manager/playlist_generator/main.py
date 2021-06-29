@@ -487,12 +487,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
+        # self.logger.debug('%s', type(item))
 
-        if options.expand_generator_to_items:
-            for item_ in item:
-                yield from self.expander(item_, **options)
-        else:
-            self.logger.warning('did not do anything with: %s', item)
+        for count, i in enumerate(item, start=1):
+            # self.logger.debug('%s: %i/?', type(i), count)
+            yield from self.expander(i, **options)
 
     @expander.register
     def expander_list(
@@ -502,9 +501,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
-        self.logger.debug('%s: %s', type(item), len(item))
+        # self.logger.debug('%s: %s', type(item), len(item))
 
-        for i in item:
+        for count, i in enumerate(item, start=1):
+            self.logger.debug('%s: %i/%i', type(i), count, len(item))
             yield from self.expander(i, **options)
 
     @expander.register
