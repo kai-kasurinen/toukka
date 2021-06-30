@@ -491,7 +491,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         for count, i in enumerate(item, start=1):
             # self.logger.debug('%s: %i/?', type(i), count)
-            yield from self.expander(i, **options)
+            yield from self.yielder(i, expander=True, **options)
 
     @expander.register
     def expander_list(
@@ -505,7 +505,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         for count, i in enumerate(item, start=1):
             self.logger.debug('%s: %i/%i', type(i), count, len(item))
-            yield from self.expander(i, **options)
+            yield from self.yielder(i, expander=True, **options)
 
     @expander.register
     def expander_track(
