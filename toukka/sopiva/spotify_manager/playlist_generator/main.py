@@ -94,19 +94,21 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         progress_tracks = progress_bars.progress_bar_for_tracks(options.looper_target_count)
         progress_looper = progress_bars.progress_bar_for_loops(options.looper_max_tries)
 
-        sources = self.sources.generator()
+        sources_generator = self.sources.generator()
 
         # wanted type
-        track: Track
+        # track: Track
 
-        for counter, track in enumerate(sources):
+        for counter, track in enumerate(sources_generator, start=1):
 
-            self.logger.debug(
-                'counter: %i, tracks: %i, sources: %i/%i',
-                counter,
-                len(self.uris_to_playlist),
-                self.sources.sources_used_count,
-                len(self.sources))
+            # ...
+            if not counter % 10:
+                self.logger.debug(
+                    'items: %i/%i, sources: %iD%iQ',
+                    counter,
+                    len(self.uris_to_playlist),
+                    self.sources.sources_used_count,
+                    len(self.sources))
 
             progress_looper.update()
 
@@ -142,22 +144,23 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 break
 
         progress_bars.stop()
-
         self.logger.info(f'{len(self.uris_to_playlist)} tracks to add')
 
     # TODO: split and move to Playlist
     def commit(self, **kwargs) -> None:
         options = self.options.push(kwargs)
 
-        if not options.dry_run:
-            if len(self.uris_to_playlist) > 0:
-                self.playlist.clear()
-                self.playlist.uris_add(self.uris_to_playlist)
-                self.playlist.details_update()
-            else:
-                self.logger.info('try something else?')
-        else:
+        if options.dry_run:
             self.logger.info('dry_run is True, not committing')
+            return
+
+        if len(self.uris_to_playlist) == 0:
+            self.logger.info('try something else?')
+            return
+
+        self.playlist.clear()
+        self.playlist.uris_add(self.uris_to_playlist)
+        self.playlist.details_update()
         self.logger.info('done')
 
     def generate_from_uris(
