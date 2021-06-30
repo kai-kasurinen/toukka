@@ -105,8 +105,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             if not counter % 10:
                 self.logger.debug(
                     'items: %i/%i, sources: %iD%iQ',
-                    counter,
                     len(self.uris_to_playlist),
+                    counter,
                     self.sources.sources_used_count,
                     len(self.sources))
 
