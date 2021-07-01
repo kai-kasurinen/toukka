@@ -856,8 +856,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         options = self.options.push(kwargs)
 
-        uri_type, uri_id = self.spotify.convert.from_uri(uri)
-        self.logger.debug('%s: %s: %s', uri, uri_type, uri_id)
+        self.logger.debug('%s')
 
         if self.check_uri(uri + '#uri'):
             return
