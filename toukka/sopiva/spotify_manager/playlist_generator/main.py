@@ -856,8 +856,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         options = self.options.push(kwargs)
 
-        self.logger.debug('%s')
-
         if self.check_uri(uri + '#uri'):
             return
 
