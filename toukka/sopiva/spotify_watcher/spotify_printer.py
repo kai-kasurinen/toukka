@@ -30,13 +30,20 @@ class SpotifyPrinter:
 
     def check_and_print_relink(self, track_id):
         track = self.spotify.track(track_id, market=self.market)
-        if track.linked_from:
-            print()
-            print(f'track {track.id} is relinked from {track.linked_from.id}')
-            # re-get _linked_ track without market
-            track_relinked = self.spotify.track(track.id, market=None)
-            print()
-            printer(track_relinked)
+        if not track.linked_from:
+            return
+
+        print()
+        print(f'track {track.uri} is relinked from {track.linked_from.uri}')
+
+        # re-get _linked_ track without market
+        track_relinked = self.spotify.track(track.id, market=None)
+        album_relinked = self.spotify.album(track_relinked.album.id, market=None)
+
+        print()
+        printer(album_relinked)
+        print()
+        printer(track_relinked)
 
     def print_all_from_track_id(self, track_id):
         track = self.spotify.track(track_id, market=None)
