@@ -38,8 +38,8 @@ class SpotifyPrinter:
         print(f'track {track.uri} is relinked from {track.linked_from.uri}')
 
         # re-get _linked_ track without market
-        track_relinked = self.spotify.track(track.id, market=None)
-        album_relinked = self.spotify.album(track_relinked.album.id, market=None)
+        track_relinked = self.spotify.track(track.id)
+        album_relinked = self.spotify.album(track_relinked.album.id)
 
         print()
         printer(album_relinked)
@@ -47,8 +47,8 @@ class SpotifyPrinter:
         printer(track_relinked)
 
     def print_all_from_track_id(self, track_id):
-        track = self.spotify.track(track_id, market=None)
-        album = self.spotify.album(track.album.id, market=None)
+        track = self.spotify.track(track_id)
+        album = self.spotify.album(track.album.id)
 
         artists = set()
         artists.update(_get_all_artist_ids_from_item(track))
