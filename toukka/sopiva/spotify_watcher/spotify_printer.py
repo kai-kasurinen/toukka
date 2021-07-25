@@ -30,6 +30,7 @@ class SpotifyPrinter:
 
     def check_and_print_relink(self, track_id):
         track = self.spotify.track(track_id, market=self.market)
+
         if not track.linked_from:
             return
 
