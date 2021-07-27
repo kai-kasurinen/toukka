@@ -8,10 +8,11 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.cli import cli_root
 from toukka.printer import printer
 
+
 @cli_root.command()
 @click.argument('user_id')
 def user(user_id: str):
-    ''' get public profile information about a Spotify user.'''
+    ''' get public profile information about a Spotify user'''
     get_spotify().user(user_id).pprint()
 
 
