@@ -15,8 +15,8 @@ def user(user_id: str):
     return get_spotify().user(user_id).pprint()
 
 
-@cli_root.command('me')
-def current_user():
+@cli_root.command()
+def me():
     '''get current user information'''
     return get_spotify().current_user().pprint()
 
