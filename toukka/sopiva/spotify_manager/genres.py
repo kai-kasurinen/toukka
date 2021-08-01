@@ -329,6 +329,22 @@ def genres_load() -> Genres:
         return pickle.load(file)
 
 
+def genres_re(name_re: str):
+    regex = re.compile(name_re)
+    genres_ = genres()
+
+    # NOTE:
+    # If the whole string matches this regular expression,
+    # return a corresponding match object.
+    # Return None if the string does not match the pattern
+    #
+    # match object is True and None is False
+    genre_names_match = list(filter(regex.fullmatch, genres_.keys()))
+
+    # TODO: return list(Genres), not just names
+    return genre_names_match
+
+
 # NOTE: for argcomplete
 def argcomplete_genre_completer(prefix, **kwargs):
     _genres = genres().keys()

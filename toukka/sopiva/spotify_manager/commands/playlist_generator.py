@@ -157,6 +157,9 @@ def from_genres_re(
         genre_name_re: tuple,
         **kwargs
         ):
+
+    # TODO: use genres.genres_re
+
     genres_match_list = list()
     genres = toukka.sopiva.spotify_manager.genres.genres()
 

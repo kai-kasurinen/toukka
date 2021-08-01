@@ -35,18 +35,11 @@ def genre(name: str):
 @cli_root.command()
 @click.argument('name_re')
 def genre_re(name_re: str):
-    regex = re.compile(name_re)
     genres = toukka.sopiva.spotify_manager.genres.genres()
-    # NOTE:
-    # If the whole string matches this regular expression,
-    # return a corresponding match object.
-    # Return None if the string does not match the pattern
-    #
-    # match object is True and None is False
-    genre_names_match = filter(regex.fullmatch, genres.keys())
+    genre_names_match_list = toukka.sopiva.spotify_manager.genres.genres_re(name_re)
 
-    for g in genre_names_match:
-        genre = genres.get(g)
+    for genre_name in genre_names_match_list:
+        genre = genres.get(genre_name)
         printer(genre)
 
 # END
