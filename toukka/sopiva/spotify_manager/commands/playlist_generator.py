@@ -158,15 +158,11 @@ def from_genres_re(
         **kwargs
         ):
 
-    # TODO: use genres.genres_re
-
     genres_match_list = list()
     genres = toukka.sopiva.spotify_manager.genres.genres()
 
     for name_re in genre_name_re:
-        name_re_regex = re.compile(name_re)
-        name_re_match = filter(name_re_regex.fullmatch, genres.keys())
-        genres_match_list.extend(name_re_match)
+        genres_match_list.extend(toukka.sopiva.spotify_manager.genres.genres_re(name_re))
 
     context = click.get_current_context()
     context.invoke(from_genres, genre_name=genres_match_list, **kwargs)

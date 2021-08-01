@@ -345,6 +345,8 @@ def genres_re(name_re: str):
     return genre_names_match
 
 
+
+
 # NOTE: for argcomplete
 def argcomplete_genre_completer(prefix, **kwargs):
     _genres = genres().keys()
