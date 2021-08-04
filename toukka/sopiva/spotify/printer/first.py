@@ -13,6 +13,7 @@ import deprecated
 
 from toukka.printer import printer
 from toukka.sopiva.spotify.model import *
+from toukka.sopiva.spotify.model.audio_features import AudioPitch, AudioMode
 
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
@@ -88,9 +89,14 @@ def print_track_audio_features(features: AudioFeatures):
           f'liveness: {features.liveness:f},',
           f'speechiness: {features.speechiness:f},',
           f'valence: {features.valence:f}')
-    print(f'\tkey: {features.key},',
-          f'mode: {features.mode},',
+
+    key_ = AudioPitch(features.key)
+    mode_ = AudioMode(features.mode)
+
+    print(f'\tkey: {features.key} ({key_}),',
+          f'mode: {features.mode} ({mode_.name}),',
           f'time signature: {features.time_signature}')
+
     print(f'\ttempo: {features.tempo:f},',
           f'loudness: {features.loudness:f}')
 
