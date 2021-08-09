@@ -116,22 +116,22 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 progress_added.update()
 
             if len(self.uris_to_playlist) >= options.looper_target_count:
-                self.logger.info('we have enough tracks to add (target count)')
+                self.logger.info('we have enough items (target count)')
                 break
 
             # playlist can contains only ~10000 tracks
             # (actually 11000 and then 500 ISE)
             if len(self.uris_to_playlist) >= 10000:
-                self.logger.info('we have enough tracks to add (playlist max)')
+                self.logger.info('we have enough items (playlist max)')
                 break
 
             # safety
             if counter >= options.looper_max_tries:
-                self.logger.info('we have tried too many tracks')
+                self.logger.info('we have tried too many items')
                 break
 
         progress_bars.stop()
-        self.logger.info(f'{len(self.uris_to_playlist)} tracks to add')
+        self.logger.info(f'{len(self.uris_to_playlist)} items to add')
 
     # TODO: split and move to Playlist
     def commit(self, **kwargs) -> None:
