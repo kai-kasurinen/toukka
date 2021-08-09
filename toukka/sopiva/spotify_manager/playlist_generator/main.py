@@ -92,15 +92,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # FIXME: move?
         progress_bars = ProgressBars(enabled=options.progress_bar)
         # NOTE: order means something
-        progress_tracks = progress_bars.progress_bar_for_tracks(options.looper_target_count)
+        progress_added = progress_bars.progress_bar_for_tracks(options.looper_target_count)
         progress_looper = progress_bars.progress_bar_for_loops(options.looper_max_tries)
 
         sources_generator = self.sources.generator()
 
-        # wanted type
-        # track: Track
-
-        for counter, track in enumerate(sources_generator, start=1):
+        for counter, item in enumerate(sources_generator, start=1):
 
             # ...
             if not counter % 10:
@@ -113,21 +110,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
             progress_looper.update()
 
-            # TODO: GRR
-            if isinstance(track, Episode):
-                self.uris_to_playlist.append(track.uri)
-                self.logger.debug('episode:%s: added', track.id)
-                continue
-
-            # TODO: remove
-            # actually we do not care as long track.id is usable
-            if not isinstance(track, Track):
-                raise Exception(f'wrong type received: {type(track)}')
-
-            if self.track_filter.is_track_ok_to_add(track):
-                self.uris_to_playlist.append(track.uri)
-                self.logger.debug('track:%s: added', track.id)
-                progress_tracks.update()
+            if self.track_filter.is_ok(item):
+                self.uris_to_playlist.append(item.uri)
+                self.logger.debug('%s:%s: added', item.type, item.id)
+                progress_added.update()
 
             if len(self.uris_to_playlist) >= options.looper_target_count:
                 self.logger.info('we have enough tracks to add (target count)')

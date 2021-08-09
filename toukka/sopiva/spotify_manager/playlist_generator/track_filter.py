@@ -2,10 +2,16 @@
 
 from typing import List, Set, Generator, Union
 
+import functools
+
 import logging
 import tekore
 
-from toukka.sopiva.spotify.model import FullTrack, Track
+from toukka.sopiva.spotify.model import (
+    FullTrack, Track,
+    FullEpisode, Episode
+)
+
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
@@ -63,7 +69,16 @@ class TrackFilter:
         #
         self.played_count_min = played_count_min
 
-    def is_track_ok_to_add(self, track: Track) -> bool:
+    @functools.singledispatchmethod
+    def is_ok(self, item):
+        raise NotImplementedError('not yet supported type: %s' % type(item))
+
+    @is_ok.register
+    def is_episode_ok(self, episode: Episode):
+        raise NotImplementedError('not yet supported type: %s' % type(item))
+
+    @is_ok.register
+    def is_track_ok(self, track: Track) -> bool:
 
         # TODO: more cleanup
 
