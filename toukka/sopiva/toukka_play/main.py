@@ -34,7 +34,7 @@ __program_description__ = 'some personal shortcuts'
 
 kwargs_for_playlist = {
     'progress_bar': True,
-    'expand_playlist_to_tracks': True,
+    'expand_playlist_to_items': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': False,
     'expand_album_to_tracks': True,
@@ -46,7 +46,7 @@ kwargs_for_genre = {
     'progress_bar': True,
     'expand_genre_to_playlists': True,
     'expand_genre_to_related_genres': True,
-    'expand_playlist_to_tracks': True,
+    'expand_playlist_to_items': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': False,
     'expand_album_to_tracks': True,
@@ -66,7 +66,7 @@ kwargs_for_genre_artists = {
 
 kwargs_for_uri = {
     'progress_bar': True,
-    'expand_playlist_to_tracks': True,
+    'expand_playlist_to_items': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': False,
     'expand_album_to_tracks': True,
@@ -78,7 +78,7 @@ kwargs_for_uri = {
 
 kwargs_for_uri_second = {
     'progress_bar': True,
-    'expand_playlist_to_tracks': True,
+    'expand_playlist_to_items': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,
     'expand_album_to_tracks': True,
@@ -89,7 +89,7 @@ kwargs_for_uri_second = {
 
 kwargs_for_uri_third = {
     'progress_bar': True,
-    'expand_playlist_to_tracks': True,
+    'expand_playlist_to_items': True,
     'expand_track_to_album': True,
     'expand_track_to_artists': True,
     'expand_album_to_tracks': True,

@@ -20,9 +20,10 @@ from toukka.sopiva.spotify.model import (
     FullTrack, SimpleTrack, Track,
     FullAlbum, SimpleAlbum, Album,
     FullArtist, SimpleArtist, Artist,
+    FullEpisode, SimpleEpisode, Episode,
+    FullShow, SimpleShow, Show,
     FullPlaylist, SimplePlaylist, Playlist,
-    ModelList,
-    Show, Episode
+    ModelList
 )
 
 from toukka.sopiva.spotify_manager.filters import (
@@ -428,10 +429,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             # NOTE: item can me track, album, artist, playlist ...
             yield item
 
-    def playlist_all_tracks_generator(
+    def playlist_all_items_generator(
             self,
             playlist_id: str
-            ) -> Generator[FullTrack, None, None]:
+            ) -> Generator[Union[FullTrack, FullEpisode], None, None]:
 
         paging = self.spotify.playlist_items(
             playlist_id=playlist_id,
@@ -439,8 +440,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             market=self.market)
 
         for playlist_item in self.spotify.all_items(paging):
-            if playlist_item.track is not None and not playlist_item.is_local:
-                yield playlist_item.track
+            if playlist_item.track is None:
+                continue
+            if playlist_item.is_local:
+                continue
+            yield playlist_item.track
 
     def randomizer(
             self,
@@ -824,12 +828,13 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         if self.check_uri(item.uri):
             return
-        elif options.expand_playlist_to_tracks:
-            yield from self.expand_playlist_to_tracks(item, **options)
+
+        if options.expand_playlist_to_items:
+            yield from self.expand_playlist_to_items(item, **options)
         else:
             self.logger.warning('did not do anything with: %s', item.uri)
 
-    def expand_playlist_to_tracks(
+    def expand_playlist_to_items(
             self,
             playlist: Playlist,
             **kwargs
@@ -840,7 +845,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if self.check_uri(playlist.uri + '#tracks'):
             return
 
-        tracks = self.playlist_all_tracks_generator(playlist.id)
+        tracks = self.playlist_all_items_generator(playlist.id)
         yielder = self.yielder(tracks,
                                expander=True,
                                randomizer=options.randomize_playlist_items,
