@@ -300,7 +300,7 @@ def print_episode(episode: Episode):
         print(f'\tshow: {episode.show.name} ({episode.show.uri})')
     print(f'\tduration: {datetime.timedelta(milliseconds=episode.duration_ms)}')
     print(f'\tlanguages: {list(episode.languages)}')
-    print(f'\tresume point: {episode.resume_point}')
+    print(f'\tresume point: {episode.resume_point.asbuiltin()}')
 
     print(f'\tdescription:')
     print(textwrap.TextWrapper(
