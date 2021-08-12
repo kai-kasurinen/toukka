@@ -112,7 +112,10 @@ def print_album_simple(album: SimpleAlbum):
     if album.album_group:
         print(f'\talbum group: {album.album_group}')
     if album.available_markets is not None:
-        print(f'\tmarkets: {len(album.available_markets)}')
+        if 0 < len(album.available_markets) < 10:
+            print(f'\tmarkets: {len(album.available_markets)} ({list(album.available_markets)})')
+        else:
+            print(f'\tmarkets: {len(album.available_markets)}')
     if album.is_playable is not None:
         print(f'\tplayable: {album.is_playable}')
 
@@ -132,7 +135,10 @@ def print_album_full(album: FullAlbum):
     if album.external_urls:
         print('\texternal urls: {album.external_urls}'.format(album=album))
     if album.available_markets is not None:
-        print('\tmarkets: %s' % (len(album.available_markets)))
+        if 0 < len(album.available_markets) < 10:
+            print(f'\tmarkets: {len(album.available_markets)} ({list(album.available_markets)})')
+        else:
+            print(f'\tmarkets: {len(album.available_markets)}')
     if album.is_playable is not None:
         print(f'\tplayable: {album.is_playable}')
     if album.label:
