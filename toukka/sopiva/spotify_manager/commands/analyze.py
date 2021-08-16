@@ -35,5 +35,4 @@ def playlist():
 def artist_related_test(**kwargs):
     toukka.sopiva.spotify_manager.analyze.artist_related_artists.artist_related_artists_test(**kwargs)
 
-
 # END

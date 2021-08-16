@@ -1,6 +1,8 @@
 #
 
 import logging
+import functools
+import operator
 import collections
 import pandas
 
@@ -50,6 +52,12 @@ def analyze_playlist(playlist_uri=None):
     print()
 
     tracks_features = spotify.tracks_audio_features(tracks_ids)
+
+    # NOTE: we drop Nones
+    tracks_features = (item for item in tracks_features if item is not None)
+    # tracks_features = filter(functools.partial(operator.is_not, None), tracks_features)
+
+    # NOTE: DataFrame fails when features has Nones
     tracks_features_dataframe = pandas.DataFrame(tracks_features)
     #tracks_features_dataframe['duration_ms'] = pandas.to_timedelta(
     #    tracks_features_dataframe['duration_ms'], unit='ms')
