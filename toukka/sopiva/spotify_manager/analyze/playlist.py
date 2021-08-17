@@ -59,9 +59,7 @@ def analyze_playlist(playlist_uri=None):
 
     # NOTE: DataFrame fails when features has Nones
     tracks_features_dataframe = pandas.DataFrame(tracks_features)
-    #tracks_features_dataframe['duration_ms'] = pandas.to_timedelta(
-    #    tracks_features_dataframe['duration_ms'], unit='ms')
-    #print(tracks_features_dataframe.dtypes)
+
     print(tracks_features_dataframe.describe())
 
 
