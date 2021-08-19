@@ -32,15 +32,17 @@ def current_user_top_tracks(
     spotify = get_spotify()
     time_range = f'{time_range}_term'
     paging = spotify.current_user_top_tracks(time_range=time_range, limit=50)
+    tracks = spotify.all_items(paging)
 
     # NOTE: sometimes spotify returns 0 items
-    if paging.total < 1:
+    if paging.total == 0:
         paging.pprint()
+        return
 
     print(f'{time_range}: {_RANGES_DESCRIPTION.get(time_range)}')
     print()
 
-    for i, item in enumerate(spotify.all_items(paging), start=1):
+    for i, item in enumerate(tracks, start=1):
 
         if output_format == 'long':
             printer(item)
@@ -66,13 +68,15 @@ def current_user_top_artists(
     artists = spotify.all_items(paging)
 
     # NOTE: sometimes spotify returns 0 items
-    if paging.total < 1:
+    if paging.total == 0:
         paging.pprint()
+        return
 
     print(f'{time_range}: {_RANGES_DESCRIPTION.get(time_range)}')
     print()
 
     for i, item in enumerate(artists, start=1):
+
         if output_format == 'long':
             printer(item)
         elif output_format == 'default':
