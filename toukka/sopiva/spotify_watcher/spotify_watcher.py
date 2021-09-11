@@ -63,6 +63,8 @@ class SpotifyWatcher(PlayerCtlManager):
               (metadata['xesam:artist'], metadata['xesam:albumArtist']))
         print('\talbum: %s' %
               (metadata['xesam:album']))
+        print('\turl: %s' %
+              (metadata['xesam:url']))
         print('\tlength: %s' %
               (datetime.timedelta(microseconds=metadata['mpris:length'])))
 
