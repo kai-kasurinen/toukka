@@ -5,6 +5,9 @@ from tekore._sender import Sender, Request, Response
 
 import requests
 
+# BUG: fails with newer tekore: 400: Missing payload
+# ... cos https://github.com/felix-hilden/tekore/commit/11d72683cc11b4ce275703dfb4059938bac49b51
+
 
 def try_parse_json(response):
     try:
