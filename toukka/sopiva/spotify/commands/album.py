@@ -44,7 +44,7 @@ def album_tracks(
     for album_track in album_tracks:
         if full:
             printer(spotify.track(album_track.id))
-        else: 
+        else:
             printer(album_track)
 
 # END
