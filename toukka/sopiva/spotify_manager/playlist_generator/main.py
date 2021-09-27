@@ -946,7 +946,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # NOTE: to list, cos expander does not understand filter
         artists = list(search)
 
-        yielder = self.yielder(artists, expander=True, **options)
+        yielder = self.yielder(artists,
+                               expander=True,
+                               randomizer=options.randomize_artists,
+                               **options)
+
         self.sources.add(yielder)
 
     def expand_genre_to_related_genres(
