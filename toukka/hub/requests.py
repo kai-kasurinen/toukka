@@ -11,11 +11,11 @@ import cachecontrol.caches
 import redis
 import xdg.BaseDirectory
 
-import diskcache
+# import diskcache
 
 from urllib3.util.retry import Retry
 from toukka.adapted.retry import RetryA
-
+from toukka.adapted.cachecontrol_diskcache import FanOutCacheAdapter
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -69,10 +69,11 @@ def get_filecache() -> cachecontrol.caches.FileCache:
 
 def get_diskcache():
     dir = xdg.BaseDirectory.save_cache_path('toukka', 'cachecontrol_diskcache')
-    cache = diskcache.FanoutCache(dir,
-                                  timeout=10,
-                                  statistics=True,
-                                  disk_min_file_size=2**19)  # 524288
+
+    cache = FanOutCacheAdapter(dir,
+                               timeout=10,
+                               statistics=True,
+                               disk_min_file_size=2**19)  # 524288
     return cache
 
 
