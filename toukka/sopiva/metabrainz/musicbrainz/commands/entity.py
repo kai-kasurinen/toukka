@@ -1,8 +1,10 @@
 #
 
 import pprint
-import argh
+import click
+
 from .. import MusicBrainzWS2
+from ..cli import cli_root
 
 
 def get_area(mbid):
@@ -10,9 +12,11 @@ def get_area(mbid):
     return pprint.pformat(ws2.area(mbid))
 
 
+@cli_root.command()
+@click.argument('mbid')
 def get_artist(mbid):
     ws2 = MusicBrainzWS2()
-    return pprint.pformat(ws2.artist(mbid))
+    pprint.pprint(ws2.artist(mbid))
 
 
 def get_event(mbid):

@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
+import runpy
+runpy.run_module('toukka.sopiva.metabrainz.musicbrainz')
