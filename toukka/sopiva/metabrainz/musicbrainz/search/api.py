@@ -11,6 +11,9 @@ from ..ratelimiter import musicbrainz_server_ratelimit_sleeper, musicbrainz_sear
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+# NOTE: search.musicbrainz.org api not available anymore
+
+
 class MusicBrainzSearch:
     def __init__(self, session=None, use_ratelimiter=True):
         self._use_ratelimiter = use_ratelimiter

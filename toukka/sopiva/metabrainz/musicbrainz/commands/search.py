@@ -1,10 +1,14 @@
 #
 
 import pprint
-import argh
+import click
+
 from .. import MusicBrainzSearch
+from ..cli import cli_root
 
 
+@cli_root.command()
+@click.argument('query')
 def search_artist(query):
     search = MusicBrainzSearch()
     return pprint.pformat(search.artist(query))
@@ -25,6 +29,8 @@ def search_track(query):
     return pprint.pformat(search.track(query))
 
 
+@cli_root.command()
+@click.argument('query')
 def search_url(query):
     search = MusicBrainzSearch()
     return pprint.pformat(search.url(query))
