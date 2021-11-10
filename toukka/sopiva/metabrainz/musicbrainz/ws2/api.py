@@ -11,6 +11,7 @@ from ..ratelimiter import musicbrainz_server_ratelimit_sleeper
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 class MusicBrainzWS2:
     def __init__(self, session=None, use_ratelimiter=True):
         self._use_ratelimiter = use_ratelimiter
