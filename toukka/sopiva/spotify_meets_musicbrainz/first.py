@@ -24,31 +24,24 @@ def print_currently_listening():
         return
 
     # printer(track)
-    # printer(track.album)
-    # for artist in track.artists:
-    #     printer(artist)
-
-    album_url = spotify.convert.to_url(track.album.type, track.album.id)
-    artists_urls = list()
-
-    for artist in track.artists:
-        artist_url = spotify.convert.to_url(artist.type, artist.id)
-        artists_urls.append(artist_url)
-
-    print(album_url)
-    print(artists_urls)
-
-    # artists
-    for artist_url in artists_urls:
-        print(f'searching {artist.name}...')
-        artist_mbids = get_entity_mbids_by_url('artist', artist_url)
-        print(f'... found {len(artist_mbids)}')
 
     # release
+    album = track.album
+    print(f'searching album ({album.uri})...')
+    album_url = spotify.convert.to_url(track.album.type, track.album.id)
+    album_mbids = get_entity_mbids_by_url('release', album_url)
+    print(f'... found {len(album_mbids)} mbids')
 
-    print('searching album...')
-    release_mbids = get_entity_mbids_by_url('release', album_url)
-    print(f'... found {len(release_mbids)}')
+    # artists
+    for artist in track.artists:
+        printer(artist)
+        print(f'searching artist {artist.name} ({artist.uri}) ...')
+        artist_url = spotify.convert.to_url(artist.type, artist.id)
+        artist_mbids = get_entity_mbids_by_url('artist', artist_url)
+        print(f'... found {len(artist_mbids)} mbids')
+
+
+
 
 
 def get_entity_mbids_by_url(entity_type, url):
@@ -77,6 +70,8 @@ def get_entity_mbids_by_url(entity_type, url):
                 logger.debug('wrong target_type (%s != %s) on relation', target_type, entity_type)
     else:
         logger.debug('failed, no result')
+
     return mbids
+
 
 # END
