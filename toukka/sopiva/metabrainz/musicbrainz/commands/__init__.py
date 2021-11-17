@@ -1,6 +1,7 @@
 #
 
+from . import get
+from . import browse
 from . import search
-from . import entity
 
 # END
