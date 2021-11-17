@@ -78,7 +78,7 @@ def get_work(mbid):
 @cli_root.command()
 @click.argument('mbid')
 def get_url(mbid):
-    printer(musicbrainzngs.get_url_by_id(mbid))
+    printer(musicbrainzngs.get_url_by_id(mbid, includes=musicbrainzngs.VALID_INCLUDES.get('url')))
 
 
 #
@@ -99,9 +99,6 @@ def get_isrc(isrc):
 @click.argument('iswc')
 def get_iswc(iswc):
     printer(musicbrainzngs.get_works_by_iswc(iswc))
-
-#
-
 
 
 # END

@@ -12,4 +12,4 @@ from ..cli import cli_root
 @cli_root.command()
 @click.argument('url')
 def browse_url(url):
-    printer(musicbrainzngs.browse_urls(resource=url))
+    printer(musicbrainzngs.browse_urls(resource=url, includes=musicbrainzngs.VALID_BROWSE_INCLUDES.get('url')))
