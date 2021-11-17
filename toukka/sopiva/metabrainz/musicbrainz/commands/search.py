@@ -3,7 +3,6 @@
 import pprint
 import click
 
-from .. import MusicBrainzSearch
 from ..cli import cli_root
 
 
