@@ -9,7 +9,7 @@ from toukka.sopiva.metabrainz import musicbrainzngs
 from toukka.printer.first import printer
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 
 def print_currently_listening():
@@ -29,19 +29,26 @@ def print_currently_listening():
     #     printer(artist)
 
     album_url = spotify.convert.to_url(track.album.type, track.album.id)
-    artist_urls = list()
+    artists_urls = list()
 
     for artist in track.artists:
         artist_url = spotify.convert.to_url(artist.type, artist.id)
-        artist_urls.append(artist_url)
+        artists_urls.append(artist_url)
 
     print(album_url)
-    print(artist_urls)
+    print(artists_urls)
 
-    get_entity_mbids_by_url('release', album_url)
+    # artists
+    for artist_url in artists_urls:
+        print(f'searching {artist.name}...')
+        artist_mbids = get_entity_mbids_by_url('artist', artist_url)
+        print(f'... found {len(artist_mbids)}')
 
-    for artist_url in artist_urls:
-        get_entity_mbids_by_url('artist', artist_url)
+    # release
+
+    print('searching album...')
+    release_mbids = get_entity_mbids_by_url('release', album_url)
+    print(f'... found {len(release_mbids)}')
 
 
 def get_entity_mbids_by_url(entity_type, url):
@@ -67,7 +74,7 @@ def get_entity_mbids_by_url(entity_type, url):
             if target_type == entity_type:
                 mbids.append(relation.get(entity_type).get('id'))
             else:
-                logger.debug('warn: wrong target_type (%s != %s) on relation', target_type, entity_type)
+                logger.debug('wrong target_type (%s != %s) on relation', target_type, entity_type)
     else:
         logger.debug('failed, no result')
     return mbids
