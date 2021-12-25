@@ -34,7 +34,7 @@ def print_currently_listening():
 
     # artists
     for artist in track.artists:
-        printer(artist)
+        # printer(artist)
         print(f'searching artist {artist.name} ({artist.uri}) ...')
         artist_url = spotify.convert.to_url(artist.type, artist.id)
         artist_mbids = get_entity_mbids_by_url('artist', artist_url)
