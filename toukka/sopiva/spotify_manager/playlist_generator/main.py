@@ -268,10 +268,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         options = self.options.push(kwargs)
 
-        exclude_uris = options.exclude_uris
+        ignore = options.ignore
 
-        if exclude_uris:
-            if uri in exclude_uris:
+        if ignore:
+            if uri in ignore:
+                self.logger.debug('%s: ignored (skipping)', uri)
                 return True
 
         if uri in self.uriban:
@@ -749,7 +750,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
 
         # TODO: move?
-        if options.exclude_various_artists_albums:
+        if options.ignore_various_artists_albums:
             various_artists_id = '0LyfQWJT6nXafLPZqxe9Of'
             artist_ids = [artist.id for artist in item.artists]
             if various_artists_id in artist_ids:

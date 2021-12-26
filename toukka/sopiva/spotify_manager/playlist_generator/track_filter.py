@@ -47,7 +47,8 @@ class TrackFilter:
     def __init__(self,
                  spotify: tekore.Spotify = None,
                  user_country: str = None,
-                 played_count_min: int = 0
+                 played_count_min: int = 0,
+                 ignore: list = None
                  ) -> None:
 
         self.logger = logging.getLogger(__name__)
