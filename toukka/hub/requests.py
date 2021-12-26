@@ -14,7 +14,7 @@ import xdg.BaseDirectory
 # import diskcache
 
 from urllib3.util.retry import Retry
-from toukka.adapted.retry import RetryA
+from toukka.adapted.urllib3_retry import RetryA
 from toukka.adapted.cachecontrol_diskcache import FanOutCacheAdapter
 
 logger = logging.getLogger(__name__)
