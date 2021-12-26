@@ -61,8 +61,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: move?
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
-        self.logger.debug(f'initialized {self}')
-        # self.logger.debug(f'options {self.options}')
 
         self.spotify = get_spotify()
         self.user_country = self.spotify.current_user().country
@@ -157,7 +155,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         options = self.options.push(kwargs)
-        # self.logger.debug('method options: %s', options)
 
         # grr, tuples can't randomized with random.shuffle
         if isinstance(uris, tuple):
@@ -183,7 +180,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         options = self.options.push(kwargs)
-        # self.logger.debug('method options: %s', options)
 
         if options.randomize_genres:
             self.logger.debug('shuffling genres')
@@ -205,7 +201,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         options = self.options.push(kwargs)
-        # self.logger.debug('method options: %s', options)
 
         search = self.search_generator(query_type=query_type, query=query)
         yielder = self.yielder(search,
@@ -225,7 +220,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> None:
 
         options = self.options.push(kwargs)
-        # self.logger.debug('method options: %s', options)
 
         seed_artist_ids: List[str] = list()
         if seed_artist_uris is not None:
