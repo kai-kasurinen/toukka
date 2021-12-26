@@ -32,6 +32,7 @@ class PlaylistGeneratorOptions:
             expand_genre_to_artists=False,
             expand_genre_to_related_genres=False,
             ignore_various_artists_albums=False,
+            various_artists_uri='spotify:artist:0LyfQWJT6nXafLPZqxe9Of',
             ignore=[],
             include_album_groups=['album', 'single', 'compilation'],
             include_genre_playlists=['intro',

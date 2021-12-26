@@ -750,19 +750,17 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
 
         # TODO: move?
-        various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
         album_artist_uris = [artist.uri for artist in item.artists]
-        ignore = options.ignore
 
         for album_artist_uri in album_artist_uris:
 
             if options.ignore_various_artists_albums:
-                if album_artist_uri == various_artists_uri:
+                if album_artist_uri == options.various_artists_uri:
                     self.logger.debug('%s:%s: various artists album (skipping)', item.type, item.id)
                     return
 
-            if ignore:
-                if album_artist_uri in ignore:
+            if options.ignore:
+                if album_artist_uri in options.ignore:
                     self.logger.debug('%s: album artist ignored (skipping)', album_artist_uri)
                     return
 
