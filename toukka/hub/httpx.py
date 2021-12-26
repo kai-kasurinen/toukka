@@ -19,7 +19,8 @@ def get_diskcache():
 
 
 def get_filecache():
-    return httpx_cache.FileCache()
+    cache = httpx_cache.FileCache()
+    return cache
 
 
 def get_client(client_type='cache'):
@@ -34,6 +35,6 @@ def get_client(client_type='cache'):
         # transport = CacheControlTransport()
         transport = httpx_cache.CacheControlTransport(cache=cache)
 
-        return httpx.Client(transport=transport)
+        return httpx.Client(transport=transport, http2=True, timeout=10.0)
 
 # END
