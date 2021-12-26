@@ -49,7 +49,9 @@ class FanOutCacheAdapter(httpx_cache.cache.base.BaseCache):
             response: httpx.Response,
             content: typing.Optional[bytes] = None,
             ) -> None:
-        raise NotImplementedError
+        key = self._get_cache_key(request)
+        to_cache = self.serializer.dumps(response=response, content=content)
+        self.data.set(key, to_cache)
 
     def delete(self, request: httpx.Request) -> None:
         key = self._get_cache_key(request)
