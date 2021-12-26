@@ -9,6 +9,7 @@ import tekore
 
 import toukka.config
 import toukka.hub.requests
+import toukka.hub.httpx
 
 import toukka.sopiva.spotify.client.current
 import toukka.sopiva.spotify.state
@@ -67,15 +68,14 @@ def get_user_token() -> tekore.RefreshingToken:
     return token
 
 
-def get_sender(sender_type='requests') -> tekore.Sender:
+def get_sender(sender_type='httpx') -> tekore.Sender:
 
     if sender_type == 'requests':
         session = toukka.hub.requests.get_cached_session()
         sender = RequestsSender(session=session)
     elif sender_type == 'httpx':
-        sender = tekore.RetryingSender(retries=3)
-        # sender = tekore.CachingSender(max_size=256, sender=tekore.RetryingSender(retries=3))
-        # sender = SqliteCachingSender(max_size=10000, sender=tekore.RetryingSender(retries=3))
+        client = toukka.hub.httpx.get_client()
+        sender = tekore.RetryingSender(sender=tekore.SyncSender(client))
     else:
         raise Exception
 
