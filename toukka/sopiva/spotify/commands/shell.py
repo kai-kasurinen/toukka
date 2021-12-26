@@ -9,6 +9,7 @@ from toukka.sopiva.spotify.printer.first import printer
 # FIXME: move to toukka
 @cli_root.command()
 def shell():
+    spotify = get_spotify()
     IPython.embed()
 
 

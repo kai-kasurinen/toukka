@@ -101,6 +101,10 @@ def print_track_audio_features(features: AudioFeatures):
           f'loudness: {features.loudness:f}')
 
 
+@printer.register
+def print_track_audio_analysis(analysis: AudioAnalysis):
+    print(analysis)
+
 # FIXME: compine album_simple and album_full
 @printer.register
 def print_album_simple(album: SimpleAlbum):
