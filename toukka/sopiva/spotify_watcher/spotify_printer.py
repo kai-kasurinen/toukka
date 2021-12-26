@@ -65,8 +65,8 @@ class SpotifyPrinter:
         self.check_and_print_relink(track_id)
         print()
         printer(self.spotify.track_audio_features(track_id))
-        print()
-        printer(self.spotify.track_audio_analysis(track_id))
+        # print()
+        # printer(self.spotify.track_audio_analysis(track_id))
 
     def print_episode(self, episode_id):
         episode = self.spotify.episode(episode_id, market=self.market)
