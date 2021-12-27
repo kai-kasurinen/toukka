@@ -77,7 +77,7 @@ class TrackFilter:
     @is_ok.register
     def is_episode_ok(self, episode: Episode):
         # TODO: ...
-        raise NotImplementedError('not yet supported type: %s' % type(item))
+        raise NotImplementedError('not yet supported type: %s' % type(episode))
 
     @is_ok.register
     def is_track_ok(self, track: Track) -> bool:
