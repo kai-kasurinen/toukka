@@ -11,10 +11,12 @@ from toukka.adapted.httpx_cache_diskcache import FanOutCacheAdapter
 def get_diskcache():
     dir = xdg.BaseDirectory.save_cache_path('toukka', 'httpx_cache_diskcache')
 
-    cache = FanOutCacheAdapter(dir,
-                               timeout=10,
-                               statistics=True,
-                               disk_min_file_size=2**19)  # 524288
+    cache = FanOutCacheAdapter(
+        dir,
+        timeout=10,
+        statistics=True,
+        disk_min_file_size=2**19)  # 524288
+
     return cache
 
 
