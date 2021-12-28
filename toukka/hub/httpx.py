@@ -21,6 +21,7 @@ def get_diskcache():
 
 
 def get_filecache():
+    # by default the cached files will be saved in $HOME/.cache/httpx-cache folder.
     cache = httpx_cache.FileCache()
     return cache
 
@@ -30,7 +31,6 @@ def get_client(client_type='cache'):
         return httpx.Client()
     elif client_type == 'cache':
 
-        # by default the cached files will be saved in $HOME/.cache/httpx-cache folder.
         # cache = get_filecache()
         cache = get_diskcache()
 
