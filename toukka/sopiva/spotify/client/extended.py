@@ -87,20 +87,24 @@ class SpotifyExtended(Spotify):
     # TODO: remove?
     def uri_to_item(self, uri: str) -> Item:
         uri_type, uri_id = self.convert.from_uri(uri)
-        if uri_type == 'artist':
-            return self.artist(uri_id)
-        elif uri_type == 'album':
-            return self.album(uri_id)
-        elif uri_type == 'track':
-            return self.track(uri_id)
-        elif uri_type == 'playlist':
-            return self.playlist(uri_id)
-        elif uri_type == 'show':
-            return self.show(uri_id)
-        elif uri_type == 'episode':
-            return self.episode(uri_id)
-        else:
-            raise Exception(f'unsupported uri: {uri} ({uri_type}, {uri_id})')
+        
+        match uri_type:
+            case 'artist':
+                return self.artist(uri_id)
+            case 'album':
+                return self.album(uri_id)
+            case 'track':
+                return self.track(uri_id)
+            case 'playlist':
+                return self.playlist(uri_id)
+            case 'show':
+                return self.show(uri_id)
+            case 'episode':
+                return self.episode(uri_id)
+            case 'user':
+                return self.user(uri_id)
+            case _:
+                raise Exception(f'unsupported uri: {uri} ({uri_type}, {uri_id})')
 
     @property
     def convert(self):
