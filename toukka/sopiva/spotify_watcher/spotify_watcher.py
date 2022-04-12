@@ -27,7 +27,7 @@ class SpotifyWatcher(PlayerCtlManager):
         self.on_spotify_metadata(player, player.props.metadata)
 
     def on_spotify_metadata(self, player, metadata):
-        track_id = metadata['mpris:trackid']
+        track_id = self._get_uri_from_trackid(metadata['mpris:trackid'])
 
         if track_id == '':
             return
@@ -38,15 +38,15 @@ class SpotifyWatcher(PlayerCtlManager):
         #
         self.print_metadata(metadata)
 
-        if 'spotify:ad:' in track_id or '/com/spotify/ad/' in track_id:
+        if track_id.startswith('spotify:ad:'):
             #logger.info('advertisement: %s', track_id)
             self.last_seen = track_id
             return
-        elif 'spotify:track:' in track_id or '/com/spotify/track/' in track_id:
+        elif track_id.startswith('spotify:track:'):
             GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
             self.last_seen = track_id
             return
-        elif 'spotify:episode:' in track_id or '/com/spotify/episode/' in track_id:
+        elif track_id.startswith('spotify:episode:'):
             GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
             self.last_seen = track_id
             return
@@ -77,12 +77,30 @@ class SpotifyWatcher(PlayerCtlManager):
         uri = 'spotify:' + type_ + ':' + id_
         return uri
 
+    def _get_uri_from_trackid(self, track_id):
+
+        if track_id.startswith('/com/spotify'):
+            track_id_new = self._convert_trackid_to_uri(track_id)
+            logger.debug(f'converted track_id {track_id} to {track_id_new}')
+            track_id = track_id_new
+
+        if not track_id.startswith('spotify:'):
+            logger.error(f'unsupported track_id: {track_id}')
+            raise Exception()
+
+        return track_id
+
+    def _convert_new_trackid_to_uri(self, trackid):
+        empty_, com_, spotify_, type_, id_ = trackid.split('/')
+        uri = 'spotify:' + type_ + ':' + id_
+        return uri
+
     def print_spotify_metadata(self):
 
         if self.last_seen.startswith('spotify:'):
             uri = self.last_seen
         elif self.last_seen.startswith('/com/spotify'):
-            uri = self.convert_trackid_to_uri(self.last_seen)
+            uri = self._convert_new_trackid_to_uri(self.last_seen)
         else:
             raise Exception()
 

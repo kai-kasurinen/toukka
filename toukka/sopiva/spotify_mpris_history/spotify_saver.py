@@ -29,7 +29,7 @@ class SpotifySaver:
     def on_track_played_enough(self, obj, metadata):
         # NOTE: metadata is gi.overrides.GLib.Variant
         metadata_dict = metadata.unpack()
-        track_id = metadata_dict.get('mpris:trackid')
+        track_id = self._get_uri_from_trackid(metadata_dict.get('mpris:trackid'))
 
         # TODO: no need all of this
         if track_id is None:
@@ -53,16 +53,7 @@ class SpotifySaver:
         track_id = metadata.get('mpris:trackid')
         logger.debug('saver %s', track_id)
 
-        track_id = metadata.get('mpris:trackid')
-        if track_id.startswith('/com/spotify'):
-            track_url = metadata.get('xesam:url')
-            track_id_new = self._convert_trackid_to_uri(track_id)
-            logger.debug(f'changed track_id {track_id} to {track_id_new}')
-            track_id = track_id_new
-
-        if not track_id.startswith('spotify:'):
-            logger.error(f'unsupported track_id: {track_id}')
-            return
+        track_id = self._get_uri_from_trackid(metadata.get('mpris:trackid'))
 
         # convert metadata to columns
         columns = {
@@ -92,10 +83,24 @@ class SpotifySaver:
         self.last_saved = track_id
         logger.debug('saved %s', track_id)
 
-    def _convert_trackid_to_uri(self, trackid):
+    def _convert_new_trackid_to_uri(self, trackid):
         empty_, com_, spotify_, type_, id_ = trackid.split('/')
         uri = 'spotify:' + type_ + ':' + id_
         return uri
+
+    def _get_uri_from_trackid(self, track_id):
+
+        if track_id.startswith('/com/spotify'):
+            track_id_new = self._convert_new_trackid_to_uri(track_id)
+            logger.debug(f'converted track_id {track_id} to {track_id_new}')
+            track_id = track_id_new
+
+        if not track_id.startswith('spotify:'):
+            logger.error(f'unsupported track_id: {track_id}')
+            raise Exception()
+
+        return track_id
+
 
 
 # END
