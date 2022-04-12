@@ -1,6 +1,7 @@
 #
 
 import logging
+import tekore
 
 from .config import lazy_config
 from .spotify_watcher import SpotifyWatcher
@@ -51,9 +52,21 @@ class SpotifySaver:
         # NOTE: metadata is now python dict
         track_id = metadata.get('mpris:trackid')
         logger.debug('saver %s', track_id)
+
+        track_id = metadata.get('mpris:trackid')
+        if track_id.startswith('/com/spotify'):
+            track_url = metadata.get('xesam:url')
+            track_id_new = tekore.to_uri(*tekore.from_url(track_url))
+            logger.debug(f'changed track_id {track_id} to {track_id_new}')
+            track_id = track_id_new
+
+        if not track_id.startswith('spotify:'):
+            logger.warning(f'unsupported track_id: {track_id}')
+            return
+
         # convert metadata to columns
         columns = {
-            'mpris_track_id':     metadata.get('mpris:trackid'),
+            'mpris_track_id':     track_id,
             'mpris_length':       metadata.get('mpris:length'),
             'mpris_art_url':      metadata.get('mpris:artUrl'),
             'xesam_album':        metadata.get('xesam:album'),
