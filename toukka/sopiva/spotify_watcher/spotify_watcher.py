@@ -72,15 +72,10 @@ class SpotifyWatcher(PlayerCtlManager):
         # make Glib happy
         return False
 
-    def convert_trackid_to_uri(self, trackid):
-        empty_, com_, spotify_, type_, id_ = trackid.split('/')
-        uri = 'spotify:' + type_ + ':' + id_
-        return uri
-
     def _get_uri_from_trackid(self, track_id):
 
         if track_id.startswith('/com/spotify'):
-            track_id_new = self._convert_trackid_to_uri(track_id)
+            track_id_new = self._convert_new_trackid_to_uri(track_id)
             logger.debug(f'converted track_id {track_id} to {track_id_new}')
             track_id = track_id_new
 
