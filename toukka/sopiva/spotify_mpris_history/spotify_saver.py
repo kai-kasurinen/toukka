@@ -40,10 +40,10 @@ class SpotifySaver:
             return
         elif track_id == self.last_saved:
             return
-        #
-        #elif 'spotify:ad:' in track_id:
-        #    return
-        #
+        # TODO: move?
+        elif track_id.startswith('spotify:ad:') or track_id.startswith('/com/spotify/ad/'):
+            logger.debug(f'advertisement, skipping')
+            return
         else:
             self.last_seen = track_id
             self.saver(metadata_dict)
