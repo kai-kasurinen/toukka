@@ -46,12 +46,12 @@ class SpotifyWatcher(PlayerCtlManager):
             GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
             self.last_seen = track_id
             return
-        elif 'spotify:episode:' in track_id:
+        elif 'spotify:episode:' in track_id or '/com/spotify/episode/' in track_id:
             GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
             self.last_seen = track_id
             return
         else:
-            logger.debug('unsupported track id: %s', track_id)
+            logger.debug('unsupported trackid: %s', track_id)
             return
 
     def print_metadata(self, metadata):
@@ -72,8 +72,21 @@ class SpotifyWatcher(PlayerCtlManager):
         # make Glib happy
         return False
 
+    def convert_trackid_to_uri(self, trackid):
+        empty_, com_, spotify_, type_, id_ = trackid.split('/')
+        uri = 'spotify:' + type_ + ':' + id_
+        return uri
+
     def print_spotify_metadata(self):
-        self.spotify_printer.print_all_from_uri(self.last_seen)
+
+        if self.last_seen.startswith('spotify:'):
+            uri = self.last_seen
+        elif self.last_seen.startswith('/com/spotify'):
+            uri = self.convert_trackid_to_uri(self.last_seen)
+        else:
+            raise Exception()
+
+        self.spotify_printer.print_all_from_uri(uri)
 
 
 #
