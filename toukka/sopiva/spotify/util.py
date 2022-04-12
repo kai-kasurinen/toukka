@@ -16,6 +16,7 @@ import toukka.sopiva.spotify.state
 
 from toukka.sopiva.spotify.sender.requests_sender import RequestsSender
 from toukka.sopiva.spotify.sender.caching_sender import SqliteCachingSender
+from toukka.sopiva.spotify.sender.retrying_sender import RetryingSender404
 from toukka.sopiva.spotify.client.current import Spotify
 
 logger = logging.getLogger(__name__)
@@ -75,7 +76,8 @@ def get_sender(sender_type='httpx') -> tekore.Sender:
         sender = RequestsSender(session=session)
     elif sender_type == 'httpx':
         client = toukka.hub.httpx.get_client()
-        sender = tekore.RetryingSender(sender=tekore.SyncSender(client))
+        # sender = tekore.RetryingSender(retries=3, sender=tekore.SyncSender(client))
+        sender = tekore.RetryingSender404(retries=3, sender=tekore.SyncSender(client))
     else:
         raise Exception
 
