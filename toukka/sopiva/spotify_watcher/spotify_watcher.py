@@ -38,11 +38,11 @@ class SpotifyWatcher(PlayerCtlManager):
         #
         self.print_metadata(metadata)
 
-        if 'spotify:ad:' in track_id:
+        if 'spotify:ad:' in track_id or '/com/spotify/ad/' in track_id:
             #logger.info('advertisement: %s', track_id)
             self.last_seen = track_id
             return
-        elif 'spotify:track:' in track_id:
+        elif 'spotify:track:' in track_id or '/com/spotify/track/' in track_id:
             GLib.timeout_add_seconds(1, self._print_spotify_metadata_callback)
             self.last_seen = track_id
             return

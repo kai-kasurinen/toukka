@@ -37,7 +37,7 @@ class Muter:
             return
         elif track_id == self.last_seen:
             self.check_spotify_sinks()
-        elif 'spotify:ad:' in track_id:
+        elif 'spotify:ad:' in track_id or '/com/spotify/ad/' in track_id:
             if self.last_mode is False:
                 self.mute()
         else:
