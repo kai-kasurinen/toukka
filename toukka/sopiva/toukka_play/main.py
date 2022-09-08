@@ -64,6 +64,16 @@ kwargs_for_genre_artists = {
     'randomize_artists': True
 }
 
+kwargs_for_genre_artists_re = {
+    'progress_bar': True,
+    'expand_genre_to_artists': True,
+    'expand_artist_to_random_album': True,
+    'expand_artist_to_related_artists': True,
+    'expand_album_to_tracks': True,
+    'randomize_artists': True,
+    'randomize_sources': True
+}
+
 kwargs_for_uri = {
     'progress_bar': True,
     'expand_playlist_to_items': True,
@@ -169,6 +179,14 @@ def genre_artists(genre_name: tuple, **kwargs):
     args = locals()
     context = click.get_current_context()
     context.invoke(from_genres, **args, **kwargs, **kwargs_for_genre_artists)
+
+@cli.command()
+@click.argument('genre_name_re', required=True, nargs=-1, autocompletion=click_genre_completer)
+@click.option('--dry-run', is_flag=True, default=False)
+def genre_artists_re(genre_name_re: str, **kwargs):
+    args = locals()
+    context = click.get_current_context()
+    context.invoke(from_genres_re, **args, **kwargs, **kwargs_for_genre_artists_re)
 
 
 def main():
