@@ -71,7 +71,7 @@ kwargs_for_genre_artists_re = {
     'expand_artist_to_related_artists': True,
     'expand_album_to_tracks': True,
     'randomize_artists': True,
-    'randomize_sources': True
+    'randomize_genres': True
 }
 
 kwargs_for_uri = {
