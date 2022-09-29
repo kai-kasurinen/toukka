@@ -10,9 +10,9 @@ from boltons.funcutils import wraps
 from tekore import Spotify
 from tekore.model import Paging
 from tekore.model import Item
+from tekore._error import NotFound, BadRequest
 
 import toukka.sopiva.spotify.convert
-
 
 logger = logging.getLogger(__name__)
 
@@ -126,5 +126,13 @@ class SpotifyExtended(Spotify):
             return playing.context.uri
         else:
             return None
+
+    # NOTE: 2022-09-22 search artist genre:rock ... offset=1000 returns BadRequest
+    def next(self, page: Paging) -> Optional[Paging]:
+        try:
+            return super().next(page)
+        except BadRequest as ex:
+            logger.warning(ex)
+            return
 
 # END
