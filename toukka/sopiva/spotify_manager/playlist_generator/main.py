@@ -45,6 +45,7 @@ from .progress_bar import ProgressBars
 from .seen import Seen
 from .banner import UriBanDict
 from .options import PlaylistGeneratorOptions
+from .audio_features_filters import is_album_instrumental
 
 
 class PlaylistGenerator(PlaylistGeneratorOptions):
@@ -757,6 +758,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 if album_artist_uri in options.ignore:
                     self.logger.debug('%s: album artist ignored (skipping)', album_artist_uri)
                     return
+
+        # move?
+        if options.ignore_non_instrumentals:
+            if not is_album_instrumental(self.spotify, item.id):
+                self.logger.debug('%s:%s: album is not instrumental (skipping)', item.type, item.id)
 
         # add as new source
         if options.expand_album_to_artists:
