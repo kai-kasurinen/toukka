@@ -16,7 +16,7 @@ def is_album_instrumental(spotify, album_id):
     
     tracks_audio_features = spotify.tracks_audio_features(track_ids)
     # drop Nones
-    tracks_features = [item for item in tracks_audio_features if item is not None]
+    tracks_audio_features = [item for item in tracks_audio_features if item is not None]
 
     tracks_audio_features_df = pandas.DataFrame(tracks_audio_features)
 
