@@ -524,6 +524,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if options.expand_track_to_album:
             # self.logger.debug('%s:%s: to album', item.type, item.id)
             yield from self.expand_track_to_album(item, **options)
+            # TODO: why not return here?
             did = True
 
         # and finally use track if not seen
