@@ -127,12 +127,4 @@ class SpotifyExtended(Spotify):
         else:
             return None
 
-    # NOTE: 2022-09-22 search artist genre:rock ... offset=1000 returns BadRequest
-    def next(self, page: Paging) -> Optional[Paging]:
-        try:
-            return super().next(page)
-        except BadRequest as ex:
-            logger.warning(ex)
-            return
-
 # END
