@@ -18,6 +18,10 @@ def is_album_instrumental(spotify, album_id):
     # drop Nones
     tracks_audio_features = [item for item in tracks_audio_features if item is not None]
 
+    if not tracks_audio_features:
+        logger.warning('no audio features')
+        return None
+
     tracks_audio_features_df = pandas.DataFrame(tracks_audio_features)
 
     instrumentalness_mean = tracks_audio_features_df['instrumentalness'].mean()
