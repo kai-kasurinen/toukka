@@ -135,4 +135,19 @@ def recently_played():
     paging = spotify.playback_recently_played()
     for played in spotify.all_items(paging):
         printer(played)
+
+
+@playback.command()
+def queue():
+    spotify = get_spotify()
+    queue = spotify.playback_queue()
+
+    print('currently playing:')
+    printer(queue.currently_playing)
+    print('queue:')
+
+    for item in queue.queue:
+        printer(item)
+
+
 # END
