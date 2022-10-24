@@ -32,6 +32,9 @@ class SpotifyWatcher(PlayerCtlManager):
         if track_id == '':
             return
 
+        if track_id is None:
+            return
+
         if track_id == self.last_seen:
             return
 
@@ -73,6 +76,9 @@ class SpotifyWatcher(PlayerCtlManager):
         return False
 
     def _get_uri_from_trackid(self, track_id):
+        
+        if track_id == '':
+            return None
 
         if track_id.startswith('/com/spotify'):
             track_id_new = self._convert_new_trackid_to_uri(track_id)
