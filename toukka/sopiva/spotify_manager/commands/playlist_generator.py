@@ -133,7 +133,7 @@ def from_recommendations(
 
 @generate_playlist.command()
 @click.argument('genre_name', required=True, nargs=-1,
-                autocompletion=toukka.sopiva.spotify_manager.genres.click_genre_completer)
+                shell_complete=toukka.sopiva.spotify_manager.genres.click_genre_completer)
 @pass_generator
 def from_genres(
         generator,

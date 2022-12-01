@@ -150,7 +150,7 @@ def uri3(uris: tuple,
 
 # FIXME: autocompletion
 @cli.command()
-@click.argument('genre_name', required=True, nargs=-1, autocompletion=click_genre_completer)
+@click.argument('genre_name', required=True, nargs=-1, shell_complete=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
 def genre(genre_name: tuple,
@@ -176,7 +176,7 @@ def genre_re(genre_name_re: str,
 
 
 @cli.command()
-@click.argument('genre_name', required=True, nargs=-1, autocompletion=click_genre_completer)
+@click.argument('genre_name', required=True, nargs=-1, shell_complete=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
 def genre_artists(genre_name: tuple, **kwargs):
@@ -184,8 +184,9 @@ def genre_artists(genre_name: tuple, **kwargs):
     context = click.get_current_context()
     context.invoke(from_genres, **args, **kwargs, **kwargs_for_genre_artists)
 
+
 @cli.command()
-@click.argument('genre_name_re', required=True, nargs=-1, autocompletion=click_genre_completer)
+@click.argument('genre_name_re', required=True, nargs=-1, shell_complete=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
 def genre_artists_re(genre_name_re: str, **kwargs):
