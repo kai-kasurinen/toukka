@@ -26,6 +26,7 @@ class PlaylistGeneratorOptions:
             expand_artist_to_recommendations=False,
             expand_album_to_tracks=False,
             expand_album_to_artists=False,
+            expand_album_to_recommendations=False,
             expand_playlist_to_items=False,
             expand_show_to_episodes=False,
             expand_genre_to_playlists=False,
