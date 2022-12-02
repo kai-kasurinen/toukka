@@ -510,19 +510,19 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # add as new source
         if options.expand_track_to_artists:
-            self.logger.debug('%s:%s: to artists', item.type, item.id)
+            # self.logger.debug('%s:%s: to artists', item.type, item.id)
             self.add_track_artists_as_source(item, **options)
             did = True
 
         # add as new source
         if options.expand_track_to_recommendations:
-            self.logger.debug('%s:%s: to recommendations', item.type, item.id)
+            # self.logger.debug('%s:%s: to recommendations', item.type, item.id)
             self.add_track_recommendations_as_source(item, **options)
             did = True
 
         # yields tracks
         if options.expand_track_to_album:
-            self.logger.debug('%s:%s: to album', item.type, item.id)
+            # self.logger.debug('%s:%s: to album', item.type, item.id)
             yield from self.expand_track_to_album(item, **options)
             did = True
             # NOTE: 2022-10-17 is this ok?
