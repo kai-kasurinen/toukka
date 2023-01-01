@@ -6,9 +6,16 @@
 # python3-httpx
 # python3-cachecontrol (?)
 # python3-enlighten 
+# python3-aiorwlock (for httpx_cache)
+# python3-validators (for click_params)
+# python3-pulsectl 
 
 click_params
 click_logging
 tekore
 httpx_cache
 options
+# for options
+combomethod
+nulltype
+chainmap
