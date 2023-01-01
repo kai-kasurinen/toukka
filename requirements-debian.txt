@@ -1,0 +1,14 @@
+#
+# debian packages:
+# python3-click
+# python3-sqlitedict
+# python3-sqlalchemy
+# python3-httpx
+# python3-cachecontrol (?)
+# python3-enlighten 
+
+click_params
+click_logging
+tekore
+httpx_cache
+options
