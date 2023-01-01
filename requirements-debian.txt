@@ -10,13 +10,19 @@
 # python3-validators (for click_params)
 # python3-pulsectl 
 
+# click extensions
 click_params
 click_logging
+
+#
 tekore
 httpx_cache
+
 # https://github.com/jonathaneunice/options
 options
 # for options
 combomethod
 nulltype
 chainmap
+
+#
