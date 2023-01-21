@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-
 def is_album_instrumental(spotify, album_id):
     
     album = spotify.album(album_id)
