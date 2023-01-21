@@ -15,6 +15,7 @@ def get_diskcache():
         dir,
         timeout=10,
         statistics=True,
+        size_limit=2**30*2,
         disk_min_file_size=2**19)  # 524288
 
     return cache
