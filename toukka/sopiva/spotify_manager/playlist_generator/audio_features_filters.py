@@ -1,14 +1,23 @@
 #
 
 import logging
-
 import pandas
+
+from .function_cache import cache
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def is_album_instrumental(spotify, album_id):
+# month
+expires = 60*60*24*30
+
+
+@cache.memoize(expire=expires, typed=True, ignore={'spotify'})
+def is_album_instrumental(album_id, spotify=None):
+    if spotify is None:
+        raise Exception
+
     album = spotify.album(album_id)
     track_ids = [track.id for track in album.tracks.items]
 

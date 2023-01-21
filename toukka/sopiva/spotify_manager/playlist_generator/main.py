@@ -763,7 +763,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # is instrumental
         if options.ignore_non_instrumental_albums:
-            if not is_album_instrumental(self.spotify, item.id):
+            if not is_album_instrumental(item.id, spotify=self.spotify):
                 self.logger.debug('%s:%s: album is not instrumental (skipping)', item.type, item.id)
                 return
 
