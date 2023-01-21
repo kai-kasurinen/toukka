@@ -6,19 +6,20 @@ from diskcache import FanoutCache
 from xdg.BaseDirectory import save_cache_path
 
 # works with functions, not methods
-#cache = FanoutCache(save_cache_path('toukka', 'diskcache', 'fanoutcache'), timeout=10)
-#cache.check(fix=True)
+# cache = FanoutCache(save_cache_path('toukka', 'diskcache', 'fanoutcache'), timeout=10)
+# cache.check(fix=True)
 
 
 def _print_stats():
     print(cache.stats())
 
+
 def _print_cache():
     for i in list(cache):
         print(i)
 
-#atexit.register(_print_cache)
-#atexit.register(_print_stats)
+# atexit.register(_print_cache)
+# atexit.register(_print_stats)
 
 
 # END
