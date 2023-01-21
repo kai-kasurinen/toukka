@@ -9,33 +9,39 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-# month
-expires = 60*60*24*30
-
-
-@cache.memoize(expire=expires, typed=True, ignore={'spotify'})
 def is_album_instrumental(album_id, spotify=None):
-    if spotify is None:
-        raise Exception
 
-    album = spotify.album(album_id)
-    track_ids = [track.id for track in album.tracks.items]
+    # month
+    expires = 60*60*24*30
 
-    tracks_audio_features = spotify.tracks_audio_features(track_ids)
-    # drop Nones
-    tracks_audio_features = [item for item in tracks_audio_features if item is not None]
+    def get_album_audio_features(album_id):
+        if spotify is None:
+            raise Exception
 
-    if not tracks_audio_features:
-        logger.warning('no audio features')
-        return None
+        album = spotify.album(album_id)
+        track_ids = [track.id for track in album.tracks.items]
+        tracks_audio_features = spotify.tracks_audio_features(track_ids)
+        tracks_audio_features = [item for item in tracks_audio_features if item is not None]
+        return tracks_audio_features
+        # END
 
-    tracks_audio_features_df = pandas.DataFrame(tracks_audio_features)
+    @cache.memoize(expire=expires, typed=True, ignore={'spotify'})
+    def get_album_instrumentalness_mean(album_id):
+        album_audio_features = get_album_audio_features(album_id)
 
-    instrumentalness_mean = tracks_audio_features_df['instrumentalness'].mean()
+        if not album_audio_features:
+            logger.warning('no album audio features')
+            return None
 
-    logger.debug(instrumentalness_mean)
+        album_audio_features_df = pandas.DataFrame(album_audio_features)
+        instrumentalness_mean = album_audio_features_df['instrumentalness'].mean()
+        return instrumentalness_mean
+        # END
 
-    if instrumentalness_mean > 0.5:
+    album_instrumentalness_mean = get_album_instrumentalness_mean(album_id)
+    logger.debug(album_instrumentalness_mean)
+
+    if album_instrumentalness_mean > 0.5:
         return True
     else:
         return False
