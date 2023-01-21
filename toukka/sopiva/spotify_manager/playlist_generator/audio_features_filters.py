@@ -20,9 +20,9 @@ def is_album_instrumental(album_id, spotify=None):
 
         album = spotify.album(album_id)
         track_ids = [track.id for track in album.tracks.items]
-        tracks_audio_features = spotify.tracks_audio_features(track_ids)
-        tracks_audio_features = [item for item in tracks_audio_features if item is not None]
-        return tracks_audio_features
+        album_audio_features = spotify.tracks_audio_features(track_ids)
+        album_audio_features = [item for item in album_audio_features if item is not None]
+        return album_audio_features
         # END
 
     @cache.memoize(expire=expires, typed=True, ignore={'spotify'})
