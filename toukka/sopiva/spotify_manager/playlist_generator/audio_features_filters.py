@@ -11,8 +11,8 @@ logger.setLevel(logging.DEBUG)
 
 def is_album_instrumental(album_id, spotify=None):
 
-    # month
-    expires = 60*60*24*30
+    # three month
+    expires = 60*60*24*30*3
 
     def get_album_audio_features(album_id):
         if spotify is None:
