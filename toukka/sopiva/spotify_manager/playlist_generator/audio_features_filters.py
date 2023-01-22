@@ -39,7 +39,7 @@ def is_album_instrumental(album_id, spotify=None):
         # END
 
     album_instrumentalness_mean = get_album_instrumentalness_mean(album_id)
-    logger.debug(album_instrumentalness_mean)
+    logger.debug(format(album_instrumentalness_mean, '.4f'))
 
     if album_instrumentalness_mean > 0.5:
         return True
