@@ -30,7 +30,7 @@ def is_album_instrumental(album_id, spotify=None):
         album_audio_features = get_album_audio_features(album_id)
 
         if not album_audio_features:
-            logger.warning('no album audio features')
+            logger.debug('no album audio features')
             return None
 
         album_audio_features_df = pandas.DataFrame(album_audio_features)
@@ -39,6 +39,11 @@ def is_album_instrumental(album_id, spotify=None):
         # END
 
     album_instrumentalness_mean = get_album_instrumentalness_mean(album_id)
+
+    if album_instrumentalness_mean is None:
+        logger.debug('no album instrumentalness')
+        return False
+
     logger.debug(format(album_instrumentalness_mean, '.4f'))
 
     if album_instrumentalness_mean > 0.5:
