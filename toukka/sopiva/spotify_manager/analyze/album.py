@@ -32,5 +32,11 @@ def analyze_album(album_uri):
     print(album_tracks_df['popularity'].describe())
     print()
     print(album_audio_features_df.describe())
+    print()
+
+    if len(track_ids) != len(album_audio_features):
+        logger.warning('album_audio_features len mismatch: tracks %i, features: %i',
+                       len(track_ids), len(album_audio_features))
+
 
 # END
