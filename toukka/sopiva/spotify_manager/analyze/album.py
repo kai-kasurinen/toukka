@@ -19,8 +19,6 @@ def analyze_album(album_uri):
 
     album_id = spotify.convert.from_uri(album_uri).id
     album = spotify.album(album_id)
-
-    album = spotify.album(album_id)
     album_tracks = list(spotify.all_items(album.tracks))
     track_ids = [track.id for track in album_tracks]
     tracks = list(spotify.tracks(track_ids))
