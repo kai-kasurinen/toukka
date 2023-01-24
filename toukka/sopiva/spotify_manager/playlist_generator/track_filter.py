@@ -71,6 +71,7 @@ class TrackFilter:
         self.uriban = UriBanDict()
         # FIXME: move
         self.bad_words_in_album_names = _bad_words_in_album_names
+        self.bad_words_in_album_names_without_ban = _bad_words_in_album_names_without_ban
         self.bad_words_in_track_names = _bad_words_in_track_names
         # TODO: add filter
         self.various_artists_uri = 'spotify:artist:0LyfQWJT6nXafLPZqxe9Of'
