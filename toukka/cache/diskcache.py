@@ -1,6 +1,6 @@
 #
 
-#import atexit
+# import atexit
 import logging
 
 import diskcache
@@ -15,7 +15,11 @@ logger.setLevel(logging.DEBUG)
 def get_cache():
     dir = xdg.BaseDirectory.save_cache_path('toukka', 'diskcache')
     cache = diskcache.FanoutCache(
-        dir)
+        dir,
+        timeout=10,
+        statistics=True,
+        size_limit=2**31,          # 2147483648
+        disk_min_file_size=2**20)  # 1048576
     return cache
 
 
