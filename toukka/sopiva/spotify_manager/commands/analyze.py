@@ -31,6 +31,11 @@ def playlist():
 
 
 @analyze.command()
+def album(**kwargs):
+    toukka.sopiva.spotify_manager.analyze.album.analyze_album(**kwargs)
+
+
+@analyze.command()
 @click.argument('artist_uri')
 def artist_related_test(**kwargs):
     toukka.sopiva.spotify_manager.analyze.artist_related_artists.artist_related_artists_test(**kwargs)
