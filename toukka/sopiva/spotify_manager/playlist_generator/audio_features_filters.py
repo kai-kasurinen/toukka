@@ -19,7 +19,8 @@ def is_album_instrumental(album_id, spotify=None):
             raise Exception
 
         album = spotify.album(album_id)
-        track_ids = [track.id for track in album.tracks.items]
+        album_tracks = spotify.all_items(album.tracks)
+        track_ids = [track.id for track in album_tracks]
         album_audio_features = spotify.tracks_audio_features(track_ids)
         album_audio_features = [item for item in album_audio_features if item is not None]
         return album_audio_features

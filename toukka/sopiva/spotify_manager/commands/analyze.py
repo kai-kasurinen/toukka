@@ -7,6 +7,7 @@ from toukka.sopiva.spotify_manager.cli import cli_root
 import toukka.sopiva.spotify_manager.analyze.user_playlists_artists_count
 import toukka.sopiva.spotify_manager.analyze.user_analyze
 import toukka.sopiva.spotify_manager.analyze.playlist
+import toukka.sopiva.spotify_manager.analyze.album
 import toukka.sopiva.spotify_manager.analyze.artist_related_artists
 
 
@@ -31,8 +32,9 @@ def playlist():
 
 
 @analyze.command()
-def album(**kwargs):
-    toukka.sopiva.spotify_manager.analyze.album.analyze_album(**kwargs)
+@click.argument('uri')
+def album(uri):
+    toukka.sopiva.spotify_manager.analyze.album.analyze_album(uri)
 
 
 @analyze.command()
