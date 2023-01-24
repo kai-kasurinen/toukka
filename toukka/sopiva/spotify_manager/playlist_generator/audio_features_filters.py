@@ -23,18 +23,20 @@ def is_album_instrumental(album_id, spotify=None):
         track_ids = [track.id for track in album_tracks]
         album_audio_features = spotify.tracks_audio_features(track_ids)
         album_audio_features = [item for item in album_audio_features if item is not None]
-        return album_audio_features
-        # END
-
-    @cache.memoize(expire=expires, typed=True, ignore={'spotify'})
-    def get_album_instrumentalness_mean(album_id):
-        album_audio_features = get_album_audio_features(album_id)
 
         if not album_audio_features:
             logger.debug('no album audio features')
             return None
 
         album_audio_features_df = pandas.DataFrame(album_audio_features)
+
+        return album_audio_features_df
+        # END
+
+    @cache.memoize(expire=expires, typed=True, ignore={'spotify'})
+    def get_album_instrumentalness_mean(album_id):
+        album_audio_features_df = get_album_audio_features(album_id)
+
         instrumentalness_mean = album_audio_features_df['instrumentalness'].mean()
         return instrumentalness_mean
         # END
