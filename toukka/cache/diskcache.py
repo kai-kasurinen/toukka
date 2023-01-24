@@ -1,23 +1,38 @@
 #
 
-import atexit
+#import atexit
+import logging
 
-from diskcache import FanoutCache
-from xdg.BaseDirectory import save_cache_path
+import diskcache
+import xdg.BaseDirectory
 
-# works with functions, not methods
-# cache = FanoutCache(save_cache_path('toukka', 'diskcache', 'fanoutcache'), timeout=10)
-# cache.check(fix=True)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
+# NOTE: cache.memoize works only with functions, not methods
+
+def get_cache():
+    dir = xdg.BaseDirectory.save_cache_path('toukka', 'diskcache')
+    cache = diskcache.FanoutCache(
+        dir)
+    return cache
+
+
+def check_cache():
+    get_cache().check(fix=True)
 
 
 def _print_stats():
-    print(cache.stats())
+    print(get_cache().stats())
 
 
 def _print_cache():
-    for i in list(cache):
+    for i in list(get_cache()):
         print(i)
 
+
+# NOTE: ?
 # atexit.register(_print_cache)
 # atexit.register(_print_stats)
 
