@@ -25,6 +25,13 @@ _bad_words_in_album_names = [
     'radio broadcast'  # Marian McPartland
     ]
 
+# FIXME: move
+_bad_words_in_album_names_without_ban = [
+    'soundtrack',
+    'original motion picture'
+    ]
+
+
 _bad_words_in_track_names = [
     'commentary',
     'christmas',
@@ -247,16 +254,21 @@ class TrackFilter:
             return False
 
     def is_track_album_name_good(self, track: FullTrack) -> bool:
-
         for bad_word in self.bad_words_in_album_names:
             if bad_word in track.album.name.lower():
                 self.uriban.add(track.album.uri, reason=f'album_name, contains {bad_word}')
                 return False
-
+        for bad_word in self.bad_words_in_album_names_without_ban:
+            if bad_word in track.album.name.lower():
+                return False
         return True
 
     def is_track_name_good(self, track: FullTrack) -> bool:
 
+        for bad_word in self.bad_words_in_track_names:
+            if bad_word in track.name.lower():
+                self.uriban.add(track.album.uri, reason=f'track_name, contains {bad_word}')
+                return False
         for bad_word in self.bad_words_in_track_names:
             if bad_word in track.name.lower():
                 self.uriban.add(track.album.uri, reason=f'track_name, contains {bad_word}')
