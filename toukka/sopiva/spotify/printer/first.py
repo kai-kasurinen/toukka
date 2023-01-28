@@ -103,7 +103,9 @@ def print_track_audio_features(features: AudioFeatures):
 
 @printer.register
 def print_track_audio_analysis(analysis: AudioAnalysis):
+    print(analysis.meta)
     print(analysis)
+
 
 # FIXME: compine album_simple and album_full
 @printer.register

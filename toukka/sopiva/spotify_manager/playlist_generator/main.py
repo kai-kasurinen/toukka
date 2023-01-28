@@ -250,7 +250,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             f'{seed_artist_uris}',
             f'{seed_track_uris}',
             f'{seed_genres}'))
-        print(self.playlist.description)
+
         self.generate(**options)
 
     # NOTE: returns False when uri is OK and True when uri is NOT ok
