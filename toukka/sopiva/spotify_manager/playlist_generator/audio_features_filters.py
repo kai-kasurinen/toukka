@@ -48,6 +48,7 @@ def is_album_instrumental(album_id, spotify=None):
     logger.debug('min: %.4f, mean: %.4f, max: %.4f',
                  album_instrumentalness_min, album_instrumentalness_mean, album_instrumentalness_max)
 
+    # NOTE: album_instrumentalness_min filters too much, use album_instrumentalness_mean
     if album_instrumentalness_min > 0.5:
         return True
     else:
