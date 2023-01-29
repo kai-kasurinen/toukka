@@ -28,7 +28,8 @@ _bad_words_in_album_names = [
 # FIXME: move
 _bad_words_in_album_names_without_ban = [
     'soundtrack',
-    'original motion picture'
+    'original motion picture',
+    'music from the motion picture'
     ]
 
 
