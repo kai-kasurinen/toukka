@@ -120,7 +120,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
             # playlist can contains only ~10000 tracks
             # (actually 11000 and then 500 ISE)
-            if len(self.uris_to_playlist) >= 10000:
+            if not options.looper_force and len(self.uris_to_playlist) >= 10000:
                 self.logger.info('we have enough items (playlist max)')
                 break
 
