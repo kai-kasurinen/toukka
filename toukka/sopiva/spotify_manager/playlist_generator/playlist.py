@@ -11,6 +11,10 @@ import toukka.config
 from toukka.sopiva.spotify.util import (get_spotify, Spotify)
 
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
 # TODO: cleanup or remove?
 
 class PlaylistModifier:
@@ -36,8 +40,6 @@ class PlaylistModifier:
         # NOTE: https://github.com/spotify/web-api/issues/1011
         # NOTE: not None -> get updated. '' -> fails
         self.playlist_description = '<empty>'
-        # FIXME: remove
-        self.__log = logging.getLogger(__name__)
 
     @property
     def description(self) -> str:
@@ -58,11 +60,14 @@ class PlaylistModifier:
 
     # TODO: remove?
     def details_update(self) -> None:
+
         if self.playlist_description is None:
-            self.__log.warning('playlist description is None')
-        self.__log.debug(
+            logger.warning('playlist description is None')
+
+        logger.debug(
             'playlist details update: name: %s, desc: %s',
             self.playlist_name, self.playlist_description)
+
         self.spotify.playlist_change_details(
             self.playlist.id,
             name=self.playlist_name,
