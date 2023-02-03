@@ -12,7 +12,7 @@ from toukka.sopiva.spotify.util import (get_spotify, Spotify)
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 # TODO: cleanup or remove?
