@@ -42,7 +42,7 @@ def alter_description(f):
                         'playlist description is too long (%i, %i), shortening it',
                         description_len, description_len_raw)
 
-                    shorted = textwrap.shorten(description, 300, placeholder='...')
+                    shorted = textwrap.shorten(description, 298, placeholder='...')
                     shorted_len = len(shorted)
                     shorted_len_raw = len(shorted.encode('utf-8'))
 
