@@ -134,6 +134,8 @@ def print_album_full(album: FullAlbum):
           '(popularity: {album.popularity}, tracks: {album.total_tracks})'.format(album=album))
     print('\tartists: %s' % _artists_to_string(album.artists))
 
+    if album.album_group:
+        print(f'\talbum group: {album.album_group}')
     if album.genres:
         print('\tgenres: {album.genres}'.format(album=album))
     if album.external_ids:
@@ -145,8 +147,6 @@ def print_album_full(album: FullAlbum):
             print(f'\tmarkets: {len(album.available_markets)} ({list(album.available_markets)})')
         else:
             print(f'\tmarkets: {len(album.available_markets)}')
-    if album.is_playable is not None:
-        print(f'\tplayable: {album.is_playable}')
     if album.label:
         print('\tlabel: {album.label}'.format(album=album))
     if album.copyrights:
