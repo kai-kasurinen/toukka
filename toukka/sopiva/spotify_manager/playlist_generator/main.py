@@ -765,16 +765,16 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                     self.logger.debug('%s: album artist ignored (skipping)', album_artist_uri)
                     return
 
-        # is played
-        if options.ignore_played_albums:
-            if self.is_album_played(item.id):
-                self.logger.debug('%s:%s: album is already played (skipping)', item.type, item.id)
-                return
-
         # is instrumental
         if options.ignore_non_instrumental_albums:
             if not is_album_instrumental(item.id, spotify=self.spotify):
                 self.logger.debug('%s:%s: album is not instrumental (skipping)', item.type, item.id)
+                return
+
+        # is played
+        if options.ignore_played_albums:
+            if self.is_album_played(item.id):
+                self.logger.debug('%s:%s: album is already played (skipping)', item.type, item.id)
                 return
 
         # add as new source
