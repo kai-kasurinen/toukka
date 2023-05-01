@@ -35,6 +35,8 @@ from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.uri import SpotifyUri
 from toukka.sopiva.spotify_manager.genres import Genre
 
+from toukka.sopiva.spotify_history.util import get_spotify_history
+
 import toukka.sopiva.spotify_manager.genres
 
 from .playlist import PlaylistModifier
@@ -79,6 +81,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             spotify=self.spotify,
             user_country=self.user_country,
             played_count_min=self.options.played_count_min)
+        self.spotify_history = get_spotify_history()
+
 
     def generate(self, **kwargs) -> None:
         options = self.options.push(kwargs)
@@ -761,6 +765,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                     self.logger.debug('%s: album artist ignored (skipping)', album_artist_uri)
                     return
 
+        # is played
+        if options.ignore_played_albums:
+            if self.is_album_played(item):
+                self.logger.debug('%s:%s: album is already played (skipping)', item.type, item.id)
+                return
+
         # is instrumental
         if options.ignore_non_instrumental_albums:
             if not is_album_instrumental(item.id, spotify=self.spotify):
@@ -1061,6 +1071,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
         if not did:
             self.logger.warning('did not do anything with: %s', item.uri)
+
+    # MOVE?
+    def is_album_played(self, album):
+        album_tracks = self.spotify.all_items(album.tracks)
+        track_uris = [track.uri for track in album_tracks]
+        return self.spotify_history.is_tracks_played(track_uris)
 
 
 # END

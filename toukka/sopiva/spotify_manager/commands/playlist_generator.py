@@ -60,6 +60,7 @@ logger = logging.getLogger(__name__)
 @click.option('--sort-artist-albums-reverse', is_flag=True)
 @click.option('--ignore-various-artists-albums', is_flag=True)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
+@click.option('--ignore-played-albums', is_flag=True)
 @click.option('--ignore', multiple=True)
 @click.option('--include-album-groups', type=StringListParamType(),
               help='album, single, appears_on, compilation',
