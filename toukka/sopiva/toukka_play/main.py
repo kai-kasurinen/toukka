@@ -52,7 +52,7 @@ kwargs_for_genre = {
     'expand_album_to_tracks': True,
     'expand_artist_to_albums': False,
     'expand_artist_to_recommendations': False,
-    'ignore_various_artists_albums': True
+    'ignore_various_artists_albums': True,
     'ignore_played_albums': True
 }
 
@@ -62,8 +62,8 @@ kwargs_for_genre_artists = {
     'expand_artist_to_random_album': True,
     'expand_artist_to_related_artists': True,
     'expand_album_to_tracks': True,
-    'randomize_artists': True
-    'ignore_various_artists_albums': True
+    'randomize_artists': True,
+    'ignore_various_artists_albums': True,
     'ignore_played_albums': True
 }
 
@@ -74,8 +74,8 @@ kwargs_for_genre_artists_re = {
     'expand_artist_to_related_artists': True,
     'expand_album_to_tracks': True,
     'randomize_artists': True,
-    'randomize_genres': True
-    'ignore_various_artists_albums': True
+    'randomize_genres': True,
+    'ignore_various_artists_albums': True,
     'ignore_played_albums': True
 }
 
