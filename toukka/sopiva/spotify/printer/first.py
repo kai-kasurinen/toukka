@@ -18,6 +18,15 @@ from toukka.sopiva.spotify.model.audio_features import AudioPitch, AudioMode
 # FIXME: remove
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
+__SPOTIFY_HISTORY__ = None
+
+
+def _get_spotify_history():
+    global __SPOTIFY_HISTORY__
+    if __SPOTIFY_HISTORY__ is None:
+        __SPOTIFY_HISTORY__ = get_spotify_history()
+    return __SPOTIFY_HISTORY__
+
 
 @printer.register
 def print_item(item: Item):
@@ -67,16 +76,21 @@ def print_track(track: Track,
 
 
 def _print_track_played_count(track):
-    spotify_history = get_spotify_history()
-    played_count_track = spotify_history.count_by_track_id(track.uri)
+    spotify_history = _get_spotify_history()
+    track_played_info = spotify_history.count_by_track_id_with_timestamps(track.uri)
 
-    played_count_isrc = None
-    if hasattr(track, 'external_ids'):
-        isrc = track.external_ids.get('isrc')
-        if isrc:
-            played_count_isrc = spotify_history.count_by_track_isrc(isrc)
+    if track_played_info.count >= 1:
+        print(f'\tplayed: {track_played_info.count}', 
+              f'({track_played_info.min.date()} - {track_played_info.max.date()})')
 
-    print(f'\tplayed: {played_count_track} track, {played_count_isrc} isrc')
+    isrc = track.external_ids.get('isrc')
+
+    if isrc is not None:
+        isrc_played_info = spotify_history.count_by_track_isrc_with_timestamps(isrc)
+
+        if isrc_played_info.count >= 1:
+            print(f'\tisrc played: {isrc_played_info.count}',
+                  f'({isrc_played_info.min.date()} - {isrc_played_info.max.date()})')
 
 
 @printer.register
@@ -134,7 +148,7 @@ def print_album_full(album: FullAlbum):
           '(popularity: {album.popularity}, tracks: {album.total_tracks})'.format(album=album))
     print('\tartists: %s' % _artists_to_string(album.artists))
 
-    if album.album_group:
+    if album.album_group and album.album_group != album.album_type:
         print(f'\talbum group: {album.album_group}')
     if album.genres:
         print('\tgenres: {album.genres}'.format(album=album))
@@ -179,8 +193,11 @@ def print_artist(artist: FullArtist,
 
 
 def _print_artist_played_count(artist):
-    spotify_history = get_spotify_history()
-    print('\tplayed: %s' % spotify_history.count_by_artist_name(artist.name))
+    spotify_history = _get_spotify_history()
+    artist_played_info = spotify_history.count_by_artist_name_with_timestamps(artist.name)
+    if artist_played_info.count >= 1:
+        print(f'\tplayed: {artist_played_info.count}',
+              f'({artist_played_info.min.date()} - {artist_played_info.max.date()})')
 
 
 @printer.register
