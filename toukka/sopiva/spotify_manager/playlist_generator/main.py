@@ -767,7 +767,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # is played
         if options.ignore_played_albums:
-            if self.is_album_played(item):
+            if self.is_album_played(item.id):
                 self.logger.debug('%s:%s: album is already played (skipping)', item.type, item.id)
                 return
 
@@ -1073,7 +1073,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             self.logger.warning('did not do anything with: %s', item.uri)
 
     # MOVE?
-    def is_album_played(self, album):
+    def is_album_played(self, album_id):
+        album = self.spotify.album(album_id)
         album_tracks = self.spotify.all_items(album.tracks)
         track_uris = [track.uri for track in album_tracks]
         return self.spotify_history.is_tracks_played(track_uris)
