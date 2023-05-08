@@ -14,7 +14,7 @@ class PlaylistGeneratorOptions:
         self.options = Options(
             dry_run=False,
             progress_bar=False,
-            looper_target_count=500,
+            looper_target_count=300,
             looper_max_tries=100000,
             looper_force=False,
             expand_track_to_album=False,
