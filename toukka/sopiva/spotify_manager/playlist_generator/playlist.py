@@ -23,7 +23,7 @@ class PlaylistModifier:
                  uri: str = None,
                  spotify: Spotify = None,
                  market: str = None,
-                 dry_run: boolean = False
+                 dry_run: bool = False
                  ) -> None:
 
         self.spotify = spotify or get_spotify()
