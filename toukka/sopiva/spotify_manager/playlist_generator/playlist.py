@@ -79,10 +79,6 @@ class PlaylistModifier:
 
     def commit(self, uris_to_playlist, dry_run) -> None:
 
-        if dry_run:
-            logger.info('dry_run is True, not committing')
-            return
-
         if len(uris_to_playlist) == 0:
             logger.info('No items to add. Try something else?')
             return
@@ -97,10 +93,10 @@ class PlaylistModifier:
             self.playlist_add_items(uris_to_playlist)
             logger.info('done')
 
+        # END
 
 
-#
-
+# TODO: move?
 def _get_playlist_uri_from_config() -> str:
     return toukka.config.lazy_config['spotify_manager']['playlist_generator']['playlist_uri'].get()
 
