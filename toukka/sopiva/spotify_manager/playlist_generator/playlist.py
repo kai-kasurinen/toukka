@@ -66,11 +66,11 @@ class PlaylistModifier:
 
         self.playlist_clear()
         self.playlist_details_update()
-        self.playlist_add_items(self.uris_to_playlist)
+        self.playlist_add_items(uris_to_playlist)
         self.logger.info('done')
 
     def playlist_add_items(self, uris: List) -> None:
-        self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist.id, uris)
+        self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
 
     # TODO: remove?
     def playlist_details_update(self) -> None:
