@@ -12,7 +12,7 @@ from toukka.sopiva.spotify.util import (get_spotify, Spotify)
 
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 
 # TODO: cleanup or remove?
@@ -35,6 +35,8 @@ class PlaylistModifier:
         # defaults
         self.playlist_name = '< g e n e r a t e d >'
         self.playlist_description = '<empty>'
+        self.playlist_cleared = False
+        self.playlist_details_updated = False
 
         self.playlist_load()
 
@@ -48,6 +50,8 @@ class PlaylistModifier:
 
     def playlist_clear(self) -> None:
         self.spotify.playlist_clear(self.playlist.id)
+        self.playlist_cleared = True
+        logger.debug('playlist cleared')
 
     def playlist_load(self) -> None:
         self.playlist = self.spotify.playlist(self.playlist_id, market=self.market)
@@ -64,10 +68,15 @@ class PlaylistModifier:
             logger.info('No items to add. Try something else?')
             return
 
-        self.playlist_clear()
-        self.playlist_details_update()
-        self.playlist_add_items(uris_to_playlist)
-        self.logger.info('done')
+        if not dry_run and not self.playlist_cleared:
+            self.playlist_clear()
+
+        if not dry_run and not self.playlist_details_updated:
+            self.playlist_details_update()
+
+        if not dry_run:
+            self.playlist_add_items(uris_to_playlist)
+            logger.info('done')
 
     def playlist_add_items(self, uris: List) -> None:
         self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
@@ -86,6 +95,8 @@ class PlaylistModifier:
             self.playlist.id,
             name=self.playlist_name,
             description=self.playlist_description)
+
+        self.playlist_details_updated = True
 
 
 #
