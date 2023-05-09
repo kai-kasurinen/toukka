@@ -72,7 +72,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.market = None
         # init empty
         self._uris_seen = Seen()
-        # TODO: move to PlaylistModifier
+        # TODO: move to PlaylistModifier or remove?
         self.uris_to_playlist: List[str] = list()
         self.uriban = UriBanDict()
         self.playlist = PlaylistModifier(uri=playlist_uri,
@@ -88,7 +88,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
     def generate(self, **kwargs) -> None:
         options = self.options.push(kwargs)
         self.looper(**options)
-        self.commit(**options)
 
     def looper(self, **kwargs) -> None:
         options = self.options.push(kwargs)
@@ -115,7 +114,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             progress_looper.update()
 
             if self.track_filter.is_ok(item):
+                # TODO: remove?
                 self.uris_to_playlist.append(item.uri)
+                # TODO: use this
+                self.playlist.track_add(item.uri)
                 self.logger.debug('%s:%s: added', item.type, item.id)
                 progress_added.update()
 
@@ -134,12 +136,18 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 self.logger.info('we have tried too many items')
                 break
 
+            # add tracks to playlist every 100
+            if options.use_partial_commits and not len(self.uris_to_playlist) % 100:
+                self.commit(**options)
+
         progress_bars.stop()
-        self.logger.info(f'{len(self.uris_to_playlist)} items to add')
+        # if something not yet added
+        self.commit()
+        self.logger.info(f'{len(self.uris_to_playlist)} items should be added to playlist')
 
     def commit(self, **kwargs) -> None:
         options = self.options.push(kwargs)
-        self.playlist.commit(self.uris_to_playlist, options.dry_run)
+        self.playlist.commit(dry_run=options.dry_run)
 
     def generate_from_uris(
             self,

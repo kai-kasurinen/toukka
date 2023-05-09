@@ -37,6 +37,7 @@ class PlaylistModifier:
         self.playlist_description = '<empty>'
         self.playlist_cleared = False
         self.playlist_details_updated = False
+        self.tracks_queue: List[str] = list()
 
         self.playlist_load()
 
@@ -58,7 +59,7 @@ class PlaylistModifier:
         self.playlist_snapshot_id = self.playlist.snapshot_id
         self.playlist_id = self.playlist.id
 
-    def playlist_add_items(self, uris: List) -> None:
+    def playlist_add_tracks(self, uris: List) -> None:
         self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
 
     def playlist_details_update(self) -> None:
@@ -77,9 +78,12 @@ class PlaylistModifier:
 
         self.playlist_details_updated = True
 
-    def commit(self, uris_to_playlist, dry_run) -> None:
+    def track_add(self, item_uri):
+        self.tracks_queue.append(item_uri)
 
-        if len(uris_to_playlist) == 0:
+    def commit(self, dry_run=True) -> None:
+
+        if len(self.tracks_queue) == 0:
             logger.info('No items to add. Try something else?')
             return
 
@@ -90,7 +94,9 @@ class PlaylistModifier:
             self.playlist_details_update()
 
         if not dry_run:
-            self.playlist_add_items(uris_to_playlist)
+            logger.info(f'adding {len(self.tracks_queue)} tracks to playlist')
+            self.playlist_add_tracks(self.tracks_queue)
+            self.tracks_queue.clear()
             logger.info('done')
 
         # END
