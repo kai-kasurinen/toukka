@@ -76,8 +76,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.uris_to_playlist: List[str] = list()
         self.uriban = UriBanDict()
         self.playlist = PlaylistModifier(uri=playlist_uri,
-                                         spotify=self.spotify,
-                                         dry_run=self.options.dry_run)
+                                         spotify=self.spotify)
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(
             spotify=self.spotify,
@@ -138,22 +137,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         progress_bars.stop()
         self.logger.info(f'{len(self.uris_to_playlist)} items to add')
 
-    # TODO: split and move to Playlist
     def commit(self, **kwargs) -> None:
         options = self.options.push(kwargs)
-
-        if options.dry_run:
-            self.logger.info('dry_run is True, not committing')
-            return
-
-        if len(self.uris_to_playlist) == 0:
-            self.logger.info('try something else?')
-            return
-
-        self.playlist.clear()
-        self.playlist.uris_add(self.uris_to_playlist)
-        self.playlist.details_update()
-        self.logger.info('done')
+        self.playlist.commit(self.uris_to_playlist, options.dry_run)
 
     def generate_from_uris(
             self,
