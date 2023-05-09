@@ -75,7 +75,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: move to PlaylistModifier
         self.uris_to_playlist: List[str] = list()
         self.uriban = UriBanDict()
-        self.playlist = PlaylistModifier(uri=playlist_uri, spotify=self.spotify)
+        self.playlist = PlaylistModifier(uri=playlist_uri,
+                                         spotify=self.spotify,
+                                         dry_run=self.options.dry_run)
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(
             spotify=self.spotify,

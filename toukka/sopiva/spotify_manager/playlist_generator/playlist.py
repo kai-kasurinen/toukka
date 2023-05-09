@@ -22,24 +22,23 @@ class PlaylistModifier:
     def __init__(self,
                  uri: str = None,
                  spotify: Spotify = None,
-                 market: str = None
+                 market: str = None,
+                 dry_run: boolean = False
                  ) -> None:
 
         self.spotify = spotify or get_spotify()
         self.playlist_uri = uri or _get_playlist_uri_from_config()
         self.market = market
+        self.dry_run = dry_run
 
         uri_type, uri_id = self.spotify.convert.from_uri(self.playlist_uri)
-        self.playlist = self.spotify.playlist(uri_id, market=self.market)
-        # TODO: remove, useless
-        self.playlist_snapshot_id = self.playlist.snapshot_id
+        self.playlist_id = uri_id
 
         # defaults
         self.playlist_name = '< g e n e r a t e d >'
-        # self.playlist_name = f'< g e n e r a t e d: {uuid.uuid4()} >'
-        # NOTE: https://github.com/spotify/web-api/issues/1011
-        # NOTE: not None -> get updated. '' -> fails
         self.playlist_description = '<empty>'
+
+        self.playlist_load()
 
     @property
     def description(self) -> str:
@@ -49,11 +48,16 @@ class PlaylistModifier:
     def description(self, value: str):
         self.playlist_description = value
 
-    def clear(self) -> None:
+    def playlist_clear(self) -> None:
         self.spotify.playlist_clear(self.playlist.id)
 
-    def reload(self) -> None:
-        self.playlist = self.spotify.playlist(self.playlist.id)
+    def playlist_load(self) -> None:
+        self.playlist = self.spotify.playlist(self.playlist_id, market=self.market)
+        self.playlist_snapshot_id = self.playlist.snapshot_id
+        self.playlist_id = self.playlist.id
+
+    def playlist_commit(self) -> None:
+        pass
 
     def uris_add(self, uris: List) -> None:
         self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist.id, uris)
