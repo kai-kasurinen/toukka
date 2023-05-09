@@ -58,6 +58,25 @@ class PlaylistModifier:
         self.playlist_snapshot_id = self.playlist.snapshot_id
         self.playlist_id = self.playlist.id
 
+    def playlist_add_items(self, uris: List) -> None:
+        self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
+
+    def playlist_details_update(self) -> None:
+
+        if self.playlist_description is None:
+            logger.warning('playlist description is None')
+
+        logger.debug(
+            'playlist details update: name: %s, desc: %s',
+            self.playlist_name, self.playlist_description)
+
+        self.spotify.playlist_change_details(
+            self.playlist.id,
+            name=self.playlist_name,
+            description=self.playlist_description)
+
+        self.playlist_details_updated = True
+
     def commit(self, uris_to_playlist, dry_run) -> None:
 
         if dry_run:
@@ -78,25 +97,6 @@ class PlaylistModifier:
             self.playlist_add_items(uris_to_playlist)
             logger.info('done')
 
-    def playlist_add_items(self, uris: List) -> None:
-        self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
-
-    # TODO: remove?
-    def playlist_details_update(self) -> None:
-
-        if self.playlist_description is None:
-            logger.warning('playlist description is None')
-
-        logger.debug(
-            'playlist details update: name: %s, desc: %s',
-            self.playlist_name, self.playlist_description)
-
-        self.spotify.playlist_change_details(
-            self.playlist.id,
-            name=self.playlist_name,
-            description=self.playlist_description)
-
-        self.playlist_details_updated = True
 
 
 #
