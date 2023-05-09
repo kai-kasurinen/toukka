@@ -84,7 +84,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             played_count_min=self.options.played_count_min)
         self.spotify_history = get_spotify_history()
 
-
     def generate(self, **kwargs) -> None:
         options = self.options.push(kwargs)
         self.looper(**options)
@@ -103,7 +102,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         for counter, item in enumerate(sources_generator, start=1):
 
             # ...
-            if not counter % 10:
+            if counter % 10 == 0:
                 self.logger.debug(
                     'items: %i/%i, sources: %iD %iQ',
                     len(self.uris_to_playlist),
@@ -138,7 +137,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
             # add tracks to playlist every 100
             # TODO: use self.playlist.tracks_queue len
-            if options.use_partial_commits and not len(self.uris_to_playlist) % 100:
+            if options.use_partial_commits and not len(self.uris_to_playlist) % 100 == 0:
                 self.commit(**options)
 
         progress_bars.stop()
