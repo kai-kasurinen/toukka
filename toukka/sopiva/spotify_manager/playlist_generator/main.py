@@ -137,6 +137,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 break
 
             # add tracks to playlist every 100
+            # TODO: use self.playlist.tracks_queue len
             if options.use_partial_commits and not len(self.uris_to_playlist) % 100:
                 self.commit(**options)
 
