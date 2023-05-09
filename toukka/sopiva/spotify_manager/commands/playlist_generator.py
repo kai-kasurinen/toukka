@@ -70,7 +70,7 @@ logger = logging.getLogger(__name__)
 #               default='intro,sound,female,year_2018,year_2019,year_2020,pulse,edge')
 @click.option('--include-genre-playlists', type=StringListParamType(),
               default='intro,sound,female,pulse,edge')
-@click.option('--looper-target-count', default=300)
+@click.option('--looper-target-count', default=500)
 @click.option('--looper-max-tries', default=100000)
 @click.option('--looper-force', is_flag=True, default=False)
 @click.option('--played-count-min', default=0)
