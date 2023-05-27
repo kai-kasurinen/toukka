@@ -128,9 +128,13 @@ class SpotifyExtended(Spotify):
         album_tracks = self.all_items(self.album_tracks(album_id))
         track_ids = [track.id for track in album_tracks]
         album_audio_features = self.tracks_audio_features(track_ids)
+        # NOTE: remove Nones
+        album_audio_features = [item for item in album_audio_features if item is not None]
+
         if len(track_ids) != len(album_audio_features):
             logger.warning('album_audio_features len mismatch: tracks %i, features: %i',
                            len(track_ids), len(album_audio_features))
+
         return album_audio_features
 
     # END

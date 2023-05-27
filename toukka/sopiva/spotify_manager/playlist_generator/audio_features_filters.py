@@ -26,8 +26,6 @@ def is_album_instrumental(album_id, spotify=None):
         raise Exception()
 
     album_audio_features = get_album_audio_features(album_id)
-    # NOTE: remove Nones
-    album_audio_features = [item for item in album_audio_features if item is not None]
 
     if not album_audio_features:
         logger.warning('no album audio features')
