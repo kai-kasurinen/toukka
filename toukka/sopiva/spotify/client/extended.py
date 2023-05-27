@@ -125,7 +125,7 @@ class SpotifyExtended(Spotify):
 
     # TODO: move?
     def album_audio_features(self, album_id):
-        album_tracks = self.all_items(self.spotify.album_tracks(album_id))
+        album_tracks = self.all_items(self.album_tracks(album_id))
         track_ids = [track.id for track in album_tracks]
         album_audio_features = self.tracks_audio_features(track_ids)
         if len(track_ids) != len(album_audio_features):
