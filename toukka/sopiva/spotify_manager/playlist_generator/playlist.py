@@ -50,33 +50,37 @@ class PlaylistModifier:
         self.playlist_description = value
 
     def playlist_clear(self) -> None:
-        self.spotify.playlist_clear(self.playlist.id)
-        self.playlist_cleared = True
-        logger.debug('playlist cleared')
+        with self.spotify.user_as():
+            self.spotify.playlist_clear(self.playlist.id)
+            self.playlist_cleared = True
+            logger.debug('playlist cleared')
 
     def playlist_load(self) -> None:
-        self.playlist = self.spotify.playlist(self.playlist_id, market=self.market)
-        self.playlist_snapshot_id = self.playlist.snapshot_id
-        self.playlist_id = self.playlist.id
+        with self.spotify.user_as():
+            self.playlist = self.spotify.playlist(self.playlist_id, market=self.market)
+            self.playlist_snapshot_id = self.playlist.snapshot_id
+            self.playlist_id = self.playlist.id
 
     def playlist_add_tracks(self, uris: List) -> None:
-        self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
+        with self.spotify.user_as():
+            self.playlist_snapshot_id = self.spotify.playlist_add(self.playlist_id, uris)
 
     def playlist_details_update(self) -> None:
+        with self.spotify.user_as():
 
-        if self.playlist_description is None:
-            logger.warning('playlist description is None')
+            if self.playlist_description is None:
+                logger.warning('playlist description is None')
 
-        logger.debug(
-            'playlist details update: name: %s, desc: %s',
-            self.playlist_name, self.playlist_description)
+            logger.debug(
+                'playlist details update: name: %s, desc: %s',
+                self.playlist_name, self.playlist_description)
 
-        self.spotify.playlist_change_details(
-            self.playlist.id,
-            name=self.playlist_name,
-            description=self.playlist_description)
+            self.spotify.playlist_change_details(
+                self.playlist.id,
+                name=self.playlist_name,
+                description=self.playlist_description)
 
-        self.playlist_details_updated = True
+            self.playlist_details_updated = True
 
     def track_add(self, item_uri):
         self.tracks_queue.append(item_uri)

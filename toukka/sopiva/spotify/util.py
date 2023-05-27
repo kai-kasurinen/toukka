@@ -114,9 +114,30 @@ def get_spotify_with_client_credentials() -> Spotify:
     return client
 
 
-def get_spotify() -> Spotify:
+def get_spotify_with_both(token_type='user'):
+    client_token = get_client_token()
+    user_token = get_user_token()
+    default_token = None
+
+    if token_type == 'user':
+        default_token = user_token
+    elif token_type == 'client':
+        default_token = client_token
+    else:
+        raise Exception()
+
+    sender = get_sender()
+    client = get_client(default_token, sender)
+
+    client.client_token = user_token
+    client.user_token = user_token
+
+    return client
+
+
+def get_spotify(token_type='user') -> Spotify:
     logger.debug('get spotify')
-    return get_spotify_with_user_credentials()
+    return get_spotify_with_both(token_type)
 
 
 # END
