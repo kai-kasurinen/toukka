@@ -27,7 +27,7 @@ def is_album_instrumental(album_id, spotify=None):
 
     album_audio_features = get_album_audio_features(album_id)
 
-    if not album_audio_features:
+    if album_audio_features is None:
         logger.warning('no album audio features')
         return False
 
