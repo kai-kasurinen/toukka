@@ -19,15 +19,7 @@ def is_album_instrumental(album_id, spotify=None):
 
     @cache.memoize(expire=expires, typed=True)
     def get_album_audio_features(album_id):
-        album = spotify.album(album_id)
-        album_tracks = spotify.all_items(album.tracks)
-        track_ids = [track.id for track in album_tracks]
-        album_audio_features = spotify.tracks_audio_features(track_ids)
-        album_audio_features = [item for item in album_audio_features if item is not None]
-        if len(track_ids) != len(album_audio_features):
-            logger.warning('album_audio_features len mismatch: tracks %i, features: %i',
-                           len(track_ids), len(album_audio_features))
-        return album_audio_features
+        return spotify.album_audio_features(album_id)
         # END
 
     if spotify is None:
