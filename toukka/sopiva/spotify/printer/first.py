@@ -129,8 +129,10 @@ def print_album_simple(album: SimpleAlbum):
           f'({album.release_date} {album.release_date_precision})',
           f'(tracks: {album.total_tracks})')
     print('\tartists: %s' % _artists_to_string(album.artists))
-    if album.album_group:
+
+    if hasattr(album, 'album_group'):
         print(f'\talbum group: {album.album_group}')
+
     if album.available_markets is not None:
         if 0 < len(album.available_markets) < 10:
             print(f'\tmarkets: {len(album.available_markets)} ({list(album.available_markets)})')
@@ -148,8 +150,10 @@ def print_album_full(album: FullAlbum):
           '(popularity: {album.popularity}, tracks: {album.total_tracks})'.format(album=album))
     print('\tartists: %s' % _artists_to_string(album.artists))
 
-    if album.album_group and album.album_group != album.album_type:
-        print(f'\talbum group: {album.album_group}')
+    if hasattr(album, 'album_group'):
+        if album.album_group and album.album_group != album.album_type:
+            print(f'\talbum group: {album.album_group}')
+
     if album.genres:
         print('\tgenres: {album.genres}'.format(album=album))
     if album.external_ids:
