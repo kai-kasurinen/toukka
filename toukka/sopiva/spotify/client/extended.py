@@ -59,23 +59,6 @@ def alter_description(f):
     return wrapper
 
 
-'''
-def catch_404(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            ret = f(*args, **kwargs)
-        except HTTPError as e:
-            if e.response.status_code == 404:
-                return None
-            else:
-                raise
-        else:
-            return ret
-    return wrapper
-'''
-
-
 class SpotifyExtended(Spotify):
     
     @property
@@ -128,12 +111,6 @@ class SpotifyExtended(Spotify):
     @property
     def convert(self):
         return toukka.sopiva.spotify.convert
-
-    # TODO: remove, not needed anymore
-    def convert_old_playlist_uri(self, uri):
-        playlist_id = uri.split(':')[4]
-        new_uri = self.convert.to_uri('playlist', playlist_id)
-        return new_uri
 
     # TODO: remove?
     def currently_playing_playlist(self):
