@@ -30,7 +30,7 @@ from toukka.sopiva.spotify_manager.filters import (
     make_multi_filter, make_filter_by_artist_genre
 )
 
-from toukka.sopiva.spotify.util import get_spotify
+from toukka.sopiva.spotify.util import get_spotify, get_spotify_with_client_credentials
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.uri import SpotifyUri
 from toukka.sopiva.spotify_manager.genres import Genre
@@ -66,6 +66,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.logger.setLevel(logging.DEBUG)
 
         self.spotify = get_spotify()
+        #self.spotify = get_spotify_with_client_credentials()
         self.user_country = self.spotify.current_user().country
 
         # disabling track relinking
