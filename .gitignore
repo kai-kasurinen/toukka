@@ -6,6 +6,10 @@ __pycache__/
 .kdev4/
 *.kdev4
 
+# Pycharm
+.idea/
+
+
 #
 .mypy_cache
 .coverage
