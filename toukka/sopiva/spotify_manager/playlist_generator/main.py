@@ -1070,8 +1070,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
     # MOVE?
     def is_album_played(self, album_id):
-        album = self.spotify.album(album_id)
-        album_tracks = self.spotify.all_items(album.tracks)
+        album_tracks = self.spotify.album_tracks_all_list_cached(album_id)
         track_uris = [track.uri for track in album_tracks]
         return self.spotify_history.is_tracks_played(track_uris)
 

@@ -25,7 +25,7 @@ dogpile_region = region_spotify
 
 #
 logger = logging.getLogger(__name__)
-logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
+# logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
 
 class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
@@ -52,9 +52,15 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
     track_audio_features_cached = dogpile_region.cache_on_arguments()(Spotify.track_audio_features)
     track_audio_analysis_cached = dogpile_region.cache_on_arguments()(Spotify.track_audio_analysis)
 
+    def album_tracks_all_list(self, album_id: str, market: str = None):
+        return list(self.all_items(self.album_tracks(album_id, market=market)))
+
+    album_tracks_all_list_cached = check_from_token(
+        dogpile_region.cache_on_arguments()(album_tracks_all_list))
+
     @dogpile_region.cache_on_arguments()
     def album_audio_features(self, album_id):
-        album_tracks = list(self.all_items(self.album_tracks(album_id)))
+        album_tracks = self.album_tracks_all_list_cached(album_id)
         track_ids = [track.id for track in album_tracks]
         album_audio_features = list(self.tracks_audio_features(track_ids))
         return AlbumAudioFeatures(album_tracks, album_audio_features)
