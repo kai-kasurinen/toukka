@@ -10,9 +10,11 @@ class FanoutCacheBackend(CacheBackend):
         
         directory = arguments.get('directory')
 
-
         if directory is None:
             raise Exception()
+
+        # seconds, month
+        self.default_expire = 60*60*24*30
 
         self.cache = diskcache.FanoutCache(
             directory,
@@ -26,7 +28,7 @@ class FanoutCacheBackend(CacheBackend):
         return self.cache.get(key, default=NO_VALUE)
 
     def set(self, key, value):
-        self.cache.set(key, value)
+        self.cache.set(key, value, expire=self.default_expire)
 
     def delete(self, key):
         self.cache.pop(key)

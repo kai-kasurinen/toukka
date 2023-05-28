@@ -22,10 +22,9 @@ from .extended_classes import (
 
 from toukka.cache.dogpile import region_spotify
 dogpile_region = region_spotify
+# logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
-#
 logger = logging.getLogger(__name__)
-logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
 
 class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
