@@ -65,7 +65,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.logger.setLevel(logging.DEBUG)
 
         self.spotify = get_spotify(token_type='client')
-        
+
         with self.spotify.user_as():
             self.user_country = self.spotify.current_user().country
 
@@ -76,7 +76,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: move to PlaylistModifier or remove?
         self.uris_to_playlist: List[str] = list()
         self.uriban = UriBanDict()
-        
+
         self.playlist = PlaylistModifier(uri=playlist_uri, spotify=self.spotify)
         self.sources = SourcesQueue()
         self.track_filter = TrackFilter(

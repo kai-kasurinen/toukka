@@ -13,8 +13,10 @@ logger.setLevel(logging.DEBUG)
 
 class SpotifyPrinter:
     def __init__(self):
-        self.spotify = get_spotify()
-        self.market = self.spotify.current_user().country
+        self.spotify = get_spotify(token_type='client')
+
+        with self.spotify.user_as():
+            self.market = self.spotify.current_user().country
 
     def _print_dash_line(self):
         print(''.ljust(100, '='))
