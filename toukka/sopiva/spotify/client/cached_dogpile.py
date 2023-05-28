@@ -16,6 +16,7 @@ dogpile_region = region_spotify
 
 logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
+
 class SpotifyDogpileCached(Spotify):
 
     # cache-control: public, max-age>0

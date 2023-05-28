@@ -18,31 +18,36 @@ import toukka.sopiva.spotify.convert
 
 logger = logging.getLogger(__name__)
 
+class SpotifyTokens(Spotify):
 
-
-class SpotifyExtended(SpotifyDogpileCached):
-    
     @property
     def client_token(self):
         return self._client_token
-    
+
     @client_token.setter
     def client_token(self, token):
         self._client_token = token
 
     def client_as(self):
         return self.token_as(self._client_token)
-    
+
     @property
     def user_token(self):
         return self._user_token
-    
+
     @user_token.setter
     def user_token(self, token):
         self._user_token = token
 
     def user_as(self):
         return self.token_as(self._user_token)
+
+
+class SpotifyExtended(SpotifyTokens, SpotifyDogpileCached):
+
+    @property
+    def convert(self):
+        return toukka.sopiva.spotify.convert
 
     # for shortening long description
     playlist_change_details = alter_description(Spotify.playlist_change_details)
@@ -69,9 +74,6 @@ class SpotifyExtended(SpotifyDogpileCached):
             case _:
                 raise Exception(f'unsupported uri: {uri} ({uri_type}, {uri_id})')
 
-    @property
-    def convert(self):
-        return toukka.sopiva.spotify.convert
 
     # TODO: remove?
     def currently_playing_playlist(self):
