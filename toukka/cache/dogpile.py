@@ -9,7 +9,7 @@ import toukka.adapted.dogpile_diskcache_backend
 
 region_null = make_region()
 region_memory = make_region()
-region_local = make_region()
+#region_local = make_region()
 region_spotify = make_region()
 #region_redis = make_region()
 #region_mongo = make_region()
@@ -57,7 +57,7 @@ def configure():
 
     region_null.configure_from_config(config, 'cache.null.')
     region_memory.configure_from_config(config, 'cache.memory.')
-    region_local.configure_from_config(config, 'cache.local.')
+    #region_local.configure_from_config(config, 'cache.local.')
     region_spotify.configure_from_config(config, 'cache.spotify.')
     #region_redis.configure_from_config(config, 'cache.redis.')
     #mongo.configure_from_config(config, 'cache.mongo.')
