@@ -9,7 +9,6 @@ from toukka.cache.dogpile import region_spotify
 
 from .decorators import check_from_token
 
-# TODO: handle from_token better
 # TODO: do something when pickling fails?
 
 dogpile_region = region_spotify

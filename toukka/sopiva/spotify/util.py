@@ -19,6 +19,8 @@ from toukka.sopiva.spotify.sender.caching_sender import SqliteCachingSender
 from toukka.sopiva.spotify.sender.retrying_sender import RetryingSender404
 from toukka.sopiva.spotify.client.current import SpotifyCurrent
 
+Spotify = SpotifyCurrent
+
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 

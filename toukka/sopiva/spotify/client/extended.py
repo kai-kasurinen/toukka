@@ -11,7 +11,7 @@ from tekore._error import NotFound, BadRequest
 
 from .decorators import alter_description
 from .cached_dogpile import SpotifyDogpileCached
-# from .cached_diskcache import SpotifyDiskcacheCached
+
 
 import toukka.sopiva.spotify.convert
 
@@ -74,14 +74,14 @@ class SpotifyExtended(SpotifyTokens, SpotifyDogpileCached):
             case _:
                 raise Exception(f'unsupported uri: {uri} ({uri_type}, {uri_id})')
 
-
     # TODO: remove?
     def currently_playing_playlist(self):
         playing = self.playback_currently_playing()
 
-        if playing.context and playing.context.type.name == 'playlist':
-            # NOTE: still old format
-            # return self.convert_old_playlist_uri(playing.context.uri)
+        if playing.context is None:
+            return None
+
+        if playing.context.type == 'playlist':
             return playing.context.uri
         else:
             return None

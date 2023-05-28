@@ -53,6 +53,8 @@ def alter_description(f):
     return wrapper
 
 
+# TODO: handle from_token better
+
 def check_from_token(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
