@@ -9,9 +9,17 @@ logger.setLevel(logging.DEBUG)
 
 class AlbumAudioFeatures:
     
-    def __init__(self, album_tracks, album_tracks_audio_features):
+    def __init__(self, album_tracks, album_audio_features):
         self.tracks = album_tracks
-        self.album_audio_features = album_tracks_audio_features
+        
+        # NOTE: remove Nones
+        album_audio_features = [item for item in album_audio_features if item is not None]
+        self.album_audio_features = album_audio_features
+
+        if len(self.tracks) != len(self.album_audio_features):
+            logger.warning('album_audio_features len mismatch: tracks %i, features: %i',
+                           len(self.tracks), len(self.album_audio_features))
+
         self.dataframe = pandas.DataFrame(self.album_audio_features)
 
     @property
