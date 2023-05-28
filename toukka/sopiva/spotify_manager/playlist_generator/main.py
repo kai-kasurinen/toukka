@@ -557,7 +557,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # makes mypy happy
         track = cast(FullTrack, track)
 
-        album = self.spotify.album(track.album.id, market=self.market)
+        album = self.spotify.album_cached(track.album.id, market=self.market)
         yielder = self.yielder(album, expander=True, **options)
         yield from yielder
 
