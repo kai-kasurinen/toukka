@@ -3,13 +3,12 @@
 import logging
 
 from tekore import Spotify
-
 from toukka.cache.dogpile import region_spotify
-
-
 from .decorators import check_from_token
 
 # TODO: do something when pickling fails?
+
+# NOTE: Not used anymore, use SpotifyExtended instead
 
 dogpile_region = region_spotify
 

@@ -15,35 +15,14 @@ cache = toukka.cache.diskcache.get_cache()
 expires = 60*60*24*30*3
 
 
-def is_album_instrumental(album_id, spotify=None):
+# TODO: move and remove
 
-    @cache.memoize(expire=expires, typed=True)
-    def get_album_audio_features(album_id):
-        return spotify.album_audio_features(album_id)
-        # END
+def is_album_instrumental(album_id, spotify=None):
 
     if spotify is None:
         raise Exception()
 
-    album_audio_features = get_album_audio_features(album_id)
-
-    if album_audio_features is None:
-        logger.warning('no album audio features')
-        return False
-
-    album_audio_features_df = pandas.DataFrame(album_audio_features)
-
-    album_instrumentalness_mean = album_audio_features_df['instrumentalness'].mean()
-    album_instrumentalness_min = album_audio_features_df['instrumentalness'].min()
-    album_instrumentalness_max = album_audio_features_df['instrumentalness'].max()
-
-    logger.debug('min: %.4f, mean: %.4f, max: %.4f',
-                 album_instrumentalness_min, album_instrumentalness_mean, album_instrumentalness_max)
-
-    # NOTE: album_instrumentalness_min filters too much, use album_instrumentalness_mean
-    if album_instrumentalness_min > 0.5:
-        return True
-    else:
-        return False
+    album_audio_features = spotify.album_audio_features(album_id)
+    return album_audio_features.is_instrumental()
 
 # END
