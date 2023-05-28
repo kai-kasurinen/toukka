@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def update():
-    spotify = get_spotify()
+    spotify = get_spotify(token_type='client')
 
     database_uri = get_database_uri_from_config()
     logger.debug(database_uri)
