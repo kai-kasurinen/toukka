@@ -1,5 +1,7 @@
 #
 
+import logging
+
 from tekore import Spotify
 
 from toukka.cache.dogpile import region_spotify
@@ -12,7 +14,7 @@ from .decorators import check_from_token
 
 dogpile_region = region_spotify
 
-
+logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
 class SpotifyDogpileCached(Spotify):
 

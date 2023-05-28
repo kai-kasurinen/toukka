@@ -11,6 +11,7 @@ from tekore._error import NotFound, BadRequest
 
 from .decorators import alter_description
 from .cached_dogpile import SpotifyDogpileCached
+# from .cached_diskcache import SpotifyDiskcacheCached
 
 import toukka.sopiva.spotify.convert
 
