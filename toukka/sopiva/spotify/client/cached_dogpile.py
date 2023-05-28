@@ -14,7 +14,7 @@ dogpile_region = region_spotify
 
 
 
-class SpotifyCached(Spotify):
+class SpotifyDogpileCached(Spotify):
 
     # cache-control: public, max-age>0
     track_cached = check_from_token(
