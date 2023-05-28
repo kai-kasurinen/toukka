@@ -1,27 +1,17 @@
 #
 
-from boltons.funcutils import wraps
 from tekore import Spotify
 
 from toukka.cache.dogpile import region_spotify
+
+
+from .decorators import check_from_token
 
 # TODO: handle from_token better
 # TODO: do something when pickling fails?
 
 region = region_spotify
 
-
-def check_from_token(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        # TODO: remove
-        if kwargs.get('market') == 'from_token':
-            raise Exception('market is from_token')
-        #elif 'market' not in kwargs.keys():
-        #    raise Exception('market is not defined')
-        else:
-            return f(*args, **kwargs)
-    return wrapper
 
 
 class SpotifyCached(Spotify):

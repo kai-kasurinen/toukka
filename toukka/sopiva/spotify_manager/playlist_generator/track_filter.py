@@ -103,7 +103,8 @@ class TrackFilter:
             return False
 
         # relinked track may be totally different
-        track_relinked = self.spotify.track(track.id, market=self.user_country)
+        # NOTE: Testing _cached version
+        track_relinked = self.spotify.track_cached(track.id, market=self.user_country)
 
         # is relinked ... (do it better)
         if track.id != track_relinked.id:
