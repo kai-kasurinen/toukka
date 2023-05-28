@@ -5,7 +5,7 @@ from .extended import SpotifyExtended
 # from .podcast import SpotifyPodcast
 
 
-class Spotify(SpotifyExtended):
+class SpotifyCurrent(SpotifyExtended):
     pass
 
 
