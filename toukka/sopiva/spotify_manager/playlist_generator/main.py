@@ -331,8 +331,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             album_id: str
             ) -> Generator[SimpleTrack, None, None]:
 
-        paging = self.spotify.album_tracks(album_id, market=self.market)
-        yield from self.spotify.all_items(paging)
+        #paging = self.spotify.album_tracks(album_id, market=self.market)
+        #yield from self.spotify.all_items(paging)
+        yield from self.spotify.album_tracks_all_list_cached(album_id)
 
     def show_episodes_generator(
             self,
