@@ -25,7 +25,7 @@ dogpile_region = region_spotify
 
 #
 logger = logging.getLogger(__name__)
-# logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
+logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
 
 class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):

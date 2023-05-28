@@ -1,0 +1,34 @@
+#
+
+import diskcache
+
+from dogpile.cache.api import CacheBackend, NO_VALUE
+from dogpile.cache import register_backend
+
+class FanoutCacheBackend(CacheBackend):
+    def __init__(self, arguments):
+        
+        directory = arguments.get('directory')
+        
+        if directory is None:
+            raise Exception()
+
+        self.cache = diskcache.FanoutCache(
+            directory,
+            timeout=10,
+            statistics=True,
+            size_limit=2**31,          # 2147483648
+            disk_min_file_size=2**20)  # 1048576
+
+    def get(self, key):
+        return self.cache.get(key, default=NO_VALUE)
+
+    def set(self, key, value):
+        self.cache.set(key, value)
+
+    def delete(self, key):
+        self.cache.pop(key)
+
+
+
+register_backend('fanout', "toukka.adapted.dogpile_diskcache_backend", "FanoutCacheBackend")
