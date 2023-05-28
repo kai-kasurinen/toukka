@@ -103,7 +103,6 @@ class TrackFilter:
             return False
 
         # relinked track may be totally different
-        # NOTE: Testing _cached version
         track_relinked = self.spotify.track_cached(track.id, market=self.user_country)
 
         # is relinked ... (do it better)
@@ -123,7 +122,7 @@ class TrackFilter:
                 track_full = track_relinked
             else:
                 # we need get it
-                track_full = self.spotify.track(track.id, market=None)
+                track_full = self.spotify.track_cached(track.id, market=None)
 
         # check playable from relinked track
         if not self.is_track_playable(track_relinked):
