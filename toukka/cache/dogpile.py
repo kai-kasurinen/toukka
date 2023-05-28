@@ -36,6 +36,7 @@ def configure():
         #'cache.spotify.arguments.filename': _spotify_cache_file,
         # spotify, local file
         'cache.spotify.backend': 'fanout',
+        'cache.spotify.expiration_time': 60*60*24*30,
         'cache.spotify.arguments.directory': _spotify_cache_dir,
         # local redis
         'cache.redis.backend': 'dogpile.cache.redis',

@@ -9,7 +9,8 @@ class FanoutCacheBackend(CacheBackend):
     def __init__(self, arguments):
         
         directory = arguments.get('directory')
-        
+
+
         if directory is None:
             raise Exception()
 
