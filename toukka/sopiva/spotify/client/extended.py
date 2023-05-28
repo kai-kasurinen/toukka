@@ -9,6 +9,7 @@ from tekore.model import Paging
 from tekore.model import Item
 from tekore._error import NotFound, BadRequest
 
+from .cached import SpotifyCached
 from .decorators import alter_description
 
 import toukka.sopiva.spotify.convert
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 
-class SpotifyExtended(Spotify):
+class SpotifyExtended(SpotifyCached):
     
     @property
     def client_token(self):

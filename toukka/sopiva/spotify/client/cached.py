@@ -10,7 +10,7 @@ from .decorators import check_from_token
 # TODO: handle from_token better
 # TODO: do something when pickling fails?
 
-region = region_spotify
+dogpile_region = region_spotify
 
 
 
@@ -18,25 +18,25 @@ class SpotifyCached(Spotify):
 
     # cache-control: public, max-age>0
     track_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.track))
+        dogpile_region.cache_on_arguments()(Spotify.track))
 
     tracks_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.tracks))
-    artist_cached = region.cache_on_arguments()(Spotify.artist)
+        dogpile_region.cache_on_arguments()(Spotify.tracks))
+    artist_cached = dogpile_region.cache_on_arguments()(Spotify.artist)
     artist_albums_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.artist_albums))
-    artist_related_artists_cached = region.cache_on_arguments()(Spotify.artist_related_artists)
+        dogpile_region.cache_on_arguments()(Spotify.artist_albums))
+    artist_related_artists_cached = dogpile_region.cache_on_arguments()(Spotify.artist_related_artists)
     artist_top_tracks_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.artist_top_tracks))
+        dogpile_region.cache_on_arguments()(Spotify.artist_top_tracks))
     album_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.album))
+        dogpile_region.cache_on_arguments()(Spotify.album))
     albums_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.albums))
+        dogpile_region.cache_on_arguments()(Spotify.albums))
     album_tracks_cached = check_from_token(
-        region.cache_on_arguments()(Spotify.album_tracks))
+        dogpile_region.cache_on_arguments()(Spotify.album_tracks))
 
     # cache-control: private, max-age=0
-    track_audio_features_cached = region.cache_on_arguments()(Spotify.track_audio_features)
-    track_audio_analysis_cached = region.cache_on_arguments()(Spotify.track_audio_analysis)
+    track_audio_features_cached = dogpile_region.cache_on_arguments()(Spotify.track_audio_features)
+    track_audio_analysis_cached = dogpile_region.cache_on_arguments()(Spotify.track_audio_analysis)
 
 # END
