@@ -1,5 +1,7 @@
 #
 
+import click
+
 from ..cli import root
 
 
