@@ -11,7 +11,6 @@ class WikidataSPARQL:
     def query(self, query):
         self.sparql.setQuery(query)
         return self.sparql.query()
-        
 
     def search_entities_by_name(self, name):
 
@@ -36,7 +35,6 @@ class WikidataSPARQL:
                 ?item p:P1902 ?statement0.
                 ?statement0 (ps:P1902) "%s".
                 }
-                LIMIT 100
             }
             }
             ''' % spotify_id
