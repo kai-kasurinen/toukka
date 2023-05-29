@@ -2,10 +2,10 @@
 
 
 import click
-import wikidataintegrator
+import pprint
 
 from ..cli import root
-
+from ..sparql.queries import WikidataSPARQL
 
 @root.command()
 def hello():
@@ -14,25 +14,27 @@ def hello():
 
 
 @root.command
-@click.argument('artist_name')
-def artist_info(artist_name):
+@click.argument('name')
+def search_entity(name):
+    
+    wikidata = WikidataSPARQL()
 
-    query = '''
-    SELECT ?item ?itemLabel ?description WHERE {
-        ?item rdfs:label "%s"@en.
-        ?item schema:description ?description.
-        FILTER (lang(?description) = "en")
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-    }
-    ''' % artist_name
+    results = wikidata.search_entities_by_name(name)
+        
+    for result in results.bindings:
+        print(result)
 
-    results = wikidataintegrator.wdi_core.WDItemEngine.execute_sparql_query(query)
-    for result in results['results']['bindings']:
-        item_label = result['itemLabel']['value']
-        description = result['description']['value']
-        print(f"Artist: {item_label}")
-        print(f"Description: {description}")
-        print()
+
+@root.command
+@click.argument('spotify_id')
+def search_spotify_artist(spotify_id):
+    
+    wikidata = WikidataSPARQL()
+
+    results = wikidata.search_spotify_artist(spotify_id)
+    
+    for result in results.bindings:
+        print(result)
 
 
 
