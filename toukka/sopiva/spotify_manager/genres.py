@@ -243,8 +243,8 @@ def genres_make():
 
     logger.info('generating genres, this may take some time')
 
-    spotify = get_spotify()
-
+    spotify =get_spotify(token_type='client')
+    
     sound_of_spotify_id = 'thesoundsofspotify'
     particle_detector_id = 'particledetector'
     particle_introductor_id = 'particleintroductor'
