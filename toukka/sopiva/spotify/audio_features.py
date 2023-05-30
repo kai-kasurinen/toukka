@@ -38,7 +38,7 @@ class AlbumFeaturesDF(TracksFeaturesDF):
         logger.debug('min: %.4f, mean: %.4f, max: %.4f',
                     instrumentalness_min, instrumentalness_mean, instrumentalness_max)
 
-        # NOTE: album_instrumentalness_min filters too much, use album_instrumentalness_mean
+        # NOTE: instrumentalness_min filters too much, use instrumentalness_mean
         if instrumentalness_min > 0.5:
             return True
         else:
