@@ -37,6 +37,7 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
     artist_cached = dogpile_region.cache_on_arguments()(Spotify.artist)
     artist_albums_cached = check_from_token(
         dogpile_region.cache_on_arguments()(Spotify.artist_albums))
+
     artist_related_artists_cached = dogpile_region.cache_on_arguments()(Spotify.artist_related_artists)
     artist_top_tracks_cached = check_from_token(
         dogpile_region.cache_on_arguments()(Spotify.artist_top_tracks))
