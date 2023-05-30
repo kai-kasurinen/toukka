@@ -15,7 +15,7 @@ class TracksFeaturesDF:
         audio_features_df.drop(columns=['duration_ms', 'uri', 'type'], inplace=True)
 
         if len(tracks_df) != len(audio_features_df):
-            logger.warning('some audio features missing: tracks %i, features: %i',
+            logger.warning('some audio features missing: tracks %i, features %i',
                            len(tracks_df), len(audio_features_df))
 
         self.df = pandas.merge(tracks_df, audio_features_df, how='left', on=['id'])
