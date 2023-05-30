@@ -12,12 +12,12 @@ class TracksFeaturesDF:
     def __init__(self, tracks, tracks_audio_features):
         tracks_df = pandas.DataFrame(tracks)        
         audio_features_df = pandas.DataFrame(filter(None, tracks_audio_features))
+        audio_features_df.drop(columns=['duration_ms', 'uri', 'type'], inplace=True)
 
         if len(tracks_df) != len(audio_features_df):
             logger.warning('some audio features missing: tracks %i, features: %i',
                            len(tracks_df), len(audio_features_df))
 
-        audio_features_df.drop(columns=['duration_ms', 'uri', 'type'], inplace=True)
         self.df = pandas.merge(tracks_df, audio_features_df, how='left', on=['id'])
 
     @property
