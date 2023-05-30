@@ -24,6 +24,9 @@ class TracksFeaturesDF:
     def instrumentalness(self):
         return self.df['instrumentalness']
 
+    # END
+
+
 class AlbumFeaturesDF(TracksFeaturesDF):
 
     def is_instrumental(self):
