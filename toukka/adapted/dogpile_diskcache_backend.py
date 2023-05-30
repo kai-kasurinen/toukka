@@ -10,7 +10,7 @@ class FanoutCacheBackend(CacheBackend):
     def __init__(self, arguments):
 
         directory = arguments.get('directory')
-        self.default_expire = arguments.get('default_expire', default=None)
+        self.default_expire = arguments.get('default_expire')
         
         if directory is None:
             raise Exception()
