@@ -5,16 +5,15 @@ import diskcache
 from dogpile.cache.api import CacheBackend, NO_VALUE
 from dogpile.cache import register_backend
 
+
 class FanoutCacheBackend(CacheBackend):
     def __init__(self, arguments):
-        
-        directory = arguments.get('directory')
 
+        directory = arguments.get('directory')
+        self.default_expire = arguments.get('default_expire', default=None)
+        
         if directory is None:
             raise Exception()
-
-        # seconds, month
-        self.default_expire = 60*60*24*30
 
         self.cache = diskcache.FanoutCache(
             directory,

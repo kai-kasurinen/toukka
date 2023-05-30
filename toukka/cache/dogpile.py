@@ -7,6 +7,8 @@ from xdg.BaseDirectory import save_cache_path
 
 import toukka.adapted.dogpile_diskcache_backend
 
+from .durations import DAY, MONTH
+
 region_null = make_region()
 region_memory = make_region()
 #region_local = make_region()
@@ -28,7 +30,7 @@ def configure():
         'cache.memory.backend': 'dogpile.cache.memory_pickle',
         # local file
         'cache.local.backend': 'dogpile.cache.dbm',
-        'cache.local.expiration_time': 60*60*24,
+        'cache.local.expiration_time': DAY,
         'cache.local.arguments.filename': _local_cache_file,
         # spotify, local file
         #'cache.spotify.backend': 'dogpile.cache.dbm',
@@ -36,21 +38,22 @@ def configure():
         #'cache.spotify.arguments.filename': _spotify_cache_file,
         # spotify, local file
         'cache.spotify.backend': 'fanout',
-        'cache.spotify.expiration_time': 60*60*24*30,
+        'cache.spotify.expiration_time': MONTH,
         'cache.spotify.arguments.directory': _spotify_cache_dir,
+        'cache.spotify.arguments.default_expire': MONTH,
         # local redis
         'cache.redis.backend': 'dogpile.cache.redis',
-        'cache.redis.expiration_time': 60*60*24,
+        'cache.redis.expiration_time': DAY,
         'cache.redis.arguments.url': 'redis://?db=10',
         # NOTE: This should be larger than dogpile’s cache expiration.
-        'cache.redis.arguments.redis_expiration_time': 60*60*24,
+        'cache.redis.arguments.redis_expiration_time': DAY,
         # NOTE: Use this when multiple processes will be talking to the same redis instance
         'cache.redis.arguments.distributed_lock': True,
         # NOTE: should be set to False when distributed_lock is True
         'cache.redis.arguments.thread_local_lock': False,
         # mongo
         'cache.mongo.backend': 'mongo',
-        'cache.mongo.expiration_time': 60*60*24,
+        'cache.mongo.expiration_time': DAY,
         'cache.mongo.arguments.db': False,
         'cache.mongo.arguments.uri': 'localhost',
         'cache.mongo.arguments.db_name': 'toukka',
