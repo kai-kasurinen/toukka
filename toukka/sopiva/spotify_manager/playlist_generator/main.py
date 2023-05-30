@@ -572,7 +572,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if self.check_uri(artist.uri + '#source'):
             return
 
-        artist = self.spotify.artist(artist.id)
+        artist = self.spotify.artist_cached(artist.id)
         yielder = self.yielder(artist, expander=True, **options)
         self.sources.add(yielder)
 
