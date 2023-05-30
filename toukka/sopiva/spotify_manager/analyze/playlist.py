@@ -9,6 +9,7 @@ import pandas
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.model import FullPlaylistTrack
+from toukka.sopiva.spotify.audio_features import TracksFeaturesDF
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -17,6 +18,7 @@ logger.setLevel(logging.DEBUG)
 # TODO: first test and then split
 # TODO: use pandas (dataclasses support needs 1.1)
 
+# TODO: CLEAN UP TESTINGS
 
 def analyze_playlist(playlist_uri=None):
     spotify = get_spotify()
@@ -47,20 +49,9 @@ def analyze_playlist(playlist_uri=None):
         tracks_ids.append(playlist_item.track.id)
         tracks.append(playlist_item.track)
 
-    tracks_dataframe = pandas.DataFrame(tracks)
-    print(tracks_dataframe['popularity'].describe())
-    print()
+    tracks_features = spotify.tracks_features_df(tracks_ids)
+    print(tracks_features.df.describe())
 
-    tracks_features = spotify.tracks_audio_features(tracks_ids)
-
-    # NOTE: we drop Nones
-    tracks_features = (item for item in tracks_features if item is not None)
-    # tracks_features = filter(functools.partial(operator.is_not, None), tracks_features)
-
-    # NOTE: DataFrame fails when features has Nones
-    tracks_features_dataframe = pandas.DataFrame(tracks_features)
-
-    print(tracks_features_dataframe.describe())
 
 
 # END

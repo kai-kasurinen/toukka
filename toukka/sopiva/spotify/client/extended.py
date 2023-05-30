@@ -12,7 +12,7 @@ from tekore._error import NotFound, BadRequest
 from .decorators import check_from_token
 # from .cached_dogpile import SpotifyDogpileCached
 
-from ..album_audio_features import AlbumAudioFeatures
+from ..audio_features import TracksFeaturesDF, AlbumFeaturesDF
 
 from .extended_classes import (
     SpotifyExtendedBase,
@@ -58,12 +58,23 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
     album_tracks_all_list_cached = check_from_token(
         dogpile_region.cache_on_arguments()(album_tracks_all_list))
 
+    def tracks_features_df(self, track_ids):
+        tracks = list(self.tracks(track_ids))
+        audio_features = list(self.tracks_audio_features(track_ids))
+        return TracksFeaturesDF(tracks, audio_features)
+
+    def album_features_df(self, album_id):
+        album_tracks = self.album_tracks_all_list(album_id)
+        track_ids = [track.id for track in album_tracks]
+        album_audio_features = list(self.tracks_audio_features(track_ids))
+        return AlbumFeaturesDF(album_tracks, album_audio_features)
+
     @dogpile_region.cache_on_arguments()
-    def album_audio_features(self, album_id):
+    def album_features_df_cached(self, album_id):
         album_tracks = self.album_tracks_all_list_cached(album_id)
         track_ids = [track.id for track in album_tracks]
         album_audio_features = list(self.tracks_audio_features(track_ids))
-        return AlbumAudioFeatures(album_tracks, album_audio_features)
+        return AlbumFeaturesDF(album_tracks, album_audio_features)
 
     # END
 
