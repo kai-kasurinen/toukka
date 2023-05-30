@@ -6,6 +6,12 @@ import pandas
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+# disc_number   duration_ms  track_number  popularity 
+#
+# acousticness  danceability energy  instrumentalness 
+# key    liveness    loudness  mode  speechiness 
+# tempo  time_signature     valence
+
 
 class TracksFeaturesDF:
     
@@ -21,8 +27,57 @@ class TracksFeaturesDF:
         self.df = pandas.merge(tracks_df, audio_features_df, how='left', on=['id'])
 
     @property
+    def popularity(self):
+        return self.df['popularity']
+
+    @property
+    def acousticness(self):
+        return self.df['acousticness']
+
+    @property
+    def danceability(self):
+        return self.df['danceability']
+
+    @property
+    def energy(self):
+        return self.df['energy']
+    
+    @property
     def instrumentalness(self):
         return self.df['instrumentalness']
+    
+    @property
+    def key(self):
+        return self.df['key']
+    
+    @property
+    def liveness(self):
+        return self.df['liveness']
+
+    @property
+    def loudness(self):
+        return self.df['loudness']
+
+    @property
+    def mode(self):
+        return self.df['mode']
+
+    @property
+    def speechiness(self):
+        return self.df['speechiness']
+ 
+    @property
+    def tempo(self):
+        return self.df['tempo']
+
+    @property
+    def time_signature(self):
+        return self.df['time_signature']
+
+    @property
+    def valence(self):
+        return self.df['valence']
+
 
     # END
 
