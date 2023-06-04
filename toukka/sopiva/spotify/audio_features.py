@@ -18,6 +18,15 @@ class TracksFeaturesDF:
     def __init__(self, tracks, tracks_audio_features):
         tracks_df = pandas.DataFrame(tracks)        
         audio_features_df = pandas.DataFrame(filter(None, tracks_audio_features))
+        
+        if audio_features_df.empty:
+            logger.warning('No audio features available')
+            audio_features_df = pandas.DataFrame(
+                columns=['id', 'acousticness', 'analysis_url',
+                         'danceability', 'duration_ms', 'energy', 'instrumentalness', 
+                         'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 
+                         'time_signature', 'track_href', 'type', 'uri', 'valence'])
+
         audio_features_df.drop(columns=['duration_ms', 'uri', 'type'], inplace=True)
 
         if len(tracks_df) != len(audio_features_df):
