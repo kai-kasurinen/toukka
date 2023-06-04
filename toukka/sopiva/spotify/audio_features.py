@@ -13,6 +13,13 @@ logger.setLevel(logging.DEBUG)
 # tempo  time_signature     valence
 
 
+AUDIO_FEATURES_COLUMNS=[
+    'id', 'acousticness', 'analysis_url',
+    'danceability', 'duration_ms', 'energy', 'instrumentalness', 
+    'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 
+    'time_signature', 'track_href', 'type', 'uri', 'valence']
+
+
 class TracksFeaturesDF:
     
     def __init__(self, tracks, tracks_audio_features):
@@ -21,12 +28,8 @@ class TracksFeaturesDF:
         
         if audio_features_df.empty:
             logger.warning('No audio features available')
-            audio_features_df = pandas.DataFrame(
-                columns=['id', 'acousticness', 'analysis_url',
-                         'danceability', 'duration_ms', 'energy', 'instrumentalness', 
-                         'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 
-                         'time_signature', 'track_href', 'type', 'uri', 'valence'])
-
+            audio_features_df = pandas.DataFrame(columns=AUDIO_FEATURES_COLUMNS)
+ 
         audio_features_df.drop(columns=['duration_ms', 'uri', 'type'], inplace=True)
 
         if len(tracks_df) != len(audio_features_df):
