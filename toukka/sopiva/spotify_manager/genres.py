@@ -41,7 +41,6 @@ class GenrePlaylists(dict):
 @dataclass(frozen=True)
 class Genre:
     name: str
-    type: 'genre'
     playlists: Optional[GenrePlaylists] = None
     related: Optional[List[Optional[str]]] = None
 
