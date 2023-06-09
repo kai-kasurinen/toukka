@@ -514,6 +514,15 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
+        # TODO: move?
+        track_artist_uris = [artist.uri for artist in item.artists]
+
+        for track_artist_uri in track_artist_uris:
+            if options.ignore:
+                if track_artist_uri in options.ignore:
+                    self.logger.debug('%s: track artist ignored (skipping)', track_artist_uri)
+                    return
+
         # add as new source
         if options.expand_track_to_artists:
             # self.logger.debug('%s:%s: to artists', item.type, item.id)
