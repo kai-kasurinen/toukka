@@ -47,6 +47,7 @@ from .progress_bar import ProgressBars
 from .seen import Seen
 from .banner import UriBanDict
 from .options import PlaylistGeneratorOptions
+from .counter import ItemCounter
 
 
 class PlaylistGenerator(PlaylistGeneratorOptions):
@@ -84,6 +85,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             user_country=self.user_country,
             played_count_min=self.options.played_count_min)
         self.spotify_history = get_spotify_history()
+        self.counter = ItemCounter()
 
     def generate(self, **kwargs) -> None:
         options = self.options.push(kwargs)
@@ -110,6 +112,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                     counter,
                     self.sources.sources_used_count,
                     len(self.sources))
+                self.logger.debug(self.counter.most_common())
+
 
             progress_looper.update()
 
@@ -144,6 +148,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # if something not yet added
         self.commit()
         self.logger.info(f'{len(self.uris_to_playlist)} items should be added to playlist')
+        self.logger.debug(self.counter.most_common())
 
     def commit(self, **kwargs) -> None:
         options = self.options.push(kwargs)
@@ -532,6 +537,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # and finally use track if not seen
         if not self.check_uri(item.uri):
             yield item
+            self.counter.plus(item.type)
             did = True
 
         # nice hack
@@ -666,10 +672,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[FullTrack, None, None]:
 
         options = self.options.push(kwargs)
-        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
-        did = False
         if self.check_uri(item.uri):
             return
+
+        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.counter.plus(item.type)
+        did = False
 
         # add as new source
         if options.expand_artist_to_related_artists:
@@ -746,6 +754,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             return
 
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.counter.plus(item.type)
+
 
         # TODO: move?
         album_artist_uris = [artist.uri for artist in item.artists]
@@ -849,6 +859,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         options = self.options.push(kwargs)
 
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
+        self.counter.plus(item.type)
 
         if self.check_uri(item.uri):
             return
@@ -912,7 +923,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         options = self.options.push(kwargs)
         if self.check_uri(f'genre:{item.name}'):
             return
+
         self.logger.debug('%s:%s', 'genre', item.name)
+        self.counter.plus('genre')
+
         did = False
         # yield
         if options.expand_genre_to_playlists:
