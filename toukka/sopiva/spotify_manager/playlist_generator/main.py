@@ -114,7 +114,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                     len(self.sources))
                 self.logger.debug(self.counter.most_common())
 
-
             progress_looper.update()
 
             if self.track_filter.is_ok(item):
@@ -764,7 +763,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         self.counter.plus(item.type)
-
 
         # TODO: move?
         album_artist_uris = [artist.uri for artist in item.artists]
