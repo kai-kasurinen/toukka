@@ -23,6 +23,8 @@ from toukka.sopiva.spotify.model import (
     FullEpisode, SimpleEpisode, Episode,
     FullShow, SimpleShow, Show,
     FullPlaylist, SimplePlaylist, Playlist,
+    PlaylistTrack,
+    FullPlaylistTrack, LocalPlaylistTrack, FullPlaylistEpisode,
     ModelList
 )
 
@@ -49,6 +51,9 @@ from .banner import UriBanDict
 from .options import PlaylistGeneratorOptions
 from .counter import ItemCounter
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 
 class PlaylistGenerator(PlaylistGeneratorOptions):
     '''generates playlist'''
@@ -62,8 +67,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         super().__init__(**kwargs)
 
         # TODO: move?
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger = logger
 
         self.spotify = get_spotify(token_type='client')
 
@@ -335,8 +339,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             album_id: str
             ) -> Generator[SimpleTrack, None, None]:
 
-        #paging = self.spotify.album_tracks(album_id, market=self.market)
-        #yield from self.spotify.all_items(paging)
         yield from self.spotify.album_tracks_all_list_cached(album_id)
 
     def show_episodes_generator(
@@ -419,19 +421,14 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
     def playlist_all_items_generator(
             self,
             playlist_id: str
-            ) -> Generator[Union[FullTrack, FullEpisode], None, None]:
+            ) -> Generator[PlaylistTrack, None, None]:
 
         paging = self.spotify.playlist_items(
             playlist_id=playlist_id,
-            limit=100,
             market=self.market)
 
-        for playlist_item in self.spotify.all_items(paging):
-            if playlist_item.track is None:
-                continue
-            if playlist_item.is_local:
-                continue
-            yield playlist_item.track
+        for item in self.spotify.all_items(paging):
+            yield item
 
     def randomizer(
             self,
@@ -481,7 +478,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
-        # self.logger.debug('%s', type(item))
+        self.logger.debug('%s', type(item))
 
         for count, i in enumerate(item, start=1):
             # self.logger.debug('%s: %i/?', type(i), count)
@@ -495,7 +492,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
-        # self.logger.debug('%s: %s', type(item), len(item))
+        self.logger.debug('%s: %s', type(item), len(item))
 
         for count, i in enumerate(item, start=1):
             self.logger.debug('%s: %i/%i', type(i), count, len(item))
@@ -509,7 +506,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Track, None, None]:
 
         options = self.options.push(kwargs)
-
         self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
         did = False
 
@@ -887,12 +883,36 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if self.check_uri(playlist.uri + '#tracks'):
             return
 
-        tracks = self.playlist_all_items_generator(playlist.id)
-        yielder = self.yielder(tracks,
+        playlist_tracks = self.playlist_all_items_generator(playlist.id)
+        yielder = self.yielder(playlist_tracks,
                                expander=True,
                                randomizer=options.randomize_playlist_items,
                                **options)
         yield from yielder
+
+    @expander.register
+    def expand_playlistrack(
+            self,
+            item: PlaylistTrack,
+            **kwargs
+            ) -> Generator[Union[FullPlaylistTrack, LocalPlaylistTrack, FullPlaylistEpisode], None, None]:
+
+        options = self.options.push(kwargs)
+        self.counter.plus('playlist_track')
+        # logger.debug('playlist track: %s, %s', item.added_at, item.added_by.uri)
+
+        # TODO: use item type
+
+        if item.track is None:
+            self.logger.warning('playlist track is None (ignoring)')
+            return
+
+        if item.is_local:
+            self.logger.warning('playlist track is local (ignoring)')
+            return
+
+        # NOTE: use expander -> track expander not used otherwise
+        yield from self.expander(item.track)
 
     @expander.register
     def expander_uri(
