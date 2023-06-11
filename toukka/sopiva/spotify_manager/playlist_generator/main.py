@@ -911,8 +911,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             self.logger.warning('playlist track is local (ignoring)')
             return
 
-        # NOTE: use expander -> track expander not used otherwise
-        yield from self.expander(item.track)
+        yielder = self.yielder(item.track, expander=True, **options)
+        yield from yielder
 
     @expander.register
     def expander_uri(
