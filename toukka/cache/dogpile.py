@@ -7,7 +7,7 @@ from xdg.BaseDirectory import save_cache_path
 
 import toukka.adapted.dogpile_diskcache_backend
 
-from .durations import DAY, MONTH
+from .durations import DAY, MONTH, YEAR
 
 region_null = make_region()
 region_memory = make_region()
@@ -38,9 +38,9 @@ def configure():
         #'cache.spotify.arguments.filename': _spotify_cache_file,
         # spotify, local file
         'cache.spotify.backend': 'fanout',
-        'cache.spotify.expiration_time': MONTH,
+        'cache.spotify.expiration_time': YEAR,
         'cache.spotify.arguments.directory': _spotify_cache_dir,
-        'cache.spotify.arguments.default_expire': MONTH,
+        'cache.spotify.arguments.default_expire': YEAR,
         # local redis
         'cache.redis.backend': 'dogpile.cache.redis',
         'cache.redis.expiration_time': DAY,

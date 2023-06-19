@@ -11,16 +11,17 @@ class FanoutCacheBackend(CacheBackend):
 
         directory = arguments.get('directory')
         self.default_expire = arguments.get('default_expire')
-        
+
         if directory is None:
             raise Exception()
 
+        # TODO: move arguments to somewhere...
         self.cache = diskcache.FanoutCache(
             directory,
             timeout=10,
             statistics=True,
-            shards=16,                 # default 8
-            size_limit=2**31*2,        # 2147483648 * 2
+            shards=32,                 # default 8
+            size_limit=2**30*10,       # 1073741824 * 10
             disk_min_file_size=2**20)  # 1048576
 
     def get(self, key):
@@ -33,5 +34,6 @@ class FanoutCacheBackend(CacheBackend):
         self.cache.pop(key)
 
 
-
 register_backend('fanout', "toukka.adapted.dogpile_diskcache_backend", "FanoutCacheBackend")
+
+# END
