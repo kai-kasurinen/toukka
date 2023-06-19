@@ -24,11 +24,11 @@ class TracksFeaturesDF:
 
     def __init__(self, tracks, tracks_audio_features):
 
-        tracks_dict = list(map(dict, tracks))
-        tracks_audio_features_dict = list(map(dict, tracks_audio_features))
+        tracks_dict = [model.dict() for model in tracks]
+        tracks_audio_features_dict = [model.dict() for model in tracks_audio_features if model is not None]
 
         tracks_df = pandas.DataFrame(tracks_dict)
-        audio_features_df = pandas.DataFrame(filter(None, tracks_audio_features_dict))
+        audio_features_df = pandas.DataFrame(tracks_audio_features_dict)
 
         if audio_features_df.empty:
             logger.warning('No audio features available')
