@@ -24,8 +24,8 @@ class TracksFeaturesDF:
 
     def __init__(self, tracks, tracks_audio_features):
 
-        tracks_dict = map(dict, tracks)
-        tracks_audio_features_dict = map(dict, tracks_audio_features)
+        tracks_dict = list(map(dict, tracks))
+        tracks_audio_features_dict = list(map(dict, tracks_audio_features))
 
         tracks_df = pandas.DataFrame(tracks_dict)
         audio_features_df = pandas.DataFrame(filter(None, tracks_audio_features_dict))
