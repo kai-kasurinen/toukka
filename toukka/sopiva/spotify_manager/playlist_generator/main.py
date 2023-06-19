@@ -24,8 +24,7 @@ from toukka.sopiva.spotify.model import (
     FullShow, SimpleShow, Show,
     FullPlaylist, SimplePlaylist, Playlist,
     PlaylistTrack,
-    FullPlaylistTrack, LocalPlaylistTrack, FullPlaylistEpisode,
-    ModelList
+    FullPlaylistTrack, LocalPlaylistTrack, FullPlaylistEpisode
 )
 
 from toukka.sopiva.spotify_manager.filters import (
