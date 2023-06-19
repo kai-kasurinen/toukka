@@ -6,10 +6,10 @@ import pandas
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-# disc_number   duration_ms  track_number  popularity 
+# disc_number   duration_ms  track_number  popularity
 #
-# acousticness  danceability energy  instrumentalness 
-# key    liveness    loudness  mode  speechiness 
+# acousticness  danceability energy  instrumentalness
+# key    liveness    loudness  mode  speechiness
 # tempo  time_signature     valence
 
 
@@ -24,8 +24,8 @@ class TracksFeaturesDF:
 
     def __init__(self, tracks, tracks_audio_features):
 
-        tracks_dict = [model.dict() for model in tracks]
-        tracks_audio_features_dict = [model.dict() for model in tracks_audio_features if model is not None]
+        tracks_dict = [model.__dict__ for model in tracks]
+        tracks_audio_features_dict = [model.__dict__ for model in tracks_audio_features if model is not None]
 
         tracks_df = pandas.DataFrame(tracks_dict)
         audio_features_df = pandas.DataFrame(tracks_audio_features_dict)
@@ -57,15 +57,15 @@ class TracksFeaturesDF:
     @property
     def energy(self):
         return self.df['energy']
-    
+
     @property
     def instrumentalness(self):
         return self.df['instrumentalness']
-    
+
     @property
     def key(self):
         return self.df['key']
-    
+
     @property
     def liveness(self):
         return self.df['liveness']
@@ -81,7 +81,7 @@ class TracksFeaturesDF:
     @property
     def speechiness(self):
         return self.df['speechiness']
- 
+
     @property
     def tempo(self):
         return self.df['tempo']
@@ -106,7 +106,7 @@ class AlbumFeaturesDF(TracksFeaturesDF):
         instrumentalness_max = self.instrumentalness.max()
 
         logger.debug('min: %.4f, mean: %.4f, max: %.4f',
-                    instrumentalness_min, instrumentalness_mean, instrumentalness_max)
+                     instrumentalness_min, instrumentalness_mean, instrumentalness_max)
 
         # NOTE: instrumentalness_min filters too much, use instrumentalness_mean
         if instrumentalness_min > 0.5:
