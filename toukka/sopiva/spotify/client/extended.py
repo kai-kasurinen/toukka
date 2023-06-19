@@ -28,9 +28,9 @@ logger = logging.getLogger(__name__)
 class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
 
     track_cached = check_from_token(
-        dogpile_region.cache_on_arguments(expiration_time=MONTH)(Spotify.track))
+        dogpile_region.cache_on_arguments(expiration_time=HALF_YEAR)(Spotify.track))
     tracks_cached = check_from_token(
-        dogpile_region.cache_on_arguments(expiration_time=MONTH)(Spotify.tracks))
+        dogpile_region.cache_on_arguments(expiration_time=HALF_YEAR)(Spotify.tracks))
 
     artist_cached = dogpile_region.cache_on_arguments(expiration_time=MONTH)(Spotify.artist)
     artist_albums_cached = check_from_token(
