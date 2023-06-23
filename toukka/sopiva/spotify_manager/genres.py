@@ -43,7 +43,7 @@ class GenrePlaylists(dict):
 @dataclass(frozen=True)
 class Genre:
     name: str
-    name_unicode: str
+    name_ascii: str
     playlists: Optional[GenrePlaylists] = None
     related: Optional[List[Optional[str]]] = None
 
