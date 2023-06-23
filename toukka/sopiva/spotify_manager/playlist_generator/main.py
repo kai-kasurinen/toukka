@@ -13,8 +13,6 @@ import functools
 
 import enlighten
 import more_itertools
-import unidecode
-
 
 from toukka.sopiva.spotify.model import (
     FullTrack, SimpleTrack, Track,
