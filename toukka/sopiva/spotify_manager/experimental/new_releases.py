@@ -12,7 +12,7 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history
 from toukka.sopiva.spotify.helper import Helper
 
-from toukka.sopiva.spotify_manager.filters import make_multi_filter
+from toukka.sopiva.spotify.filters import make_multi_filter
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

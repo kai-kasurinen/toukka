@@ -3,6 +3,7 @@
 from typing import Generator, Tuple, Optional
 
 import logging
+import unidecode
 
 from tekore import Spotify
 
@@ -10,6 +11,7 @@ from .decorators import check_from_token
 # from .cached_dogpile import SpotifyDogpileCached
 
 from ..audio_features import TracksFeaturesDF, AlbumFeaturesDF
+from ..filters import make_filter_by_artist_genre
 
 from .extended_classes import (
     SpotifyExtendedBase,
@@ -19,10 +21,12 @@ from .extended_classes import (
 
 from toukka.cache.durations import DAY, WEEK, MONTH, HALF_YEAR, YEAR
 from toukka.cache.dogpile import region_spotify
-dogpile_region = region_spotify
-# logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
 logger = logging.getLogger(__name__)
+# logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
+
+
+dogpile_region = region_spotify
 
 
 class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
@@ -36,7 +40,9 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
     artist_albums_cached = check_from_token(
         dogpile_region.cache_on_arguments(expiration_time=WEEK)(Spotify.artist_albums))
 
-    artist_related_artists_cached = dogpile_region.cache_on_arguments(expiration_time=WEEK)(Spotify.artist_related_artists)
+    artist_related_artists_cached = dogpile_region.cache_on_arguments(
+        expiration_time=WEEK)(Spotify.artist_related_artists)
+
     artist_top_tracks_cached = check_from_token(
         dogpile_region.cache_on_arguments(expiration_time=DAY)(Spotify.artist_top_tracks))
 
@@ -73,6 +79,19 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
         track_ids = [track.id for track in album_tracks]
         album_audio_features = list(self.tracks_audio_features(track_ids))
         return AlbumFeaturesDF(album_tracks, album_audio_features)
+
+    def artists_by_genre(self, genre_name):
+        # NOTE: genre.name is unicode and artists.genres are ascii
+        genre_name = unidecode.unidecode(genre_name)
+        # NOTE: search support unicode and ascii genre name
+        search = self.search(query=f'genre:"{genre_name}"', types=['artist'])
+        paging = search[0]
+        artists = self.all_items(paging)
+        artists = filter(make_filter_by_artist_genre(genre_name), artists)
+        artists = list(artists)
+        return artists
+
+    artists_by_genre_cached = dogpile_region.cache_on_arguments(expiration_time=WEEK)(artists_by_genre)
 
     # END
 

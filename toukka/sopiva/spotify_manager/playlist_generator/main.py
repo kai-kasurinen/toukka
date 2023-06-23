@@ -27,10 +27,6 @@ from toukka.sopiva.spotify.model import (
     FullPlaylistTrack, LocalPlaylistTrack, FullPlaylistEpisode
 )
 
-from toukka.sopiva.spotify_manager.filters import (
-    make_multi_filter, make_filter_by_artist_genre
-)
-
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify_manager.uri import SpotifyUri
@@ -1013,16 +1009,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             return
 
         # genre.name is unicode and artists.genres contains ascii
-        genre_name = unidecode.unidecode(genre.name)
+        genre_name = genre.name
 
-        query = f'genre:"{genre_name}"'
-        query_type = 'artist'
-
-        search = self.search_generator(query_type=query_type, query=query)
-        # search genre matches substrings, so filter
-        search = filter(make_filter_by_artist_genre(genre_name), search)
-        # NOTE: to list, cos expander does not understand filter
-        artists = list(search)
+        artists = self.spotify.artists_by_genre_cached(genre_name)
 
         yielder = self.yielder(artists,
                                expander=True,
