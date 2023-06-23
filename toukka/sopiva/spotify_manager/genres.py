@@ -6,6 +6,8 @@ import itertools
 import pickle
 import os
 
+import unidecode
+
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -41,6 +43,7 @@ class GenrePlaylists(dict):
 @dataclass(frozen=True)
 class Genre:
     name: str
+    name_unicode: str
     playlists: Optional[GenrePlaylists] = None
     related: Optional[List[Optional[str]]] = None
 
@@ -243,8 +246,8 @@ def genres_make():
 
     logger.info('generating genres, this may take some time')
 
-    spotify =get_spotify(token_type='client')
-    
+    spotify = get_spotify(token_type='client')
+
     sound_of_spotify_id = 'thesoundsofspotify'
     particle_detector_id = 'particledetector'
     particle_introductor_id = 'particleintroductor'
@@ -285,8 +288,15 @@ def genres_make():
         for year in years_range:
             genre_playlists[f'year_{year}'] = years[year].get(genre_name)
 
+        genre_name_unicode = genre_name
+        genre_name_ascii = unidecode.unidecode(genre_name_unicode)
+
+        if genre_name_ascii != genre_name_unicode:
+            logger.warning('%s != %s', genre_name_ascii, genre_name_unicode)
+
         genre = Genre(
-            name=genre_name,
+            name=genre_name_unicode,
+            name_ascii=genre_name_ascii,
             playlists=genre_playlists,
             related=related.get(genre_name)
             )
