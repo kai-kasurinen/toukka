@@ -1,9 +1,14 @@
 #
 
+import logging
+import pprint
 import diskcache
 
 from dogpile.cache.api import CacheBackend, NO_VALUE
 from dogpile.cache import register_backend
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class FanoutCacheBackend(CacheBackend):
