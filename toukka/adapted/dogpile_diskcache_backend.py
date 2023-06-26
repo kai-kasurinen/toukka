@@ -1,7 +1,7 @@
 #
 
 import logging
-import pprint
+
 import diskcache
 
 from dogpile.cache.api import CacheBackend, NO_VALUE
