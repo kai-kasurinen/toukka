@@ -339,6 +339,12 @@ def genres_load() -> Genres:
         return pickle.load(file)
 
 
+def get_genres_list():
+    g = genres()
+    g_list = list(g.keys())
+    return g_list
+
+
 def genres_re(name_re: str):
     regex = re.compile(name_re)
     genres_ = genres()
