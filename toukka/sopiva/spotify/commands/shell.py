@@ -12,7 +12,8 @@ from toukka.sopiva.spotify_history.util import get_spotify_history
 def shell():
     spotify = get_spotify()
     spotify_history = get_spotify_history()
-    IPython.embed()
-
+    # IPython.embed()
+    environment = dict(spotify=spotify, spotify_history=spotify_history)
+    IPython.start_ipython(['--profile=toukka'], user_ns=environment)
 
 # END
