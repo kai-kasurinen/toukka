@@ -44,6 +44,9 @@ from .banner import UriBanDict
 from .options import PlaylistGeneratorOptions
 from .counter import ItemCounter
 
+from .ignores import VARIOUS_ARTISTS, CLASSICAL_ARTISTS
+
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -265,6 +268,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         options = self.options.push(kwargs)
 
         ignore = options.ignore
+
+        if options.ignore_classical_artists:
+            if uri in CLASSICAL_ARTISTS:
+                self.logger.debug('%s:%s: classical artist (skipping)', item.type, item.id)
+                return
 
         if ignore:
             if uri in ignore:
@@ -506,6 +514,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         track_artist_uris = [artist.uri for artist in item.artists]
 
         for track_artist_uri in track_artist_uris:
+
+            if options.ignore_classical_artists:
+                if track_artist_uri in CLASSICAL_ARTISTS:
+                    self.logger.debug('%s:%s: classical artist track (skipping)', item.type, item.id)
+                    return
+
             if options.ignore:
                 if track_artist_uri in options.ignore:
                     self.logger.debug('%s: track artist ignored (skipping)', track_artist_uri)
@@ -758,9 +772,14 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         for album_artist_uri in album_artist_uris:
 
-            if options.ignore_various_artists_albums:
-                if album_artist_uri == options.various_artists_uri:
+            if options.ignore_various_artists:
+                if album_artist_uri in VARIOUS_ARTISTS:
                     self.logger.debug('%s:%s: various artists album (skipping)', item.type, item.id)
+                    return
+
+            if options.ignore_classical_artists:
+                if album_artist_uri in CLASSICAL_ARTISTS:
+                    self.logger.debug('%s:%s: classical artist album (skipping)', item.type, item.id)
                     return
 
             if options.ignore:
