@@ -271,7 +271,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         if options.ignore_classical_artists:
             if uri in CLASSICAL_ARTISTS:
-                self.logger.debug('%s:%s: classical artist (skipping)', item.type, item.id)
+                self.logger.debug('%s: classical artist (skipping)', uri)
                 return
 
         if ignore:
