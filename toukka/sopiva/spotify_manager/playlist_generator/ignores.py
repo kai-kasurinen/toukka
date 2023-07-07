@@ -13,5 +13,6 @@ CLASSICAL_ARTISTS = [
     'spotify:artist:459INk8vcC0ebEef82WjIK',    # Erik Satie
     'spotify:artist:5aIqB5nVVvmFsvSdExz408',    # Johann Sebastian Bach
     'spotify:artist:7jzR5qj8vFnSu5JHaXgFEr',    # Jean Sibelius
-    'spotify:artist:656RXuyw7CE0dtjdPgjJV6'     # Joseph Haydn
+    'spotify:artist:656RXuyw7CE0dtjdPgjJV6',    # Joseph Haydn
+    'spotify:artist:7ie36YytMoKtPiL7tUvmoE'     # Igor Stravinsky
 ]
