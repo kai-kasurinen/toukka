@@ -79,7 +79,7 @@ def get_sender(sender_type='httpx') -> tekore.Sender:
     elif sender_type == 'httpx':
         client = toukka.hub.httpx.get_client()
         # sender = tekore.RetryingSender(retries=3, sender=tekore.SyncSender(client))
-        sender = RetryingSender404(retries=3, sender=tekore.SyncSender(client))
+        sender = RetryingSender404(retries=10, sender=tekore.SyncSender(client))
     else:
         raise Exception
 
