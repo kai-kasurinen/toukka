@@ -75,7 +75,7 @@ class RetryingSender404(ExtendingSender):
                 seconds = r.headers.get('Retry-After', 1)
                 time.sleep(int(seconds) + 1)
             elif r.status_code >= 500 and tries > 1:
-                logger.debug('code %i and retries %i', r.status_code, tries)
+                logger.debug('code %i and tries %i', r.status_code, tries)
                 tries -= 1
                 time.sleep(delay_seconds)
                 delay_seconds *= 2
