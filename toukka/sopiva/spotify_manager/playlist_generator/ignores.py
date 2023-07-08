@@ -14,5 +14,6 @@ CLASSICAL_ARTISTS = [
     'spotify:artist:5aIqB5nVVvmFsvSdExz408',    # Johann Sebastian Bach
     'spotify:artist:7jzR5qj8vFnSu5JHaXgFEr',    # Jean Sibelius
     'spotify:artist:656RXuyw7CE0dtjdPgjJV6',    # Joseph Haydn
-    'spotify:artist:7ie36YytMoKtPiL7tUvmoE'     # Igor Stravinsky
+    'spotify:artist:7ie36YytMoKtPiL7tUvmoE',    # Igor Stravinsky
+    'spotify:artist:3MKCzCnpzw3TjUYs2v7vDA'     # Pyotr Ilyich Tchaikovsky
 ]
