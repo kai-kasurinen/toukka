@@ -793,10 +793,17 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 self.logger.debug('%s:%s: album is already played (skipping)', item.type, item.id)
                 return
 
+        # TODO: rename option and crate album features only once...
         # is instrumental
         if options.ignore_non_instrumental_albums:
             if not self.spotify.album_features_df_cached(item.id).is_instrumental():
                 self.logger.debug('%s:%s: album is not instrumental (skipping)', item.type, item.id)
+                return
+
+        # is energetic
+        if options.only_energetic:
+            if not self.spotify.album_features_df_cached(item.id).is_energetic():
+                self.logger.debug('%s:%s: album is not energetic (skipping)', item.type, item.id)
                 return
 
         # add as new source

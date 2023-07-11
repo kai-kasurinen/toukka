@@ -75,6 +75,7 @@ logger = logging.getLogger(__name__)
 @click.option('--looper-max-tries', default=100000)
 @click.option('--looper-force', is_flag=True, default=False)
 @click.option('--played-count-min', default=0)
+@click.option('--only-energetic', is_flag=True, default=False)
 @click.pass_context
 def generate_playlist(ctx, **kwargs):
     # FIXME: subcommand --help calls this

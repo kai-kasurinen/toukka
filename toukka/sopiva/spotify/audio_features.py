@@ -114,6 +114,18 @@ class AlbumFeaturesDF(TracksFeaturesDF):
         else:
             return False
 
+    def is_energetic(self):
+        energy_mean = self.energy.mean()
+        energy_min = self.energy.min()
+        energy_max = self.energy.max()
+        logger.debug('min: %.4f, mean: %.4f, max: %.4f',
+                     energy_min, energy_mean, energy_max)
+
+        if energy_min > 0.6:
+            return True
+        else:
+            return False
+
     # END
 
 
