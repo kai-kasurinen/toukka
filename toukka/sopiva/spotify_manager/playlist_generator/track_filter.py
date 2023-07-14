@@ -46,7 +46,8 @@ _bad_words_in_track_names = [
     'o little town of bethlehem',
     'we three kings',
     'coventry carol',
-    'santa claus'
+    'santa claus',
+    'xmas'
     ]
 
 

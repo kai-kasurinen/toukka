@@ -121,7 +121,7 @@ class AlbumFeaturesDF(TracksFeaturesDF):
         logger.debug('min: %.4f, mean: %.4f, max: %.4f',
                      energy_min, energy_mean, energy_max)
 
-        if energy_min > 0.5:
+        if energy_mean > 0.5:
             return True
         else:
             return False
