@@ -145,7 +145,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         progress_bars.stop()
         # if something not yet added
-        self.commit()
+        self.commit(**options)
         self.logger.info(f'{len(self.uris_to_playlist)} items should be added to playlist')
         self.logger.debug(self.counter.most_common())
 
