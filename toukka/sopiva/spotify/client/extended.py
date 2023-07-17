@@ -11,7 +11,7 @@ from .decorators import check_from_token
 # from .cached_dogpile import SpotifyDogpileCached
 
 from ..audio_features import TracksFeaturesDF, AlbumFeaturesDF
-from ..filters import make_filter_by_artist_genre
+from ..filters import make_filter_by_artist_genre, make_filter_by_album_label
 
 from .extended_classes import (
     SpotifyExtendedBase,
@@ -90,6 +90,15 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
         artists = filter(make_filter_by_artist_genre(genre_name), artists)
         artists = list(artists)
         return artists
+
+    def albums_by_label(self, label_name):
+        search = self.search(query=f'label:"{label_name}"', types=['album'])
+        paging = search[0]
+        albums = self.all_items(paging)
+        albums_ids = [album.id for album in albums]
+        albums = self.albums(albums_ids)
+        albums = list(filter(make_filter_by_album_label(label_name), albums))
+        return albums
 
     artists_by_genre_cached = dogpile_region.cache_on_arguments(expiration_time=WEEK)(artists_by_genre)
 
