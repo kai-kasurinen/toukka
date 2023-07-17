@@ -1,5 +1,7 @@
 #
 
+import operator
+
 
 # TODO: ?
 
@@ -44,3 +46,10 @@ def make_filter_by_attribute(attribute, value):
         else:
             return False
     return filter_by_attribute
+
+
+# NOTE: chatgpt example
+# popular_artists = filter_objects_by_attribute(artists, 'popularity', 50, operator.gt)
+#
+def filter_objects_by_attribute(objects, attribute, value, op=operator.eq):
+    return filter(lambda obj: op(getattr(obj, attribute), value), objects)
