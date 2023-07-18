@@ -2,6 +2,9 @@
 
 import collections
 
+#
+
+import logging
 import click
 
 from click_params import StringListParamType
@@ -15,7 +18,9 @@ from toukka.sopiva.spotify_manager.experimental.new_releases import (
     search_new_releases, album_to_genres, artists_played_counts
 )
 
-from toukka.sopiva.spotify_manager.experimental.search_test import search_artists_by_genre
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 @cli_root.command()
@@ -58,10 +63,24 @@ def new_releases(
 
 @cli_root.command()
 @click.argument('genre')
-def artists_by_genre(
-        **kwargs
-        ):
-    search_artists_by_genre(**kwargs)
+def artists_by_genre(genre: str):
+    spotify = get_spotify()
+    logger.debug('searching artists by genre: %s', genre)
+    artists = spotify.artists_by_genre(genre)
+    logger.debug('total results after filtering: %s', len(artists))
+    for artist in artists:
+        printer(artist)
+
+
+@cli_root.command()
+@click.argument('label')
+def albums_by_label(label: str):
+    spotify = get_spotify()
+    logger.debug('searching albums by label: %s', label)
+    albums = spotify.albums_by_label(label)
+    logger.debug('total results after filtering: %s', len(albums))
+    for album in albums:
+        printer(album)
 
 
 # END

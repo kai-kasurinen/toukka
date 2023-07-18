@@ -49,6 +49,7 @@ def make_filter_by_attribute(attribute, value):
 
 
 # NOTE: chatgpt example
+# TODO: use operator.attrgetter
 # popular_artists = filter_objects_by_attribute(artists, 'popularity', 50, operator.gt)
 #
 def filter_objects_by_attribute(objects, attribute, value, op=operator.eq):
