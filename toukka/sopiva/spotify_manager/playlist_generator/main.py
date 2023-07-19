@@ -328,17 +328,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         albums = self.spotify.all_items(paging)
 
-        # FIXME: move?
-        if options.sort_artist_albums_by_keys:
-
-            self.logger.debug('adding sorting by %s, reverse: %s',
-                              options.sort_artist_albums_by_keys,
-                              options.sort_artist_albums_reverse)
-
-            albums = sorted(albums,
-                            key=operator.attrgetter(*options.sort_artist_albums_by_keys),
-                            reverse=options.sort_artist_albums_reverse)
-
         for album in albums:
 
             # speed up things
