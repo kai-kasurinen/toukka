@@ -676,6 +676,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         yielder = self.yielder(artists,
                                expander=True,
                                randomizer=options.randomize_artists,
+                               sorter=True,
+                               sorter_keys=options.sort_artists_by_keys,
+                               sorter_reverse=options.sort_artists_reverse,
                                **options)
 
         self.sources.add(yielder)
@@ -1082,6 +1085,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         yielder = self.yielder(artists,
                                expander=True,
                                randomizer=options.randomize_artists,
+                               sorter=True,
+                               sorter_keys=options.sort_artists_by_keys,
+                               sorter_reverse=options.sort_artists_reverse,
                                **options)
 
         self.sources.add(yielder)
