@@ -61,6 +61,7 @@ class PlaylistGeneratorOptions:
             randomize_uris=False,
             randomize_search=False,
             randomize_recommendations=False,
+            randomize_labels=False,
             played_count_min=0,
             use_partial_commits=True,
             only_energetic=False

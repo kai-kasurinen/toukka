@@ -37,7 +37,7 @@ from .model import SpotifyUri, Label
 from .playlist import PlaylistModifier
 from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter
-from .util import scramble_generator, take_random_items_generator
+from .util import scramble_generator, take_random_items_generator, empty_generator
 from .progress_bar import ProgressBars
 from .seen import Seen
 from .banner import UriBanDict
@@ -255,6 +255,26 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             f'{seed_track_uris}',
             f'{seed_genres}'))
 
+        self.generate(**options)
+
+    def generate_from_labels(
+            self,
+            labels: list[str],
+            **kwargs
+            ) -> None:
+
+        options = self.options.push(kwargs)
+
+        if options.randomize_labels:
+            self.logger.debug('shuffling labels')
+            random.shuffle(labels)
+
+        # TODO: move?
+        labels_ = [Label(label) for label in labels]
+
+        yielder = self.yielder(labels_, expander=True, **options)
+        self.sources.add(yielder)
+        self.playlist.description = ', '.join(labels)
         self.generate(**options)
 
     # NOTE: returns False when uri is OK and True when uri is NOT ok
@@ -1121,6 +1141,53 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             did = True
         if not did:
             self.logger.warning('did not do anything with: %s', item.uri)
+
+    @expander.register
+    def expander_label(
+            self,
+            item: Label,
+            **kwargs
+            ) -> Generator[Any, None, None]:
+
+        options = self.options.push(kwargs)
+        if self.check_uri(f'label:{item}'):
+            return
+
+        self.logger.debug('%s:%s', 'label', item)
+        self.counter.plus('label')
+
+        did = False
+
+        # add as new source
+        if options.expand_label_to_albums:
+            self.expand_label_to_albums(item, **options)
+            did = True
+
+        if not did:
+            self.logger.warning('did not do anything with: label:%s', item)
+
+        # NOTE: without this method is not generator
+        yield from empty_generator()
+
+    def expand_label_to_albums(
+            self,
+            label: Label,
+            **kwargs
+            ) -> None:
+
+        options = self.options.push(kwargs)
+
+        if self.check_uri(f'label:{label}#albums'):
+            return
+
+        albums = self.spotify.albums_by_label(label)
+
+        yielder = self.yielder(albums,
+                               expander=True,
+                               randomizer=options.randomize_albums,
+                               **options)
+
+        self.sources.add(yielder)
 
     # MOVE?
     def is_album_played(self, album_id):
