@@ -499,7 +499,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             generator = self.randomizer(generator, **options)
 
         if taker:
-            logger.debug('taking only %i first items', taker_count)
+            logger.debug('taking only %i items', taker_count)
             generator = more_itertools.take(taker_count, generator)
 
         if expander:
