@@ -484,6 +484,8 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             sorter=False,
             sorter_keys=None,
             sorter_reverse=None,
+            taker=False,
+            taker_count=1,
             **kwargs
             ) -> Generator[Any, None, None]:
 
@@ -498,6 +500,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         if expander:
             generator = self.expander(generator, **options)
+
+        if taker:
+            logger.debug('taking only %i first items', taker_count)
+            generator = more_itertools.take(taker_count, generator)
 
         yield from generator
 
@@ -766,8 +772,11 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             artist.id,
             include_groups=options.include_album_groups)
 
+        # TODO: ?
         if options.expand_artist_to_random_album:
-            albums = take_random_items_generator(albums)
+            options.taker = True
+            options.taker_count = 1
+            options.randomize_albums = True
 
         yielder = self.yielder(albums,
                                expander=True,
