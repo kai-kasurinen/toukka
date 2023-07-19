@@ -538,7 +538,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
-        self.logger.debug('%s: %s', type(item), len(item))
 
         for count, i in enumerate(item, start=1):
             self.logger.debug('%s: %i/%i', type(i), count, len(item))
