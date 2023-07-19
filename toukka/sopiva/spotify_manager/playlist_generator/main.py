@@ -498,12 +498,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if sorter and sorter_keys:
             generator = self.sorter(generator, sorter_keys, sorter_reverse, **options)
 
-        if expander:
-            generator = self.expander(generator, **options)
-
         if taker:
             logger.debug('taking only %i first items', taker_count)
             generator = more_itertools.take(taker_count, generator)
+
+        if expander:
+            generator = self.expander(generator, **options)
 
         yield from generator
 
@@ -774,8 +774,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         # TODO: ?
         if options.expand_artist_to_random_album:
-            options.taker = True
+            taker = True
             options.randomize_albums = True
+        else:
+            taker = False
 
         yielder = self.yielder(albums,
                                expander=True,
@@ -783,6 +785,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                                sorter=True,
                                sorter_keys=options.sort_artist_albums_by_keys,
                                sorter_reverse=options.sort_artist_albums_reverse,
+                               taker=taker,
                                **options)
         yield from yielder
 
