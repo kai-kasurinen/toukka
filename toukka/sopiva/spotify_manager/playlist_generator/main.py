@@ -775,7 +775,6 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: ?
         if options.expand_artist_to_random_album:
             options.taker = True
-            options.taker_count = 1
             options.randomize_albums = True
 
         yielder = self.yielder(albums,
