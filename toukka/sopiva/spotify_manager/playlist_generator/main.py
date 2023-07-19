@@ -494,7 +494,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             generator = self.randomizer(generator, **options)
 
         if sorter and sorter_keys:
-            generator = self.sorter(generator, sorter_keys, sorter_reverse)
+            generator = self.sorter(generator, sorter_keys, sorter_reverse, **options)
 
         if expander:
             generator = self.expander(generator, **options)
