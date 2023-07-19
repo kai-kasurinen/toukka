@@ -464,18 +464,48 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         yield from scramble_generator(generator)
 
-    def yielder(
+    def sorter(
             self,
-            generator: Iterable,
-            expander=False,
-            randomizer=False,
+            items: Iterable,
+            keys=None, reverse=False, randomize=False,
             **kwargs
             ) -> Generator[Any, None, None]:
 
         options = self.options.push(kwargs)
 
+        if isinstance(items, types.GeneratorType):
+            logger.debug('converting generator to list')
+            items = list(items)
+
+        if keys:
+            logger.debug('sorting by %s, reverse: %s', keys, reverse)
+            items.sort(key=operator.attrgetter(*keys), reverse=reverse)
+
+        elif randomize:
+            logger.debug('randomizing')
+            random.shuffle(items)
+
+        yield from items
+
+    def yielder(
+            self,
+            generator: Iterable,
+            expander=False,
+            randomizer=False,
+            sorter=False,
+            sorter_keys=None,
+            sorter_reverse=None,
+            **kwargs
+            ) -> Generator[Any, None, None]:
+
+        options = self.options.push(kwargs)
+
+        # TODO: use sorter instead
         if randomizer:
             generator = self.randomizer(generator, **options)
+
+        if sorter and sorter_keys:
+            generator = self.sorter(generator, sorter_keys, sorter_reverse)
 
         if expander:
             generator = self.expander(generator, **options)
@@ -750,6 +780,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         yielder = self.yielder(albums,
                                expander=True,
                                randomizer=options.randomize_albums,
+                               sorter=True,
+                               sorter_keys=options.sort_artist_albums_by_keys,
+                               sorter_reverse=options.sort_artist_albums_reverse,
                                **options)
         yield from yielder
 
@@ -1185,6 +1218,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         yielder = self.yielder(albums,
                                expander=True,
                                randomizer=options.randomize_albums,
+                               sorter=True,
+                               sorter_keys=options.sort_label_albums_by_keys,
+                               sorter_reverse=options.sort_label_albums_reverse,
                                **options)
 
         self.sources.add(yielder)

@@ -51,6 +51,8 @@ class PlaylistGeneratorOptions:
                                      'edge'],
             sort_artist_albums_by_keys=['album_group', 'release_date'],
             sort_artist_albums_reverse=False,
+            sort_label_albums_by_keys=['album_type', 'release_date'],
+            sort_label_albums_reverse=False,
             sort_show_episodes_by_keys=['release_date'],
             sort_show_episodes_reverse=False,
             randomize_artists=False,
