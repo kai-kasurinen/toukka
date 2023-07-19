@@ -33,6 +33,7 @@ class PlaylistGeneratorOptions:
             expand_genre_to_playlists=False,
             expand_genre_to_artists=False,
             expand_genre_to_related_genres=False,
+            expand_label_to_albums=False,
             ignore_various_artists=True,
             ignore_classical_artists=True,
             ignore_non_instrumental_albums=False,

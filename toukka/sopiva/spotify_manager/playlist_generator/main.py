@@ -27,13 +27,13 @@ from toukka.sopiva.spotify.model import (
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
-from toukka.sopiva.spotify_manager.uri import SpotifyUri
 from toukka.sopiva.spotify_manager.genres import Genre
 
 from toukka.sopiva.spotify_history.util import get_spotify_history
 
 import toukka.sopiva.spotify_manager.genres
 
+from .model import SpotifyUri, Label
 from .playlist import PlaylistModifier
 from .sources_queue import SourcesQueue
 from .track_filter import TrackFilter

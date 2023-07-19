@@ -205,4 +205,17 @@ def from_new_releases(
     context = click.get_current_context()
     context.invoke(from_uris, uris=uris)
 
+
+@generate_playlist.command()
+@click.argument('label_name', required=True, nargs=-1)
+@pass_generator
+def from_labels(
+        generator,
+        label_name: tuple,
+        **kwargs
+        ):
+
+    generator.generate_from_labels(labels=label_name, **kwargs)
+
+
 # END
