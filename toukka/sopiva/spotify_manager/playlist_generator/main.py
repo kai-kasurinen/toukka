@@ -491,12 +491,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
 
         options = self.options.push(kwargs)
 
+        if sorter and sorter_keys:
+            generator = self.sorter(generator, sorter_keys, sorter_reverse, **options)
+
         # TODO: use sorter instead
         if randomizer:
             generator = self.randomizer(generator, **options)
-
-        if sorter and sorter_keys:
-            generator = self.sorter(generator, sorter_keys, sorter_reverse, **options)
 
         if taker:
             logger.debug('taking only %i first items', taker_count)
