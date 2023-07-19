@@ -55,7 +55,7 @@ class PlaylistGeneratorOptions:
             sort_label_albums_reverse=False,
             sort_show_episodes_by_keys=['release_date'],
             sort_show_episodes_reverse=False,
-            sort_artists_by_keys=None,
+            sort_artists_by_keys=[],
             sort_artists_reverse=False,
             randomize_artists=False,
             randomize_albums=False,
