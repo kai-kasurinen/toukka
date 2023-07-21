@@ -23,6 +23,7 @@ from toukka.cache.durations import DAY, WEEK, MONTH, HALF_YEAR, YEAR
 from toukka.cache.dogpile import region_spotify
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 # logging.getLogger("dogpile.cache").setLevel(logging.DEBUG)
 
 
@@ -94,12 +95,15 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
     artists_by_genre_cached = dogpile_region.cache_on_arguments(expiration_time=WEEK)(artists_by_genre)
 
     def albums_by_label(self, label_name, market=None):
+        logger.debug('searching albums by label: %s', label_name)
         search = self.search(query=f'label:"{label_name}"', types=['album'], market=market)
         paging = search[0]
         albums = self.all_items(paging)
         albums_ids = [album.id for album in albums]
         albums = self.albums(albums_ids, market=market)
         albums = list(filter(make_filter_by_album_label(label_name), albums))
+        logger.debug('total results %i, after filtering %i', paging.total, len(albums))
+
         return albums
 
     # END
