@@ -93,12 +93,12 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
 
     artists_by_genre_cached = dogpile_region.cache_on_arguments(expiration_time=WEEK)(artists_by_genre)
 
-    def albums_by_label(self, label_name):
-        search = self.search(query=f'label:"{label_name}"', types=['album'])
+    def albums_by_label(self, label_name, market=None):
+        search = self.search(query=f'label:"{label_name}"', types=['album'], market=market)
         paging = search[0]
         albums = self.all_items(paging)
         albums_ids = [album.id for album in albums]
-        albums = self.albums(albums_ids)
+        albums = self.albums(albums_ids, market=market)
         albums = list(filter(make_filter_by_album_label(label_name), albums))
         return albums
 

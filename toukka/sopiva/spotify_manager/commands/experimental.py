@@ -74,10 +74,15 @@ def artists_by_genre(genre: str):
 
 @cli_root.command()
 @click.argument('label')
-def albums_by_label(label: str):
+@click.option('--market')
+def albums_by_label(
+        label: str,
+        market: str = None
+        ):
+
     spotify = get_spotify()
     logger.debug('searching albums by label: %s', label)
-    albums = spotify.albums_by_label(label)
+    albums = spotify.albums_by_label(label, market=market)
     logger.debug('total results after filtering: %s', len(albums))
     for album in albums:
         printer(album)

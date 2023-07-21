@@ -1218,7 +1218,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if self.check_uri(f'label:{label}#albums'):
             return
 
-        albums = self.spotify.albums_by_label(label)
+        albums = self.spotify.albums_by_label(label, market=self.user_country)
 
         yielder = self.yielder(albums,
                                expander=True,
