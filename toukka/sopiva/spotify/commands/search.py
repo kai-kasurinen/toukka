@@ -36,7 +36,7 @@ def search(type: str,
     items = spotify.all_items(paging)
 
     if full:
-        items = spotify.items_list_to_full(list(items))
+        items = spotify.simple_to_full(list(items))
 
     for count, item in enumerate(items, start=1):
         printer(item)

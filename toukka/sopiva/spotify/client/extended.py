@@ -106,23 +106,13 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
 
         return albums
 
-    def items_list_to_full(self, items_list):
-
+    def simple_to_full(self, items_list):
         if not items_list:
             return []
-
         item_type = items_list[0].type
         item_ids = [item.id for item in items_list]
-
-        match item_type:
-            case 'album':
-                return self.albums(item_ids)
-            case 'artist':
-                return self.artists(item_ids)
-            case 'track':
-                return self.tracks(item_ids)
-            case _:
-                raise Exception()
+        method_name = item_type + "s"
+        return getattr(self, method_name)(item_ids)
 
 
 
