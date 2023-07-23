@@ -18,11 +18,13 @@ _types = [k[:-1] for k in tekore._client.api.search.paging_type.keys()]
 @click.argument('type', type=click.Choice(_types))
 @click.argument('query')
 @click.option('--market')
+@click.option('--full', is_flag=True)
 @click.option('--limit', type=int)
 def search(type: str,
            query: str,
            limit: int = None,
-           market: str = None):
+           market: str = None,
+           full: bool = False):
     spotify = get_spotify()
     search = spotify.search(query=query,
                             types=[type],
@@ -31,7 +33,12 @@ def search(type: str,
     print(f'results total: {paging.total}')
     print()
 
-    for count, item in enumerate(spotify.all_items(paging), start=1):
+    items = spotify.all_items(paging)
+
+    if full:
+        items = spotify.items_list_to_full(list(items))
+
+    for count, item in enumerate(items, start=1):
         printer(item)
 
         if limit is not None and count >= limit:
