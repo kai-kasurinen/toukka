@@ -170,6 +170,7 @@ def genre(genre_name: tuple,
 @click.argument('genre_name_re', required=True, nargs=-1)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
+@click.option('--randomize-genres', '--randomize', is_flag=True)
 def genre_re(genre_name_re: str,
              **kwargs
              ):
@@ -184,6 +185,7 @@ def genre_re(genre_name_re: str,
 @click.argument('genre_name', required=True, nargs=-1, shell_complete=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
+@click.option('--randomize-genres', '--randomize', is_flag=True)
 def genre_artists(genre_name: tuple, **kwargs):
     args = locals()
     context = click.get_current_context()
@@ -194,6 +196,7 @@ def genre_artists(genre_name: tuple, **kwargs):
 @click.argument('genre_name_re', required=True, nargs=-1, shell_complete=click_genre_completer)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--ignore-non-instrumental-albums', '--instrumental-only', is_flag=True)
+@click.option('--randomize-genres', '--randomize', is_flag=True)
 def genre_artists_re(genre_name_re: str, **kwargs):
     args = locals()
     context = click.get_current_context()
