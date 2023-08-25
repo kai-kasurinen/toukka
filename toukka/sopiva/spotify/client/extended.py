@@ -87,10 +87,13 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
         # NOTE: search support unicode and ascii genre name
         search = self.search(query=f'genre:"{genre_name}"', types=['artist'])
         paging = search[0]
-        artists = self.all_items(paging)
-        artists = filter(make_filter_by_artist_genre(genre_name), artists)
-        artists = list(artists)
-        return artists
+        artists = list(self.all_items(paging))
+        artists_filter = filter(make_filter_by_artist_genre(genre_name), artists)
+        artists_filter = list(artists_filter)
+        logger.debug('total results %i (pager %i), after filtering %i',
+                     len(artists), paging.total, len(artists_filter))
+
+        return artists_filter
 
     artists_by_genre_cached = dogpile_region.cache_on_arguments(expiration_time=WEEK)(artists_by_genre)
 
