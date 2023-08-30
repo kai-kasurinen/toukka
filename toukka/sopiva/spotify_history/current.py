@@ -21,7 +21,7 @@ Session = sessionmaker()
 class SpotifyHistory:
     def __init__(self):
         database_uri = get_database_uri_from_config()
-        self.engine = create_engine(database_uri, echo=False)
+        self.engine = create_engine(database_uri, echo=False, pool_pre_ping=True)
         # FIXME: Session should be global or something
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
