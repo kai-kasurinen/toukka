@@ -292,8 +292,8 @@ def genres_make():
         genre_name_unicode = genre_name
         genre_name_ascii = unidecode.unidecode(genre_name_unicode)
 
-        if genre_name_ascii != genre_name_unicode:
-            logger.warning('%s != %s', genre_name_ascii, genre_name_unicode)
+        # if genre_name_ascii != genre_name_unicode:
+        #     logger.warning('%s != %s', genre_name_ascii, genre_name_unicode)
 
         genre = Genre(
             name=genre_name_unicode,
