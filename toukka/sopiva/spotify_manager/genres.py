@@ -7,6 +7,7 @@ import pickle
 import os
 
 import unidecode
+import tekore
 
 from dataclasses import dataclass
 from typing import List, Optional
@@ -67,9 +68,8 @@ def genres_make():
     def process_sound_of_spotify(user_id: str):
 
         logger.info('processing user: %s', user_id)
-        paging = spotify.playlists(user_id)
-        playlists = spotify.all_items(paging)
-        logger.info('%s playlists count: %i', user_id, paging.total)
+        playlists = spotify.playlists_all_list_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
 
         sounds = dict()
         places = dict()
@@ -144,9 +144,8 @@ def genres_make():
     def process_particle_detector(user_id: str):
 
         logger.info('processing user: %s', user_id)
-        paging = spotify.playlists(user_id)
-        playlists = spotify.all_items(paging)
-        logger.info('%s playlists count: %i', user_id, paging.total)
+        playlists = spotify.playlists_all_list_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
 
         intros = dict()
         pulses = dict()
@@ -190,9 +189,8 @@ def genres_make():
     def process_particle_filter(user_id: str):
 
         logger.info('processing user: %s', user_id)
-        paging = spotify.playlists(user_id)
-        playlists = spotify.all_items(paging)
-        logger.info('%s playlists count: %i', user_id, paging.total)
+        playlists = spotify.playlists_all_list_cached(user_id)
+        logger.info('%s playlists count: %i', user_id, len(playlists))
 
         females = dict()
 
@@ -215,9 +213,12 @@ def genres_make():
     def process_particle_detector_year(user_id: str, year: int):
 
         logger.info('processing user: %s, year: %i', user_id, year)
-        paging = spotify.playlists(user_id)
-        playlists = spotify.all_items(paging)
-        logger.info('%s playlists count: %i', user_id, paging.total)
+        try:
+            playlists = spotify.playlists_all_list_cached(user_id)
+        except tekore.BadGateway as e:
+            logger.error(e)
+            return Genres()
+        logger.info('%s playlists count: %i', user_id, len(playlists))
 
         ret = Genres()
         for playlist in playlists:
