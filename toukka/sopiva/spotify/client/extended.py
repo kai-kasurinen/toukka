@@ -68,6 +68,7 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
 
     playlists_all_list_cached = check_from_token(
         dogpile_region.cache_on_arguments(expiration_time=WEEK)(playlists_all_list))
+
     def playlist_items_all_list(self, playlist_id: str, market: str = None):
         return list(self.all_items(self.playlist_items(playlist_id=playlist_id, market=market)))
 
@@ -127,9 +128,6 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
         item_ids = [item.id for item in items_list]
         method_name = item_type + "s"
         return getattr(self, method_name)(item_ids)
-
-
-
 
     # END
 
