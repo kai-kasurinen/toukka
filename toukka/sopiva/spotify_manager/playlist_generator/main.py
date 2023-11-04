@@ -433,7 +433,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             playlist_id: str
             ) -> Generator[PlaylistTrack, None, None]:
 
-        playlist_items = self.spotify.playlist_items_all_list(playlist_id=playlist_id, market=self.market)
+        playlist_items = self.spotify.playlist_items_all_list_cached(playlist_id=playlist_id, market=self.market)
 
         for item in playlist_items:
             yield item
