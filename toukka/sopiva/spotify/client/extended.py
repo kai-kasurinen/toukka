@@ -73,7 +73,7 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
         return list(self.all_items(self.playlist_items(playlist_id=playlist_id, market=market)))
 
     playlist_items_all_list_cached = check_from_token(
-        dogpile_region.cache_on_arguments(expiration_time=DAY)(playlist_items_all_list))
+        dogpile_region.cache_on_arguments(expiration_time=2*DAY)(playlist_items_all_list))
 
     def tracks_features_df(self, track_ids):
         tracks = list(self.tracks(track_ids))
