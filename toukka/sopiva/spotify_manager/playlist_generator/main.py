@@ -433,11 +433,9 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             playlist_id: str
             ) -> Generator[PlaylistTrack, None, None]:
 
-        paging = self.spotify.playlist_items(
-            playlist_id=playlist_id,
-            market=self.market)
+        playlist_items = self.spotify.playlist_items_all_list(playlist_id=playlist_id, market=self.market)
 
-        for item in self.spotify.all_items(paging):
+        for item in playlist_items:
             yield item
 
     def randomizer(
