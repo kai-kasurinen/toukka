@@ -36,7 +36,7 @@ def current_user_top_tracks(
 
     # NOTE: sometimes spotify returns 0 items
     if paging.total == 0:
-        paging.pprint()
+        print('Failed...')
         return
 
     print(f'{time_range}: {_RANGES_DESCRIPTION.get(time_range)}')
