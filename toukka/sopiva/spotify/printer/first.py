@@ -83,7 +83,9 @@ def _print_track_played_count(track):
         print(f'\tplayed: {track_played_info.count}', 
               f'({track_played_info.min.date()} - {track_played_info.max.date()})')
 
-    isrc = track.external_ids.get('isrc')
+    isrc = None
+    if hasattr(track, 'external_ids') and track.external_ids:
+        isrc = track.external_ids.get('isrc')
 
     if isrc is not None:
         isrc_played_info = spotify_history.count_by_track_isrc_with_timestamps(isrc)
