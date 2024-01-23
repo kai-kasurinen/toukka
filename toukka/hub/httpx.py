@@ -1,5 +1,7 @@
 #
 
+import logging
+
 import httpx
 import httpx_cache
 
@@ -31,9 +33,11 @@ def get_client(client_type='cache'):
     if client_type == 'plain':
         return httpx.Client()
     elif client_type == 'cache':
-
         # cache = get_filecache()
         cache = get_diskcache()
+
+        # FIXME: remove or move
+        logging.getLogger('httpx').setLevel(logging.WARNING)
 
         transport_http = httpx.HTTPTransport(retries=3)
         transport_cache = httpx_cache.CacheControlTransport(cache=cache, transport=transport_http)
