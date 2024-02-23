@@ -14,6 +14,9 @@ import functools
 import enlighten
 import more_itertools
 
+import langdetect
+from langdetect.lang_detect_exception import LangDetectException
+
 from toukka.sopiva.spotify.model import (
     FullTrack, SimpleTrack, Track,
     FullAlbum, SimpleAlbum, Album,
@@ -549,7 +552,16 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             ) -> Generator[Track, None, None]:
 
         options = self.options.push(kwargs)
-        self.logger.debug('%s:%s: %s', item.type, item.id, item.name)
+
+        # TODO: move
+        try:
+            track_lang = langdetect.detect(item.name)
+        except LangDetectException:
+            track_lang = None
+
+        self.logger.debug('%s:%s: %s (%s)', item.type, item.id, item.name, track_lang)
+
+        # TODO: remove?
         did = False
 
         # TODO: move?
@@ -566,6 +578,10 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                 if track_artist_uri in options.ignore:
                     self.logger.debug('%s: track artist ignored (skipping)', track_artist_uri)
                     return
+
+        if 'track:lang:%s' % track_lang in options.ignore:
+            self.logger.debug('%s: track lang (%s) ignored (skipping)', item.uri, track_lang)
+            return
 
         # add as new source
         if options.expand_track_to_artists:
