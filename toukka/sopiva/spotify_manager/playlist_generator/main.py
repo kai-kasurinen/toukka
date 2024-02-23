@@ -584,7 +584,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
                     return
 
         if 'track:lang:%s' % track_lang2 in options.ignore:
-            self.logger.debug('%s: track lang (%s) ignored (skipping)', item.uri, track_lang)
+            self.logger.debug('%s: track lang (%s) ignored (skipping)', item.uri, track_lang2)
             return
 
         # add as new source
