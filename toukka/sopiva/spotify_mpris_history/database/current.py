@@ -54,10 +54,9 @@ class SpotifyMprisHistoryDB:
 
     def last_saved_mpris_track_id(self):
         # FIXME: update to orm
-        last = self.engine.execute('''SELECT mpris_track_id
-                        FROM spotify_mpris_history
-                        ORDER BY id
-                        DESC LIMIT 1''').fetchone()
+        with self.session_scope() as session:
+            last = session.execute(text("SELECT mpris_track_id FROM spotify_mpris_history ORDER BY id DESC LIMIT 1")).fetchone()
+
         if last is None:
             return None
         return last[0]
