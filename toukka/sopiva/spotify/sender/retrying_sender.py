@@ -85,6 +85,12 @@ class RetryingSender404(ExtendingSender):
                 tries -= 1
                 time.sleep(delay_seconds)
                 delay_seconds *= 2
+            # NOTE: stupid spotify bug
+            elif r.status_code >= 401 and tries > 1:
+                logger.warning('401, retrying')
+                tries -= 1
+                time.sleep(delay_seconds)
+                delay_seconds *= 2
             else:
                 return r
 
