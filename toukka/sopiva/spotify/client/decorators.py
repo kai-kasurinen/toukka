@@ -4,7 +4,7 @@ from typing import Generator, Tuple, Optional
 
 import logging
 import textwrap
-
+import pydantic
 from boltons.funcutils import wraps
 
 
@@ -65,4 +65,17 @@ def check_from_token(f):
         #    raise Exception('market is not defined')
         else:
             return f(*args, **kwargs)
+    return wrapper
+
+
+def check_validation_error(f):
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except pydantic.ValidationError as e:
+            logger.error(f"Validation error: {e}")
+            return None
+
     return wrapper

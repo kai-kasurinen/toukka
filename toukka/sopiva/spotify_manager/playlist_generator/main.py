@@ -2,6 +2,7 @@
 #
 
 from typing import List, Set, Generator, Union, Any, Dict, cast, Optional
+import types
 from collections.abc import Iterable
 
 import logging
@@ -515,7 +516,16 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             **kwargs
             ):
 
+
         raise NotImplementedError('not yet supported expander type: %s' % type(item))
+
+    @expander.register
+    def expander_none(
+            self,
+            item: None,
+            **kwargs
+    ):
+        yield from empty_generator()
 
     @expander.register
     def expander_generator(

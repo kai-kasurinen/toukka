@@ -7,7 +7,7 @@ import unidecode
 
 from tekore import Spotify
 
-from .decorators import check_from_token
+from .decorators import check_from_token, check_validation_error
 # from .cached_dogpile import SpotifyDogpileCached
 
 from ..audio_features import TracksFeaturesDF, AlbumFeaturesDF
@@ -47,8 +47,8 @@ class SpotifyExtended(SpotifyExtendedTokens, SpotifyExtendedTools):
     artist_top_tracks_cached = check_from_token(
         dogpile_region.cache_on_arguments(expiration_time=DAY)(Spotify.artist_top_tracks))
 
-    album_cached = check_from_token(
-        dogpile_region.cache_on_arguments(expiration_time=MONTH)(Spotify.album))
+    album_cached = check_validation_error(check_from_token(
+        dogpile_region.cache_on_arguments(expiration_time=MONTH)(Spotify.album)))
     albums_cached = check_from_token(
         dogpile_region.cache_on_arguments(expiration_time=MONTH)(Spotify.albums))
     album_tracks_cached = check_from_token(
