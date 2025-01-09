@@ -169,6 +169,12 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         if isinstance(uris, tuple):
             uris = list(uris)
 
+        if options.take_one_uri:
+            taker = True
+            taker_count = 1
+        else:
+            taker = False
+
         if options.randomize_uris:
             self.logger.debug('shuffling uris')
             random.shuffle(uris)
@@ -176,7 +182,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: move?
         uris_ = [SpotifyUri(uri) for uri in uris]
 
-        yielder = self.yielder(uris_, expander=True, **options)
+        yielder = self.yielder(uris_, expander=True, taker=taker, taker_count=taker_count,  **options)
         self.sources.add(yielder)
 
         self.playlist.description = ', '.join(uris)
