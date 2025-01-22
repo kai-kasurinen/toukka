@@ -174,6 +174,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
             taker_count = 1
         else:
             taker = False
+            taker_count = None
 
         if options.randomize_uris:
             self.logger.debug('shuffling uris')
