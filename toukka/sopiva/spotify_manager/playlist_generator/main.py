@@ -180,7 +180,7 @@ class PlaylistGenerator(PlaylistGeneratorOptions):
         # TODO: move?
         uris_ = [SpotifyUri(uri) for uri in uris]
 
-        yielder = self.yielder(uris_, expander=True, taker=taker, taker_count=taker_count,  **options)
+        yielder = self.yielder(uris_, expander=True, **options)
         self.sources.add(yielder)
 
         self.playlist.description = ', '.join(uris)
