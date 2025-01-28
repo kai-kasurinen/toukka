@@ -17,6 +17,8 @@ click_logging
 #
 tekore
 httpx_cache
+# for httpx_cache
+aiorwlock
 
 # https://github.com/jonathaneunice/options
 options
@@ -25,4 +27,5 @@ combomethod
 nulltype
 chainmap
 
-#
+# 
+fasttext-langdetect
