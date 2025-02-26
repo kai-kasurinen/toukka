@@ -19,11 +19,19 @@ logger = logging.getLogger(__name__)
 def lang_detect(text):
     return lang_detect_1(text)
 
-
 def lang_detect_1(text):
-    res = ftlangdetect.detect(text=text)
-    logger.debug('%s (%s, %s)', text, res['lang'], res['score'])
-    return res['lang']
+     return None
+
+#  File "/usr/lib/python3/dist-packages/fasttext/FastText.py", line 232, in predict
+#    return labels, np.array(probs, copy=False)
+#                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^
+# ValueError: Unable to avoid copy while creating an array as requested.
+
+
+# def lang_detect_1(text):
+#    res = ftlangdetect.detect(text=text)
+#    logger.debug('%s (%s, %s)', text, res['lang'], res['score'])
+#    return res['lang']
 
 
 def lang_detect_0(text):
