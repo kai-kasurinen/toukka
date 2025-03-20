@@ -89,6 +89,7 @@ def get_sender(sender_type='httpx') -> tekore.Sender:
 def get_client_token() -> tekore.RefreshingToken:
     # client_id, client_secret, client_redirect = tekore.util.read_environment()
     client_id, client_secret, redirect_uri = _read_from_config()
+    # TODO: use sender?
     credentials = tekore.RefreshingCredentials(client_id, client_secret)
     token = credentials.request_client_token()
     return token
