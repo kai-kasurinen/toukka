@@ -12,7 +12,6 @@ from toukka.sopiva.spotify_database.util import get_database_uri_from_config
 from toukka.sopiva.spotify_database.database.first import SpotifyTrackISRC
 from toukka.sopiva.spotify_mpris_history.database.current import SpotifyMprisHistory
 
-Base = declarative_base()
 # TODO: rename track_id to track_uri or something
 
 Session = sessionmaker()
@@ -26,9 +25,6 @@ class SpotifyHistory:
         self.session = self.Session()
         self.history = SpotifyMprisHistory
         self.isrcs = SpotifyTrackISRC
-        # FIXME: move
-        Base.metadata.create_all(self.engine) 
-
 
     # FIXME: hack?
     def __del__(self):
