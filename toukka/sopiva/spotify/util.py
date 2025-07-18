@@ -65,7 +65,7 @@ def get_user_token() -> tekore.RefreshingToken:
     if token is None:
         logger.debug('referesh token not found, prompt user input')
         scope = tekore.Scope(tekore.scope.every)
-        token = tekore.prompt_for_user_token(client_id, client_secret, redirect_uri, scope)
+        token = tekore.prompt_for_user_token(client_id, client_secret, redirect_uri, scope, open_browser=False)
         set_user_refresh_token(token.refresh_token)
 
     return token

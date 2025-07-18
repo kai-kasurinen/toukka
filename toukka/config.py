@@ -1,4 +1,8 @@
 #
+#
+# NOTE: default path ~/.config/toukka/config.yaml
+
+
 
 import confuse
 

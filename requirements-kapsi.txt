@@ -1,0 +1,33 @@
+# Debian GNU/Linux 12 (bookworm)
+# 2025-07-18
+
+tekore
+
+click_params
+click_logging
+
+options
+
+confuse
+
+cachecontrol
+
+redis
+
+diskcache
+
+hishel
+
+unidecode
+
+boltons
+
+dogpile.cache
+
+sqlitedict
+
+humanize
+
+sqlalchemy
+
+iso8601
