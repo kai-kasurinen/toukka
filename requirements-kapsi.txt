@@ -20,6 +20,9 @@ iso8601
 
 pyxdg
 pandas
+enlighten
+langdetect
+
 
 
 
