@@ -5,10 +5,10 @@ import logging
 import httpx
 import hishel
 
-def get_client():
+def get_client_():
         return httpx.Client(http2=True)
 
-def get_client_cached():
+def get_client():
 
         logging.getLogger('httpx').setLevel(logging.WARNING)
 
