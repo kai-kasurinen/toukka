@@ -10,7 +10,7 @@ from langdetect.lang_detect_exception import LangDetectException
 
 os.environ['FTLANG_CACHE'] = save_cache_path('toukka', 'fasttext-langdetect')
 
-import ftlangdetect
+# import ftlangdetect
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
