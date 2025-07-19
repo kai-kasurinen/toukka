@@ -9,6 +9,8 @@ __pycache__/
 # Pycharm
 .idea/
 
+#
+build/
 
 #
 .mypy_cache
