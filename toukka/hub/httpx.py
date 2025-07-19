@@ -1,9 +1,14 @@
 #
 
 import logging
+import os
 
+import sqlite3
 import httpx
 import hishel
+
+from xdg.BaseDirectory import save_cache_path
+
 
 def get_client_():
         return httpx.Client(http2=True)
@@ -12,9 +17,9 @@ def get_client():
 
         logging.getLogger('httpx').setLevel(logging.WARNING)
 
-        # default file is ~/.hishel.sqlite
-        # TODO: change path
-        storage = hishel.SQLiteStorage()
+        cache_file = os.path.join(save_cache_path('toukka'), 'hishel.sqlite')
+
+        storage = hishel.SQLiteStorage(connection=sqlite3.connect(cache_file))
 
         transport_http = httpx.HTTPTransport(retries=3)
         transport_cache = hishel.CacheTransport(transport=transport_http, storage=storage)
