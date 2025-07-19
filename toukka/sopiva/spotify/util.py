@@ -71,17 +71,11 @@ def get_user_token() -> tekore.RefreshingToken:
     return token
 
 
-def get_sender(sender_type='httpx') -> tekore.Sender:
+def get_sender() -> tekore.Sender:
 
-    if sender_type == 'requests':
-        session = toukka.hub.requests.get_cached_session()
-        sender = RequestsSender(session=session)
-    elif sender_type == 'httpx':
-        client = toukka.hub.httpx.get_client()
-        # sender = tekore.RetryingSender(retries=3, sender=tekore.SyncSender(client))
-        sender = RetryingSender404(retries=5, sender=tekore.SyncSender(client))
-    else:
-        raise Exception
+    client = toukka.hub.httpx.get_client()
+    # sender = tekore.RetryingSender(retries=3, sender=tekore.SyncSender(client))
+    sender = RetryingSender404(retries=5, sender=tekore.SyncSender(client))
 
     return sender
 
