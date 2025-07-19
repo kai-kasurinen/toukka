@@ -8,13 +8,13 @@ import logging
 import tekore
 
 import toukka.config
-import toukka.hub.requests
+# import toukka.hub.requests
 import toukka.hub.httpx
 
 import toukka.sopiva.spotify.client.current
 import toukka.sopiva.spotify.state
 
-from toukka.sopiva.spotify.sender.requests_sender import RequestsSender
+# from toukka.sopiva.spotify.sender.requests_sender import RequestsSender
 from toukka.sopiva.spotify.sender.caching_sender import SqliteCachingSender
 from toukka.sopiva.spotify.sender.retrying_sender import RetryingSender404
 from toukka.sopiva.spotify.client.current import SpotifyCurrent
