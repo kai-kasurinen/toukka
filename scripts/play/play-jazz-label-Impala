@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#	--expand-track-to-recommendations \
+#	--expand-album-to-recommendations \
+#	--expand-track-to-album \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-label-to-albums \
+	--expand-album-to-tracks \
+	--expand-album-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--instrumental-only \
+	--ignore "spotify:album:1bq8tAlIbyuvrPvanGAw1s" \
+	--ignore "spotify:album:4Dc5K5aEwYdMwxOS4B9EvB" \
+	--ignore "spotify:album:4QghoSHAdTobOzKwbyFeo2" \
+	--ignore "spotify:album:3QHrmADFQhvMH7sCO7M0ug" \
+	--ignore "spotify:album:2LOxBLyeaq9e5WdWTN22vM" \
+	from-labels "Impala"
+

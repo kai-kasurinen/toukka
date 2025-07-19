@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#	--randomize-uris \
+#	--randomize-playlist-items \
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--ignore-various-artists-albums \
+	from-uris \
+		spotify:playlist:5h6fdYewYht0S6FICRfrVf

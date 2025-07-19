@@ -1,0 +1,56 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+        --expand-album-to-artists \
+        --expand-artist-to-random-album \
+        --expand-artist-to-related-artists \
+        --randomize-uris \
+        --randomize-playlist-items \
+	--instrumental-only \
+	--ignore-various-artists-albums \
+	--ignore spotify:artist:2szp9EHFXhBSuS3PmZwqvg \
+	--ignore spotify:artist:2voHaTmDMF2QFv95m9SLtq \
+	--ignore spotify:artist:459INk8vcC0ebEef82WjIK \
+	--ignore spotify:artist:1tcgfoMTT1szjUeaikxRjA \
+	--ignore spotify:artist:0vPjQskREu8zGvFT3jYUWa \
+	--ignore spotify:artist:1385hLNbrnbCJGokfH2ac2 \
+	--ignore spotify:artist:0Kekt6CKSo0m5mivKcoH51 \
+	--ignore spotify:artist:5x2Ufw4gSPVw4TNcGCpFT1 \
+	--ignore spotify:artist:7vfydQ0nVBVgJ0ajs8EtRM \
+	--ignore spotify:artist:7y97mc3bZRFXzT2szRM4L4 \
+	--ignore spotify:artist:5aIqB5nVVvmFsvSdExz408 \
+	--ignore spotify:artist:17hR0sYHpx7VYTMRfFUOmY \
+	--ignore spotify:artist:6nZiWg5ZB511S24WmB7TCV \
+	--ignore spotify:artist:4Ws5hSoABAwvGJ4LhHwHgq \
+	--ignore spotify:artist:72Syhg4FIEracKDa3yumQY \
+	--ignore spotify:artist:09b9oXw3X9LhhKA8GJsMDT \
+	--ignore spotify:artist:4CMC2nnStv4EENjKBSDpKR \
+	--ignore spotify:artist:3U6eCXHFS6wQVuFuqeW09m \
+	--ignore spotify:artist:3LruscMfdxyvqJpFzywkfb \
+	--ignore spotify:artist:2VZNmg4vCnew4Pavo8zDdW \
+	--ignore spotify:artist:6FDcfa9dc1dT6QIvDcIItq \
+	--ignore spotify:artist:2i66H6Y7BoIctXC5Dfqp2Z \
+	--ignore spotify:artist:1joFZGTRER78nUsWtgHCHR \
+	--ignore spotify:artist:7E3BRXV9ZbCt5lQTCXMTia \
+	--ignore spotify:artist:3eX54towHuwK80Za9BKZ8l \
+	--ignore spotify:artist:7GMpkbegUlL4UvUe5w47zu \
+	--ignore spotify:artist:2EX6hgMIUZhPty734qcBaS \
+	--ignore spotify:artist:4G1ZsxfEEztbE1VcnNInPg \
+	--ignore spotify:artist:6pSQcy8935ABNiK2qOpOlK \
+	--ignore spotify:artist:5q3wKuiaCK8BRPZQSvehFd \
+	--ignore spotify:artist:1Uff91EOsvd99rtAupatMP \
+	--ignore spotify:artist:2T5bM1nb5fZVw5Bm851HNh \
+	--ignore spotify:artist:1QEN3Dm0P6qnHLpVoMQ9C0 \
+	--ignore spotify:artist:2P6ygesd9xg5DPOBnda2jg \
+	--ignore spotify:artist:7o7D77HMHvg1sAmtryKoVy \
+	--ignore spotify:artist:48zEFyblYVZnfNhtmpY0mM \
+	--ignore spotify:artist:69lxxQvsfAIoQbB20bEPFC \
+	--ignore spotify:artist:5gqhueRUZEa7VDnQt4HODp \
+	--ignore spotify:artist:3pghtNhopnwVPykMEK9NLd \
+	from-search playlist "piano"
+# END
+

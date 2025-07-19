@@ -1,0 +1,11 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+        --progress-bar \
+        --expand-label-to-albums \
+        --expand-album-to-tracks \
+        --expand-album-to-recommendations \
+        --expand-track-to-album \
+        --instrumental-only \
+		from-labels "Flame Jazz"
+

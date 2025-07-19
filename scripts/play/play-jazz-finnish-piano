@@ -1,0 +1,15 @@
+#!/bin/bash
+
+toukka-spotify-manager generate-playlist \
+        --progress-bar \
+        --expand-artist-to-random-album \
+        --expand-artist-to-related-artists \
+        --expand-album-to-tracks \
+        --instrumental-only \
+        --ignore-played-albums \
+	from-uris \
+		spotify:artist:1TUB4SrRqhM7dLKObTXnSq \
+		spotify:artist:67Ab9p2xTxwNzuTZJfAO48 \
+		spotify:artist:3Z9kTMfXLpFuZ81jY8zm0I \
+		spotify:artist:5dP0K6UFJq6UOewk4qIKmL \
+		spotify:artist:1nlJUHlmuvSRMGPMsulgGX

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--include-album-groups=album,compilation \
+	--randomize-artists \
+	from-uris spotify:artist:0KV2B2b0q24rEawMkFmQvD
+

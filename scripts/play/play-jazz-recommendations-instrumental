@@ -1,0 +1,11 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-track-to-recommendations \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--instrumental-only \
+	from-recommendations --seed-genres jazz --attributes min_instrumentalness:0.7
+
+

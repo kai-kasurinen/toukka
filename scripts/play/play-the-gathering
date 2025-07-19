@@ -1,0 +1,12 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--expand-track-to-artists \
+	--include-album-groups=album,compilation \
+	from-uris spotify:album:1EOXtZ6YCFsmZbPxbumw13 spotify:album:61WXAjS3h7ZR2U64n1JR6r spotify:album:0V6f5X3GST9f4M3vLqSeWu
+
+

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-track-to-album	\
+	--expand-album-to-tracks \
+	--randomize-artists \
+	--randomize-search \
+	--randomize-genres \
+	--instrumental-only \
+	--ignore-various-artists-albums \
+	from-genres-re \
+		".*jazztronica.*" \
+		"nu jazz" \
+		"acid jazz" \
+		"electro jazz"
+
+

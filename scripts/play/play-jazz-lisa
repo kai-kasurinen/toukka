@@ -1,0 +1,14 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--include-album-groups=album,compilation \
+	--randomize-artists \
+	--instrumental-only \
+	--ignore-played-albums \
+	--ignore spotify:artist:1T2GGSXnjKOGfo2FsGi1WM \
+	from-uris spotify:artist:02TuGOMPygRh8f5AIDYD5C
+

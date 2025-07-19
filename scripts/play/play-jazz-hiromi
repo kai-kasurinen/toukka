@@ -1,0 +1,12 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--ignore-various-artists-albums \
+	--include-album-groups=album,compilation \
+	--randomize-artists \
+	from-uris \
+		spotify:artist:7DeuppKQdCVhuWrzzCBBpc

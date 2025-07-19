@@ -1,0 +1,16 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--randomize-artists \
+	--randomize-search \
+	--randomize-genres \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	from-genres \
+		"modern jazz piano"
+

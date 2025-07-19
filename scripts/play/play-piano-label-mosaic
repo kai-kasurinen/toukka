@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#	--expand-track-to-recommendations \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--randomize-search \
+	--expand-label-to-albums \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--expand-album-to-recommendations \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	--ignore-classical-artists \
+		from-labels "Piano Mosaic"
+

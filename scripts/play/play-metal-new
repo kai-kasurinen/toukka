@@ -1,0 +1,16 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+        --expand-album-to-artists \
+        --expand-artist-to-random-album \
+        --expand-artist-to-related-artists \
+        --randomize-uris \
+        --randomize-playlist-items \
+	--ignore-various-artists-albums \
+	--ignore-classical-artists \
+	from-uris \
+		spotify:playlist:37i9dQZF1DX5J7FIl4q56G

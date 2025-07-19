@@ -1,0 +1,31 @@
+7#!/bin/bash
+
+toukka-spotify-manager generate-playlist \
+        --progress-bar \
+        --expand-artist-to-random-album \
+        --expand-artist-to-related-artists \
+        --expand-album-to-tracks \
+        --instrumental-only \
+        --ignore-played-albums \
+	from-uris \
+		spotify:artist:0joLINVKV1XeB3CvRHlxw0 \
+		spotify:artist:17YpqTajGC7ohJUzAiDbBQ \
+		spotify:artist:1Mwp07Vtu7EU1mO05v84kl \
+		spotify:artist:7lkzHd6Tzt9hQJSnIYkVrl \
+		spotify:artist:7z30NYlp451piFubiN7jW0 \
+		spotify:artist:4jFFUMZ8s8EWxbK4XVjVVD \
+		spotify:artist:5S2idUqIInbZK416x8PKUg \
+		spotify:artist:0T0EDpLClEi5OrBqQUefBD \
+		spotify:artist:0XIcHwpBXlQtt037NGJXdA \
+		spotify:artist:1kuzJdBsQbShpXntTagPm4 \
+		spotify:artist:0T0EDpLClEi5OrBqQUefBD \
+		spotify:artist:1jWOpqr6kOOCmw3VqYmnW5 \
+		spotify:artist:1t2lqc2h706wnrSIGChpK7 \
+		spotify:artist:5S2idUqIInbZK416x8PKUg \
+		spotify:artist:1Iw7NNwr6GlWU6uj3PitT2 \
+		spotify:artist:5BSBQIWGdoItNDo3XkJJHe \
+		spotify:artist:4FFrLKRNmwGJ4pEzhkpQtv \
+		spotify:artist:1jWOpqr6kOOCmw3VqYmnW5 \
+		spotify:artist:5o52BOj8untw6hOzTjmRsi \
+		spotify:artist:4Qwj56r88a95geCz7UF6KA \
+		spotify:artist:6iXJrIGdEi4VOAvZDXk93k

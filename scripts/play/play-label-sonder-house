@@ -1,0 +1,7 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-album-to-tracks \
+	from-search \
+		album 'label:"Sonder House"' 

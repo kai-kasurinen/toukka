@@ -1,0 +1,29 @@
+#!/bin/sh
+
+#	--randomize-artists \
+#	--randomize-search \
+#	--randomize-genres \
+#	--ignore-various-artists-albums \
+#	--ignore "genre:classic iskelmä" \
+#	--ignore "genre:deep adult standards" \
+#	--ignore "genre:vintage italian pop" \
+#	--ignore "genre:adult standards" \
+#	--ignore "genre:bengali folk" \
+#	--ignore "genre:vintage schlager" \
+#	--ignore "genre:russian romance" \
+#	--ignore "genre:vintage broadway" \
+#	--ignore "genre:mazandarani folk" \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-album-to-tracks \
+	--expand-track-to-album \
+	--instrumental-only \
+	--ignore-classical-artists \
+	--ignore-played-albums \
+	from-genres-re \
+		".*finnish.*jazz.*"
+

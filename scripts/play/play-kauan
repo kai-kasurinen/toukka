@@ -1,0 +1,15 @@
+#!/bin/sh
+
+#	--include-album-groups=album,compilation \
+#	--randomize-artists \
+#	--ignore-non-instrumental-albums \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--ignore-various-artists-albums \
+	from-uris \
+		spotify:artist:2QgzO1Z5XYu9zj3nOYsXUa
+

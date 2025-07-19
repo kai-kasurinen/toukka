@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#        --randomize-uris \
+#        --randomize-playlist-items \
+#	--ignore-played-albums \
+#	--ignore-various-artists-albums \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+        --expand-album-to-artists \
+        --expand-artist-to-random-album \
+        --expand-artist-to-related-artists \
+	--instrumental-only \
+	--ignore-classical-artists \
+	from-uris \
+		spotify:playlist:37i9dQZF1DX3joPD88EypN \
+		spotify:playlist:1ChjgrC2JNFGEqHyw3sZVL \
+		spotify:playlist:6w2RyFiMmt5H0MfV1lMtoI \
+		spotify:playlist:5PUYsoczv6JW2L7pP9VFaq

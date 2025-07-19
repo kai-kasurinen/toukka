@@ -1,0 +1,15 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-label-to-albums \
+	--expand-album-to-tracks \
+	--expand-album-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--instrumental-only \
+	--ignore "spotify:artist:3JCVeg5KkE8S0sfJFfsKP7" \
+	from-labels \
+		"Eclipse Music" \
+		"Eclipse Music / Supersounds Music Oy"
+

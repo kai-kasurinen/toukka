@@ -1,0 +1,12 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--expand-track-to-artists \
+	--include-album-groups=album,compilation \
+	from-uris spotify:album:2skvJw7CjGmagv5JDGd3sn spotify:album:0KKuJRTOQSJLt8I7K065El
+
+

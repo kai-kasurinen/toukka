@@ -1,0 +1,30 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-track-to-album	\
+	--expand-album-to-tracks \
+	--randomize-artists \
+	--randomize-search \
+	--randomize-genres \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	--ignore "genre:background jazz" \
+	--ignore "genre:background jazz product" \
+	--ignore "genre:jazz metal" \
+	--ignore "genre:jazz rock" \
+	--ignore "genre:japanese jazztronica" \
+	--ignore "genre:jazztronica" \
+	--ignore "genre:electro jazz" \
+	--ignore "genre:nu jazz" \
+	--ignore "genre:progressive jazz fusion" \
+	from-genres-re \
+		".*jazz.*" \
+		"bebop" \
+		"hard bop" \
+		"contemporary post-bop" \
+		"stride"
+

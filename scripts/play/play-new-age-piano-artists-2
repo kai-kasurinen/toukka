@@ -1,0 +1,18 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-albums \
+	--expand-album-to-tracks \
+	--expand-album-to-recommendations \
+	--expand-track-to-album \
+	--randomize-artists \
+	--randomize-search \
+	--randomize-genres \
+	--instrumental-only \
+	--ignore-various-artists-albums \
+	--ignore-classical-artists \
+	from-genres-re \
+		"new age piano"
+

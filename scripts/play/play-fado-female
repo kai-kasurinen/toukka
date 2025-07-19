@@ -1,0 +1,3 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist --expand-genre-to-playlists --expand-playlist-to-items --expand-track-to-album --expand-album-to-tracks --expand-album-to-artists --expand-artist-to-albums --include-genre-playlists=female from-genres-re "fado"

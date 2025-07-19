@@ -1,0 +1,20 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--randomize-artists \
+	--randomize-search \
+	--randomize-genres \
+	--ignore-played-albums \
+	--ignore "spotify:artist:25QnlyR1c47kxXwdgXriK6" \
+	--ignore "track:lang:de" \
+	--ignore "track:lang:ru" \
+	--ignore "track:lang:id" \
+	--ignore "genre:indonesian gothic metal" \
+	from-genres-re \
+		".*gothic.*metal.*"
+

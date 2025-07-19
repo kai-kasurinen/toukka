@@ -1,0 +1,11 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-label-to-albums \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--expand-album-to-recommendations \
+	--instrumental-only \
+		from-labels "Ricky-Tick Records"
+

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--randomize-genres \
+	--ignore-various-artists-albums \
+	--ignore-played-albums \
+	--ignore "spotify:artist:1yiq4MFzqzqpMQNprXARh4" \
+	--ignore "spotify:artist:4wiRusPutFlhOkzr24Olkm" \
+	from-genres-re \
+		".*gothic.*metal.*"
+

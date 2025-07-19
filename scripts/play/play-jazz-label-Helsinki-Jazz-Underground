@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#	--expand-track-to-recommendations \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-label-to-albums \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--expand-album-to-recommendations \
+	--instrumental-only \
+		from-labels \
+			"Helsinki Jazz Underground" \
+			"Helsinki-Jazz-Underground" 

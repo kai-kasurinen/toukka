@@ -1,0 +1,15 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+        --progress-bar \
+	--expand-label-to-albums \
+        --expand-album-to-tracks \
+        --instrumental-only \
+	--ignore-played-albums \
+	from-labels \
+		"We Jazz" \
+		"Helsinki-Jazz-Underground" \
+		"Helsinki Jazz Underground" \
+		"Flame Jazz" \
+		"Ricky-Tick Records" \
+		"Jazzaggression"

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--randomize-artists \
+	--randomize-search \
+	--randomize-genres \
+	--instrumental-only \
+	--ignore-various-artists-albums \
+	--ignore-played-albums \
+	--ignore-classical-artists \
+	--ignore "spotify:artist:36X8MXEfTuZeAmxcvUp8f0" \
+	from-genres-re \
+		".*anime.*piano.*"
+

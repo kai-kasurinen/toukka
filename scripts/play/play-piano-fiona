@@ -1,0 +1,5 @@
+#!/bin/sh
+
+toukka-play uri spotify:artist:1UnEeCMhJgy2JrfmNX4v0d
+
+

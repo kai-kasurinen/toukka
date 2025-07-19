@@ -1,0 +1,76 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-albums \
+	--expand-album-to-tracks \
+	--expand-artist-to-related-artists \
+	--randomize-artists \
+	--ignore spotify:artist:7vwpKCVjqvSn8RVOhD38g9 \
+	--ignore spotify:artist:5qUOOLH8pTCB9XZrzj5jag \
+	--ignore spotify:artist:27DGFhdWUeudNFbPJROkWF \
+	--ignore spotify:artist:57laChtTEdJ7VqnU0qpBtp \
+	--ignore spotify:artist:1qW4m07516Q5lMSerc7mr9 \
+	--ignore spotify:artist:3xoAJARqZuP7pF6f5h5rxA \
+	--ignore spotify:artist:0gBZaH1J35u5w3S9tkP6aD \
+	--ignore spotify:album:1QWpPkWTnwoJngFk7JzaA0  \
+	--ignore spotify:artist:0OoMbVbBDLUA18mCB6O3d5 \
+	--ignore spotify:artist:3AdcSxxep8tZESjs9K3mZ9 \
+	--ignore spotify:artist:461sVAxk7a1yog2yExyBRX \
+	--ignore spotify:artist:29w4oGLyEXCDDyaCvKTtfN \
+	--ignore spotify:artist:1XvEjHuBKBUIbZHuBesoCE \
+	--ignore spotify:artist:6q94KewnCnut4Ta36dCoaB \
+	--ignore spotify:artist:3LtlJprzuq0Ii8p8YFZXai \
+	--ignore spotify:artist:6OWrEjKgMyuSiXrKYghYqp \
+	--ignore spotify:artist:7j1lSJOJQBRw80bRit36Fs \
+	--ignore spotify:artist:1yLIaxyVkZnLMXhfRSYEjV \
+	--ignore spotify:artist:74FWRHtdjFgWKiWkWYuAVh \
+	--ignore spotify:artist:4XQh612A44SjTTAQ7hMUuP \
+	--ignore spotify:artist:0C7vbfD3UtshkAi5BjrpA8 \
+	--ignore spotify:artist:60Ygpctc1ZdaRuvvrkiqAU \
+	--ignore spotify:artist:1k3YN6p4gb48dCrbLgwbht \
+	--ignore spotify:artist:7GMpkbegUlL4UvUe5w47zu \
+	--ignore spotify:artist:6l2KUZu4TEk26aBaP663G6 \
+	--ignore spotify:artist:1zIcfg9uUp5YjS9Bb1sEgc \
+	--ignore spotify:artist:4tHZV2ZowPkzOvX4eG1inY \
+	--ignore spotify:artist:7mOe6jfxX9EILXET9l5L6H \
+	--ignore spotify:artist:1I2tg6xucySGp9tyt7ei34 \
+	--ignore spotify:album:1jv8oYIatenPhf6tL883w9  \
+	--ignore spotify:artist:2YdblFMUbUSxdwFNffi7ct \
+	--ignore spotify:artist:4301XXSbiO4YrZZcuyktbB \
+	--ignore spotify:artist:60YDZf6o3FXnne3f6rlxHM \
+	--ignore spotify:album:2vn1g9syLYQTn8VykTORDf  \
+	--ignore spotify:artist:71tFaKKy6x1inyCFHjpzUE \
+	--ignore spotify:artist:0sNXk2NCcF4VpqvJ0KRffX \
+	--ignore spotify:artist:5o4dgimn1R07w1d2ZzpzpP \
+	--ignore spotify:artist:4VczIY2BzHi4zlJywVnRPZ \
+	--ignore spotify:artist:2ydqw8ijsOMDxRczhzWhHd \
+	--ignore spotify:artist:1M3qiPflivyEXjer0WqGqR \
+	--ignore spotify:artist:2ydqw8ijsOMDxRczhzWhHd \
+	--ignore spotify:artist:5gjbJH4uF12lqYaPJfLygo \
+	--ignore spotify:artist:1WCGM94WQwqQnisq2QEOHl \
+	--ignore spotify:artist:0BbHILJDz4eN90gbl1mHZj \
+	--ignore spotify:artist:5vAlVucLqE9LIqobdWzVdn \
+	--ignore spotify:artist:5SkCoDbdYJn9RkWHTa1CUF \
+	--ignore spotify:artist:0FXk0xKcMcLfLjkGduqGkn \
+	--ignore spotify:artist:5xXWh6pIT6H8NzENvUU9HN \
+	--ignore spotify:artist:2zUPf8Btzm9ro7vM35THTf \
+	--ignore spotify:artist:2EGdLtlrhZb9F1IRN44VbS \
+	--ignore spotify:artist:3vcW0hEkcR2gnHLUmhaJ1d \
+	--ignore spotify:artist:3Be0FxZRoCJ8UPrkwe6Xuw \
+	--ignore spotify:artist:1xwEwfwgvdrYZ2rm654VhL \
+	--ignore spotify:artist:0oGuRxr8O9eLnI4MS3pkTt \
+	--ignore spotify:artist:53k1kqkyCUpbJMK93MBxxc \
+	--ignore spotify:artist:63hFk4MZ7eUnYooe9r8fxg \
+	--ignore spotify:artist:2kJB0zMAucIFswEBHs4Ys9 \
+	--ignore spotify:artist:4W12lEvVl5wectUtRNrvDh \
+	--ignore spotify:artist:1O7bUkov2v71fDS60GOfMD \
+	--ignore spotify:artist:2kmoueb7a0hxghunb7XAVN \
+	--ignore spotify:artist:1UD3SXwenV5Zmrdl7KKfqW \
+	--ignore spotify:artist:4H1DT9A2uoT7pTVRDSolnk \
+	--ignore spotify:artist:5xz44HCcpJAkEmM6qUzA7u \
+	--ignore spotify:artist:4vPiZNfnHqzN52FOn38BEv \
+	from-genres \
+		"background piano"
+

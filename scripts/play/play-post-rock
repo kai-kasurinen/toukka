@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#	--randomize-genres \
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--include-genre-playlists=intro,sound,female,pulse,edge \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	--ignore "genre:ambient post-rock" \
+	from-genres-re ".*post.rock.*"

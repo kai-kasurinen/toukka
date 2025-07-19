@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# album: Ambient Sleeping Pill 5 (compilation) (spotify:album:7cEETUDt1Dn6ypo2Db1NEa) (2021-07-30 day) (tracks: 11)
+#         artists: Various Artists (spotify:artist:0LyfQWJT6nXafLPZqxe9Of)
+#        markets: 178
+# album: Ambient Sleeping Pill 1 (compilation) (spotify:album:4Yrrc0c0U5zWgxPP7zG4T6) (2014-01-31 day) (tracks: 10)
+#         artists: Various Artists (spotify:artist:0LyfQWJT6nXafLPZqxe9Of)
+#         markets: 178
+# album: Ambient Sleeping Pill 4 (compilation) (spotify:album:5wIjOK6AHoEa5gWLxS57S5) (2015-03-14 day) (tracks: 10)
+#         artists: Various Artists (spotify:artist:0LyfQWJT6nXafLPZqxe9Of)
+#         markets: 178
+# album: Ambient Sleeping Pill 3 (compilation) (spotify:album:7oM3oufjDVnetTa6jwzrcI) (2014-04-05 day) (tracks: 8)
+#         artists: Various Artists (spotify:artist:0LyfQWJT6nXafLPZqxe9Of)
+#         markets: 178
+# album: Ambient Sleeping Pill 2 (compilation) (spotify:album:7FSvEEx8aPX8s5COt0qBAM) (2014-02-28 day) (tracks: 8)
+#         artists: Various Artists (spotify:artist:0LyfQWJT6nXafLPZqxe9Of)
+#        markets: 178
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--expand-track-to-artists \
+	--expand-playlist-to-items \
+	--include-album-groups=album,compilation \
+	from-uris \
+		spotify:album:4Yrrc0c0U5zWgxPP7zG4T6 \
+		spotify:album:7FSvEEx8aPX8s5COt0qBAM \
+		spotify:album:7oM3oufjDVnetTa6jwzrcI \
+		spotify:album:5wIjOK6AHoEa5gWLxS57S5 \
+		spotify:album:7cEETUDt1Dn6ypo2Db1NEa
+
+
+

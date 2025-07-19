@@ -1,0 +1,15 @@
+#!/bin/sh
+
+#	--include-genre-playlists=intro,sound,female,pulse,edge,year_2019,year_2020,year_2021,year_2022 \
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--instrumental-only \
+	--ignore-various-artists-albums \
+	from-genres-re ".*jazz.piano.*"

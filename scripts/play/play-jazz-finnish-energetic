@@ -1,0 +1,15 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-albums \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--include-album-groups=album,single,compilation,appears_on \
+	--ignore-played-albums \
+	--instrumental-only \
+	--ignore-classical-artists \
+	--only-energetic \
+	--ignore "genre:vintage finnish jazz" \
+		from-genres-re ".*finnish.*jazz.*"

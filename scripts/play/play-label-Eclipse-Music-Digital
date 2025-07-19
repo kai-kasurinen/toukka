@@ -1,0 +1,13 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-label-to-albums \
+	--expand-album-to-tracks \
+	--expand-album-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--instrumental-only \
+	from-labels \
+		"Eclipse Music Digital"
+

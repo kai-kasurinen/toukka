@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#	--randomize-uris \
+#	--randomize-playlist-items \
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--expand-album-to-recommendations \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	from-uris \
+		spotify:playlist:37i9dQZF1DX43E1RoZ4lai \
+		spotify:playlist:37i9dQZF1DWWfxnl2EyBbd \
+		spotify:playlist:37i9dQZF1DWY3X53lmPYk9 \
+		spotify:playlist:37i9dQZF1DWVvXA824aCbn \
+		spotify:playlist:37i9dQZF1DX5q7wCXFrkHh
+# END

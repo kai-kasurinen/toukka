@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#	--ignore-various-artists-albums \
+#	--randomize-search \
+#	--randomize-genres \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-artists \
+	--expand-artist-to-random-album \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--randomize-artists \
+	--include-album-groups=album,single,compilation,appears_on \
+	--instrumental-only \
+	--ignore-played-albums \
+	--ignore-classical-artists \
+	--ignore-various-artists \
+	--ignore "spotify:artist:6lSQjYii4BRXZuFwmHJz5x" \
+	from-genres-re \
+		".*finnish.*jazz.*"
+

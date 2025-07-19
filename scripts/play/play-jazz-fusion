@@ -1,0 +1,14 @@
+#!/bin/sh
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-genre-to-playlists \
+	--expand-genre-to-related-genres \
+	--expand-playlist-to-items \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--instrumental-only \
+	--ignore-various-artists-albums \
+	--ignore "genre:classical jazz fusion" \
+	from-genres-re ".*jazz fusion.*"

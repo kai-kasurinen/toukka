@@ -1,0 +1,18 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--expand-track-to-artists \
+	--expand-playlist-to-items \
+	--include-album-groups=album,compilation \
+	from-uris \
+		spotify:album:6ix1hZTHk45Npp220mqv7j \
+		spotify:album:7y3qsOYaa4d7PPAjGA3ioE \
+		spotify:album:2jagQByBpQMevSxF0lEvoS \
+		spotify:album:55i8j01A0o78CsKI2OWrMT \
+		spotify:album:4OrVQSgSJJuz2P9JRWUFzn \
+		spotify:album:4cvBGD4LScbUtAeCCh0Ykn \
+		spotify:album:6l7TZVCSf4RYOJM1YlslHD

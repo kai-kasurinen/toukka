@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-albums \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--ignore spotify:album:0RfLTKV6AMVIgih1OUC9RA \
+	--ignore spotify:album:3pIrYQbvVxVyS7nVEFlKub \
+	--ignore spotify:album:7Liy9ntOVkKh67CXmKaCxz \
+	--ignore spotify:album:0KcCihwMpcUgmUHxL61Jjt \
+	--ignore spotify:album:5C3kYdbiaGfWENH5iUwtd6 \
+	--ignore spotify:album:1UslfDrpFvdvWMEgxCh6my \
+	--ignore spotify:album:1p7Sbud0QXzi3EwegX3G0K \
+	--ignore spotify:album:3yhQNNigksErLNcYaBvZCx \
+	--ignore spotify:album:1cR81uIZPUT1M5a0ynS4ic \
+	--ignore spotify:album:0ybgbrZMuJ24wzsKZuJql5 \
+	--ignore spotify:album:3PyhaDRrvU2XsJSXSyinMp \
+	--ignore spotify:album:77H6hYesYJMUBS0wb7DDQL \
+	--ignore spotify:album:6jGE0w8kA1RRGuFHIco1U5 \
+	--ignore spotify:album:6BGvhwSZngMZIijrvazl84 \
+	--ignore spotify:album:3nx4q9eJCiarLWgbeVhjup \
+	--ignore spotify:album:7jcwVz2H8M4Ds6oyHXbm7n \
+	--ignore spotify:album:6HJNJ8JTNiwFLrCRTYJe49 \
+	--ignore spotify:album:26Lm4KJoQOI6sMka838ykR \
+	--ignore spotify:album:0w3K5a2sdeREbzadu235b5 \
+	--ignore spotify:album:6hhLkZ9rIrryyKmcCa2K5r \
+	from-uris \
+		spotify:artist:1xwEwfwgvdrYZ2rm654VhL
+

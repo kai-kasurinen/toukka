@@ -1,0 +1,67 @@
+#!/bin/sh
+
+#	--looper-target-count=10000 \
+
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-albums \
+	--expand-artist-to-related-artists \
+	--expand-album-to-tracks \
+	--ignore spotify:artist:0970WjsH7pmyGe0LJFERjo \
+	--ignore spotify:artist:4xESzcmLRQn2GPJCkWN9D5 \
+	--ignore spotify:artist:5WxEOHmmomZ2sEFY1vSgSb \
+	--ignore spotify:artist:65rnazawnvlK4Jhr7Gcd9X \
+	--ignore spotify:artist:4A4X3dAnue0OcKTt9J5A9c \
+	--ignore spotify:artist:7nJZGLYats5djSl9BxC2Le \
+	--ignore spotify:artist:5yeDBP6xDWbBV0q3YAJ7bZ \
+	--ignore spotify:album:5ycsjHAme67OzIYHEOE3QX \
+	--ignore spotify:album:2EQXg5i8OvbHhJjeDcFYVQ \
+	--ignore spotify:album:4mA79jMaPXdaozvogjPEfx \
+	--ignore spotify:album:1tDgR7Y5grtZH7YAJqwV3L \
+	--ignore spotify:album:0k1p6MTYG69wlJQikQebEo \
+	--ignore spotify:album:7cCYoJBFQiSbzg0c3UBLD1 \
+	--ignore spotify:artist:2MsuulLWCG8gvHTUp5L9V1 \
+	--ignore spotify:artist:1lhAjweMdZOcGZHkiyki1L \
+	--ignore spotify:artist:1u5f5plg9bmJGQzIQHmQht \
+	--ignore spotify:artist:0P0UXFJ1DtX3ggiYGhKUqs \
+	--ignore spotify:album:5FfegQrmeRSRvdJ5ojjDUz \
+	--ignore spotify:album:0wnVtZXbddLVODNFaTHyg0 \
+	--ignore spotify:artist:42ZxYNK8wmSwfkwV1oesGb \
+	--ignore spotify:album:1vLnrbMt9halPMybmfpMg1 \
+	--ignore spotify:album:3mIv2DmWnoESYWIoO9Z0Nw \
+	--ignore spotify:artist:4HVfhhAsJTmR8yyXhCdkh2 \
+	--ignore spotify:artist:3OfuOiVvU2zW8evhjOltOk \
+	--ignore spotify:artist:4XUltzTgP8sMvgKTOyjceo \
+	--ignore spotify:album:32ILW0ERvU3X8TW9aIx98n \
+	--ignore spotify:artist:4W2mcEq4BtIpUc3vlvXOpy \
+	--ignore spotify:artist:5rh3D2plRcWLQq9tFkFQbF \
+	--ignore spotify:artist:5OXjt0KyUu2LCzDIWh2HAq \
+	--ignore spotify:artist:3kNRzUQPJsu1pVLRUGzxGY \
+	--ignore spotify:album:15PrnCdhSakhFyQP59XagG \
+	--ignore spotify:artist:63JYtP1HRZEMOAAKOJe0NB \
+	--ignore spotify:album:1AvzQjVphDsXlxqU52V8zo \
+	--ignore spotify:album:019n36bItYomeOVtno97to \
+	--ignore spotify:artist:6yQTfpKGR7JfwjCyiTDpny \
+	--ignore spotify:album:2ATn645qeo0VY60n32Ryid \
+	--ignore spotify:artist:0BuePd3jjM2PDw0T8hzOew \
+	--ignore spotify:artist:7FQRbf8gbKw8KZQZAJWxH2 \
+	--ignore spotify:artist:2YQWKWa5lpuQym9BEONStv \
+	--ignore spotify:artist:6loZG94eB7myZSCyFCHm5X \
+	--ignore spotify:artist:5JeGIria1VlkgF7pQBysxZ \
+	--ignore spotify:artist:3I47W6SIIS24cECbGOeakB \
+	--ignore spotify:artist:039kGTxuU3lje3oZdRcCwA \
+	--ignore spotify:artist:77C3owGTFPmigDDIpQLoiF \
+	--ignore spotify:artist:2Z5iQ23reHkZArqqSM27zj \
+	--ignore spotify:artist:5WUzdwQxWfTXSZKKtP0ugm \
+	--ignore spotify:artist:1TdBC4CYssA4Cg6gHcN8Ak \
+	--ignore spotify:artist:3PJf9tyCBdYvchFXkl8YLF \
+	--ignore spotify:artist:1OJleZN9LjkVBrmwc05NG2 \
+	--ignore spotify:artist:5GUeVUxaqi8a3nE65GAy1o \
+	--ignore spotify:artist:0E6Rgrz8KnKRXEGtO3D5UD \
+	--ignore spotify:artist:1IefpZVHvnvtIbXb6iezio \
+	--ignore spotify:artist:6sciWiZGwHsgkAmpB3uzsX \
+	--ignore spotify:artist:48WxLSQmT0HHYwWJIGsiC7 \
+	from-uris \
+		spotify:artist:3ukxdaMXPEYQ9n8687J3m3
+

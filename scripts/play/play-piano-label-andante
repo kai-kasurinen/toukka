@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#	--expand-track-to-recommendations \
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--randomize-search \
+	--expand-label-to-albums \
+	--expand-track-to-album \
+	--expand-album-to-tracks \
+	--expand-album-to-recommendations \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	--ignore-classical-artists \
+	--ignore spotify:album:3LtRWiqvw4KOVWOO3nfknH \
+	--ignore spotify:album:50mc7Z6UdBcl6pz3Q0zUQ6 \
+	--ignore spotify:album:1xmkcYg6RiCGyeVlIl0qyW \
+	--ignore spotify:album:3kLYpLHPuU7Q6OhpwjLKRn \
+	--ignore spotify:album:2SYaeo8XPdb96TfHNUNjv8 \
+	--ignore spotify:album:5NR6qHMn8NY0n34EB1LXbB \
+	--ignore spotify:artist:4ftus3y0BlNVkDBAVxQHbM \
+	--ignore spotify:album:0Moi7PMuAmT8jsASl7EGuw \
+	--ignore spotify:album:3L1DpqYI8hmgPx7qIgZx2x \
+ 	--ignore spotify:album:1ZWV1cpZ8FXdo15VFPAU1s \
+	--ignore spotify:artist:3NLvXOZtSYiCwXc24os7Wh \
+	--ignore spotify:album:0jYpt2SUkOWCBuWvgoSbGR \
+	--ignore spotify:artist:7y97mc3bZRFXzT2szRM4L4 \
+	--ignore spotify:artist:2UqjDAXnDxejEyE0CzfUrZ \
+	--ignore spotify:artist:4NJhFmfw43RLBLjQvxDuRS \
+	--ignore spotify:artist:2wOqMjp9TyABvtHdOSOTUS \
+	--ignore spotify:artist:459INk8vcC0ebEef82WjIK \
+	--ignore spotify:artist:5aIqB5nVVvmFsvSdExz408 \
+	--ignore spotify:artist:5Y1YwWzFX7BIxBbdAOXOEJ \
+		from-labels "Andante Piano"
+

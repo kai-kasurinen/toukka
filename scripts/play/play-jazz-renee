@@ -1,0 +1,14 @@
+#!/bin/sh
+
+toukka-spotify-manager generate-playlist \
+	--progress-bar \
+	--expand-artist-to-related-artists \
+	--expand-artist-to-random-album \
+	--expand-album-to-tracks \
+	--include-album-groups=album,compilation \
+	--randomize-artists \
+	--ignore-various-artists-albums \
+	--ignore-non-instrumental-albums \
+	--ignore-played-albums \
+	--ignore spotify:artist:5NraZqjLPm6GwCrwsD62LR \
+	from-uris spotify:artist:7ixjaiJXnC2cxrbIE3WugD
