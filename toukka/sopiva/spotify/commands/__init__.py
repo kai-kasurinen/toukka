@@ -14,3 +14,4 @@ from . import follow
 from . import shell
 from . import podcast
 from . import resource
+from . import watcher
