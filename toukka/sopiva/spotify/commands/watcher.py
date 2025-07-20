@@ -94,7 +94,7 @@ class SpotifyMonitor:
             logger.debug('no change in item')
         else:
             logger.debug('item changed')
-            self._on_changed_item(self._current_playback.item)
+            self.on_changed_item(self._current_playback.item)
 
         if self._current_playback.device is None:
             logger.debug('no device')
@@ -131,14 +131,13 @@ class SpotifyMonitor:
     def on_changed_context(self, context):
         pass
     
-    def _on_changed_item(self, item):
+    def on_changed_item(self, item):
         if item.type == 'track':
             self.on_changed_track(item)
         elif item.type == 'episode':
             self.on_changed_episode(item)
         else:
             logger.warning('Unknown item type: %s', item.type)
-        pass
 
     def on_changed_track(self, track):
         pass
@@ -169,8 +168,8 @@ class SpotifyWatcher(SpotifyMonitor):
             self._print_dash_line()
 
     def on_no_last_playback(self):
-         self.printer(self._current_playback)
-         self.printer(self._current_playback.item)
+         self.on_changed_playback(self._current_playback)
+         self.on_changed_item(self._current_playback.item)
 
     def on_changed_playback(self, playback):
         pass
@@ -188,7 +187,15 @@ class SpotifyWatcher(SpotifyMonitor):
         self.printer(context)
     
     def on_changed_track(self, track):
+        self.printer(track)
 
+    def on_changed_episode(self, episode):
+        self.printer(episode)
+
+    def on_changed_device(self, device):
+        self.printer(device)
+
+    def print_track(self, track):
         artists = set()
         for artist in track.artists:
             artists.add(artist.id)
@@ -200,11 +207,6 @@ class SpotifyWatcher(SpotifyMonitor):
 
         self.printer(track)
         self.printer(track.album)
- 
-    def on_changed_episode(self, episode):
-        self.printer(episode)
 
-    def on_changed_device(self, device):
-        self.printer(device)
 
 # END
