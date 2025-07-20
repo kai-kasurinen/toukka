@@ -30,9 +30,9 @@ class SpotifyMonitor:
         self._last_playback = False
 
     def sleep(self):
-        logger.debug('sleeping for %s seconds', self.current_sleep)
+        logger.debug('sleeping for %s seconds', self._current_sleep)
         time.sleep(self._current_sleep)
-        self.current_sleep = 60
+        self._current_sleep = 60
 
     def run(self):
         self.looper()
@@ -90,7 +90,7 @@ class SpotifyMonitor:
         # TODO: support is_playing, currently_playing_type, progress_ms, *state
 
         # Update last playback
-        self.last_playback = self.current_playback
+        self._last_playback = self._current_playback
         return
 
     def on_pre_loop(self):
