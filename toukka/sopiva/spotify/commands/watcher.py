@@ -65,7 +65,7 @@ class SpotifyMonitor:
 
         if self._current_playback.context is None:
             logger.debug('no context')
-        elif self._current_playback.contect == self._last_playback.context:
+        elif self._current_playback.context == self._last_playback.context:
             logger.debug('no change in context')
         else:
             logger.debug('context changed')
