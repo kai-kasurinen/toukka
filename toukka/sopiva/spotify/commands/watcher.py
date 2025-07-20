@@ -14,6 +14,8 @@ from toukka.sopiva.spotify.cli import cli_root
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+# TODO Monitor also playlist changes
+
 @cli_root.command()
 def watcher():
     watcher = SpotifyWatcher()
