@@ -59,6 +59,10 @@ class SpotifyMonitor:
             self.on_no_last_playback()
             return
         
+        if type(self._current_playback) is not type(self._last_playback):
+            logger.debug('current playback object type changed')
+            self.on_changed_playback_object_type(self._current_playback)
+
         if self._current_playback is None:
             logger.debug('no playback')
             return
@@ -122,6 +126,9 @@ class SpotifyMonitor:
     def on_changed_playback(self, playback):
         pass
 
+    def on_changed_playback_object_type(self, playback):
+        pass
+
     def on_changed_is_playing(self, is_playing):
         pass
 
@@ -173,6 +180,10 @@ class SpotifyWatcher(SpotifyMonitor):
 
     def on_changed_playback(self, playback):
         pass
+
+    def on_changed_playback_object_type(self, playback):
+        logger.info('Playback object type changed to: %s', type(playback))
+        printer(playback)
 
     def on_changed_is_playing(self, is_playing):
         if is_playing:
