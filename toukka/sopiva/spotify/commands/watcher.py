@@ -53,6 +53,9 @@ class SpotifyMonitor:
                 self.last_cp = self.current_cp
                 self.current_sleep = 1
                 return
+            
+            logger(self.current_cp)
+            logger(self.last_cp)
 
             if self.current_cp == self.last_cp:
                 logger.debug('no change in currently playing')
@@ -65,6 +68,7 @@ class SpotifyMonitor:
             if self.current_cp is None:
                 logger.debug('no currently playing')
                 return
+
 
             if self.current_cp.context == self.last_cp.context:
                 logger.debug('no change in context')
@@ -81,7 +85,8 @@ class SpotifyMonitor:
 
             if self.current_cp.item is None:
                 logger.debug('no item')
-                return
+            
+            return
 
 
 class SpotifyWatcher(SpotifyMonitor):
