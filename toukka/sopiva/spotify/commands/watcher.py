@@ -65,12 +65,18 @@ class SpotifyMonitor:
 
         if self._current_playback is None:
             logger.debug('no playback')
+            self.on_no_playback()
             return
         elif self._current_playback == self._last_playback:
             logger.debug('no change in playback')
         else:
             logger.debug('playback changed')
             self.on_changed_playback(self._current_playback)
+
+        if self._last_playback is None:
+            # TODO: handle this case
+            logger.debug('last playback is None, skipping further checks')
+            pass
         
         if self._current_playback.is_playing == self._last_playback.is_playing:
             logger.debug('no change in playback state')
@@ -121,6 +127,9 @@ class SpotifyMonitor:
         pass
 
     def on_no_last_playback(self):
+        pass
+    
+    def on_no_playback(self):
         pass
 
     def on_changed_playback(self, playback):
