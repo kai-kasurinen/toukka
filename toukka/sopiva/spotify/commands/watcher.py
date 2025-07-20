@@ -86,8 +86,7 @@ class SpotifyMonitor:
     def check_playback(self):
          self.current_playback = self.spotify.playback()
 
-
-def on_currently_playing_changed(self):
+    def on_currently_playing_changed(self):
             pass
 
 # END
