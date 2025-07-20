@@ -135,7 +135,7 @@ class SpotifyWatcher(SpotifyMonitor):
         self._something_printed = False
 
     def on_post_loop(self):
-        if not self._something_printed:
+        if self._something_printed:
             self._print_dash_line()
 
     def on_no_last_playback(self):
