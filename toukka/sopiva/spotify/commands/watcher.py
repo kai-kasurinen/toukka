@@ -52,7 +52,7 @@ class SpotifyMonitor:
         if self._last_playback is False:
             logger.debug('no last playback, setting current as last')
             self._last_playback = self._current_playback
-            self.current_sleep = 1
+            self._current_sleep = 1
             return
         
         if self._current_playback is None:
