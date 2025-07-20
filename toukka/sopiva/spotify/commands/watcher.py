@@ -203,14 +203,15 @@ class SpotifyWatcher(SpotifyMonitor):
 
     def print_track_artists(self, track):
         artist_ids = set()
+        artists = set()
         for artist in track.artists:
             artist_ids.add(artist.id)
         for artist in track.album.artists:
             artist_ids.add(artist.id)
-        artists = self.spotify.artists(list(artist_ids))
-        for artist in artists:
-            self.printer(artist)
-
-
+  
+        # NOTE: artist() is usually cached, so this is fast (artists() is usually not cached)
+        for artist_id in artist_ids:
+            self.printer(self.spotify.artist(artist_id))
+  
 
 # END
