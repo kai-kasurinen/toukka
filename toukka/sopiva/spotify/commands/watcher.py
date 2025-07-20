@@ -40,7 +40,7 @@ class SpotifyMonitor:
         while True:
 
             self.check_currently_playing()
-            self.check_current_playback()
+            self.check_playback()
             self.sleep()
 
             
@@ -83,8 +83,8 @@ class SpotifyMonitor:
             
             return
 
-    def check_current_playback(self):
-         self.current_playback = self.spotify.current_playback()
+    def check_playback(self):
+         self.current_playback = self.spotify.playback()
 
 
 def on_currently_playing_changed(self):
