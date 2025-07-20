@@ -12,7 +12,7 @@ from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.cli import cli_root
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 # TODO Monitor also playlist changes
 
