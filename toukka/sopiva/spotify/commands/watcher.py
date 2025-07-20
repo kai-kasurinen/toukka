@@ -206,7 +206,7 @@ class SpotifyWatcher(SpotifyMonitor):
             artist_ids.add(artist.id)
         for artist in track.album.artists:
             artist_ids.add(artist.id)
-        artists = self.spotify.artists(artist_ids)
+        artists = self.spotify.artists(list(artist_ids))
         for artist in artists:
             self.printer(artist)
 
