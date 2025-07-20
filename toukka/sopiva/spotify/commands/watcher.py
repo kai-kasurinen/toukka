@@ -54,8 +54,8 @@ class SpotifyMonitor:
                 self.current_sleep = 1
                 return
             
-            logger(self.current_cp)
-            logger(self.last_cp)
+            logger.debug(self.current_cp)
+            logger.debug(self.last_cp)
 
             if self.current_cp == self.last_cp:
                 logger.debug('no change in currently playing')
