@@ -67,6 +67,18 @@ class SpotifyMonitor:
         else:
             logger.debug('playback changed')
             self.on_changed_playback(self._current_playback)
+        
+        if self._current_playback.is_playing == self._last_playback.is_playing:
+            logger.debug('no change in playback state')
+        else:
+            logger.debug('is playing changed')
+            self.on_changed_is_playing(self._current_playback.is_playing)
+
+        if self._current_playback.currently_playing_type == self._last_playback.currently_playing_type:
+            logger.debug('no change in currently playing type')
+        else:
+            logger.debug('currently playing type changed')
+            self.on_changed_playing_type(self._current_playback.currently_playing_type)
 
         if self._current_playback.context is None:
             logger.debug('no context')
@@ -82,7 +94,7 @@ class SpotifyMonitor:
             logger.debug('no change in item')
         else:
             logger.debug('item changed')
-            self.on_changed_item(self._current_playback.item)
+            self._on_changed_item(self._current_playback.item)
 
         if self._current_playback.device is None:
             logger.debug('no device')
@@ -92,7 +104,7 @@ class SpotifyMonitor:
             logger.debug('device changed')
             self.on_changed_device(self._current_playback.device)
 
-        # TODO: support is_playing, currently_playing_type, progress_ms, *state
+        # TODO: support progress_ms, *state
 
         # Update last playback
         self._last_playback = self._current_playback
@@ -110,10 +122,28 @@ class SpotifyMonitor:
     def on_changed_playback(self, playback):
         pass
 
+    def on_changed_is_playing(self, is_playing):
+        pass
+
+    def on_changed_playing_type(self, playing_type):
+        pass
+
     def on_changed_context(self, context):
         pass
     
-    def on_changed_item(self, item):
+    def _on_changed_item(self, item):
+        if item.type == 'track':
+            self.on_changed_track(item)
+        elif item.type == 'episode':
+            self.on_changed_episode(item)
+        else:
+            logger.warning('Unknown item type: %s', item.type)
+        pass
+
+    def on_changed_track(self, track):
+        pass
+
+    def on_changed_episode(self, episode):
         pass
 
     def on_changed_device(self, device):
@@ -145,11 +175,34 @@ class SpotifyWatcher(SpotifyMonitor):
     def on_changed_playback(self, playback):
         pass
 
+    def on_changed_is_playing(self, is_playing):
+        if is_playing:
+            logger.info('Playback started')
+        else:
+            logger.info('Playback stopped')
+
+    def on_changed_playing_type(self, playing_type):
+        logger.info('Currently playing type changed to: %s', playing_type)
+
     def on_changed_context(self, context):
         self.printer(context)
     
-    def on_changed_item(self, item):
-        self.printer(item)
+    def on_changed_track(self, track):
+
+        artists = set()
+        for artist in track.artists:
+            artists.add(artist.id)
+        for artist in track.album.artists:
+            artists.add(artist.id)
+        for artist_id in artists:
+            artist = self.spotify.artist(artist_id)
+            self.printer(artist)
+
+        self.printer(track)
+        self.printer(track.album)
+ 
+    def on_changed_episode(self, episode):
+        self.printer(episode)
 
     def on_changed_device(self, device):
         self.printer(device)
