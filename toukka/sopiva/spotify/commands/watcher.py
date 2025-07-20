@@ -196,16 +196,20 @@ class SpotifyWatcher(SpotifyMonitor):
         self.printer(device)
 
     def print_track(self, track):
+        self.print_track_artists(track)
+        self.printer(track)
+        self.printer(track.album)
+
+    def print_track_artists(self, track):
         artist_ids = set()
         for artist in track.artists:
             artist_ids.add(artist.id)
         for artist in track.album.artists:
             artist_ids.add(artist.id)
-        for artist in self.spotify.artists(artist_ids):
+        artists = self.spotify.artists(artist_ids)
+        for artist in artists:
             self.printer(artist)
 
-        self.printer(track)
-        self.printer(track.album)
 
 
 # END
