@@ -199,7 +199,7 @@ class SpotifyWatcher(SpotifyMonitor):
         self.print_track_artists(track)
         self.printer(track.album)
         self.printer(track)
-        self.printer(self.spotify.track_audio_features(track.id))
+        self.printer(self.spotify.track_audio_features_cached(track.id))
 
     def print_track_artists(self, track):
         artist_ids = set()
