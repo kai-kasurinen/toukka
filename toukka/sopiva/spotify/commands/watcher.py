@@ -187,7 +187,7 @@ class SpotifyWatcher(SpotifyMonitor):
         self.printer(context)
     
     def on_changed_track(self, track):
-        self.printer(track)
+        self.print_track(track)
 
     def on_changed_episode(self, episode):
         self.printer(episode)
