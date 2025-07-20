@@ -295,7 +295,7 @@ def print_currently_playing_context(cpc: CurrentlyPlayingContext):
             humanize.naturaltime(datetime.datetime.now() - cpc_timestamp)))
     print('\tprogress: %s' % datetime.timedelta(milliseconds=cpc.progress_ms))
 
-    disallows_dict = ccp.actions.disallows.dict()
+    disallows_dict = cpc.actions.disallows.dict()
     disallows = _get_flags(disallows_dict, disallows_dict.keys())
     print(f'\tactions disallows: {disallows}')
 
