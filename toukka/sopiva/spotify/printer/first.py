@@ -278,21 +278,37 @@ def print_currently_playing(cp: CurrentlyPlaying):
     # if cp.item:
     #     printer(cp.item)
 
-
+# TODO: combine cpt and cpc handing
 @printer.register
 def print_currently_playing_context(cpc: CurrentlyPlayingContext):
     print(f'currently playing context: playing {cpc.is_playing}')
+    # TODO add smart_shuffle
     print(f'\tstate: repeat: {cpc.repeat_state}, shuffle: {cpc.shuffle_state}')
     print(f'\ttype: {cpc.currently_playing_type.name}')
+
     if cpc.context:
         print(f'\tcontext: {cpc.context.type.name} ({cpc.context.uri})')
-    #print(f'\tdevice: {cpc.device}')
-    print()
-    print(f'{cpc.device}')
-    print()
-    # if cpc.item:
-    #     printer(cpc.item)
 
+    cpc_timestamp = datetime.datetime.fromtimestamp(cpc.timestamp/1000.0)
+    print('\ttimestamp: %s (%s)' % (
+            humanize.naturaldate(cpc_timestamp),
+            humanize.naturaltime(datetime.datetime.now() - cpc_timestamp)))
+    print('\tprogress: %s' % datetime.timedelta(milliseconds=cpc.progress_ms))
+
+    disallows_dict = ccp.actions.disallows.dict()
+    disallows = _get_flags(disallows_dict, disallows_dict.keys())
+    print(f'\tactions disallows: {disallows}')
+
+    printer(cpc.device)
+    
+@printer.register
+def print_device(device: Device):
+    print(f'device: {device.name} ({device.id})')
+    print(f'\ttype: {device.type},',
+          f'is_active: {device.is_active},',
+          f'is_private_session: {device.is_private_session},',
+          f'is_restricted: {device.is_restricted}')
+    print(f'\tvolume_percent: {device.volume_percent}')
 
 @printer.register
 def print_track_local(track: LocalTrack):
