@@ -132,6 +132,12 @@ class SpotifyWatcher(SpotifyMonitor):
     def on_post_loop(self):
             pass
 
+    def on_no_last_playback(self):
+         printer(self._current_playback)
+         printer(self._current_playback.device)
+         printer(self._current_playback.context)
+         printer(self._current_playback.item)
+
     def on_changed_playback(self, playback):
             pass
 
