@@ -2,6 +2,7 @@
 
 '''spotify watcher'''
 
+import logging
 import time
 
 import click
@@ -10,49 +11,70 @@ from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify.printer.first import printer
 from toukka.sopiva.spotify.cli import cli_root
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 @cli_root.command()
 def watcher():
+    watcher = SpotifyWatcher()
+    watcher.loop()
 
-    spotify = get_spotify()
-    sleep= 0
-    last_cp = None
-    last_context = None
-    last_item = None
 
-    while True:
+class SpotifyMonitor:
 
-        time.sleep(sleep)
-        sleep = 60
-        _print_dash_line()
-        cp = spotify.playback_currently_playing()
-    
-        if cp is None:
-            last_cp = cp
-            continue
+    def __init__(self):
+        self.spotify = get_spotify()
 
-        if cp == last_cp:
-            last_cp = cp
-            continue
-        else:
-            printer(cp)
+        self.current_sleep = 0
 
-        if cp.context is None:
-            last_context = cp.context
-            continue
+        self.current_cp = None
+        self.last_cp = None
 
-        if cp.context == last_context:
-            last_context = cp.context
-        else:
-            last_context = cp.context
-            printer(cp.context)
-            printer(spotify.uri_to_item(cp.context.uri))
+    def sleep(self):
+        logger.debug('sleeping for %s seconds', self.current_sleep)
+        time.sleep(self.current_sleep)
+        self.current_sleep = 60
 
-        if cp.item is None:
-            last_item = cp.item
-            continue
-        else:
-            last_item = cp.item
-            printer(cp.item)
+    def loop(self):
 
-def _print_dash_line():
-        print(''.ljust(100, '='))
+        while True:
+
+            self.sleep()
+
+            self.current_cp = self.spotify.playback_currently_playing()
+        
+            if self.current_cp == self.last_cp:
+                logger.debug('no change in currently playing')
+                continue
+            else:
+                logger.debug('currently playing changed')
+                self.last_cp = self.current_cp
+
+            if self.current_cp is None:
+                logger.debug('no currently playing item')
+                continue
+
+            if self.current_cp.context == self.last_cp.context:
+                logger.debug('no change in context')
+            else:
+                logger.debug('context changed')
+
+            if self.current_cp.context is None:
+                logger.debug('no context')
+
+            if self.current_cp.item == self.last_cp.item:
+                logger.debug('no change in item')
+            else:
+                logger.debug('item changed')
+
+            if self.current_cp.item is None:
+                logger.debug('no item')
+                continue
+
+
+class SpotifyWatcher(SpotifyMonitor):
+
+    def _print_dash_line(self):
+            print(''.ljust(100, '='))
+
+# END
