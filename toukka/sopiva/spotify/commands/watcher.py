@@ -34,6 +34,7 @@ class SpotifyMonitor:
     def sleep(self):
         logger.debug('sleeping for %s seconds', self._current_sleep)
         time.sleep(self._current_sleep)
+        # TODO: add dynamic sleep time
         self._current_sleep = 60
 
     def run(self):
