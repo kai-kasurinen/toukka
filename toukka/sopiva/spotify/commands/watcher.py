@@ -99,54 +99,59 @@ class SpotifyMonitor:
         return
 
     def on_pre_loop(self):
-            pass
+        pass
 
     def on_post_loop(self):
-            pass
+        pass
 
     def on_no_last_playback(self):
-         pass
+        pass
 
     def on_changed_playback(self, playback):
-            pass
+        pass
 
     def on_changed_context(self, context):
-            pass
+        pass
     
     def on_changed_item(self, item):
-            pass
+        pass
 
     def on_changed_device(self, device):
-            pass
+        pass
 
 # END
 
 
 class SpotifyWatcher(SpotifyMonitor):
 
+    def printer(self, item):
+        printer(item)
+        self._something_printed = True
+
     def _print_dash_line(self):
-            print(''.ljust(100, '='))
+        print(''.ljust(100, '='))
 
     def on_pre_loop(self):
-            self._print_dash_line()
+        self._something_printed = False
 
     def on_post_loop(self):
-            pass
+        if not self._something_printed:
+            self._print_dash_line()
 
     def on_no_last_playback(self):
-         printer(self._current_playback)
-         printer(self._current_playback.item)
+         self.printer(self._current_playback)
+         self.printer(self._current_playback.item)
 
     def on_changed_playback(self, playback):
-            pass
+        pass
 
     def on_changed_context(self, context):
-            printer(context)
+        self.printer(context)
     
     def on_changed_item(self, item):
-            printer(item)
+        self.printer(item)
 
     def on_changed_device(self, device):
-         printer(device)
+        self.printer(device)
 
 # END
