@@ -175,8 +175,10 @@ class SpotifyWatcher(SpotifyMonitor):
             self._print_dash_line()
 
     def on_no_last_playback(self):
-         self.printer(self._current_playback)
-         self.on_changed_item(self._current_playback.item)
+         if self._current_playback is not None:
+             self.printer(self._current_playback)
+             if self._current_playback.item is not None:
+                 self.on_changed_item(self._current_playback.item)
 
     def on_changed_playback(self, playback):
         pass
