@@ -1,0 +1,67 @@
+
+# python3-confuse
+confuse
+# python3-click
+click
+# python3-sqlitedict
+sqlitedict
+# python3-sqlalchemy
+sqlaclhemy
+# python3-httpx
+httpx
+# python3-cachecontrol (?)
+# TODO: remove
+cachecontrol
+# python3-enlighten
+enlighten
+# python3-validators (for click_params)
+validators
+# python3-pulsectl 
+pulsectl
+# python3-xdg?
+pyxdg
+# python3-pandas
+pandas
+# python3-langdetect
+langdetect
+# python3-cachecontrol
+# TODO: remove
+cachecontrol
+# python3-redi
+# TODO: remove
+redis
+# python3-diskcache
+diskcache
+# python3-unidecode
+unidecode
+# python3-boltons
+boltons
+# python3-dogpile.cache
+dogpile.cache
+# python3-sqlitedict
+sqlitedict
+# python3-humanize
+humanize
+# python3-iso8601
+iso8601
+
+# click extensions
+click_params
+click_logging
+
+# Spotify
+tekore
+
+# httpx extensions
+hishel
+
+# https://github.com/jonathaneunice/options
+options
+# for options
+combomethod
+nulltype
+chainmap
+
+
+
+
