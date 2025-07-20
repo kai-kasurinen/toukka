@@ -30,6 +30,9 @@ class SpotifyMonitor:
         self.current_cp = False
         self.last_cp = False
 
+        self.current_playback = False
+        self.last_playback = False
+
     def sleep(self):
         logger.debug('sleeping for %s seconds', self.current_sleep)
         time.sleep(self.current_sleep)
@@ -57,15 +60,11 @@ class SpotifyMonitor:
 
             if self.current_cp is None:
                 logger.debug('no currently playing')
-                return
             elif self.current_cp == self.last_cp:
                 logger.debug('no change in currently playing')
-                self.last_cp = self.current_cp
-                return
             else:
                 logger.debug('currently playing changed')
-                self.last_cp = self.current_cp
-                self.on_currently_playing_changed()
+                self.on_currently_playing()
 
             if self.current_cp.context is None:
                 logger.debug('no context')
@@ -80,13 +79,21 @@ class SpotifyMonitor:
                 logger.debug('no change in item')
             else:
                 logger.debug('item changed')
-            
+
+            self.last_cp = self.current_cp
             return
 
     def check_playback(self):
-         self.current_playback = self.spotify.playback()
+        logger.debug('checking playback')
+        self.current_playback = self.spotify.playback()
 
-    def on_currently_playing_changed(self):
+        if self.last_playback is False:
+            logger.debug('no last playback, setting current as last')
+            self.last_playback = self.current_playback
+            self.current_sleep = 1
+            return
+
+    def on_currently_playing(self):
             pass
 
 # END
