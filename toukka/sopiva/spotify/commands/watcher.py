@@ -66,6 +66,7 @@ class SpotifyMonitor:
         if self._current_playback is None:
             logger.debug('no playback')
             self.on_no_playback()
+            # BUG: last_playback is not updated here
             return
         elif self._current_playback == self._last_playback:
             logger.debug('no change in playback')
