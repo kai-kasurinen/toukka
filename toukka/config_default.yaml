@@ -4,3 +4,11 @@ spotify:
    client_id:
    client_secret:
    redirect_uri:
+
+spotify_manager:
+   playlist_generator:
+       playlist_uri: 
+
+
+spotify_database:
+    database_uri: 'sqlite://:memory:'
