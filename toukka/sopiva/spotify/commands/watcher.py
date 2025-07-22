@@ -52,64 +52,49 @@ class SpotifyMonitor:
         logger.debug('checking playback')
         self._current_playback = self.spotify.playback()
 
-        if self._last_playback is None:
-            logger.debug('no last playback')
+        if self._current_playback is None and self._last_playback is None:
+            logger.debug('no current playback and no last playback')
+            self._current_sleep = 120
 
-            if self._current_playback is not None:
-                logger.debug('Playback started for the first time or resumed after being off.')
-                self._current_sleep = 1
-                self.on_no_last_playback()
-        else:
-            pass
+        elif self._current_playback is not None and self._last_playback is not None:
 
-        if self._current_playback is None:
-            logger.debug('no playback')
-            self.on_no_playback()
-        elif self._current_playback == self._last_playback:
-            logger.debug('no change in playback')
-        else:
-            logger.debug('playback changed')
-            self.on_changed_playback(self._current_playback)
-        
-        if self._current_playback is not None and self._last_playback is not None:
+            if self._current_playback != self._last_playback:
+                logger.debug('playback changed')
+                self.on_changed_playback(self._current_playback)
 
-            if self._current_playback.is_playing == self._last_playback.is_playing:
-                logger.debug('no change in playback state')
-            else:
+            if self._current_playback.is_playing != self._last_playback.is_playing:
                 logger.debug('is playing changed')
                 self.on_changed_is_playing(self._current_playback.is_playing)
 
-            if self._current_playback.currently_playing_type == self._last_playback.currently_playing_type:
-                logger.debug('no change in currently playing type')
-            else:
+            if self._current_playback.currently_playing_type != self._last_playback.currently_playing_type:
                 logger.debug('currently playing type changed')
                 self.on_changed_playing_type(self._current_playback.currently_playing_type)
 
-            if self._current_playback.context is None:
-                logger.debug('no context')
-            elif self._current_playback.context == self._last_playback.context:
-                logger.debug('no change in context')
-            else:
+            if self._current_playback.context != self._last_playback.context:
                 logger.debug('context changed')
                 self.on_changed_context(self._current_playback.context)
 
-            if self._current_playback.item is None:
-                logger.debug('no item')
-            elif self._current_playback.item == self._last_playback.item:
-                logger.debug('no change in item')
-            else:
+            if self._current_playback.item != self._last_playback.item:
                 logger.debug('item changed')
                 self.on_changed_item(self._current_playback.item)
 
-            if self._current_playback.device is None:
-                logger.debug('no device')
-            elif self._current_playback.device == self._last_playback.device:
-                logger.debug('no change in device')
-            else:
+            if self._current_playback.device != self._last_playback.device:
                 logger.debug('device changed')
                 self.on_changed_device(self._current_playback.device)
+
+        elif self._current_playback is not None and self._last_playback is None:
+                logger.debug('Playback started for the first time or resumed after being off.')
+                self._current_sleep = 1
+                self.on_playback_appears(self._current_playback)
+        
+        elif self._current_playback is None and self._last_playback is not None:
+            logger.debug('Playback stopped or paused.')
+            self.on_playback_disappears()
+
         else:
-            logger.debug('current playback or last playback is None, skipping further checks')
+            logger.warning('This should not happen')
+            pass
+
         
         # Update last playback
         self._last_playback = self._current_playback
@@ -121,10 +106,10 @@ class SpotifyMonitor:
     def on_post_loop(self):
         pass
 
-    def on_no_last_playback(self):
+    def on_playback_appears(self, playback):
         pass
     
-    def on_no_playback(self):
+    def on_playback_disappears(self):
         pass
 
     def on_changed_playback(self, playback):
@@ -175,18 +160,17 @@ class SpotifyWatcher(SpotifyMonitor):
         if self._something_printed:
             self._print_dash_line()
 
-    def on_no_last_playback(self):
-         if self._current_playback is not None:
-             self.printer(self._current_playback)
-             if self._current_playback.item is not None:
-                 self.on_changed_item(self._current_playback.item)
+    def on_playback_appears(self, playback):
+        self.printer(playback)
+
+        if playback.item is not None:
+            self.on_changed_item(playback.item)
+
+    def on_playback_disappears(self):
+        logger.info('Playback stopped or paused.')
 
     def on_changed_playback(self, playback):
         pass
-
-    def on_changed_playback_object_type(self, playback):
-        logger.info('Playback object type changed to: %s', type(playback))
-        printer(playback)
 
     def on_changed_is_playing(self, is_playing):
         if is_playing:
