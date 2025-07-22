@@ -66,7 +66,7 @@ class SpotifyMonitor:
         if self._current_playback is None:
             logger.debug('no playback')
             self.on_no_playback()
-            # BUG: last_playback is not updated here
+            self._last_playback = self._current_playback
             return
         elif self._current_playback == self._last_playback:
             logger.debug('no change in playback')
@@ -77,7 +77,6 @@ class SpotifyMonitor:
         if self._last_playback is None:
             # TODO: handle this case
             logger.debug('last playback is None, skipping further checks')
-            pass
         
         if self._current_playback.is_playing == self._last_playback.is_playing:
             logger.debug('no change in playback state')
@@ -220,7 +219,7 @@ class SpotifyWatcher(SpotifyMonitor):
 
     def print_track(self, track):
         self.print_track_artists(track)
-        self.printer(track.album)
+        self.printer(self.spotify.album(track.album.id))
         self.printer(track)
         self.printer(self.spotify.track_audio_features_cached(track.id))
 
