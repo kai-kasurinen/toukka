@@ -125,7 +125,9 @@ class SpotifyMonitor:
         pass
     
     def on_changed_item(self, item):
-        if item.type == 'track':
+        if item is None:
+            return
+        elif item.type == 'track':
             self.on_changed_track(item)
         elif item.type == 'episode':
             self.on_changed_episode(item)
