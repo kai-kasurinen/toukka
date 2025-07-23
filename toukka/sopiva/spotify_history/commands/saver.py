@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 @cli_root.command()
-def save():
+def saver():
     saver = SpotifySaver()
     saver.run()
 
@@ -40,7 +40,7 @@ class SpotifySaver:
     def check_recently_played(self):
         logger.debug('checking recently played')
 
-        recently_played = self.spotify.recently_played()
+        recently_played = self.spotify.playback_recently_played()
 
         if recently_played:
             logger.info('recently played tracks found: %s', len(recently_played))
