@@ -12,7 +12,7 @@ from . import commands
 
 def main():
     toukka.logger.simple.init_logging()
-    cli.root.main()
+    cli.cli_root.main()
 
 
 # END
