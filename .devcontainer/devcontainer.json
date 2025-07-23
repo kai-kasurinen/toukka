@@ -1,0 +1,18 @@
+{
+    "image":"mcr.microsoft.com/devcontainers/universal:2",
+
+        "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python", // Python-kehityksen peruslaajennus
+                "ms-python.vscode-pylance", // Koodin täydennys, tyypityksen tarkistus
+                "ms-toolsai.jupyter", // Jupyter Notebook/Lab -tuki
+                "GitHub.copilot"
+            ],
+            "settings": {
+            }
+        }
+    },
+
+    "postCreateCommand": "pip3 install -r requirements.txt"
+}
