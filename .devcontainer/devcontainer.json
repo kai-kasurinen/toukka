@@ -4,9 +4,9 @@
         "customizations": {
         "vscode": {
             "extensions": [
-                "ms-python.python", // Python-kehityksen peruslaajennus
-                "ms-python.vscode-pylance", // Koodin täydennys, tyypityksen tarkistus
-                "ms-toolsai.jupyter", // Jupyter Notebook/Lab -tuki
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter", 
                 "GitHub.copilot"
             ],
             "settings": {
@@ -14,5 +14,5 @@
         }
     },
 
-    "postCreateCommand": "pip3 install -r requirements.txt"
+    "postCreateCommand": "pip install --user -r requirements.txt"
 }
