@@ -40,7 +40,7 @@ class SpotifySaver:
     def check_recently_played(self):
         logger.debug('checking recently played')
 
-        recently_played = self.spotify.playback_recently_played()
+        recently_played = list(self.spotify.playback_recently_played())
 
         if recently_played:
             logger.info('recently played tracks found: %s', len(recently_played))
