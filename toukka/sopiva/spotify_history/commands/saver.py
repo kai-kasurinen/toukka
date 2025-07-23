@@ -42,8 +42,7 @@ class SpotifySaver:
 
         recently_played = self.spotify.playback_recently_played()
 
-        for item in recently_played:
-            logger.debug('recently played item: %s', item)
-
+        for played in spotify.all_items(recent):
+            logger.debug('recently played: %s', played)
 
 # END
