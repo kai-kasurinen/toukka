@@ -6,7 +6,7 @@ click
 # python3-sqlitedict
 sqlitedict
 # python3-sqlalchemy
-sqlaclhemy
+sqlalchemy
 # python3-httpx
 httpx
 # python3-cachecontrol (?)
