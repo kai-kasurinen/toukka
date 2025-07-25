@@ -5,8 +5,9 @@ confuse
 click
 # python3-sqlitedict
 sqlitedict
-# python3-sqlalchemy
+# python3-sqlalchemy, python3-psycopg2
 sqlalchemy
+psycopg2
 # python3-httpx
 httpx
 # python3-cachecontrol (?)
@@ -44,6 +45,8 @@ sqlitedict
 humanize
 # python3-iso8601
 iso8601
+# python3-networkx
+networkx
 
 # click extensions
 click_params
@@ -61,7 +64,4 @@ options
 combomethod
 nulltype
 chainmap
-
-
-
 
