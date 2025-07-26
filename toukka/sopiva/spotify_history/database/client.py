@@ -47,7 +47,7 @@ class SpotifyHistory:
         return self.count_by_track_uri_with_timestamps(track_id)
 
     def count_by_track_isrc_with_timestamps(self, isrc):
-        pass
+        return ItemStats_(count=0, min=None, max=None)
 
     def is_track_in_history(self, track_id):
         pass
