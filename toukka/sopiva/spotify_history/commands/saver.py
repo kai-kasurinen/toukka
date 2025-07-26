@@ -25,7 +25,7 @@ class SpotifySaver:
 
     def __init__(self):
         self.spotify = get_spotify()
-        self.db = database.SpotifyDB)
+        self.db = database.SpotifyDB()
         self._current_sleep = 600
 
     def sleep(self):
@@ -47,7 +47,7 @@ class SpotifySaver:
         # TODO: use after
         recently_played = self.spotify.playback_recently_played()
         logger.debug('after %s', recently_played.after)
-        recent_played_items = list(self.spotify.all_items(recently_played).reversed())
+        recent_played_items = list(self.spotify.all_items(recently_played).reverse())
         logger.debug('found %s recently played items', len(recent_played_items))
 
         with self.db.session_scope() as session:
@@ -55,9 +55,13 @@ class SpotifySaver:
             for item in recent_played_items:
                 logger.debug('recently played: %s', item)
 
-            exists = session.query(database.TrackHistory).filter_by(played_at=item.played_at, track_id=track.id).first()
+                exists = session.query(database.TrackHistory).filter_by(played_at=item.played_at, track_id=item.track.id).first()
 
-            if exists is None:
-                logger.debug('newly played: %s', item)
-                session.add(database.TrackHistory(played_at=item.played_at, track_id=item.track.id, meta=item.track))
+                if exists is None:
+                    logger.debug('newly played: %s', item)
+                    session.add(database.TrackHistory(played_at=item.played_at, track_id=item.track.id, meta=item.track))
 
+            session.commit()
+            logger.debug('committed recently played items') 
+
+# END
