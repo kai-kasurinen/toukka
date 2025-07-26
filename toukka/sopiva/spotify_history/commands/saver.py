@@ -27,6 +27,7 @@ class SpotifySaver:
         self.spotify = get_spotify()
         self.db = database.SpotifyDB()
         self._current_sleep = 600
+        self._after = None
 
     def sleep(self):
         logger.debug('sleeping for %s seconds', self._current_sleep)
@@ -45,9 +46,9 @@ class SpotifySaver:
         logger.debug('checking recently played')
 
         # TODO: use after
-        recently_played = self.spotify.playback_recently_played()
+        recently_played = self.spotify.playback_recently_played(after=self._after))
         logger.debug('after %s, before %s', recently_played.cursors.after, recently_played.cursors.before)
-        recent_played_items = list(self.spotify.all_items(recently_played)).reverse()
+        recent_played_items = list(recently_played.items).reverse()
         logger.debug('found %s recently played items', len(recent_played_items))
 
         with self.db.session_scope() as session:
@@ -63,5 +64,7 @@ class SpotifySaver:
 
             session.commit()
             logger.debug('committed recently played items') 
+
+        self._after = recently_played.cursors.after
 
 # END
