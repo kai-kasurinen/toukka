@@ -21,12 +21,15 @@ class SpotifyHistory:
         return self.count_by_track_uri(track_id)
 
     def count_by_artist_name(self, artist_name):
-        pass
+        # TODO: implement this method
+        return 0
 
     def count_by_track_isrc(self, isrc):
-        pass
+        # TODO: implement this method
+        return 0
 
     def count_by_artist_name_with_timestamps(self, artist_name):
+        # TODO: implement this method
         pass
 
     def count_by_track_uri_with_timestamps(self, track_uri):
