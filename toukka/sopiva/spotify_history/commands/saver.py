@@ -55,7 +55,7 @@ class SpotifySaver:
         with self.db.session_scope() as session:
 
             for item in recent_played_items:
-                logger.debug('recently played: %s', item.id)
+                logger.debug('recently played: %s', item.track.id)
 
                 exists = session.query(database.SpotifyHistory).filter_by(played_at=item.played_at, track_id=item.track.id).first()
 
