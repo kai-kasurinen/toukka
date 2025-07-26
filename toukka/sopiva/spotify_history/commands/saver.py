@@ -44,8 +44,12 @@ class SpotifySaver:
     def check_recently_played(self):
         logger.debug('checking recently played')
 
-        # TODO: use after
         recently_played = self.spotify.playback_recently_played(after=self._after)
+
+        if recently_played is None:
+            logger.debug('no recently played items found')
+            return
+
         logger.debug('after %s, before %s', recently_played.cursors.after, recently_played.cursors.before)
         recent_played_items = list(reversed(recently_played.items))
         logger.debug('found %s recently played items', len(recent_played_items))
