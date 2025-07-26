@@ -61,7 +61,7 @@ class SpotifySaver:
 
                 if exists is None:
                     logger.debug('newly played: %s', item)
-                    session.add(database.TrackHistory(played_at=item.played_at, track_id=item.track.id, meta=item.track))
+                    session.add(database.SpotifyHistory(played_at=item.played_at, track_id=item.track.id, meta=item.track))
 
             session.commit()
             logger.debug('committed recently played items') 
