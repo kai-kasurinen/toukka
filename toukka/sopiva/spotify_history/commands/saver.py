@@ -25,7 +25,7 @@ class SpotifySaver:
     def __init__(self):
         self.spotify = get_spotify()
         self.db = database.SpotifyDB()
-        self._current_sleep = 600
+        self._current_sleep = 300
         self._after = None
 
     def sleep(self):
