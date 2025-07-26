@@ -39,7 +39,7 @@ class SpotifyHistory:
         stmt = select(
             func.count(database.SpotifyHistory.track_uri),
             func.min(database.SpotifyHistory.played_at),
-            func.max(database.SpotifyHistory.played_at).where(database.SpotifyHistory.track_uri == track_uri))
+            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.track_uri == track_uri)
         result = self.session.execute(stmt).fetchone()
         return result
 
