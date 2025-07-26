@@ -47,7 +47,7 @@ class SpotifySaver:
         # TODO: use after
         recently_played = self.spotify.playback_recently_played()
         logger.debug('after %s, before %s', recently_played.cursors.after, recently_played.cursors.before)
-        recent_played_items = list(self.spotify.all_items(recently_played).reverse())
+        recent_played_items = list(self.spotify.all_items(recently_played)).reverse()
         logger.debug('found %s recently played items', len(recent_played_items))
 
         with self.db.session_scope() as session:
