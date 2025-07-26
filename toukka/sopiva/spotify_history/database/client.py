@@ -12,7 +12,7 @@ from toukka.sopiva.spotify_database.database import first as database
 class SpotifyHistory:
     def __init__(self):
         self.db = database.SpotifyDB()
-        self.session = self.db.session()
+        self.session = self.db.Session()
 
     def count_by_track_uri(self, track_uri):
         return self.session.query(database.SpotifyHistory).filter(database.SpotifyHistory.track_uri == track_uri).count()
