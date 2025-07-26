@@ -50,7 +50,13 @@ class SpotifySaver:
             logger.debug('no recently played items found')
             return
 
-        logger.debug('after %s, before %s', recently_played.cursors.after, recently_played.cursors.before)
+        if recently_played.cursors is not None:
+            logger.debug('after %s, before %s', recently_played.cursors.after, recently_played.cursors.before)
+            after = recently_played.cursors.after
+        else:
+            logger.debug('no cursors found in recently played')
+            after = None
+
         recent_played_items = list(reversed(recently_played.items))
         logger.debug('found %s recently played items', len(recent_played_items))
 
@@ -72,6 +78,6 @@ class SpotifySaver:
             session.commit()
             logger.debug('committed recently played items') 
 
-        self._after = recently_played.cursors.after
+        self._after = after
 
 # END
