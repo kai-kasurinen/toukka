@@ -8,6 +8,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 
+from toukka.sopiva.spotify_database.util import get_database_uri_from_config
+
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -50,7 +52,8 @@ class SpotifyBannedWord(Base):
 
 
 class SpotifyDB:
-    def __init__(self, database_uri):
+    def __init__(self, database_uri=None):
+        self._database_uri = database_uri or get_database_uri_from_config()
         self.engine = create_engine(database_uri, echo=False, pool_pre_ping=True)
         self.Session = sessionmaker(bind=self.engine)
         self._create()
