@@ -1,12 +1,16 @@
 #
 
-from sqlalchemy.sql import func
+import collections
+
+
+Åfrom sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import exists
 
 
 from toukka.sopiva.spotify_database.database import first as database
 
+ItemStats_ = collections.namedtuple('ItemStats_', ['count', 'min', 'max'])
 
 
 class SpotifyHistory:
@@ -23,14 +27,13 @@ class SpotifyHistory:
     def count_by_artist_name(self, artist_name):
         # TODO: implement this method
         return 0
-
     def count_by_track_isrc(self, isrc):
         # TODO: implement this method
         return 0
 
     def count_by_artist_name_with_timestamps(self, artist_name):
         # TODO: implement this method
-        pass
+        return ItemStats_(count=0, min=None, max=None)
 
     def count_by_track_uri_with_timestamps(self, track_uri):
         stmt = select(
