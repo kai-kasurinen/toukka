@@ -18,7 +18,7 @@ class SpotifyHistory(Base):
     __tablename__ = "spotify_history"
     id = Column(Integer, primary_key=True)
     played_at = Column(DateTime(timezone=True), nullable=False, index=True)
-    track_id = Column(String, nullable=False, index=True)
+    track_uri = Column(String, nullable=False, index=True)
     meta = Column(JSON, nullable=True)
 
 
