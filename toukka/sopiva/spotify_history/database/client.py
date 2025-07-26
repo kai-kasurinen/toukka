@@ -3,7 +3,7 @@
 import collections
 
 
-Åfrom sqlalchemy.sql import func
+from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import exists
 
