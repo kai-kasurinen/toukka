@@ -4,7 +4,6 @@ import logging
 import time
 
 import click
-from requests import session
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_database.database import first as database
