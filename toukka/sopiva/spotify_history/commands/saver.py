@@ -55,13 +55,13 @@ class SpotifySaver:
         with self.db.session_scope() as session:
 
             for item in recent_played_items:
-                logger.debug('recently played: %s', item)
+                logger.debug('recently played: %s', item.id)
 
                 exists = session.query(database.SpotifyHistory).filter_by(played_at=item.played_at, track_id=item.track.id).first()
 
                 if exists is None:
                     logger.debug('newly played: %s', item)
-                    session.add(database.SpotifyHistory(played_at=item.played_at, track_id=item.track.id, meta=item.track))
+                    session.add(database.SpotifyHistory(played_at=item.played_at, track_id=item.track.id))
 
             session.commit()
             logger.debug('committed recently played items') 
