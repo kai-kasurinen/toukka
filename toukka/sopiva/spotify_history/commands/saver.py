@@ -60,7 +60,7 @@ class SpotifySaver:
                 exists = session.query(database.SpotifyHistory).filter_by(played_at=item.played_at, track_id=item.track.id).first()
 
                 if exists is None:
-                    logger.debug('newly played: %s', item)
+                    logger.debug('newly played: %s', item.track.id)
                     session.add(database.SpotifyHistory(played_at=item.played_at, track_id=item.track.id))
 
             session.commit()
