@@ -55,7 +55,7 @@ class SpotifySaver:
             after = recently_played.cursors.after
         else:
             logger.debug('no cursors found in recently played')
-            after = None
+            after = self._after
 
         recent_played_items = list(reversed(recently_played.items))
         logger.debug('found %s recently played items', len(recent_played_items))
