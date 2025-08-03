@@ -20,11 +20,12 @@ def get_client():
 
         cache_file = os.path.join(save_cache_path('toukka'), 'hishel.sqlite')
 
-        storage = hishel.SQLiteStorage(connection=sqlite3.connect(cache_file, timeout=30), ttl=None)
+        storage = hishel.SQLiteStorage(connection=sqlite3.connect(cache_file, timeout=5), ttl=WEEK)
 
         transport_http = httpx.HTTPTransport(retries=3)
         transport_cache = hishel.CacheTransport(transport=transport_http, storage=storage)
 
         return httpx.Client(transport=transport_cache, http2=True, timeout=60.0)
+
 
 # END
