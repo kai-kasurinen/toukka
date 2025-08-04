@@ -12,7 +12,7 @@ from toukka.sopiva.spotify_database.database import first as database
 from ..cli import cli_root
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 @cli_root.command()
 def saver():
