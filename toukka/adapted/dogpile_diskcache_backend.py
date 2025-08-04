@@ -26,7 +26,7 @@ class FanoutCacheBackend(CacheBackend):
             timeout=10,
             statistics=True,
             shards=32,                 # default 8
-            size_limit=2**30*20,       # 1073741824 * 20
+            size_limit=2**30*5,       # 1073741824 * 5
             disk_min_file_size=2**20)  # 1048576
 
     def get(self, key):
