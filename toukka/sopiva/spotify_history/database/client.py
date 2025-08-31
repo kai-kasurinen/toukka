@@ -8,6 +8,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import exists
 
+
 from toukka.sopiva.spotify_database.database import first as database
 
 
@@ -37,7 +38,7 @@ class SpotifyHistory:
         stmt = select(
             func.count(database.SpotifyHistory.track_uri),
             func.min(database.SpotifyHistory.played_at),
-            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.contains({"artists": [{"name": artist_name}]}))
+            func.max(database.SpotifyHistory.played_at)).where(SpotifyHistory.meta.op('@>')(bindparam('value'))).params(value={'artists': [{'name': artist_name}]})
         result = self.session.execute(stmt).fetchone()
         return result
 
@@ -45,7 +46,7 @@ class SpotifyHistory:
         stmt = select(
             func.count(database.SpotifyHistory.track_uri),
             func.min(database.SpotifyHistory.played_at),
-            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.contains({"artists": [{"uri": artist_uri}]}))
+            func.max(database.SpotifyHistory.played_at)).where(SpotifyHistory.meta.op('@>')(bindparam('value'))).params(value={'artists': [{'uri': artist_uri}]})
         result = self.session.execute(stmt).fetchone()
         return result
 
