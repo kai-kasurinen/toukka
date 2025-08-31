@@ -24,9 +24,13 @@ class SpotifyHistory:
         return self.count_by_track_uri(track_id)
 
     def count_by_artist_name(self, artist_name):
-        # TODO: implement this method
-        return 0
+        stmt = select(func.count(database.SpotifyHistory.id)).where(SpotifyHistory.meta.contains({"artists": [{"name": artist_name}]}))
+        return self.session.execute(stmt).scalar()
     
+    def count_by_artist_uri(self, artist_uri):
+        stmt = select(func.count(database.SpotifyHistory.id)).where(SpotifyHistory.meta.contains({"artists": [{"uri": artist_uri}]}))
+        return self.session.execute(stmt).scalar()
+
     def count_by_track_isrc(self, isrc):
         return self.session.query(func.count(database.SpotifyHistory.id)).filter(database.SpotifyHistory.meta['external_ids']['isrc'].as_string() == isrc).scalar()
     
