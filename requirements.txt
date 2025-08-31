@@ -11,9 +11,6 @@ psycopg2
 # python3-httpx, python3-h2
 httpx
 h2
-# python3-cachecontrol (?)
-# TODO: remove
-cachecontrol
 # python3-enlighten
 enlighten
 # python3-validators (for click_params)
@@ -29,7 +26,7 @@ langdetect
 # python3-cachecontrol
 # TODO: remove
 cachecontrol
-# python3-redi
+# python3-redis
 # TODO: remove
 redis
 # python3-diskcache
@@ -48,7 +45,7 @@ humanize
 iso8601
 # python3-networkx
 networkx
-#
+# ipython3
 ipython
 
 # click extensions
