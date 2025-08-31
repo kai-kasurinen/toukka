@@ -3,6 +3,8 @@
 confuse
 # python3-click
 click
+# python3-argh
+argh
 # python3-sqlitedict
 sqlitedict
 # python3-sqlalchemy, python3-psycopg2
