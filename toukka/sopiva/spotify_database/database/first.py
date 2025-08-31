@@ -25,6 +25,7 @@ class SpotifyHistory(Base):
     played_at = Column(DateTime(timezone=True), nullable=False, index=True)
     track_uri = Column(String, nullable=False, index=True)
     meta = Column(JSONVariant, nullable=True)
+    # CREATE INDEX idx_meta_gin ON spotify_history USING GIN (meta);
 
 
 class SpotifyTrackISRC(Base):
