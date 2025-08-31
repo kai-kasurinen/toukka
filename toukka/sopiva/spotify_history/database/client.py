@@ -33,15 +33,14 @@ class SpotifyHistory:
 
     def count_by_track_isrc(self, isrc):
         return self.session.query(func.count(database.SpotifyHistory.id)).filter(database.SpotifyHistory.meta['external_ids']['isrc'].as_string() == isrc).scalar()
-    
+
     def count_by_artist_name_with_timestamps(self, artist_name):
-        # FIXME: use contains() and not op('@>')
         stmt = select(
             func.count(database.SpotifyHistory.track_uri),
             func.min(database.SpotifyHistory.played_at),
-            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.op('@>')(bindparam('value'))).params(value={'artists': [{'name': artist_name}]})
+            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.contains({"artists": [{"name": artist_name}]}))
         result = self.session.execute(stmt).fetchone()
-        return result
+        return result 
 
     def count_by_artist_uri_with_timestamps(self, artist_uri):
         stmt = select(
