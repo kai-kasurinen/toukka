@@ -35,8 +35,20 @@ class SpotifyHistory:
         return self.session.query(func.count(database.SpotifyHistory.id)).filter(database.SpotifyHistory.meta['external_ids']['isrc'].as_string() == isrc).scalar()
     
     def count_by_artist_name_with_timestamps(self, artist_name):
-        # TODO: implement this method
-        return ItemStats_(count=0, min=None, max=None)
+        stmt = select(
+            func.count(database.SpotifyHistory.track_uri),
+            func.min(database.SpotifyHistory.played_at),
+            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.contains({"artists": [{"name": artist_name}]}))
+        result = self.session.execute(stmt).fetchone()
+        return result
+
+    def count_by_artist_uri_with_timestamps(self, artist_uri):
+        stmt = select(
+            func.count(database.SpotifyHistory.track_uri),
+            func.min(database.SpotifyHistory.played_at),
+            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.contains({"artists": [{"uri": artist_uri}]}))
+        result = self.session.execute(stmt).fetchone()
+        return result
 
     def count_by_track_uri_with_timestamps(self, track_uri):
         stmt = select(
