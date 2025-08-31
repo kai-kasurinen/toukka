@@ -49,6 +49,8 @@ iso8601
 networkx
 # ipython3
 ipython
+# python3-deprecated
+deprecated
 
 # click extensions
 click_params
