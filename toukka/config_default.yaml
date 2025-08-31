@@ -11,4 +11,4 @@ spotify_manager:
 
 
 spotify_database:
-    database_uri: 'sqlite://:memory:'
+    database_uri: 'sqlite:///:memory:'
