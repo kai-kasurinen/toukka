@@ -4,9 +4,11 @@ from contextlib import contextmanager
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, Text, DateTime, String, JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
+
 
 from toukka.sopiva.spotify_database.util import get_database_uri_from_config
 
@@ -14,12 +16,15 @@ from toukka.sopiva.spotify_database.util import get_database_uri_from_config
 Base = declarative_base()
 metadata = Base.metadata
 
+JSONVariant = JSON().with_variant(JSONB(), "postgresql")
+
+
 class SpotifyHistory(Base):
     __tablename__ = "spotify_history"
     id = Column(Integer, primary_key=True)
     played_at = Column(DateTime(timezone=True), nullable=False, index=True)
     track_uri = Column(String, nullable=False, index=True)
-    meta = Column(JSON, nullable=True)
+    meta = Column(JSONVariant, nullable=True)
 
 
 class SpotifyTrackISRC(Base):
