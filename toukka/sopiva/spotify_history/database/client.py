@@ -12,25 +12,24 @@ from toukka.sopiva.spotify_database.database import first as database
 
 ItemStats_ = collections.namedtuple('ItemStats_', ['count', 'min', 'max'])
 
-
 class SpotifyHistory:
     def __init__(self):
         self.db = database.SpotifyDB()
         self.session = self.db.Session()
 
     def count_by_track_uri(self, track_uri):
-        return self.session.query(database.SpotifyHistory).filter(database.SpotifyHistory.track_uri == track_uri).count()
-
+        return self.session.query(func.count(database.SpotifyHistory.id)).filter(database.SpotifyHistory.track_uri == track_uri).scalar()
+ 
     def count_by_track_id(self, track_id):
         return self.count_by_track_uri(track_id)
 
     def count_by_artist_name(self, artist_name):
         # TODO: implement this method
         return 0
+    
     def count_by_track_isrc(self, isrc):
-        # TODO: implement this method
-        return 0
-
+        return self.session.query(func.count(database.SpotifyHistory.id)).filter(database.SpotifyHistory.meta['external_ids']['isrc'].as_string() == isrc).scalar()
+    
     def count_by_artist_name_with_timestamps(self, artist_name):
         # TODO: implement this method
         return ItemStats_(count=0, min=None, max=None)
@@ -47,7 +46,13 @@ class SpotifyHistory:
         return self.count_by_track_uri_with_timestamps(track_id)
 
     def count_by_track_isrc_with_timestamps(self, isrc):
-        return ItemStats_(count=0, min=None, max=None)
+        stmt = select(
+            func.count(database.SpotifyHistory.track_uri),
+            func.min(database.SpotifyHistory.played_at),
+            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta['external_ids']['isrc'].as_string() == isrc)
+        result = self.session.execute(stmt).fetchone()
+        return result
+
 
     def is_track_in_history(self, track_id):
         pass
