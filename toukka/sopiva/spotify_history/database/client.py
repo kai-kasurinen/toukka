@@ -8,8 +8,6 @@ from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import exists
 
-from sqlalchemy.dialects.postgresql import JSONB
-
 from toukka.sopiva.spotify_database.database import first as database
 
 
