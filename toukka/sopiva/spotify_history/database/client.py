@@ -7,6 +7,7 @@ from sqlalchemy import bindparam
 from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import exists
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 from toukka.sopiva.spotify_database.database import first as database
@@ -38,7 +39,7 @@ class SpotifyHistory:
         stmt = select(
             func.count(database.SpotifyHistory.track_uri),
             func.min(database.SpotifyHistory.played_at),
-            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.contains({"artists": [{"name": artist_name}]}))
+            func.max(database.SpotifyHistory.played_at)).where(database.SpotifyHistory.meta.cast(JSONB).contains({"artists": [{"name": artist_name}]}))
         result = self.session.execute(stmt).fetchone()
         return result 
 
