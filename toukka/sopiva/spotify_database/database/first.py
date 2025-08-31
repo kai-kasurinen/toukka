@@ -8,7 +8,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
-from sqlalchemy.types import TypeDecorator
 
 
 from toukka.sopiva.spotify_database.util import get_database_uri_from_config
@@ -17,13 +16,8 @@ from toukka.sopiva.spotify_database.util import get_database_uri_from_config
 Base = declarative_base()
 metadata = Base.metadata
 
-class JSONVariant(TypeDecorator):
-    impl = JSON
-    
-    def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql':
-            return dialect.type_descriptor(JSONB())
-        return dialect.type_descriptor(JSON())
+
+JSONVariant = JSON().with_variant(JSONB(), "postgresql")
 
 
 class SpotifyHistory(Base):
