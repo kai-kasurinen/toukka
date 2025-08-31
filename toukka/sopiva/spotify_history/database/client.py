@@ -7,6 +7,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import exists
 
+from sqlalchemy.dialects.postgresql import JSONB
 
 from toukka.sopiva.spotify_database.database import first as database
 
@@ -23,11 +24,11 @@ class SpotifyHistory:
         return self.count_by_track_uri(track_id)
 
     def count_by_artist_name(self, artist_name):
-        stmt = select(func.count(database.SpotifyHistory.id)).where(SpotifyHistory.meta.contains({"artists": [{"name": artist_name}]}))
+        stmt = select(func.count(database.SpotifyHistory.id)).where(SpotifyHistory.meta.cast(JSONB).contains({"artists": [{"name": artist_name}]}))
         return self.session.execute(stmt).scalar()
     
     def count_by_artist_uri(self, artist_uri):
-        stmt = select(func.count(database.SpotifyHistory.id)).where(SpotifyHistory.meta.contains({"artists": [{"uri": artist_uri}]}))
+        stmt = select(func.count(database.SpotifyHistory.id)).where(SpotifyHistory.meta.cast(JSONB).contains({"artists": [{"uri": artist_uri}]}))
         return self.session.execute(stmt).scalar()
 
     def count_by_track_isrc(self, isrc):
