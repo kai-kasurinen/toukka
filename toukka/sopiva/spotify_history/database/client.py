@@ -10,7 +10,6 @@ from sqlalchemy.sql import exists
 
 from toukka.sopiva.spotify_database.database import first as database
 
-ItemStats_ = collections.namedtuple('ItemStats_', ['count', 'min', 'max'])
 
 class SpotifyHistory:
     def __init__(self):
