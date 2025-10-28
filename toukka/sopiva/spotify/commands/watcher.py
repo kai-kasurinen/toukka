@@ -49,7 +49,7 @@ class SpotifyMonitor:
             self.on_post_loop()
 
     def check_playback(self):
-        logger.debug('checking playback')
+        logger.info('checking playback')
         self._current_playback = self.spotify.playback()
 
         if self._current_playback is None and self._last_playback is None:
