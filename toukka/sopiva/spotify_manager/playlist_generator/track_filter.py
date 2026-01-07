@@ -106,6 +106,9 @@ class TrackFilter:
         # relinked track may be totally different
         track_relinked = self.spotify.track_cached(track.id, market=self.user_country)
 
+        # HACK: spotify api returns mixed data when track is relinked
+        track_relinked = self.spotify.track_cached(track_relinked.id, market=self.user_country)
+
         # is relinked ... (do it better)
         if track.id != track_relinked.id:
             relinked = True
