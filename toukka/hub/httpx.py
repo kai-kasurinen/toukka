@@ -6,6 +6,7 @@ import os
 import sqlite3
 import httpx
 import hishel
+import hishel.httpx
 
 from xdg.BaseDirectory import save_cache_path
 
@@ -20,10 +21,10 @@ def get_client():
 
         cache_file = os.path.join(save_cache_path('toukka'), 'hishel.sqlite')
 
-        storage = hishel.SQLiteStorage(connection=sqlite3.connect(cache_file, timeout=30), ttl=WEEK)
+        storage = hishel.SyncSqliteStorage(connection=sqlite3.connect(cache_file, timeout=30), default_ttl=WEEK)
 
         transport_http = httpx.HTTPTransport(retries=3)
-        transport_cache = hishel.CacheTransport(transport=transport_http, storage=storage)
+        transport_cache = hishel.httpx.SyncCacheTransport(next_transport=transport_http, storage=storage)
 
         return httpx.Client(transport=transport_cache, http2=True, timeout=60.0)
 
