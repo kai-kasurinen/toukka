@@ -5,8 +5,8 @@ import itertools
 import functools
 import operator
 
-import langdetect
-from langdetect.lang_detect_exception import LangDetectException
+# import langdetect
+# from langdetect.lang_detect_exception import LangDetectException
 
 from toukka.sopiva.spotify.util import get_spotify
 from toukka.sopiva.spotify_history.util import get_spotify_history

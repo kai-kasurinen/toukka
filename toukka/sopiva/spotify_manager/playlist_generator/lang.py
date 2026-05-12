@@ -5,8 +5,8 @@ import logging
 
 from xdg.BaseDirectory import save_cache_path
 
-import langdetect
-from langdetect.lang_detect_exception import LangDetectException
+# import langdetect
+# from langdetect.lang_detect_exception import LangDetectException
 
 os.environ['FTLANG_CACHE'] = save_cache_path('toukka', 'fasttext-langdetect')
 
